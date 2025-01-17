@@ -1,10 +1,10 @@
 #include "Object3DNode.h"
 
+#include "Engine/Module/Render/RenderTargetGroup/SingleRenderTarget.h"
+#include "Engine/Rendering/DirectX/DirectXResourceObject/DepthStencil/DepthStencil.h"
+#include "Engine/Rendering/DirectX/DirectXResourceObject/OffscreenRender/OffscreenRender.h"
 #include "Engine/Rendering/DirectX/PipelineState/PipelineState.h"
 #include "Engine/Rendering/DirectX/PipelineState/PSOBuilder/PSOBuilder.h"
-#include "Engine/Module/Render/RenderTargetGroup/SingleRenderTarget.h"
-#include "Engine/Rendering/DirectX/DirectXResourceObject/OffscreenRender/OffscreenRender.h"
-#include "Engine/Rendering/DirectX/DirectXResourceObject/DepthStencil/DepthStencil.h"
 
 #include "Engine/Rendering/RenderingSystemValues.h"
 
@@ -22,14 +22,14 @@ void Object3DNode::set_render_target(const std::shared_ptr<SingleRenderTarget>& 
 	if (renderTarget_) {
 		renderTarget = renderTarget_;
 		resultSvtHandle = renderTarget_->offscreen_render().texture_gpu_handle();
-		renderTarget_->offscreen_render().set_claer_color(RenderingSystemValues::DEFAULT_CLEAR_COLOR);
+		renderTarget_->offscreen_render().set_clear_color(RenderingSystemValues::DEFAULT_CLEAR_COLOR);
 	}
 	else {
 		auto temp = std::make_shared<SingleRenderTarget>();
 		renderTarget = temp;
 		renderTarget->initialize();
 		resultSvtHandle = temp->offscreen_render().texture_gpu_handle();
-		temp->offscreen_render().set_claer_color(RenderingSystemValues::DEFAULT_CLEAR_COLOR);
+		temp->offscreen_render().set_clear_color(RenderingSystemValues::DEFAULT_CLEAR_COLOR);
 	}
 }
 
@@ -51,8 +51,8 @@ void Object3DNode::create_pipeline_state() {
 	inputLayoutBuilder.add_element("TEXCOORD", 0, DXGI_FORMAT_R32G32_FLOAT);
 	inputLayoutBuilder.add_element("NORMAL", 0, DXGI_FORMAT_R32G32B32_FLOAT);
 
-	ShaderBuilder shaderManager;
-	shaderManager.initialize(
+	ShaderBuilder shaderBuilder;
+	shaderBuilder.initialize(
 		"EngineResources/HLSL/3DObject/Object3d.VS.hlsl",
 		"EngineResources/HLSL/3DObject/Object3d.PS.hlsl"
 	);
@@ -63,7 +63,7 @@ void Object3DNode::create_pipeline_state() {
 	psoBuilder->inputlayout(inputLayoutBuilder.build());
 	psoBuilder->rasterizerstate();
 	psoBuilder->rootsignature(rootSignatureBuilder.build());
-	psoBuilder->shaders(shaderManager);
+	psoBuilder->shaders(shaderBuilder);
 	psoBuilder->primitivetopologytype();
 	psoBuilder->rendertarget();
 

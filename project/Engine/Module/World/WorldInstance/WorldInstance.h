@@ -2,12 +2,13 @@
 
 #include "Library/Math/Transform3D.h"
 #include "Library/Math/Hierarchy.h"
+#include "Library/Math/Affine.h"
 
 #include <Engine/Resources/Json/JsonResource.h>
 
 class WorldInstance {
 public:
-	WorldInstance() = default;
+	WorldInstance();
 	virtual ~WorldInstance() = default;
 
 	WorldInstance(const WorldInstance&) = delete;
@@ -17,14 +18,9 @@ public:
 
 public:
 	/// <summary>
-	/// 初期化処理
-	/// </summary>
-	virtual void initialize();
-
-	/// <summary>
 	/// 行列の更新
 	/// </summary>
-	void update_matrix();
+	void update_affine();
 
 	/// <summary>
 	/// Targetの方向を向く
@@ -45,7 +41,7 @@ private:
 	/// WorldMatrixの作成
 	/// </summary>
 	/// <returns></returns>
-	Matrix4x4 create_world_matrix() const;
+	Affine create_world_affine() const;
 
 public:
 	/// <summary>
@@ -80,19 +76,19 @@ public:
 	/// Hierarchyの親アドレスの取得
 	/// </summary>
 	/// <returns>存在しなければnullptr</returns>
-	const WorldInstance* get_parent_address() const { return hierarchy.get_parent_address(); };
+	const Reference<const WorldInstance>& get_parent_address() const { return hierarchy.get_parent(); };
 
 	/// <summary>
 	/// World行列の取得
 	/// </summary>
 	/// <returns></returns>
-	const Matrix4x4& world_matrix() const { return worldMatrix; };
+	const Affine& world_affine() const { return affine; };
 
 	/// <summary>
 	/// WorldPositionの取得
 	/// </summary>
 	/// <returns></returns>
-	Vector3 world_position() const { return Transform3D::ExtractPosition(worldMatrix); };
+	Vector3 world_position() const { return affine.get_origin(); };
 
 	/// <summary>
 	/// 親子付け
@@ -114,7 +110,7 @@ protected:
 	Hierarchy hierarchy{}; // Hierarchy
 
 private:
-	Matrix4x4 worldMatrix = CMatrix4x4::IDENTITY;
+	Affine affine;
 
 protected:
 	bool isActive = true;

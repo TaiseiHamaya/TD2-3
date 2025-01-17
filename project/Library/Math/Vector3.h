@@ -19,9 +19,15 @@ public:
 
 public:
 	// ------------------基礎構造------------------
-	float x; // X座標
-	float y; // Y座標
-	float z; // Z座標
+	union {
+		struct {
+			float x; // X座標
+			float y; // Y座標
+			float z; // Z座標
+		};
+
+		float xyz[3];
+	};
 
 public:
 	// ------------------operator------------------
@@ -39,6 +45,8 @@ public:
 	inline constexpr Vector3& operator/=(float times) noexcept;
 	inline constexpr bool operator==(const Vector3& opr) const noexcept;
 	inline constexpr bool operator!=(const Vector3& opr) const noexcept;
+	inline constexpr const float& operator[](size_t i) const;
+	inline constexpr float& operator[](size_t i);
 
 
 public:
@@ -141,9 +149,9 @@ public:
 	/// <param name="to">終点の位置ベクトル</param>
 	/// <param name="t">割合T</param>
 	/// </summary>
-	static constexpr const Vector3 Lerp(const Vector3& from, const Vector3& to, const float& t) noexcept;
+	static constexpr const Vector3 Lerp(const Vector3& from, const Vector3& to, float t) noexcept;
 
-	static constexpr const Vector3 Lerp(const Vector3& from, const Vector3& to, const Vector3& t) noexcept;
+	static constexpr const Vector3 LerpElement(const Vector3& from, const Vector3& to, const Vector3& t) noexcept;
 
 	/// <summary>
 	/// 2次ベジエ曲線
@@ -270,6 +278,14 @@ inline constexpr bool Vector3::operator!=(const Vector3& opr) const noexcept {
 	return !(*this == opr);
 }
 
+inline constexpr const float& Vector3::operator[](size_t i) const {
+	return xyz[i];
+}
+
+inline constexpr float& Vector3::operator[](size_t i) {
+	return xyz[i];
+}
+
 constexpr float Vector3::DotProduct(const Vector3& input1, const Vector3& input2) noexcept {
 	return input1.x * input2.x + input1.y * input2.y + input1.z * input2.z;
 }
@@ -298,11 +314,11 @@ constexpr const Vector3 Vector3::Multiply(const Vector3& vector, const Vector3& 
 	return Vector3{ vector.x * times.x, vector.y * times.y, vector.z * times.z };
 }
 
-constexpr const Vector3 Vector3::Lerp(const Vector3& from, const Vector3& to, const float& t) noexcept {
+constexpr const Vector3 Vector3::Lerp(const Vector3& from, const Vector3& to, float t) noexcept {
 	return from * (1 - t) + to * t;
 }
 
-inline constexpr const Vector3 Vector3::Lerp(const Vector3& from, const Vector3& to, const Vector3& t) noexcept {
+inline constexpr const Vector3 Vector3::LerpElement(const Vector3& from, const Vector3& to, const Vector3& t) noexcept {
 	return {
 		from.x * (1 - t.x) + to.x * t.x,
 		from.y * (1 - t.y) + to.y * t.y,
