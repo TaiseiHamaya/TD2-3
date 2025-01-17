@@ -85,15 +85,15 @@ void WinApp::Initialize(DWORD windowConfig) {
 	ImGuiManager::Initialize();
 #endif // _DEBUG
 	// システム使用のオブジェクトをロード
-	PolygonMeshManager::RegisterLoadQue("./EngineResources/Models/ErrorObject", "ErrorObject.obj");
-	PolygonMeshManager::RegisterLoadQue("./EngineResources/Models/Frustum", "Frustum.obj");
-	PolygonMeshManager::RegisterLoadQue("./EngineResources/Models", "Grid.obj");
-	PolygonMeshManager::RegisterLoadQue("./EngineResources/Models/Camera", "CameraAxis.obj");
+	PolygonMeshManager::RegisterLoadQue("./EngineResources/Models/ErrorObject/ErrorObject.obj");
+	PolygonMeshManager::RegisterLoadQue("./EngineResources/Models/Frustum/Frustum.obj");
+	PolygonMeshManager::RegisterLoadQue("./EngineResources/Models/Grid/Grid.obj");
+	PolygonMeshManager::RegisterLoadQue("./EngineResources/Models/Camera/CameraAxis.obj");
 
 	// 待機
 	BackgroundLoader::WaitEndExecute();
 
-	Console("Complite initialize application.\n");
+	Console("Complete initialize application.\n");
 }
 
 void WinApp::BeginFrame() {
@@ -141,8 +141,12 @@ void WinApp::Finalize() {
 	// COMの終了
 	CoUninitialize();
 	instance.reset();
-	// App
-	Console("Complite finalize application.\n");
+
+	// ログ
+	Console("Complete finalize application.\n");
+
+	// chrono内のTZDBを削除
+	std::chrono::get_tzdb_list().~tzdb_list();
 }
 
 void WinApp::ShowAppWindow() {

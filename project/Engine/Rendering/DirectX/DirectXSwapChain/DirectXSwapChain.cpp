@@ -14,9 +14,16 @@
 #include "Engine/Rendering/DirectX/DirectXSystemValues.h"
 
 void DirectXSwapChain::Initialize() {
-	GetInstance().create_swapchain();
-	GetInstance().create_render_target();
+	auto& instance = GetInstance();
+	instance.create_swapchain();
+	instance.create_render_target();
 	SetClearColor(RenderingSystemValues::DEFAULT_CLEAR_COLOR);
+}
+
+void DirectXSwapChain::Finalize() {
+	auto& instance = GetInstance();
+	instance.renderTarget.reset();
+	instance.swapChain.Reset();
 }
 
 void DirectXSwapChain::SwapScreen() {
@@ -29,7 +36,7 @@ const std::shared_ptr<SwapChainRenderTargetGroup>& DirectXSwapChain::GetRenderTa
 
 void DirectXSwapChain::SetClearColor(const Color4& color_) noexcept {
 	for (RenderTarget& renderTargetItr : GetInstance().renderTarget->get_render_targets()) {
-		renderTargetItr.set_claer_color(color_);
+		renderTargetItr.set_clear_color(color_);
 	}
 }
 

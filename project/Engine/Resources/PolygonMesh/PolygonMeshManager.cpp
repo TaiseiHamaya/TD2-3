@@ -2,9 +2,11 @@
 
 #include <mutex>
 
-#include "Engine/Resources/PolygonMesh/PolygonMesh.h"
-#include "Engine/Resources/BackgroundLoader/BackgroundLoader.h"
 #include "Engine/Debug/Output.h"
+#include "Engine/Resources/BackgroundLoader/BackgroundLoader.h"
+#include "Engine/Utility/Tools/SmartPointer.h"
+#include "PolygonMesh.h"
+#include "PolygonMeshBuilder.h"
 
 #ifdef _DEBUG
 #include <imgui.h>
@@ -21,23 +23,25 @@ PolygonMeshManager& PolygonMeshManager::GetInstance() noexcept {
 	return instance;
 }
 
-void PolygonMeshManager::RegisterLoadQue(const std::string& directoryPath, const std::string& fileName) {
+void PolygonMeshManager::RegisterLoadQue(const std::filesystem::path& filePath) {
 	// ロード済みの場合は何もしない
-	if (IsRegistered(fileName)) {
+	if (IsRegistered(filePath.filename().string())) {
 		return;
 	}
-	// BackgroundLoaderにLoadPolygonMeshイベントとして転送
-	BackgroundLoader::RegisterLoadQue(LoadEvent::LoadPolygonMesh, directoryPath, fileName);
+	// BackgroundLoaderにイベント送信
+	BackgroundLoader::RegisterLoadQue(
+		eps::CreateUnique<PolygonMeshBuilder>(filePath)
+	);
 }
 
-std::weak_ptr<PolygonMesh> PolygonMeshManager::GetPolygonMesh(const std::string& meshName) {
+std::shared_ptr<const PolygonMesh> PolygonMeshManager::GetPolygonMesh(const std::string& meshName) {
 	std::lock_guard<std::mutex> lock{ meshMutex }; 
 	if (IsRegisteredNonlocking(meshName)) {
 		return GetInstance().meshInstanceList.at(meshName);
 	}
 	else {
 		// 存在しないメッシュを呼び出したらエラー用メッシュを使用する
-		Console("[PolygonMeshManager] Unloading polygon mesh. Name-\'{:}\'\n", meshName);
+		Console("Warning : Unknown polygon mesh. Name-\'{:}\'\n", meshName);
 		return GetInstance().meshInstanceList.at("ErrorObject.obj");
 	}
 }
@@ -49,7 +53,7 @@ bool PolygonMeshManager::IsRegistered(const std::string& meshName) {
 
 void PolygonMeshManager::Transfer(const std::string& name, std::shared_ptr<PolygonMesh>& data) {
 	std::lock_guard<std::mutex> lock{ meshMutex };
-	Console("[PolygonMeshManager] Transfer new PolygonMesh. Name-\'{:}\', Address-\'{:}\'\n", name, (void*)data.get());
+	Console("Transfer new PolygonMesh. Name-\'{:}\', Address-\'{:}\'\n", name, (void*)data.get());
 	GetInstance().meshInstanceList.emplace(name, data);
 }
 

@@ -12,6 +12,7 @@
 #include <Library/Math/Definition.h>
 
 ParticleEmitterInstance::ParticleEmitterInstance(std::filesystem::path jsonFile, uint32_t MaxParticle) :
+	WorldInstance(),
 	numMaxParticle(MaxParticle),
 	jsonResource("Particle" / jsonFile) {
 	drawType = static_cast<ParticleDrawType>(jsonResource.try_emplace<int>("DrawType"));
@@ -65,15 +66,15 @@ void ParticleEmitterInstance::update() {
 }
 
 void ParticleEmitterInstance::begin_rendering() {
-	update_matrix();
+	update_affine();
 	if (!drawSystem) {
 		return;
 	}
 	for (uint32_t index = 0; std::unique_ptr<Particle>&particle : particles) {
-		particle->update_matrix();
+		particle->update_affine();
 		drawSystem->write_to_buffer(
 			index,
-			particle->world_matrix(),
+			particle->world_affine().to_matrix(),
 			particle->create_uv_matrix(),
 			particle->get_color()
 		);
@@ -210,22 +211,19 @@ void ParticleEmitterInstance::emit_once() {
 			world_position() + offset,
 			std::lerp(particleInit.lifetime.min, particleInit.lifetime.max, RandomEngine::Random01Closed()),
 			direction * speed,
-			Vector3::Lerp(particleInit.acceleration.min, particleInit.acceleration.max,
+			Vector3::LerpElement(particleInit.acceleration.min, particleInit.acceleration.max,
 				{ RandomEngine::Random01Closed(), RandomEngine::Random01Closed(), RandomEngine::Random01Closed() }),
-			Color4::Lerp(particleInit.color.min, particleInit.color.max,
+			Color4::LerpElement(particleInit.color.min, particleInit.color.max,
 				{ RandomEngine::Random01Closed(), RandomEngine::Random01Closed(), RandomEngine::Random01Closed(), RandomEngine::Random01Closed() }),
-			Color4::Lerp(particleFinal.color.min, particleFinal.color.max,
+			Color4::LerpElement(particleFinal.color.min, particleFinal.color.max,
 				{ RandomEngine::Random01Closed(), RandomEngine::Random01Closed(), RandomEngine::Random01Closed(), RandomEngine::Random01Closed() }),
-			Vector3::Lerp(particleInit.size.min, particleInit.size.max,
+			Vector3::LerpElement(particleInit.size.min, particleInit.size.max,
 				{ RandomEngine::Random01Closed(), RandomEngine::Random01Closed(), RandomEngine::Random01Closed() }),
-			Vector3::Lerp(particleFinal.size.min, particleFinal.size.max,
+			Vector3::LerpElement(particleFinal.size.min, particleFinal.size.max,
 				{ RandomEngine::Random01Closed(), RandomEngine::Random01Closed(), RandomEngine::Random01Closed() }),
 			particleInit.rotation.mode, rotation
 		)
 	);
-	if (newParticle) {
-		newParticle->initialize();
-	}
 }
 
 bool ParticleEmitterInstance::is_end_all() const {

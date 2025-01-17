@@ -1,10 +1,14 @@
 #include "SceneDemo.h"
 
 #include "CallbackManagerDemo.h"
+#include "Engine/Module/World/AnimatedMesh/AnimatedMeshInstance.h"
 #include "Engine/Module/World/Camera/Camera3D.h"
 #include "Engine/Module/World/Collision/Collider/SphereCollider.h"
+#include "Engine/Module/World/Collision/Collider/AABBCollider.h"
 #include "Engine/Module/World/Collision/CollisionManager.h"
 #include "Engine/Module/World/Mesh/MeshInstance.h"
+#include "Engine/Resources/Animation/NodeAnimation/NodeAnimationManager.h"
+#include "Engine/Resources/Animation/Skeleton/SkeletonManager.h"
 #include "Engine/Resources/PolygonMesh/PolygonMeshManager.h"
 #include "Engine/Runtime/Scene/SceneManager.h"
 #include "Library/Math/Hierarchy.h"
@@ -39,13 +43,19 @@ SceneDemo::SceneDemo() = default;
 SceneDemo::~SceneDemo() = default;
 
 void SceneDemo::load() {
-	PolygonMeshManager::RegisterLoadQue("./EngineResources/Models", "Sphere.obj");
-	AudioManager::RegisterLoadQue("./EngineResources", "Alarm01.wav");
-	AudioManager::RegisterLoadQue("./EngineResources/Texture", "CircularGaugeTexter.png");
+	PolygonMeshManager::RegisterLoadQue("./EngineResources/Models/Primitive/Sphere.obj");
+	PolygonMeshManager::RegisterLoadQue("./EngineResources/Models/Bone/bone.obj");
+	PolygonMeshManager::RegisterLoadQue("./EngineResources/Models/gltf-test/Boss_RangedAttack.gltf");
+	AudioManager::RegisterLoadQue("./EngineResources/Alarm01.wav");
+	AudioManager::RegisterLoadQue("./EngineResources/Texture/CircularGaugeTexter.png");
 	// 存在しないファイルをロードしようとするとエラー出力が出る
-	AudioManager::RegisterLoadQue("./Engine/Resources", "SE_meteoEachOther.wav");
-	PolygonMeshManager::RegisterLoadQue("./Engine/Resources", "SE_meteoEachOther.wav");
-	TextureManager::RegisterLoadQue("./Engine/Resources", "SE_meteoEachOther.wav");
+	AudioManager::RegisterLoadQue("./Engine/Resources/SE_meteoEachOther.wav");
+	PolygonMeshManager::RegisterLoadQue("./Engine/Resources/SE_meteoEachOther.wav");
+	TextureManager::RegisterLoadQue("./Engine/Resources/SE_meteoEachOther.wav");
+
+	PolygonMeshManager::RegisterLoadQue("./EngineResources/Models/Player.gltf");
+	NodeAnimationManager::RegisterLoadQue("./EngineResources/Models/Player.gltf");
+	SkeletonManager::RegisterLoadQue("./EngineResources/Models/Player.gltf");
 }
 
 void SceneDemo::initialize() {
@@ -59,42 +69,44 @@ void SceneDemo::initialize() {
 		});
 	//camera3D->from_json();
 
+	{
+		//animationPlayer.isLoop = true;
+		//animationPlayer.timer = 0;
+		//animationPlayer.animationName = "animation_AnimatedCube";
+		//animationPlayer.nodeName = "AnimatedCube";
+		//animationPlayer.nodeAnimation = nodeAnimationResource;
+	}
 
 	//testValue = jsonResource.try_emplace<WorldInstance>("name");
 	jsonResource.register_value(__JSON_RESOURCE_REGISTER(testValue));
 
 	parent = std::make_unique<MeshInstance>();
-	parent->reset_object("Sphere.obj");
+	parent->reset_mesh("Player.gltf");
 	child = std::make_unique<MeshInstance>();
-	child->reset_object("Sphere.obj");
+	child->reset_mesh("Sphere.obj");
 	child->set_parent(*parent);
 
+	animatedMeshInstance = eps::CreateUnique<AnimatedMeshInstance>("Player.gltf", "Idle", true);
+
 	parentCollider = std::make_unique<SphereCollider>();
-	parentCollider->initialize();
 	parentCollider->set_parent(*parent);
 
 	childCollider = std::make_unique<SphereCollider>();
-	childCollider->initialize();
 	childCollider->set_parent(*child);
 
 	singleCollider = std::make_unique<SphereCollider>();
-	singleCollider->initialize();
 
-	single2Collider = std::make_unique<SphereCollider>();
-	single2Collider->initialize();
+	single2Collider = std::make_unique<AABBCollider>();
 	single2Collider->get_transform().set_translate_x(-3.0f);
 
-	single3Collider = std::make_unique<SphereCollider>();
-	single3Collider->initialize();
+	single3Collider = std::make_unique<AABBCollider>();
 	single3Collider->get_transform().set_translate_x(3.0f);
 
 	particleEmitter = eps::CreateUnique<ParticleEmitterInstance>("test.json", 128);
-	particleEmitter->initialize();
 
 	sprite = std::make_unique<SpriteInstance>("uvChecker.png");
 
 	directionalLight = eps::CreateUnique<DirectionalLightInstance>();
-	directionalLight->initialize();
 
 	collisionManager = std::make_unique<CollisionManager>();
 	collisionManager->set_callback_manager(
@@ -115,32 +127,47 @@ void SceneDemo::initialize() {
 	std::shared_ptr<Object3DNode> object3dNode;
 	object3dNode = std::make_unique<Object3DNode>();
 	object3dNode->initialize();
-	object3dNode->set_render_target(renderTarget);
-	object3dNode->set_config(eps::to_bitflag(RenderNodeConfig::ContinueDrawBefore) | RenderNodeConfig::ContinueUseDpehtBefore);
+	object3dNode->set_render_target_SC(DirectXSwapChain::GetRenderTarget());
+	//object3dNode->set_render_target(renderTarget);
+	object3dNode->set_config(RenderNodeConfig::ContinueDrawBefore | RenderNodeConfig::ContinueUseDpehtBefore);
+	//object3dNode->set_render_target_SC(DirectXSwapChain::GetRenderTarget());
+
+	std::shared_ptr<SkinningMeshNode> skinningMeshNode;
+	skinningMeshNode = std::make_unique<SkinningMeshNode>();
+	skinningMeshNode->initialize();
+	skinningMeshNode->set_render_target_SC(DirectXSwapChain::GetRenderTarget());
+	//skinningMeshNode->set_render_target(renderTarget);
+	skinningMeshNode->set_config(
+		RenderNodeConfig::ContinueDrawBefore |
+		RenderNodeConfig::ContinueUseDpehtBefore |
+		RenderNodeConfig::ContinueDrawAfter |
+		RenderNodeConfig::ContinueUseDpehtAfter
+	);
 	//object3dNode->set_render_target_SC(DirectXSwapChain::GetRenderTarget());
 
 	std::shared_ptr<ParticleMeshNode> particleBillboardNode;
 	particleBillboardNode = std::make_unique<ParticleMeshNode>();
 	particleBillboardNode->initialize();
-	particleBillboardNode->set_render_target(renderTarget);
-	particleBillboardNode->set_config(eps::to_bitflag(RenderNodeConfig::ContinueDrawAfter) | RenderNodeConfig::ContinueUseDpehtAfter);
+	particleBillboardNode->set_config(RenderNodeConfig::ContinueDrawAfter | RenderNodeConfig::ContinueUseDpehtAfter);
+	//particleBillboardNode->set_render_target(renderTarget);
+	particleBillboardNode->set_render_target_SC(DirectXSwapChain::GetRenderTarget());
 
-	outlineNode = std::make_unique<OutlineNode>();
-	outlineNode->initialize();
-	//outlineNode->set_render_target();
-	outlineNode->set_render_target_SC(DirectXSwapChain::GetRenderTarget());
-	outlineNode->set_texture_resource(object3dNode->result_stv_handle());
-	outlineNode->set_depth_resource(DepthStencilValue::depthStencil->texture_gpu_handle());
-	outlineNode->set_config(RenderNodeConfig::ContinueDrawBefore);
+	//outlineNode = std::make_unique<OutlineNode>();
+	//outlineNode->initialize();
+	////outlineNode->set_render_target();
+	//outlineNode->set_render_target_SC(DirectXSwapChain::GetRenderTarget());
+	//outlineNode->set_texture_resource(object3dNode->result_stv_handle());
+	//outlineNode->set_depth_resource(DepthStencilValue::depthStencil->texture_gpu_handle());
+	//outlineNode->set_config(RenderNodeConfig::ContinueDrawBefore);
 
 	std::shared_ptr<SpriteNode> spriteNode;
 	spriteNode = std::make_unique<SpriteNode>();
 	spriteNode->initialize();
-	spriteNode->set_config(eps::to_bitflag(RenderNodeConfig::ContinueDrawAfter) | RenderNodeConfig::ContinueDrawBefore);
+	spriteNode->set_config(RenderNodeConfig::ContinueDrawAfter | RenderNodeConfig::ContinueDrawBefore);
 	spriteNode->set_render_target_SC(DirectXSwapChain::GetRenderTarget());
 
 	renderPath = eps::CreateUnique<RenderPath>();
-	renderPath->initialize({ object3dNode,particleBillboardNode,outlineNode,spriteNode });
+	renderPath->initialize({ object3dNode,skinningMeshNode,particleBillboardNode, spriteNode });
 
 	//DirectXSwapChain::GetRenderTarget()->set_depth_stencil(nullptr);
 	//DirectXSwapChain::SetClearColor(Color4{ 0.0f,0.0f,0.0f,0.0f });
@@ -156,9 +183,24 @@ void SceneDemo::finalize() {
 
 void SceneDemo::begin() {
 	collisionManager->begin();
+	animatedMeshInstance->begin();
 }
 
 void SceneDemo::update() {
+	//animationPlayer.update();
+	//parent->get_transform().set_scale(
+	//	animationPlayer.calculate_scale()
+	//);
+	//parent->get_transform().set_quaternion(
+	//	animationPlayer.calculate_rotate()
+	//);
+	//parent->get_transform().set_translate(
+	//	animationPlayer.calculate_translate()
+	//);
+
+	animatedMeshInstance->update();
+
+
 	particleEmitter->update();
 	directionalLight->update();
 }
@@ -171,6 +213,8 @@ void SceneDemo::begin_rendering() {
 	sprite->begin_rendering();
 	particleEmitter->begin_rendering();
 	directionalLight->begin_rendering();
+
+	animatedMeshInstance->begin_rendering();
 }
 
 void SceneDemo::late_update() {
@@ -189,17 +233,23 @@ void SceneDemo::draw() const {
 #ifdef _DEBUG
 	collisionManager->debug_draw3d();
 	camera3D->debug_draw();
+	animatedMeshInstance->draw_skeleton();
 	DebugValues::ShowGrid();
 #endif // _DEBUG
+
+	renderPath->next();
+	directionalLight->register_world(3);
+	camera3D->register_world(1);
+	animatedMeshInstance->draw();
 
 	renderPath->next();
 	camera3D->register_world(1);
 	particleEmitter->draw();
 
 	renderPath->next();
-	outlineNode->draw();
+	//outlineNode->draw();
 
-	renderPath->next();
+	//renderPath->next();
 	//sprite->draw();
 
 }
@@ -236,6 +286,13 @@ void SceneDemo::debug_update() {
 	camera3D->debug_gui();
 	ImGui::End();
 
+	ImGui::Begin("AnimatedMesh");
+	animatedMeshInstance->debug_gui();
+	if (ImGui::Button("Restart")) {
+		animatedMeshInstance->get_animation()->restart();
+	}
+	ImGui::End();
+
 	ImGui::Begin("Parent");
 	parent->debug_gui();
 	ImGui::End();
@@ -248,25 +305,6 @@ void SceneDemo::debug_update() {
 	sprite->debug_gui();
 	ImGui::End();
 
-	ImGui::Begin("Single");
-	singleCollider->debug_gui();
-	ImGui::End();
-
-	ImGui::Begin("Audio");
-	audioPlayer->debug_gui();
-	if (ImGui::Button("Play")) {
-		audioPlayer->play();
-	}
-	ImGui::SameLine();
-	if (ImGui::Button("Stop")) {
-		audioPlayer->stop();
-	}
-	ImGui::SameLine();
-	if (ImGui::Button("Pause")) {
-		audioPlayer->pause();
-	}
-	ImGui::End();
-
 	AudioManager::DebugGui();
 
 	ImGui::Begin("WorldClock");
@@ -277,23 +315,8 @@ void SceneDemo::debug_update() {
 	collisionManager->debug_gui();
 	ImGui::End();
 
-	ImGui::Begin("Particle");
-	if (ImGui::Button("Emit")) {
-		//particleSystem->emit();
-	}
-	particleEmitter->debug_gui();
-	ImGui::End();
-
 	ImGui::Begin("DirectionalLight");
 	directionalLight->debug_gui();
-	ImGui::End();
-
-	ImGui::Begin("TestImGui");
-	jsonResource.show_imgui();
-	if (ImGui::Button("Save")) {
-		
-		jsonResource.save();
-	}
 	ImGui::End();
 }
 #endif // _DEBUG

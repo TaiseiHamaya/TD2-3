@@ -4,8 +4,10 @@
 
 #include <mutex>
 
+#include "./AudioResource.h"
+#include "./AudioResourceBuilder.h"
 #include "Engine/Resources/BackgroundLoader/BackgroundLoader.h"
-#include "Engine/Resources/Audio/AudioResource.h"
+#include "Engine/Utility/Tools/SmartPointer.h"
 #include "Engine/Debug/Output.h"
 
 std::mutex audioMutex;
@@ -35,11 +37,14 @@ void AudioManager::Finalize() {
 	instance.audioResources.clear();
 }
 
-void AudioManager::RegisterLoadQue(const std::string& filePath, const std::string& audioFile) {
-	if (IsRegistered(audioFile)) {
+void AudioManager::RegisterLoadQue(const std::filesystem::path& filePath) {
+	if (IsRegistered(filePath.filename().string())) {
 		return;
 	}
-	BackgroundLoader::RegisterLoadQue(LoadEvent::LoadAudio, filePath, audioFile);
+	// BackgroundLoaderにイベント送信
+	BackgroundLoader::RegisterLoadQue(
+		eps::CreateUnique<AudioResourceBuilder>(filePath)
+	);
 }
 
 const std::unique_ptr<AudioResource>& AudioManager::GetAudio(const std::string& audioName) {
@@ -49,7 +54,7 @@ const std::unique_ptr<AudioResource>& AudioManager::GetAudio(const std::string& 
 		return GetInstance().audioResources.at(audioName);
 	}
 	else {
-		Console("[AudioManager] Audio Name-\'{:}\' is not loading.\n", audioName);
+		Console("Warning : Audio Name-\'{:}\' is not loading.\n", audioName);
 		return GetInstance().audioResources.at("NULL");
 	}
 }
@@ -69,10 +74,10 @@ void AudioManager::UnloadAudio(const std::string& audioName) {
 void AudioManager::Transfer(const std::string& name, std::unique_ptr<AudioResource>&& data) {
 	std::lock_guard<std::mutex> lock{ audioMutex };
 	if (IsRegisteredNonlocking(name)) {
-		Console("[AudioManager] Transferring registered Audio. Name-\'{:}\', Address-\'{:}\'\n", name, (void*)data.get());
+		Console("Warning : Transferring registered Audio. Name-\'{:}\', Address-\'{:}\'\n", name, (void*)data.get());
 		return;
 	}
-	Console("[AudioManager] Transfer new Audio. Name-\'{:}\', Address-\'{:}\'\n", name, (void*)data.get());
+	Console("Transfer new Audio. Name-\'{:}\', Address-\'{:}\'\n", name, (void*)data.get());
 	GetInstance().audioResources.emplace(name, std::move(data));
 
 }
