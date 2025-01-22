@@ -45,6 +45,7 @@ SceneDemo::~SceneDemo() = default;
 void SceneDemo::load() {
 	PolygonMeshManager::RegisterLoadQue("./EngineResources/Models/Primitive/Sphere.obj");
 	PolygonMeshManager::RegisterLoadQue("./EngineResources/Models/Bone/bone.obj");
+	PolygonMeshManager::RegisterLoadQue("./GameResources/Models/ParentObj/ParentObj.obj");
 	PolygonMeshManager::RegisterLoadQue("./EngineResources/Models/gltf-test/Boss_RangedAttack.gltf");
 	AudioManager::RegisterLoadQue("./EngineResources/Alarm01.wav");
 	AudioManager::RegisterLoadQue("./EngineResources/Texture/CircularGaugeTexter.png");
@@ -85,6 +86,8 @@ void SceneDemo::initialize() {
 	child = std::make_unique<MeshInstance>();
 	child->reset_mesh("Sphere.obj");
 	child->reparent(*parent);
+	debugCheckObj = std::make_unique<MeshInstance>();
+	debugCheckObj->reset_mesh("ParentObj.obj");
 
 	animatedMeshInstance = eps::CreateUnique<AnimatedMeshInstance>("Player.gltf", "Idle", true);
 
@@ -225,6 +228,8 @@ void SceneDemo::begin_rendering() {
 	directionalLight->begin_rendering();
 
 	animatedMeshInstance->begin_rendering();
+
+	debugCheckObj->begin_rendering();
 }
 
 void SceneDemo::late_update() {
@@ -240,6 +245,7 @@ void SceneDemo::draw() const {
 	camera3D->register_world(1);
 	parent->draw();
 	child->draw();
+	debugCheckObj->draw();
 #ifdef _DEBUG
 	camera3D->debug_draw();
 	animatedMeshInstance->draw_skeleton();
@@ -320,6 +326,10 @@ void SceneDemo::debug_update() {
 
 	ImGui::Begin("Sprite");
 	sprite->debug_gui();
+	ImGui::End();
+
+	ImGui::Begin("DebugCheckObj");
+	debugCheckObj->debug_gui();
 	ImGui::End();
 
 	AudioManager::DebugGui();
