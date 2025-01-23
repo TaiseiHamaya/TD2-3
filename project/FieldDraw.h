@@ -15,6 +15,18 @@ public:
 
 private:
 	std::vector < std::unique_ptr<MeshInstance>> block;
-	const int index=10;
+	const int index=49;
+
+	
+
+	int map[7][7] = {
+		{0,0,0,0,0,0,0},
+		{0,1,1,1,1,1,0},
+		{0,0,0,0,0,1,0},
+		{0,0,0,0,1,0,0},
+		{0,0,0,0,1,0,0},
+		{0,0,0,1,0,0,0},
+		{0,0,0,1,0,0,0},
+	};
 };
 

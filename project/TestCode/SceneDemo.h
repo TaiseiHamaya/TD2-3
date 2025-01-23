@@ -68,6 +68,7 @@ private:
 
 	std::unique_ptr<MeshInstance> parent;
 	std::unique_ptr<MeshInstance> child;
+	std::unique_ptr<MeshInstance> debugCheckObj;
 	std::unique_ptr<AnimatedMeshInstance> animatedMeshInstance;
 	std::unique_ptr<SpriteInstance> sprite;
 	std::unique_ptr<DirectionalLightInstance> directionalLight;

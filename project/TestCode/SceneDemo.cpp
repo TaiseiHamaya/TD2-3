@@ -59,6 +59,7 @@ void SceneDemo::load() {
 
 //gameObjectをロード
 	PolygonMeshManager::RegisterLoadQue("./GameResources/Models/RordObj/RordObj.obj");
+	PolygonMeshManager::RegisterLoadQue("./GameResources/Models/ParentObj/ParentObj.obj");
 
 }
 
@@ -91,6 +92,9 @@ void SceneDemo::initialize() {
 	child->reparent(*parent);
 	fieldObjs = std::make_unique<FieldDraw>();
 	fieldObjs->init();
+	debugCheckObj = std::make_unique<MeshInstance>();
+	debugCheckObj->reset_mesh("ParentObj.obj");
+
 	animatedMeshInstance = eps::CreateUnique<AnimatedMeshInstance>("Player.gltf", "Idle", true);
 
 	parentCollider = std::make_unique<SphereCollider>(1.0f);
@@ -232,6 +236,7 @@ void SceneDemo::begin_rendering() {
 	animatedMeshInstance->begin_rendering();
 
 	fieldObjs->begin_rendering();
+	debugCheckObj->begin_rendering();
 }
 
 void SceneDemo::late_update() {
@@ -248,6 +253,7 @@ void SceneDemo::draw() const {
 	//parent->draw();
 	//child->draw();
 	fieldObjs->draw();
+	debugCheckObj->draw();
 #ifdef _DEBUG
 	camera3D->debug_draw();
 	animatedMeshInstance->draw_skeleton();
@@ -328,6 +334,10 @@ void SceneDemo::debug_update() {
 
 	ImGui::Begin("Sprite");
 	sprite->debug_gui();
+	ImGui::End();
+
+	ImGui::Begin("debugCheck");
+	debugCheckObj->debug_gui();
 	ImGui::End();
 
 	AudioManager::DebugGui();

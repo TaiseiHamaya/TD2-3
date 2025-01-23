@@ -14,7 +14,8 @@ void FieldDraw::init(){
 		//bloc = std::make_unique<MeshInstance>();
 		block[i]->reset_mesh("RordObj.obj");
 	}
-	
+
+
 
 }
 
@@ -27,12 +28,22 @@ void FieldDraw::begin_rendering(){
 	}
 }
 
-void FieldDraw::draw(){ 
-	for(int i = 0; i < block.size(); i++)
+void FieldDraw::draw(){
+	int blockNum = 0;//描画するインスタンスの要素番号を定義
+	for(int y = 0; y < 7; y++)
 	{
-		block[i]->get_transform().set_translate_x((float)i*2);
-		block[i]->draw();
+		for(int x = 0; x < 7; x++)
+		{
+
+			if(map[y][x] == 1){
+
+				block[blockNum]->get_transform()
+					.set_translate(Vector3((float)x, 0, 7-(float)y));
+				block[blockNum]->get_transform().set_scale(Vector3(0.5f, 0.5f, 0.5f));
+				block[blockNum]->draw();
+				blockNum++;//要素番号を加算し次のインスタンスで描画出来るようにする
+			}
+		}
 	}
 	
-	
-	 }
+}
