@@ -23,6 +23,7 @@ public:
 	void set_translate(Vector3 translate) { object_->get_transform().set_translate(translate); }
 	// 親子付けする
 	void set_parent(MeshInstance* parent) { object_->reparent(parent); }
+	void unset_parent() { object_->reparent(nullptr); }
 
 private:
 	std::unique_ptr<MeshInstance> object_;

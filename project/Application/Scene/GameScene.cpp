@@ -103,6 +103,7 @@ void GameScene::debug_update()
 	camera3D->debug_gui();
 	ImGui::End();
 
+	playerManager->debug_update();
 }
 #endif // _DEBUG
 
