@@ -1,9 +1,10 @@
 #pragma once
 
 #include <memory>
+#include <vector>
 class MeshInstance;
 class FieldDraw{
-public :
+public:
 	FieldDraw();
 	~FieldDraw();
 
@@ -13,7 +14,7 @@ public:
 	void draw();
 
 private:
-	std::unique_ptr<MeshInstance> block;
-
+	std::vector < std::unique_ptr<MeshInstance>> block;
+	const int index=10;
 };
 
