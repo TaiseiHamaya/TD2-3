@@ -2,6 +2,7 @@
 
 #include "Engine/Runtime/Scene/SceneManager.h"
 #include "TestCode/SceneDemo.h"
+#include "Application/Scene/GameScene.h"
 
 int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 	WinApp::Initialize();
@@ -10,7 +11,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 	WorldClock::IsFixDeltaTime(false);
 #endif // _DEBUG
 
-	SceneManager::Initialize(std::make_unique<SceneDemo>());
+	SceneManager::Initialize(std::make_unique<GameScene>());
 
 	WinApp::ShowAppWindow();
 
