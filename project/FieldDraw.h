@@ -8,11 +8,12 @@ public :
 	~FieldDraw();
 
 public:
-	void Init();
-	void Draw();
+	void init();
+	void begin_rendering();
+	void draw();
 
 private:
-	std::unique_ptr<MeshInstance> parent;
+	std::unique_ptr<MeshInstance> block;
 
 };
 

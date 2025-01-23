@@ -56,6 +56,10 @@ void SceneDemo::load() {
 	PolygonMeshManager::RegisterLoadQue("./EngineResources/Models/Player.gltf");
 	NodeAnimationManager::RegisterLoadQue("./EngineResources/Models/Player.gltf");
 	SkeletonManager::RegisterLoadQue("./EngineResources/Models/Player.gltf");
+
+//gameObjectをロード
+	PolygonMeshManager::RegisterLoadQue("./GameResources/Models/RordObj/RordObj.obj");
+
 }
 
 void SceneDemo::initialize() {
@@ -85,7 +89,8 @@ void SceneDemo::initialize() {
 	child = std::make_unique<MeshInstance>();
 	child->reset_mesh("Sphere.obj");
 	child->reparent(*parent);
-
+	fieldObjs = std::make_unique<FieldDraw>();
+	fieldObjs->init();
 	animatedMeshInstance = eps::CreateUnique<AnimatedMeshInstance>("Player.gltf", "Idle", true);
 
 	parentCollider = std::make_unique<SphereCollider>(1.0f);
@@ -225,6 +230,8 @@ void SceneDemo::begin_rendering() {
 	directionalLight->begin_rendering();
 
 	animatedMeshInstance->begin_rendering();
+
+	fieldObjs->begin_rendering();
 }
 
 void SceneDemo::late_update() {
@@ -238,8 +245,9 @@ void SceneDemo::draw() const {
 	renderPath->begin();
 	directionalLight->register_world(3);
 	camera3D->register_world(1);
-	parent->draw();
-	child->draw();
+	//parent->draw();
+	//child->draw();
+	fieldObjs->draw();
 #ifdef _DEBUG
 	camera3D->debug_draw();
 	animatedMeshInstance->draw_skeleton();
@@ -249,7 +257,7 @@ void SceneDemo::draw() const {
 	renderPath->next();
 	directionalLight->register_world(3);
 	camera3D->register_world(1);
-	animatedMeshInstance->draw();
+	//animatedMeshInstance->draw();
 
 	renderPath->next();
 	camera3D->register_world(1);
@@ -259,7 +267,7 @@ void SceneDemo::draw() const {
 	//outlineNode->draw();
 
 	//renderPath->next();
-	//sprite->draw();
+	sprite->draw();
 
 	renderPath->next();
 
