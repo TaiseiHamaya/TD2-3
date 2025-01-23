@@ -17,6 +17,7 @@ public:
 	void draw() const;
 public:
 	Vector3 get_transform() { return object_->get_transform().get_translate(); }
+	MeshInstance* get_object() { return object_.get(); }
 private:
 	std::unique_ptr<MeshInstance> object_;
 

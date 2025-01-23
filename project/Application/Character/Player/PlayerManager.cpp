@@ -21,8 +21,23 @@ void PlayerManager::update()
 	player->update();
 	child->update();
 
-
-	if (player->get_transform() + {1.0f, 0.0f, 0.0f})
+	// くっつく処理
+	if (player->get_transform().x + 1.0f == child->get_translate().x && player->get_transform().z == child->get_translate().z) {
+		child->set_parent(player->get_object());
+		child->set_translate({ 1.0f, 0.0f, 0.0f });
+	}
+	else if (player->get_transform().x - 1.0f == child->get_translate().x && player->get_transform().z == child->get_translate().z) {
+		child->set_parent(player->get_object());
+		child->set_translate({ -1.0f, 0.0f, 0.0f });
+	}
+	else if (player->get_transform().x == child->get_translate().x && player->get_transform().z + 1.0f == child->get_translate().z) {
+		child->set_parent(player->get_object());
+		child->set_translate({ 0.0f, 0.0f, 1.0f });
+	}
+	else if (player->get_transform().x == child->get_translate().x && player->get_transform().z - 1.0f == child->get_translate().z) {
+		child->set_parent(player->get_object());
+		child->set_translate({ 0.0f, 0.0f, -1.0f });
+	}
 }
 
 void PlayerManager::begin_rendering()

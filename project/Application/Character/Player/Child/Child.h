@@ -17,7 +17,13 @@ public:
 	void draw() const;
 
 public:
-	Vector3 get_transform() { return object_->get_transform().get_translate(); }
+	// 平行移動を取得
+	Vector3 get_translate() { return object_->get_transform().get_translate(); }
+
+	void set_translate(Vector3 translate) { object_->get_transform().set_translate(translate); }
+	// 親子付けする
+	void set_parent(MeshInstance* parent) { object_->reparent(parent); }
+
 private:
 	std::unique_ptr<MeshInstance> object_;
 
