@@ -2,7 +2,7 @@
 #include <memory>
 #include "Engine/Module/World/Mesh/MeshInstance.h"
 
-class Player
+class Child
 {
 public:
 	void load();
@@ -19,8 +19,7 @@ public:
 private:
 	std::unique_ptr<MeshInstance> object_;
 
-	float speed = 1.0f;
-	struct PlayerData {
-		
-	};
+	//float speed = 1.0f;
+
 };
+
