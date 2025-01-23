@@ -6,6 +6,8 @@
 class RenderPath;
 class Camera3D;
 #include "Application/Character/Player/PlayerManager.h"
+#include "Application/ClearUIClass.h"
+
 
 
 class GameScene : public BaseScene
@@ -40,6 +42,7 @@ private:
 	std::unique_ptr<RenderPath> renderPath;
 	// プレイヤーの生成
 	std::unique_ptr<PlayerManager> playerManager;
+	std::unique_ptr<ClearUIClass> clearUI;
 
 	std::unique_ptr<Camera3D> camera3D;
 	std::unique_ptr<DirectionalLightInstance> directionalLight;

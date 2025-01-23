@@ -9,6 +9,8 @@
 #include "Engine/Resources/Animation/Skeleton/SkeletonManager.h"
 #include "Engine/Module/World/Camera/Camera2D.h"
 #include "Engine/Module/World/Camera/Camera3D.h"
+#include "Engine/Resources/Texture/TextureManager.h"
+
 
 GameScene::GameScene() = default;
 
@@ -19,6 +21,8 @@ void GameScene::load()
 	//PolygonMeshManager::RegisterLoadQue("./EngineResources/Models/Primitive/Sphere.obj");
 	PolygonMeshManager::RegisterLoadQue("./GameResources/Models/ParentObj/ParentObj.obj");
 	PolygonMeshManager::RegisterLoadQue("./GameResources/Models/ChildObj/ChildObj.obj");
+	TextureManager::RegisterLoadQue("./GameResources/Texture/ClearTex.png");
+
 }
 
 void GameScene::initialize()
@@ -44,6 +48,9 @@ void GameScene::initialize()
 
 	renderPath = eps::CreateUnique<RenderPath>();
 	renderPath->initialize({object3dNode});
+
+	clearUI = std::make_unique<ClearUIClass>();
+	
 }
 
 void GameScene::popped()
@@ -62,6 +69,7 @@ void GameScene::update()
 {
 	playerManager->update();
 	directionalLight->update();
+	clearUI->update();
 }
 
 void GameScene::begin_rendering()
@@ -70,6 +78,7 @@ void GameScene::begin_rendering()
 
 	camera3D->update_matrix();
 	directionalLight->begin_rendering();
+	clearUI->begin_rendering();
 
 }
 
@@ -86,6 +95,7 @@ void GameScene::draw() const
 	playerManager->draw();
 
 	renderPath->next();
+	clearUI->darw();
 }
 
 #ifdef _DEBUG
