@@ -47,20 +47,20 @@ void MapchipField::draw(){
 			if(curMap[y][x] == 1){
 
 				block[blockNum]->get_transform()
-					.set_translate(Vector3((float)x, 0, culs - (float)y));
+					.set_translate(Vector3((float)x, 0, (float)y));
 				//block[blockNum]->get_transform().set_scale(Vector3(0.5f, 0.5f, 0.5f));
 				block[blockNum]->draw();
 				blockNum++;//要素番号を加算し次のインスタンスで描画出来るようにする
 			} else if(curMap[y][x] == 2){
 				wall[wallNum]->get_transform()
-					.set_translate(Vector3((float)x, 0, culs - (float)y));
+					.set_translate(Vector3((float)x, 0, (float)y));
 				//wall[wallNum]->get_transform().set_scale(Vector3(0.5f, 0.5f, 0.5f));
 				wall[wallNum]->draw();
 				wallNum++;//要素番号を加算し次のインスタンスで描画出来るようにする
 
 			} else if(curMap[y][x] == 3){
 				goal->get_transform()
-					.set_translate(Vector3((float)x, 0, culs - (float)y));
+					.set_translate(Vector3((float)x, 0, (float)y));
 				goal->draw();
 				
 			}

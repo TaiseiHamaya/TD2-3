@@ -20,9 +20,13 @@ public:
 
 	//アクセッサ
 	int getElement(int x, int y){
-		return curMap[culs -y][x];
+		return curMap[y][x];
 	}
 private:
+
+	//メモ　
+	//ステージの左下が0,0右上が7,7
+
 	std::vector < std::unique_ptr<MeshInstance>> block;
 	std::vector < std::unique_ptr<MeshInstance>> wall;
 	 std::unique_ptr<MeshInstance> goal;
