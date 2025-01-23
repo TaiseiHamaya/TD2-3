@@ -17,6 +17,8 @@ void FieldDraw::init(){
 
 	}
 	goal.push_back(std::make_unique<MeshInstance>());
+
+	loadMap(0);
 }
 
 void FieldDraw::begin_rendering(){
@@ -29,22 +31,24 @@ void FieldDraw::begin_rendering(){
 	}
 }
 
+void FieldDraw::update(){}
+
 void FieldDraw::draw(){
 	int blockNum = 0;//描画するインスタンスの要素番号を定義
 	int wallNum = 0;
-	for(int y = 0; y < 7; y++)
+	for(int y = 0; y < culs; y++)
 	{
-		for(int x = 0; x < 7; x++)
+		for(int x = 0; x < rows; x++)
 		{
 
-			if(map[y][x] == 1){
+			if(curMap[y][x] == 1){
 
 				block[blockNum]->get_transform()
-					.set_translate(Vector3((float)x, 0, 7-(float)y));
+					.set_translate(Vector3((float)x, 0, 7 - (float)y));
 				//block[blockNum]->get_transform().set_scale(Vector3(0.5f, 0.5f, 0.5f));
 				block[blockNum]->draw();
 				blockNum++;//要素番号を加算し次のインスタンスで描画出来るようにする
-			} else if(map[y][x] == 2){
+			} else if(curMap[y][x] == 2){
 				wall[wallNum]->get_transform()
 					.set_translate(Vector3((float)x, 0, 7 - (float)y));
 				//wall[wallNum]->get_transform().set_scale(Vector3(0.5f, 0.5f, 0.5f));
@@ -54,5 +58,17 @@ void FieldDraw::draw(){
 			}
 		}
 	}
-	
+
+}
+
+void FieldDraw::loadMap(int stageNum){
+
+
+	for(int y = 0; y < culs; y++)
+	{
+		for(int x = 0; x < rows; x++)
+		{
+			curMap[y][x] = map[stageNum][y][x];
+		}
+	}
 }
