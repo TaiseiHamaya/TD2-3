@@ -20,6 +20,9 @@ void PlayerManager::update()
 {
 	player->update();
 	child->update();
+
+
+	if (player->get_transform() + {1.0f, 0.0f, 0.0f})
 }
 
 void PlayerManager::begin_rendering()

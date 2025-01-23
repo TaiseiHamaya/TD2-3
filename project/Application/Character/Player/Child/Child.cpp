@@ -8,6 +8,7 @@ void Child::initialize()
 {
 	object_ = std::make_unique<MeshInstance>();
 	object_->reset_mesh("ChildObj.obj");
+	object_->get_transform().set_translate({ 4.0f, 1.0f, 2.0f });
 }
 
 void Child::finalize()
