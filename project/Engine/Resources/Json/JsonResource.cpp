@@ -15,8 +15,8 @@ void JsonResource::load(const std::filesystem::path& file) {
 	// 相対ディレクトリで始まる場合
 	if (file.string().starts_with("./")) {
 		filePath = file;
-	}
 	// ファイル名のみor一部ディレクトリの続きの場合
+	}
 	else {
 		filePath = DEFAULT_DIRECTORY / file;
 	}
