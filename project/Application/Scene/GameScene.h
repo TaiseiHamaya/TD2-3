@@ -1,9 +1,10 @@
 #pragma once
 #include "Engine/Runtime/Scene/BaseScene.h"
 #include <memory>
+#include "Engine/Module/World/Light/DirectionalLight/DirectionalLightInstance.h"
 
 class RenderPath;
-
+class Camera3D;
 #include "Application/Character/Player/Player.h"
 
 class GameScene : public BaseScene
@@ -38,5 +39,8 @@ private:
 	std::unique_ptr<RenderPath> renderPath;
 	// プレイヤーの生成
 	std::unique_ptr<Player> player;
+
+	std::unique_ptr<Camera3D> camera3D;
+	std::unique_ptr<DirectionalLightInstance> directionalLight;
 };
 

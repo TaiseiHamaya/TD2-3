@@ -7,7 +7,6 @@ class Player
 public:
 	void load();
 	void initialize();
-	//void popped();
 	void finalize();
 
 	void begin();

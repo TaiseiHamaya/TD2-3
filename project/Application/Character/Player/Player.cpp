@@ -9,7 +9,7 @@ void Player::load()
 void Player::initialize()
 {
 	object_ = std::make_unique<MeshInstance>();
-	object_->reset_mesh("Player.gltf");
+	object_->reset_mesh("Sphere.obj");
 }
 
 void Player::finalize()
