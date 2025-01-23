@@ -16,8 +16,8 @@ void MapchipField::init(){
 		wall[i]->reset_mesh("WallObj.obj");
 
 	}
-	goal.push_back(std::make_unique<MeshInstance>());
-
+	goal=std::make_unique<MeshInstance>();
+	goal->reset_mesh("GoalObj.obj");
 	loadMap(1);
 }
 
@@ -29,6 +29,7 @@ void MapchipField::begin_rendering(){
 		wall[i]->begin_rendering();
 
 	}
+	goal->begin_rendering();
 }
 
 void MapchipField::update(){
@@ -57,10 +58,16 @@ void MapchipField::draw(){
 				wall[wallNum]->draw();
 				wallNum++;//要素番号を加算し次のインスタンスで描画出来るようにする
 
+			} else if(curMap[y][x] == 3){
+				goal->get_transform()
+					.set_translate(Vector3((float)x, 0, culs - (float)y));
+				goal->draw();
+				
 			}
 		}
 	}
-
+	
+	
 }
 
 void MapchipField::loadMap(int stageNum){

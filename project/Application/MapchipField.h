@@ -25,11 +25,11 @@ public:
 private:
 	std::vector < std::unique_ptr<MeshInstance>> block;
 	std::vector < std::unique_ptr<MeshInstance>> wall;
-	std::vector < std::unique_ptr<MeshInstance>> goal;
+	 std::unique_ptr<MeshInstance> goal;
 	const int index=49;
 	static const int mapIndex = 2;
 	int curMapIndex = 0;
-	static const int rows = 7;//行	
+	static const int rows = 7;//行
 	static const int culs = 7;//列
 
 
@@ -50,7 +50,7 @@ private:
 		{0,1,1,1,1,1,0},
 		{0,1,0,0,0,0,0},
 		{0,1,1,1,1,1,0},
-		{0,0,0,0,0,0,0},
+		{3,0,0,0,0,0,0},
 		}
 	};
 
