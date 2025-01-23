@@ -57,28 +57,28 @@ void Player::move(MapchipField* mapchipField)
 	isMove = false;
 	Vector3 position = object_->get_transform().get_translate();
 	if (Input::GetInstance().IsTriggerKey(KeyID::W)) {
-		if (mapchipField->getElement(object_->get_transform().get_translate().x, object_->get_transform().get_translate().z + 1.0f) != 2) {
+		if (mapchipField->getElement(object_->get_transform().get_translate().x, object_->get_transform().get_translate().z + 1.0f) == 1) {
 			position.z += speed;
 			isMove = true;
 			direction = { 0.0f, 0.0f, 1.0f };
 		}
 	}
 	else if (Input::GetInstance().IsTriggerKey(KeyID::A)) {
-		if (mapchipField->getElement(object_->get_transform().get_translate().x - 1.0f, object_->get_transform().get_translate().z) != 2) {
+		if (mapchipField->getElement(object_->get_transform().get_translate().x - 1.0f, object_->get_transform().get_translate().z) == 1) {
 			position.x -= speed;
 			isMove = true;
 			direction = { -1.0f, 0.0f, 0.0f };
 		}
 	}
 	else if (Input::GetInstance().IsTriggerKey(KeyID::S)) {
-		if (mapchipField->getElement(object_->get_transform().get_translate().x, object_->get_transform().get_translate().z - 1.0f) != 2) {
+		if (mapchipField->getElement(object_->get_transform().get_translate().x, object_->get_transform().get_translate().z - 1.0f) == 1) {
 			position.z -= speed;
 			isMove = true;
 			direction = { 0.0f, 0.0f, -1.0f };
 		}
 	}
 	else if (Input::GetInstance().IsTriggerKey(KeyID::D)) {
-		if (mapchipField->getElement(object_->get_transform().get_translate().x + 1.0f, object_->get_transform().get_translate().z) != 2) {
+		if (mapchipField->getElement(object_->get_transform().get_translate().x + 1.0f, object_->get_transform().get_translate().z) == 1) {
 			position.x += speed;
 			isMove = true;
 			direction = { 1.0f, 0.0f, 0.0f };
