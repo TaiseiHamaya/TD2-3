@@ -6,7 +6,8 @@
 class RenderPath;
 class Camera3D;
 #include "Application/Character/Player/PlayerManager.h"
-#include "Application/ClearUIClass.h"
+#include "Application/GameManagement.h"
+#include "Engine/Module/Render/RenderNode/Sprite/SpriteNode.h"
 
 
 
@@ -42,7 +43,7 @@ private:
 	std::unique_ptr<RenderPath> renderPath;
 	// プレイヤーの生成
 	std::unique_ptr<PlayerManager> playerManager;
-	std::unique_ptr<ClearUIClass> clearUI;
+	std::unique_ptr<GameManagement> managementUI;//ゲームクリア、ゲームオーバーをまとめて管理してる
 
 	std::unique_ptr<Camera3D> camera3D;
 	std::unique_ptr<DirectionalLightInstance> directionalLight;

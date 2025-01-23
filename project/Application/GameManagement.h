@@ -4,10 +4,10 @@
 
 class SpriteInstance;
 
-class ClearUIClass{
+class GameManagement{
 public:
-    ClearUIClass();
-    ~ClearUIClass();
+    GameManagement();
+    ~GameManagement();
 
     void init();
     void update();
@@ -16,10 +16,13 @@ public:
 
     //アクセッサ
     void SetClearFlag(bool value){ clearFlag = value; }
+    void SetFailedFlag(bool value){ failedFlag = value; }
 
 private:
-    std::unique_ptr<SpriteInstance> sprite;
+    std::unique_ptr<SpriteInstance> clearSprite;
+    std::unique_ptr<SpriteInstance> failedSprite;
 
     bool clearFlag;
+    bool failedFlag;
 
 };

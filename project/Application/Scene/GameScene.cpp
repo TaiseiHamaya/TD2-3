@@ -22,6 +22,7 @@ void GameScene::load()
 	PolygonMeshManager::RegisterLoadQue("./GameResources/Models/ParentObj/ParentObj.obj");
 	PolygonMeshManager::RegisterLoadQue("./GameResources/Models/ChildObj/ChildObj.obj");
 	TextureManager::RegisterLoadQue("./GameResources/Texture/ClearTex.png");
+	TextureManager::RegisterLoadQue("./GameResources/Texture/FailedTex.png");
 
 }
 
@@ -41,16 +42,22 @@ void GameScene::initialize()
 
 	directionalLight = eps::CreateUnique<DirectionalLightInstance>();
 
+	std::shared_ptr<SpriteNode> spriteNode;
+	spriteNode = std::make_unique<SpriteNode>();
+	spriteNode->initialize();
+	spriteNode->set_config(RenderNodeConfig::ContinueDrawAfter | RenderNodeConfig::ContinueDrawBefore);
+	spriteNode->set_render_target_SC(DirectXSwapChain::GetRenderTarget());
+
 	std::shared_ptr<Object3DNode> object3dNode;
 	object3dNode = std::make_unique<Object3DNode>();
 	object3dNode->initialize();
 	object3dNode->set_render_target_SC(DirectXSwapChain::GetRenderTarget());
 
 	renderPath = eps::CreateUnique<RenderPath>();
-	renderPath->initialize({object3dNode});
+	renderPath->initialize({object3dNode,spriteNode });
 
-	clearUI = std::make_unique<ClearUIClass>();
-	
+	managementUI = std::make_unique<GameManagement>();
+
 }
 
 void GameScene::popped()
@@ -69,7 +76,7 @@ void GameScene::update()
 {
 	playerManager->update();
 	directionalLight->update();
-	clearUI->update();
+	managementUI->update();
 }
 
 void GameScene::begin_rendering()
@@ -78,7 +85,7 @@ void GameScene::begin_rendering()
 
 	camera3D->update_matrix();
 	directionalLight->begin_rendering();
-	clearUI->begin_rendering();
+	managementUI->begin_rendering();
 
 }
 
@@ -95,7 +102,8 @@ void GameScene::draw() const
 	playerManager->draw();
 
 	renderPath->next();
-	clearUI->darw();
+	managementUI->darw();
+	renderPath->next();
 }
 
 #ifdef _DEBUG
