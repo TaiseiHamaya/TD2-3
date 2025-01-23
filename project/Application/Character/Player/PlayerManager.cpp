@@ -31,13 +31,16 @@ void PlayerManager::update()
             Vector3 directions[] = {
                 {-1.0f, 0.0f, 0.0f},   // 右
                 {1.0f, 0.0f, 0.0f},  // 左
-                {0.0f, 0.0f, 1.0f},   // 前
-                {0.0f, 0.0f, -1.0f}   // 後ろ
+                {0.0f, 0.0f, -1.0f},   // 前
+                {0.0f, 0.0f, 1.0f}   // 後ろ
             };
+
+            Vector3 playerPos = player->get_transform();
+            Vector3 childPos = child->get_translate();
 
             for (const auto& direction : directions) {
                 // 親のワールド位置と子の位置をチェック
-                Vector3 playerToChild = child->get_translate() - player->get_transform();
+                Vector3 playerToChild = playerPos - childPos;
                 if (ApproximatelyEqual(playerToChild, direction)) {
                     // 子オブジェクトを親に設定
                     child->set_parent(player->get_object());
@@ -45,6 +48,10 @@ void PlayerManager::update()
                     // 回転を考慮してオフセットを計算
                     Quaternion parentRotation = player->get_rotation();
                     Vector3 adjustedOffset = direction * parentRotation;
+
+                    if (adjustedOffset.x == 1.0f || adjustedOffset.x == -1.0f || adjustedOffset.z == 1.0f || adjustedOffset.z == -1.0f) {
+                        adjustedOffset *= -1.0f;
+                    }
 
                     // ローカル空間に子を移動
                     child->set_translate(adjustedOffset);

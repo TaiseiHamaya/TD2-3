@@ -22,6 +22,8 @@ public:
 
 public:
 	Vector3 get_transform() { return object_->get_transform().get_translate(); }
+	//Vector3 get_world_pos(){return object_->get_transform(). }
+
 	Quaternion get_rotation() { return object_->get_transform().get_quaternion(); }
 	MeshInstance* get_object() { return object_.get(); }
 
