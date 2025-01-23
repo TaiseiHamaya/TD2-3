@@ -222,6 +222,7 @@ void SceneDemo::update() {
 
 	particleEmitter->update();
 	directionalLight->update();
+	fieldObjs->update();
 }
 
 void SceneDemo::begin_rendering() {
