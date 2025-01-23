@@ -59,7 +59,7 @@ void SceneDemo::load() {
 
 //gameObjectをロード
 	PolygonMeshManager::RegisterLoadQue("./GameResources/Models/RordObj/RordObj.obj");
-	PolygonMeshManager::RegisterLoadQue("./GameResources/Models/ParentObj/ParentObj.obj");
+	PolygonMeshManager::RegisterLoadQue("./GameResources/Models/WallObj/WallObj.obj");
 
 }
 
@@ -253,7 +253,7 @@ void SceneDemo::draw() const {
 	//parent->draw();
 	//child->draw();
 	fieldObjs->draw();
-	debugCheckObj->draw();
+	//debugCheckObj->draw();
 #ifdef _DEBUG
 	camera3D->debug_draw();
 	animatedMeshInstance->draw_skeleton();
