@@ -20,52 +20,19 @@ void PlayerManager::begin()
 
 void PlayerManager::update()
 {
-	player->update();
+	player->update(mapchipField_);
 	child->update();
 
-    // 親が設定されていない場合のみ処理
+    // 親が設定されていない場合のみ結合
     if (!player->get_parent_flag()) {
-        // プレイヤーが移動している場合のみ処理
-        if (player->get_move_flag()) {
-            // 子オブジェクトが隣接しているか判定
-            Vector3 directions[] = {
-                {-1.0f, 0.0f, 0.0f},   // 右
-                {1.0f, 0.0f, 0.0f},  // 左
-                {0.0f, 0.0f, -1.0f},   // 前
-                {0.0f, 0.0f, 1.0f}   // 後ろ
-            };
-
-            Vector3 playerPos = player->get_transform();
-            Vector3 childPos = child->get_translate();
-
-            for (const auto& direction : directions) {
-                // 親のワールド位置と子の位置をチェック
-                Vector3 playerToChild = playerPos - childPos;
-                if (ApproximatelyEqual(playerToChild, direction)) {
-                    // 子オブジェクトを親に設定
-                    child->set_parent(player->get_object());
-
-                    // 回転を考慮してオフセットを計算
-                    Quaternion parentRotation = player->get_rotation();
-                    Vector3 adjustedOffset = direction * parentRotation;
-
-                    if (adjustedOffset.x == 1.0f || adjustedOffset.x == -1.0f || adjustedOffset.z == 1.0f || adjustedOffset.z == -1.0f) {
-                        adjustedOffset *= -1.0f;
-                    }
-
-                    // ローカル空間に子を移動
-                    child->set_translate(adjustedOffset);
-
-                    // 親子関係フラグを設定
-                    player->set_parent_flag(true);
-                }
-            }
-        }
+        attach_child_to_player();
     }
     // 親が設定されている場合は切り離し
     else {
-        DetachChildFromPlayer(player.get(), child.get());
+        detach_child_from_player();
     }
+
+    update_mapchip();
 }
 
 void PlayerManager::begin_rendering()
@@ -91,7 +58,52 @@ void PlayerManager::debug_update()
 }
 #endif // _DEBUG
 
-void PlayerManager::DetachChildFromPlayer(Player* player, Child* child)
+void PlayerManager::update_mapchip()
+{
+    if (mapchipField_->getElement(player->get_transform().x, player->get_transform().z) == 0) {
+        player->set_fall_flag(true);
+    }
+
+}
+
+void PlayerManager::attach_child_to_player()
+{
+    // プレイヤーが移動している場合のみ処理
+    if (player->get_move_flag()) {
+        // 子オブジェクトが隣接しているか判定
+        Vector3 directions[] = {
+            {-1.0f, 0.0f, 0.0f},   // 右
+            {1.0f, 0.0f, 0.0f},  // 左
+            {0.0f, 0.0f, -1.0f},   // 前
+            {0.0f, 0.0f, 1.0f}   // 後ろ
+        };
+
+        for (const auto& direction : directions) {
+            // 親のワールド位置と子の位置をチェック
+            Vector3 playerToChild = player->get_transform() - child->get_translate();
+            if (ApproximatelyEqual(playerToChild, direction)) {
+                // 子オブジェクトを親に設定
+                child->set_parent(player->get_object());
+
+                // 回転を考慮してオフセットを計算
+                Quaternion parentRotation = player->get_rotation();
+                Vector3 adjustedOffset = direction * parentRotation;
+
+                if (adjustedOffset.x == 1.0f || adjustedOffset.x == -1.0f || adjustedOffset.z == 1.0f || adjustedOffset.z == -1.0f) {
+                    adjustedOffset *= -1.0f;
+                }
+
+                // ローカル空間に子を移動
+                child->set_translate(adjustedOffset);
+
+                // 親子関係フラグを設定
+                player->set_parent_flag(true);
+            }
+        }
+    }
+}
+
+void PlayerManager::detach_child_from_player()
 {
 	if (Input::GetInstance().IsTriggerKey(KeyID::Space)) {
 		// 子オブジェクトをワールド空間に戻す

@@ -1,16 +1,16 @@
 #pragma once
 #include <memory>
 #include "Engine/Module/World/Mesh/MeshInstance.h"
+#include <Application/MapchipField.h>
 
 class Player
 {
 public:
-	void load();
 	void initialize();
 	void finalize();
 
 	void begin();
-	void update();
+	void update(MapchipField* mapchipField);
 	void begin_rendering();
 	void late_update();
 
@@ -30,10 +30,12 @@ public:
 	bool get_parent_flag() const { return isParent; }
 	void set_parent_flag(bool flag) { isParent = flag; }
 
+	void set_fall_flag(bool flag) { isFall = flag; }
+
 	bool get_move_flag() const { return isMove; }
 
 private:
-	void move();
+	void move(MapchipField* mapchipField);
 	void rotate();
 
 private:
@@ -44,8 +46,8 @@ private:
 	bool isParent = false;
 	// このフレームに移動したかどうかを取るフラグ
 	bool isMove = false;
-
-	// デバッグ用変数
+	// プレイヤーが落下中かどうかを判定するフラグ
+	bool isFall = false;
+	// プレイヤーの向きを取る変数
 	Vector3 direction{};
-
 };

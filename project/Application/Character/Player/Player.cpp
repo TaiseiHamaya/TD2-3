@@ -1,16 +1,11 @@
 #include "Player.h"
 #include "Engine/Runtime/Input/Input.h"
 
-
-void Player::load()
-{
-}
-
 void Player::initialize()
 {
 	object_ = std::make_unique<MeshInstance>();
 	object_->reset_mesh("ParentObj.obj");
-	object_->get_transform().set_translate({2.0f, 1.0f, 2.0f});
+	object_->get_transform().set_translate({ 0.0f, 1.0f, 0.0f });
 }
 
 void Player::finalize()
@@ -21,10 +16,16 @@ void Player::begin()
 {
 }
 
-void Player::update()
+void Player::update(MapchipField* mapchipField)
 {
-	move();
+	move(mapchipField);
 	rotate();
+
+	if (isFall) {
+		Vector3 position = object_->get_transform().get_translate();
+		position.y -= 0.1f;
+		object_->get_transform().set_translate(position);
+	}
 }
 
 void Player::begin_rendering()
@@ -50,30 +51,38 @@ void Player::debug_update()
 }
 #endif // _DEBUG
 
-void Player::move()
+void Player::move(MapchipField* mapchipField)
 {
 	// このフレームで移動したかどうかの判定
 	isMove = false;
 	Vector3 position = object_->get_transform().get_translate();
 	if (Input::GetInstance().IsTriggerKey(KeyID::W)) {
-		position.z += speed;
-		isMove = true;
-		direction = { 0.0f, 0.0f, 1.0f };
+		if (mapchipField->getElement(object_->get_transform().get_translate().x, object_->get_transform().get_translate().z + 1.0f) != 2) {
+			position.z += speed;
+			isMove = true;
+			direction = { 0.0f, 0.0f, 1.0f };
+		}
 	}
 	else if (Input::GetInstance().IsTriggerKey(KeyID::A)) {
-		position.x -= speed;
-		isMove = true;
-		direction = { -1.0f, 0.0f, 0.0f };
+		if (mapchipField->getElement(object_->get_transform().get_translate().x - 1.0f, object_->get_transform().get_translate().z) != 2) {
+			position.x -= speed;
+			isMove = true;
+			direction = { -1.0f, 0.0f, 0.0f };
+		}
 	}
 	else if (Input::GetInstance().IsTriggerKey(KeyID::S)) {
-		position.z -= speed;
-		isMove = true;
-		direction = { 0.0f, 0.0f, -1.0f };
+		if (mapchipField->getElement(object_->get_transform().get_translate().x, object_->get_transform().get_translate().z - 1.0f) != 2) {
+			position.z -= speed;
+			isMove = true;
+			direction = { 0.0f, 0.0f, -1.0f };
+		}
 	}
 	else if (Input::GetInstance().IsTriggerKey(KeyID::D)) {
-		position.x += speed;
-		isMove = true;
-		direction = { 1.0f, 0.0f, 0.0f };
+		if (mapchipField->getElement(object_->get_transform().get_translate().x + 1.0f, object_->get_transform().get_translate().z) != 2) {
+			position.x += speed;
+			isMove = true;
+			direction = { 1.0f, 0.0f, 0.0f };
+		}
 	}
 	object_->get_transform().set_translate(position);
 }

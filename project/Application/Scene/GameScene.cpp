@@ -46,6 +46,8 @@ void GameScene::initialize()
 	fieldObjs = std::make_unique<MapchipField>();
 	fieldObjs->init();
 
+	playerManager->set_mapchip_field(fieldObjs.get());
+
 	directionalLight = eps::CreateUnique<DirectionalLightInstance>();
 
 	std::shared_ptr<SpriteNode> spriteNode;
