@@ -16,11 +16,9 @@ GameScene::~GameScene() = default;
 
 void GameScene::load()
 {
-	PolygonMeshManager::RegisterLoadQue("./EngineResources/Models/Primitive/Sphere.obj");
-	//PolygonMeshManager::RegisterLoadQue("./EngineResources/Models/Primitive/Sphere");
-	//PolygonMeshManager::RegisterLoadQue("./EngineResources/Models/Player.gltf");
-	//NodeAnimationManager::RegisterLoadQue("./EngineResources/Models/Player.gltf");
-	//SkeletonManager::RegisterLoadQue("./EngineResources/Models/Player.gltf");
+	//PolygonMeshManager::RegisterLoadQue("./EngineResources/Models/Primitive/Sphere.obj");
+	PolygonMeshManager::RegisterLoadQue("./GameResources/Models/ParentObj/ParentObj.obj");
+	PolygonMeshManager::RegisterLoadQue("./GameResources/Models/ChildObj/ChildObj.obj");
 }
 
 void GameScene::initialize()
@@ -34,8 +32,8 @@ void GameScene::initialize()
 		{0,10,-10}
 		});
 
-	player = std::make_unique<Player>();
-	player->initialize();
+	playerManager = std::make_unique<PlayerManager>();
+	playerManager->initialize();
 
 	directionalLight = eps::CreateUnique<DirectionalLightInstance>();
 
@@ -43,7 +41,6 @@ void GameScene::initialize()
 	object3dNode = std::make_unique<Object3DNode>();
 	object3dNode->initialize();
 	object3dNode->set_render_target_SC(DirectXSwapChain::GetRenderTarget());
-	object3dNode->set_config(RenderNodeConfig::ContinueDrawBefore | RenderNodeConfig::ContinueUseDpehtBefore);
 
 	renderPath = eps::CreateUnique<RenderPath>();
 	renderPath->initialize({object3dNode});
@@ -63,15 +60,17 @@ void GameScene::begin()
 
 void GameScene::update()
 {
-
+	playerManager->update();
 	directionalLight->update();
 }
 
 void GameScene::begin_rendering()
 {
+	playerManager->begin_rendering();
+
 	camera3D->update_matrix();
 	directionalLight->begin_rendering();
-	player->begin_rendering();
+
 }
 
 void GameScene::late_update()
@@ -83,9 +82,10 @@ void GameScene::draw() const
 	renderPath->begin();
 	camera3D->register_world(1);
 	directionalLight->register_world(3);
-	player->draw();
 
-	//renderPath->next();
+	playerManager->draw();
+
+	renderPath->next();
 }
 
 #ifdef _DEBUG
