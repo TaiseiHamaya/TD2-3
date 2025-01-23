@@ -15,6 +15,9 @@ public:
 
 	void draw() const;
 
+
+
+
 private:
 	std::unique_ptr<Player> player;
 	std::unique_ptr<Child> child;

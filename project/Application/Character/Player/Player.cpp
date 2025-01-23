@@ -10,6 +10,7 @@ void Player::initialize()
 {
 	object_ = std::make_unique<MeshInstance>();
 	object_->reset_mesh("ParentObj.obj");
+	object_->get_transform().set_translate({2.0f, 1.0f, 2.0f});
 }
 
 void Player::finalize()

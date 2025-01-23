@@ -19,6 +19,8 @@ void GameScene::load()
 	//PolygonMeshManager::RegisterLoadQue("./EngineResources/Models/Primitive/Sphere.obj");
 	PolygonMeshManager::RegisterLoadQue("./GameResources/Models/ParentObj/ParentObj.obj");
 	PolygonMeshManager::RegisterLoadQue("./GameResources/Models/ChildObj/ChildObj.obj");
+	PolygonMeshManager::RegisterLoadQue("./GameResources/Models/RordObj/RordObj.obj");
+	PolygonMeshManager::RegisterLoadQue("./GameResources/Models/WallObj/WallObj.obj");
 }
 
 void GameScene::initialize()
@@ -28,12 +30,15 @@ void GameScene::initialize()
 	camera3D->initialize();
 	camera3D->set_transform({
 		CVector3::BASIS,
-		Quaternion::EulerDegree(45,0,0),
-		{0,10,-10}
+		Quaternion::EulerDegree(30,0,0),
+		{3,8,-10}
 		});
 
 	playerManager = std::make_unique<PlayerManager>();
 	playerManager->initialize();
+
+	fieldObjs = std::make_unique<MapchipField>();
+	fieldObjs->init();
 
 	directionalLight = eps::CreateUnique<DirectionalLightInstance>();
 
@@ -61,12 +66,14 @@ void GameScene::begin()
 void GameScene::update()
 {
 	playerManager->update();
+	fieldObjs->update();
 	directionalLight->update();
 }
 
 void GameScene::begin_rendering()
 {
 	playerManager->begin_rendering();
+	fieldObjs->begin_rendering();
 
 	camera3D->update_matrix();
 	directionalLight->begin_rendering();
@@ -83,6 +90,7 @@ void GameScene::draw() const
 	camera3D->register_world(1);
 	directionalLight->register_world(3);
 
+	fieldObjs->draw();
 	playerManager->draw();
 
 	renderPath->next();
@@ -91,6 +99,10 @@ void GameScene::draw() const
 #ifdef _DEBUG
 void GameScene::debug_update()
 {
+	ImGui::Begin("Camera");
+	camera3D->debug_gui();
+	ImGui::End();
+
 }
 #endif // _DEBUG
 
