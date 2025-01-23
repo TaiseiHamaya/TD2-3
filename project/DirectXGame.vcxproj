@@ -120,11 +120,10 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     </FxCompile>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="Block.cpp" />
     <ClCompile Include="Engine\Module\DrawExecutor\LineGroupDrawExecutor\LineGroupDrawExecutor.cpp" />
     <ClCompile Include="Engine\Module\World\Collision\Collider\AABBCollider.cpp" />
     <ClCompile Include="Application\Scene\GameScene.cpp" />
-    <ClCompile Include="FieldDraw.cpp" />
+    <ClCompile Include="Application\MapchipField.cpp" />
     <ClCompile Include="Library\Math\Affine.cpp" />
     <ClCompile Include="Library\Math\Basis.cpp" />
     <ClCompile Include="Engine\Resources\Audio\AudioResourceBuilder.cpp" />
@@ -236,11 +235,10 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClCompile Include="Engine\Module\World\WorldInstanceManager.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="Block.h" />
     <ClInclude Include="Engine\Module\DrawExecutor\LineGroupDrawExecutor\LineGroupDrawExecutor.h" />
     <ClInclude Include="Engine\Module\World\Collision\Collider\AABBCollider.h" />
     <ClInclude Include="Application\Scene\GameScene.h" />
-    <ClInclude Include="FieldDraw.h" />
+    <ClInclude Include="Application\MapchipField.h" />
     <ClInclude Include="Library\Math\Affine.h" />
     <ClInclude Include="Library\Math\Basis.h" />
     <ClInclude Include="Engine\Resources\Audio\AudioResourceBuilder.h" />

@@ -4,10 +4,10 @@
 #include <vector>
 #include <Engine/Runtime/Input/Input.h>
 class MeshInstance;
-class FieldDraw{
+class MapchipField{
 public:
-	FieldDraw();
-	~FieldDraw();
+	MapchipField();
+	~MapchipField();
 
 public:
 	void init();

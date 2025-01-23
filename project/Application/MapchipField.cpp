@@ -1,11 +1,11 @@
-#include "FieldDraw.h"
+#include "Application/MapchipField.h"
 #include "Engine/Module/World/Mesh/MeshInstance.h"
 
-FieldDraw::FieldDraw(){}
+MapchipField::MapchipField(){}
 
-FieldDraw::~FieldDraw(){}
+MapchipField::~MapchipField(){}
 
-void FieldDraw::init(){
+void MapchipField::init(){
 
 
 	for(int i = 0; i < index; i++)
@@ -21,7 +21,7 @@ void FieldDraw::init(){
 	loadMap(1);
 }
 
-void FieldDraw::begin_rendering(){
+void MapchipField::begin_rendering(){
 
 	for(int i = 0; i < block.size(); i++)
 	{
@@ -31,11 +31,11 @@ void FieldDraw::begin_rendering(){
 	}
 }
 
-void FieldDraw::update(){
+void MapchipField::update(){
 	debugChangeStage();
 }
 
-void FieldDraw::draw(){
+void MapchipField::draw(){
 	int blockNum = 0;//描画するインスタンスの要素番号を定義
 	int wallNum = 0;
 	for(int y = 0; y < culs; y++)
@@ -63,7 +63,7 @@ void FieldDraw::draw(){
 
 }
 
-void FieldDraw::loadMap(int stageNum){
+void MapchipField::loadMap(int stageNum){
 
 
 	for(int y = 0; y < culs; y++)
@@ -75,7 +75,7 @@ void FieldDraw::loadMap(int stageNum){
 	}
 }
 
-void FieldDraw::debugChangeStage(){
+void MapchipField::debugChangeStage(){
 
 
 	if(curMapIndex < mapIndex - 1 &&

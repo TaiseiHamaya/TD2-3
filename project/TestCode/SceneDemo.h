@@ -35,7 +35,7 @@ class RenderPath;
 #include "Engine/Resources/Animation/NodeAnimation/NodeAnimationPlayer.h"
 #include "Engine/Resources/Animation/Skeleton/SkeletonResource.h"
 
-#include "FieldDraw.h"
+#include "Application/MapchipField.h"
 
 class SceneDemo : public BaseScene {
 public:
@@ -93,5 +93,5 @@ private:
 
 	JsonResource jsonResource{ "./Test.json" };
 	Transform2D testValue{};
-	std::unique_ptr<FieldDraw> fieldObjs;
+	std::unique_ptr<MapchipField> fieldObjs;
 };
