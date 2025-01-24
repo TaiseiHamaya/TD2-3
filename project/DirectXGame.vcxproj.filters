@@ -633,6 +633,9 @@
     <ClCompile Include="Application\GameManagement.cpp">
       <Filter>ソース ファイル</Filter>
     </ClCompile>
+    <ClCompile Include="Application\LevelLoader\LevelLoader.cpp">
+      <Filter>ソース ファイル</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Engine\Application\WinApp.h">
@@ -1058,6 +1061,9 @@
     <ClInclude Include="Application\GameManagement.h">
       <Filter>ヘッダー ファイル</Filter>
     </ClInclude>
+    <ClInclude Include="Application\LevelLoader\LevelLoader.h">
+      <Filter>ヘッダー ファイル</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="EngineResources\HLSL\FullscreenShader.hlsl">
@@ -1137,5 +1143,6 @@
     <None Include="EngineResources\HLSL\Particle\ParticleBillboard\ParticleBillboard.hlsli">
       <Filter>EngineResources\HLSL\Particle\ParticleBillboard</Filter>
     </None>
+    <None Include="..\..\..\..\..\..\..\Downloads\stage1.json" />
   </ItemGroup>
 </Project>

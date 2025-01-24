@@ -1,102 +1,59 @@
 #include "Application/MapchipField.h"
 #include "Engine/Module/World/Mesh/MeshInstance.h"
 
-MapchipField::MapchipField(){}
+#include "Application/LevelLoader/LevelLoader.h"
 
-MapchipField::~MapchipField(){}
+MapchipField::MapchipField() = default;
 
-void MapchipField::init(){
+MapchipField::~MapchipField() = default;
+
+void MapchipField::initialize(const LevelLoader& level) {
+	const std::string fieldFileName[] = {
+		"", // 穴
+		"RordObj.obj", // 床
+		"WallObj.obj", // 壁
+		"GoalObj.obj" // ゴール
+	};
+
+	auto& fieldLevel = level.get_field();
+	auto& fieldZeroGravity = level.get_zerogravity();
 
 
-	for(int i = 0; i < index; i++)
-	{
-		block.push_back(std::make_unique<MeshInstance>());
-		block[i]->reset_mesh("RordObj.obj");
-		wall.push_back(std::make_unique<MeshInstance>());
-		wall[i]->reset_mesh("WallObj.obj");
-
-	}
-	goal=std::make_unique<MeshInstance>();
-	goal->reset_mesh("GoalObj.obj");
-	loadMap(1);
-}
-
-void MapchipField::begin_rendering(){
-
-	for(int i = 0; i < block.size(); i++)
-	{
-		block[i]->begin_rendering();
-		wall[i]->begin_rendering();
-
-	}
-	goal->begin_rendering();
-}
-
-void MapchipField::update(){
-	debugChangeStage();
-}
-
-void MapchipField::draw(){
-	int blockNum = 0;//描画するインスタンスの要素番号を定義
-	int wallNum = 0;
-	for(int y = 0; y < culs; y++)
-	{
-		for(int x = 0; x < rows; x++)
-		{
-
-			if(curMap[y][x] == 1){
-
-				block[blockNum]->get_transform()
-					.set_translate(Vector3((float)x, 0, (float)y));
-				//block[blockNum]->get_transform().set_scale(Vector3(0.5f, 0.5f, 0.5f));
-				block[blockNum]->draw();
-				blockNum++;//要素番号を加算し次のインスタンスで描画出来るようにする
-			} else if(curMap[y][x] == 2){
-				wall[wallNum]->get_transform()
-					.set_translate(Vector3((float)x, 0, (float)y));
-				//wall[wallNum]->get_transform().set_scale(Vector3(0.5f, 0.5f, 0.5f));
-				wall[wallNum]->draw();
-				wallNum++;//要素番号を加算し次のインスタンスで描画出来るようにする
-
-			} else if(curMap[y][x] == 3){
-				goal->get_transform()
-					.set_translate(Vector3((float)x, 0, (float)y));
-				goal->draw();
-				
+	constexpr float boxSize = 1.0f;
+	field.resize(fieldLevel.size());
+	for (uint32_t row = 0; row < fieldLevel.size(); ++row) {
+		field[row].resize(fieldLevel[row].size());
+		for (uint32_t column = 0; column < fieldLevel.size(); ++column) {
+			field[row][column].isZeroGravity = fieldZeroGravity[row][column];
+			field[row][column].type = fieldLevel[row][column];
+			if (field[row][column].type != 0) {
+				field[row][column].mesh = std::make_unique<MeshInstance>(fieldFileName[field[row][column].type]);
 			}
-		}
-	}
-	
-	
-}
-
-void MapchipField::loadMap(int stageNum){
-
-
-	for(int y = 0; y < culs; y++)
-	{
-		for(int x = 0; x < rows; x++)
-		{
-			curMap[y][x] = map[stageNum][y][x];
+			else {
+				field[row][column].mesh = std::make_unique<MeshInstance>();
+			}
+			field[row][column].mesh->get_transform().set_translate(
+				Vector3{ row * 1.0f , 0.0f, column * 1.0f }
+			);
 		}
 	}
 }
 
-void MapchipField::debugChangeStage(){
+void MapchipField::update() {
+}
 
-
-	if(curMapIndex < mapIndex - 1 &&
-		Input::GetInstance().IsTriggerKey(KeyID::K))
-	{
-		curMapIndex++;
-		loadMap(curMapIndex);
+void MapchipField::begin_rendering() {
+	for (auto& vec : field) {
+		for (auto& elem : vec) {
+			elem.mesh->begin_rendering();
+		}
 	}
-	if(curMapIndex > 0 &&
-		Input::GetInstance().IsTriggerKey(KeyID::J))
-	{
-		curMapIndex--;
-		loadMap(curMapIndex);
+}
+
+void MapchipField::draw() {
+	for (auto& vec : field) {
+		for (auto& elem : vec) {
+			elem.mesh->draw();
+		}
 	}
-
-
 }
