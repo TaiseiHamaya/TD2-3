@@ -10,6 +10,7 @@
 #include "Engine/Module/World/Camera/Camera2D.h"
 #include "Engine/Module/World/Camera/Camera3D.h"
 #include "Engine/Resources/Texture/TextureManager.h"
+#include <Engine/Runtime/WorldClock/WorldClock.h>
 
 #include "Application/LevelLoader/LevelLoader.h"
 
@@ -85,6 +86,8 @@ void GameScene::begin()
 
 void GameScene::update()
 {
+	WorldClock::Update();
+
 	playerManager->update();
 	fieldObjs->update();
 	directionalLight->update();

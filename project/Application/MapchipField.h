@@ -26,9 +26,7 @@ public:
 	void draw();
 
 	//アクセッサ
-	uint32_t getElement(float x, float y) {
-		return field[static_cast<int>(y)][static_cast<int>(x)].type;
-	}
+	int getElement(float x, float y);
 private:
 
 	//メモ　

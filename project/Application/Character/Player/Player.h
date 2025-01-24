@@ -1,53 +1,50 @@
 #pragma once
-#include <memory>
-#include "Engine/Module/World/Mesh/MeshInstance.h"
+#include "CharacterBase.h"
 #include <Application/MapchipField.h>
+#include "Engine/Runtime/WorldClock/WorldClock.h"
 
-class Player
-{
+class Player : public CharacterBase {
 public:
-	void initialize();
-	void finalize();
-
-	void begin();
-	void update(MapchipField* mapchipField);
-	void begin_rendering();
-	void late_update();
-
-	void draw() const;
+    void initialize() override;
+    void finalize() override;
+    void update() override;
+    void update(MapchipField* mapchipField);
+    void begin_rendering() override;
+    void draw() const override;
 
 #ifdef _DEBUG
-	void debug_update();
-#endif // _DEBUG
+    void debug_update();
+#endif
+    // アクセッサ
+    Vector3 get_translate_instance() const { return targetPosition; }
 
-public:
-	Vector3 get_transform() { return object_->get_transform().get_translate(); }
-	//Vector3 get_world_pos(){return object_->get_transform(). }
-
-	Quaternion get_rotation() { return object_->get_transform().get_quaternion(); }
-	MeshInstance* get_object() { return object_.get(); }
-
-	bool get_parent_flag() const { return isParent; }
-	void set_parent_flag(bool flag) { isParent = flag; }
-
-	void set_fall_flag(bool flag) { isFall = flag; }
-
-	bool get_move_flag() const { return isMove; }
+    bool is_parent() const { return isParent; }
+    void set_parent(bool flag) { isParent = flag; }
+    void set_falling(bool flag) { isFall = flag; }
+    bool is_moving() const { return isMove; }
 
 private:
-	void move(MapchipField* mapchipField);
-	void rotate();
+    void move(MapchipField* mapchipField);
+    void rotate();
+    bool can_move_to(const Vector3& position, MapchipField* mapchipField) const;
+    void start_rotation(const Vector3& direction);
 
 private:
-	std::unique_ptr<MeshInstance> object_;
-	// プレイヤーの移動速度
-	float speed = 1.0f;
-	// 子コアラとくっついているかどうかの判定
-	bool isParent = false;
-	// このフレームに移動したかどうかを取るフラグ
-	bool isMove = false;
-	// プレイヤーが落下中かどうかを判定するフラグ
-	bool isFall = false;
-	// プレイヤーの向きを取る変数
-	Vector3 direction{};
+    bool isParent = false;
+    bool isMove = false;
+    bool isFall = false;
+    Vector3 direction{};
+
+    Vector3 targetPosition;  // 次の目標位置
+    float moveTimer = 0.0f;  // 移動の進行状況を管理するタイマー
+    float moveDuration = 0.3f;  // 移動にかける時間（秒）
+    bool isMoving = false;   // 現在移動中かどうかのフラグ
+
+    Quaternion targetRotation;  // 次の目標回転
+    Quaternion startRotation;   // 補間の開始回転
+    float rotateTimer = 0.0f;    // 回転の進行状況を管理するタイマー
+    float rotateDuration = 0.3f; // 回転にかける時間（秒）
+    bool isRotating = false;     // 現在回転中かどうかのフラグ
+
+    float deltaTime = WorldClock::DeltaSeconds();
 };

@@ -57,3 +57,18 @@ void MapchipField::draw() {
 		}
 	}
 }
+
+int MapchipField::getElement(float x, float y)
+{
+	// 座標を整数に変換
+	int ix = static_cast<int>(x);
+	int iy = static_cast<int>(y);
+
+	// 範囲チェック (0 <= ix, iy <= 6)
+	if (ix < 0 || ix > 6 || iy < 0 || iy > 6) {
+		return 0; // 範囲外の場合は 0 を返す
+	}
+
+	// 範囲内の場合はマップから値を取得
+	return field[iy][ix].type;
+}
