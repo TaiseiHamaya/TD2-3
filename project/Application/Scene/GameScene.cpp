@@ -83,7 +83,7 @@ void GameScene::begin()
 
 void GameScene::update()
 {
-	WorldClock::Update();
+	//WorldClock::Update();
 
 	playerManager->update();
 	fieldObjs->update();
