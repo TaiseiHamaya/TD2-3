@@ -8,6 +8,10 @@ void PlayerManager::initialize() {
 
 	child = std::make_unique<Child>();
 	child->initialize();
+	
+	if (auto p = dynamic_cast<Player*>(player.get())) {
+		p->set_child(child.get());
+	}
 }
 
 void PlayerManager::finalize() {
@@ -63,6 +67,9 @@ void PlayerManager::draw() const {
 void PlayerManager::debug_update() {
 	if (auto p = dynamic_cast<Player*>(player.get())) {
 		p->debug_update();
+	}
+	if (auto c = dynamic_cast<Child*>(child.get())) {
+		c->debug_update();
 	}
 }
 #endif // _DEBUG
@@ -148,4 +155,15 @@ bool PlayerManager::approximately_equal(const Vector3& a, const Vector3& b, floa
 	return std::fabs(a.x - b.x) < epsilon &&
 		std::fabs(a.y - b.y) < epsilon &&
 		std::fabs(a.z - b.z) < epsilon;
+}
+
+void PlayerManager::check_child_collision()
+{
+	// 回転中に子供が壁にぶつかる場合
+	if (auto p = dynamic_cast<Player*>(player.get())) {
+		Vector3 childNextPosition = childPos + p->get_direction() * deltaTime;
+		if (mapchipField_->getElement(childNextPosition.x, childNextPosition.z) == 2) {
+			p->cancel_rotation(true); // 回転を中断する処理
+		}
+	}
 }

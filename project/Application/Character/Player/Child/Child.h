@@ -1,5 +1,5 @@
 #pragma once
-#include "CharacterBase.h"
+#include "Application/Character/CharacterBase.h"
 
 class Child : public CharacterBase {
 public:
@@ -13,6 +13,9 @@ public:
     void unset_parent() { object_->reparent(nullptr); }
     void set_falling(bool flag) { isFall = flag; }
 
+#ifdef _DEBUG
+    void debug_update();
+#endif
 private:
     bool isFall = false;
 };

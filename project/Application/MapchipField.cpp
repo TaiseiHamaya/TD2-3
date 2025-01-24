@@ -23,7 +23,7 @@ void MapchipField::initialize(const LevelLoader& level) {
 	field.resize(fieldLevel.size());
 	for (uint32_t row = 0; row < fieldLevel.size(); ++row) {
 		field[row].resize(fieldLevel[row].size());
-		for (uint32_t column = 0; column < fieldLevel.size(); ++column) {
+		for (uint32_t column = 0; column < fieldLevel[row].size(); ++column) {
 			field[row][column].isZeroGravity = fieldZeroGravity[row][column];
 			field[row][column].type = fieldLevel[row][column];
 			if (field[row][column].type != 0) {
@@ -32,8 +32,10 @@ void MapchipField::initialize(const LevelLoader& level) {
 			else {
 				field[row][column].mesh = std::make_unique<MeshInstance>();
 			}
+
+			// 左下を (0, 0) とする座標変換
 			field[row][column].mesh->get_transform().set_translate(
-				Vector3{ row * 1.0f , 0.0f, column * 1.0f }
+				Vector3{ column * boxSize, 0.0f, row * boxSize }
 			);
 		}
 	}

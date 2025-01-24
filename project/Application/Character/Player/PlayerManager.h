@@ -24,7 +24,7 @@ private:
     void attach_child_to_player();
     void detach_child_from_player();
     bool approximately_equal(const Vector3& a, const Vector3& b, float epsilon = 1e-5f);
-
+    void check_child_collision();
 private:
     std::unique_ptr<CharacterBase> player;
     std::unique_ptr<CharacterBase> child;
@@ -32,4 +32,6 @@ private:
 
     Vector3 playerPos{};
     Vector3 childPos{};
+
+    float deltaTime = WorldClock::DeltaSeconds();
 };

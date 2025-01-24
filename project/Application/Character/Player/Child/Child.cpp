@@ -29,3 +29,12 @@ void Child::draw() const
 {
 	object_->draw();
 }
+
+#ifdef _DEBUG
+void Child::debug_update()
+{
+	ImGui::Begin("Child");
+	object_->debug_gui();
+	ImGui::End();
+}
+#endif // _DEBUG

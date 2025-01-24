@@ -49,6 +49,7 @@ void GameScene::initialize()
 
 	fieldObjs = std::make_unique<MapchipField>();
 	fieldObjs->initialize(levelLoader);
+	
 
 	playerManager->set_mapchip_field(fieldObjs.get());
 
@@ -86,7 +87,7 @@ void GameScene::begin()
 
 void GameScene::update()
 {
-	WorldClock::Update();
+	//WorldClock::Update();
 
 	playerManager->update();
 	fieldObjs->update();

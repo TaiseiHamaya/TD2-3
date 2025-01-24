@@ -122,7 +122,7 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
   <ItemGroup>
     <ClCompile Include="Application\Character\Player\Child\Child.cpp" />
     <ClCompile Include="Application\GameManagement.cpp" />
-    <ClCompile Include="CharacterBase.cpp" />
+    <ClCompile Include="Application\Character\CharacterBase.cpp" />
     <ClCompile Include="Engine\Module\DrawExecutor\LineGroupDrawExecutor\LineGroupDrawExecutor.cpp" />
     <ClCompile Include="Engine\Module\World\Collision\Collider\AABBCollider.cpp" />
     <ClCompile Include="Application\Scene\GameScene.cpp" />
@@ -242,7 +242,7 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
   <ItemGroup>
     <ClInclude Include="Application\Character\Player\Child\Child.h" />
     <ClInclude Include="Application\GameManagement.h" />
-    <ClInclude Include="CharacterBase.h" />
+    <ClInclude Include="Application\Character\CharacterBase.h" />
     <ClInclude Include="Engine\Module\DrawExecutor\LineGroupDrawExecutor\LineGroupDrawExecutor.h" />
     <ClInclude Include="Engine\Module\World\Collision\Collider\AABBCollider.h" />
     <ClInclude Include="Application\Scene\GameScene.h" />
@@ -455,7 +455,6 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     </FxCompile>
   </ItemGroup>
   <ItemGroup>
-    <None Include="..\..\..\..\..\..\..\Downloads\stage1.json" />
     <None Include="EngineResources\HLSL\3DObject\Object3d.hlsli">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
