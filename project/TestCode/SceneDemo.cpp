@@ -92,7 +92,7 @@ void SceneDemo::initialize() {
 	child->reset_mesh("Sphere.obj");
 	child->reparent(*parent);
 	fieldObjs = std::make_unique<MapchipField>();
-	fieldObjs->init();
+	//fieldObjs->init();
 	debugCheckObj = std::make_unique<MeshInstance>();
 	debugCheckObj->reset_mesh("ParentObj.obj");
 

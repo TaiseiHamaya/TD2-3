@@ -11,6 +11,7 @@
 #include "Engine/Module/World/Camera/Camera3D.h"
 #include "Engine/Resources/Texture/TextureManager.h"
 
+#include "Application/LevelLoader/LevelLoader.h"
 
 GameScene::GameScene() = default;
 
@@ -40,11 +41,13 @@ void GameScene::initialize()
 		{3,8,-10}
 		});
 
+	LevelLoader levelLoader{ 1 };
+
 	playerManager = std::make_unique<PlayerManager>();
 	playerManager->initialize();
 
 	fieldObjs = std::make_unique<MapchipField>();
-	fieldObjs->init();
+	fieldObjs->initialize(levelLoader);
 
 	playerManager->set_mapchip_field(fieldObjs.get());
 
@@ -111,6 +114,10 @@ void GameScene::draw() const
 
 	fieldObjs->draw();
 	playerManager->draw();
+
+#ifdef _DEBUG
+	camera3D->debug_draw();
+#endif // _DEBUG
 
 	renderPath->next();
 	managementUI->darw();
