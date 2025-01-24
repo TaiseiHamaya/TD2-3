@@ -1,34 +1,18 @@
 #pragma once
-#include <memory>
-#include "Engine/Module/World/Mesh/MeshInstance.h"
+#include "CharacterBase.h"
 
-class Child
-{
+class Child : public CharacterBase {
 public:
-	void load();
-	void initialize();
-	void finalize();
+    void initialize() override;
+    void finalize() override;
+    void update() override;
+    void begin_rendering() override;
+    void draw() const override;
 
-	void begin();
-	void update();
-	void begin_rendering();
-	void late_update();
-
-	void draw() const;
-
-public:
-	// 平行移動を取得
-	Vector3 get_translate() { return object_->get_transform().get_translate(); }
-
-	void set_translate(Vector3 translate) { object_->get_transform().set_translate(translate); }
-	// 親子付けする
-	void set_parent(MeshInstance* parent) { object_->reparent(parent); }
-	void unset_parent() { object_->reparent(nullptr); }
+    void set_parent(MeshInstance* parent) { object_->reparent(parent); }
+    void unset_parent() { object_->reparent(nullptr); }
+    void set_falling(bool flag) { isFall = flag; }
 
 private:
-	std::unique_ptr<MeshInstance> object_;
-
-	//float speed = 1.0f;
-
+    bool isFall = false;
 };
-

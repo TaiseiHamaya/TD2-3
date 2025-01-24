@@ -19,9 +19,7 @@ public:
 
 
 	//アクセッサ
-	int getElement(float x, float y) {
-		return curMap[static_cast<int>(y)][static_cast<int>(x)];
-	}
+	int getElement(float x, float y);
 private:
 
 	//メモ　
