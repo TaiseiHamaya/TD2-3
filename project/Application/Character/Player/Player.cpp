@@ -164,9 +164,8 @@ void Player::rotate(MapchipField* mapchipField)
 	}
 }
 
-bool Player::can_move_to(const Vector3& position, MapchipField* mapchipField) 
+bool Player::can_move_to(const Vector3& position, MapchipField* mapchipField)
 {
-	
 	if (!isParent) {
 		auto element = mapchipField->getElement(position.x, position.z);
 		return element == 1 || element == 3;
@@ -174,8 +173,7 @@ bool Player::can_move_to(const Vector3& position, MapchipField* mapchipField)
 	else {
 		Vector3 childDirection{};
 		Vector3 nextChildPos{};
-		//Vector3 rotatedChildPos{};
-		
+
 		if (std::round(child_->get_translate().x) == 1.0f) {
 			childDirection = rotate_direction_90_left(direction);
 		}
@@ -186,26 +184,19 @@ bool Player::can_move_to(const Vector3& position, MapchipField* mapchipField)
 			childDirection = direction;
 		}
 
-
 		nextChildPos = object_->get_transform().get_translate() + childDirection + direction;
-
-		//auto elementNowPlayer = mapchipField->getElement(std::round(object_->get_transform().get_translate().x), std::round(object_->get_transform().get_translate().z));
-		//auto elementRotatedChild = mapchipField->getElement(std::round(rotatedChildPos.x), std::round(rotatedChildPos.z));
 
 		auto elementNextPlayer = mapchipField->getElement(std::round(position.x), std::round(position.z));
 		auto elementChild = mapchipField->getElement(std::round(nextChildPos.x), std::round(nextChildPos.z));
 
-		//if (elementNowPlayer == 0 || elementNowPlayer == 2) {
-		//	if (elementRotatedChild == 0 || elementRotatedChild == 2) {
-		//		isRotating = false;
-		//		return false;
-		//	}
-		//}
-		if (elementNextPlayer == 0 || elementNextPlayer == 2) {
-			if (elementChild == 0 || elementChild == 2) {
-				return false;
-			}
+		if (elementNextPlayer == 0 && elementChild == 0) {
+			return false;
 		}
+
+		if (elementNextPlayer == 2 || elementChild == 2) {
+			return false;
+		}
+
 		return true;
 	}
 }
@@ -313,7 +304,6 @@ bool Player::check_collision_during_rotation(MapchipField* mapchipField)
 			secondPos -= childDirection;
 			thirdPos -= childDirection;
 		}
-
 		return check_collision(firstPos) || check_collision(secondPos) || check_collision(thirdPos);
 		};
 
@@ -323,7 +313,12 @@ bool Player::check_collision_during_rotation(MapchipField* mapchipField)
 	if (check_side_collisions(rightDirection, childDirection)) {
 		// 右側が埋まってたら逆回転
 		isReverseRotation = true;
-		midRotation = Quaternion::FromToRotation({ 0.0f, 0.0f, -1.0f }, leftDirection);
+		if (childDirection == direction) {
+			midRotation = Quaternion::FromToRotation({ 0.0f, 0.0f, -1.0f }, rightDirection);
+		}
+		else {
+			midRotation = Quaternion::FromToRotation({ 0.0f, 0.0f, -1.0f }, childDirection);
+		}
 
 		if (check_side_collisions(leftDirection, childDirection)) {
 			// 両方埋まってたら終了
@@ -336,10 +331,13 @@ bool Player::check_collision_during_rotation(MapchipField* mapchipField)
 
 	if (check_side_collisions(leftDirection, childDirection)) {
 		// 左側が埋まってたら逆回転
+		isReverseRotation = true;
 		if (childDirection == direction) {
-			isReverseRotation = true;
+			midRotation = Quaternion::FromToRotation({ 0.0f, 0.0f, -1.0f }, rightDirection);
 		}
-		midRotation = Quaternion::FromToRotation({ 0.0f, 0.0f, -1.0f }, rightDirection);
+		else {
+			midRotation = Quaternion::FromToRotation({ 0.0f, 0.0f, -1.0f }, childDirection);
+		}
 
 		if (check_side_collisions(rightDirection, childDirection)) {
 			// 両方埋まってたら終了
