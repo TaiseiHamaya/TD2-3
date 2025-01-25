@@ -310,33 +310,17 @@ bool Player::check_collision_during_rotation(MapchipField* mapchipField)
 	Vector3 leftDirection = rotate_direction_90_left(childDirection);
 	Vector3 rightDirection = rotate_direction_90_right(childDirection);
 
-	if (check_side_collisions(rightDirection, childDirection)) {
-		// 右側が埋まってたら逆回転
-		isReverseRotation = true;
-		if (childDirection == direction) {
-			midRotation = Quaternion::FromToRotation({ 0.0f, 0.0f, -1.0f }, rightDirection);
-		}
-		else {
-			midRotation = Quaternion::FromToRotation({ 0.0f, 0.0f, -1.0f }, childDirection);
-		}
-
-		if (check_side_collisions(leftDirection, childDirection)) {
-			// 両方埋まってたら終了
-			rotateTimer = 0.0f;
-			isRotating = false;
-			object_->get_transform().set_quaternion(startRotation); // 元の回転に戻す
-			return true;
-		}
-	}
-
 	if (check_side_collisions(leftDirection, childDirection)) {
 		// 左側が埋まってたら逆回転
 		isReverseRotation = true;
-		if (childDirection == direction) {
-			midRotation = Quaternion::FromToRotation({ 0.0f, 0.0f, -1.0f }, rightDirection);
+		if (std::round(child_->get_translate().x) == 1.0f) {
+			midRotation = Quaternion::FromToRotation({ 0.0f, 0.0f, -1.0f }, -childDirection);
+		}
+		else if (std::round(child_->get_translate().x) == -1.0f){
+			midRotation = Quaternion::FromToRotation({ 0.0f, 0.0f, -1.0f }, childDirection);
 		}
 		else {
-			midRotation = Quaternion::FromToRotation({ 0.0f, 0.0f, -1.0f }, childDirection);
+			midRotation = Quaternion::FromToRotation({ 0.0f, 0.0f, -1.0f }, rightDirection);
 		}
 
 		if (check_side_collisions(rightDirection, childDirection)) {
@@ -348,6 +332,27 @@ bool Player::check_collision_during_rotation(MapchipField* mapchipField)
 		}
 	}
 
+	if (check_side_collisions(rightDirection, childDirection)) {
+		// 右側が埋まってたら逆回転
+		isReverseRotation = true;
+		if (std::round(child_->get_translate().x) == 1.0f) {
+			midRotation = Quaternion::FromToRotation({ 0.0f, 0.0f, -1.0f }, childDirection);
+		}
+		else if (std::round(child_->get_translate().x) == -1.0f) {
+			midRotation = Quaternion::FromToRotation({ 0.0f, 0.0f, -1.0f }, -childDirection);
+		}
+		else {
+			midRotation = Quaternion::FromToRotation({ 0.0f, 0.0f, -1.0f }, leftDirection);
+		}
+
+		if (check_side_collisions(leftDirection, childDirection)) {
+			// 両方埋まってたら終了
+			rotateTimer = 0.0f;
+			isRotating = false;
+			object_->get_transform().set_quaternion(startRotation); // 元の回転に戻す
+			return true;
+		}
+	}
 
 	return false; // 衝突がなければ回転を続行
 }
