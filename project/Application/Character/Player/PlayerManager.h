@@ -1,12 +1,14 @@
 #pragma once
 #include <memory>
 #include "Application/Character/Player/Player.h"
-#include "Application/Character/Player/Child/Child.h"
-#include <Application/MapchipField.h>
+#include "Application/Character/Child/Child.h"
+#include "Application/Mapchip/MapchipHandler.h"
+#include "Application/Scene/GameManagement.h"
+
 
 class PlayerManager {
 public:
-    void initialize(const LevelLoader& level);
+    void initialize(const LevelLoader& level, MapchipField* mapchipField);
     void finalize();
     void update();
     void begin_rendering();
@@ -16,22 +18,24 @@ public:
     void debug_update();
 #endif
 
-    void set_mapchip_field(MapchipField* mapchipField) { mapchipField_ = mapchipField; }
+    void set_game_management(GameManagement* gameManagement) { gameManagement_ = gameManagement; }
+private:
+    void manage_parent_child_relationship();
+
+    void attach_child_to_player(Player* player, Child* child);
+    void detach_child_from_player(Player* player, Child* child);
+    bool is_game_cleared() const { return gameCleared; }
 
 private:
-    void update_mapchip();
-    void check_fall_conditions();
-    void attach_child_to_player();
-    void detach_child_from_player();
-    bool approximately_equal(const Vector3& a, const Vector3& b, float epsilon = 1e-5f);
-    void check_child_collision();
-private:
-    std::unique_ptr<CharacterBase> player;
-    std::unique_ptr<CharacterBase> child;
+    std::unique_ptr<Player> player;
+    std::unique_ptr<Child> child;
+    std::unique_ptr<MapchipHandler> mapchipHandler;
+    GameManagement* gameManagement_;
     MapchipField* mapchipField_;
 
-    Vector3 playerPos{};
-    Vector3 childPos{};
+    Vector3 playerPos{}; // プレイヤーの現在位置
+    Vector3 childPos{};  // 子オブジェクトの現在位置
 
-    float deltaTime = WorldClock::DeltaSeconds();
+    int gameCleared = 0; // クリア状態を管理(0:通常 1:クリア 2:失敗)
+
 };

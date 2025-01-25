@@ -1,9 +1,10 @@
 #pragma once
 #include "Application/Character/CharacterBase.h"
+#include <Application/Mapchip/MapchipHandler.h>
 
 class Child : public CharacterBase {
 public:
-    void initialize(const LevelLoader& level) override;
+    void initialize(const LevelLoader& level, MapchipHandler* mapchipHandler) override;
     void finalize() override;
     void update() override;
     void begin_rendering() override;

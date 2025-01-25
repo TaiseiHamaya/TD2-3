@@ -44,14 +44,11 @@ void GameScene::initialize()
 
 	LevelLoader levelLoader{ 1 };
 
-	playerManager = std::make_unique<PlayerManager>();
-	playerManager->initialize(levelLoader);
-
 	fieldObjs = std::make_unique<MapchipField>();
 	fieldObjs->initialize(levelLoader);
-	
 
-	playerManager->set_mapchip_field(fieldObjs.get());
+	playerManager = std::make_unique<PlayerManager>();
+	playerManager->initialize(levelLoader, fieldObjs.get());
 
 	directionalLight = eps::CreateUnique<DirectionalLightInstance>();
 
@@ -70,6 +67,7 @@ void GameScene::initialize()
 	renderPath->initialize({object3dNode,spriteNode });
 
 	managementUI = std::make_unique<GameManagement>();
+	playerManager->set_game_management(managementUI.get());
 
 }
 

@@ -7,8 +7,8 @@ class RenderPath;
 class Camera3D;
 
 #include "Application/Character/Player/PlayerManager.h"
-#include "Application/MapchipField.h"
-#include "Application/GameManagement.h"
+#include "Application/Mapchip/MapchipField.h"
+#include "Application/Scene/GameManagement.h"
 #include "Engine/Module/Render/RenderNode/Sprite/SpriteNode.h"
 
 

@@ -1,6 +1,6 @@
 #include "Child.h"
 
-void Child::initialize(const LevelLoader& level)
+void Child::initialize(const LevelLoader& level, MapchipHandler* mapchipHandler)
 {
 	object_ = std::make_unique<MeshInstance>();
 	object_->reset_mesh("ChiledKoala.obj");

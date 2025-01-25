@@ -2,12 +2,13 @@
 #include <memory>
 #include "Engine/Module/World/Mesh/MeshInstance.h"
 #include "Application/LevelLoader/LevelLoader.h"
+#include "Application/Mapchip/MapchipHandler.h"
 
 class CharacterBase {
 public:
     virtual ~CharacterBase() = default;
 
-    virtual void initialize(const LevelLoader& level) = 0;
+    virtual void initialize(const LevelLoader& level, MapchipHandler* mapchipHandler) = 0;
     virtual void finalize() = 0;
     virtual void update() = 0;
     virtual void begin_rendering() = 0;

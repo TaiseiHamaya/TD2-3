@@ -1,16 +1,23 @@
 #include "PlayerManager.h"
 #include "Engine/Runtime/Input/Input.h"
 #include <cmath>
+#include <Application/Utility/GameUtility.h>
 
-void PlayerManager::initialize(const LevelLoader& level) {
-	player = std::make_unique<Player>();
-	player->initialize(level);
+void PlayerManager::initialize(const LevelLoader& level, MapchipField* mapchipField) {
+	mapchipField_ = mapchipField;
+
+	mapchipHandler = std::make_unique<MapchipHandler>();
+	mapchipHandler->initialize(mapchipField_);
 
 	child = std::make_unique<Child>();
-	child->initialize(level);
-	
-	if (auto p = dynamic_cast<Player*>(player.get())) {
-		p->set_child(child.get());
+	child->initialize(level, mapchipHandler.get());
+
+	player = std::make_unique<Player>();
+	player->initialize(level, mapchipHandler.get());
+	player->set_child(child.get());
+
+	if (player) {
+		player->set_parent(false);
 	}
 }
 
@@ -20,36 +27,35 @@ void PlayerManager::finalize() {
 }
 
 void PlayerManager::update() {
+	// クリアか失敗のフラグが立ってたら早期リターン
+	if (gameCleared != 0) return;
+
 	// プレイヤーと子供の位置を計算
-	if (auto p = dynamic_cast<Player*>(player.get())) {
-		playerPos = p->get_translate();
-		childPos = child->get_translate();
+	playerPos = player->get_translate();
+	childPos = child->get_translate();
 
-		if (p->is_parent()) {
-			childPos = playerPos + childPos * p->get_rotation();
-		}
+	if (player->is_parent()) {
+		childPos = playerPos + childPos * player->get_rotation();
 	}
 
-	// プレイヤーのマップチップ関連の更新
-	if (auto p = dynamic_cast<Player*>(player.get())) {
-		p->update(mapchipField_);
-	}
+	// マップチップ関連の更新
+	mapchipHandler->update_player_on_mapchip(player.get(), child.get());
 
-	// マップチップ以外の更新
+	// 状態の更新
 	player->update();
 	child->update();
 
-	// くっつく処理と切り離す処理
-	if (auto p = dynamic_cast<Player*>(player.get())) {
-		if (!p->is_parent()) {
-			attach_child_to_player();
-		}
-		else {
-			detach_child_from_player();
-		}
+	// 親子関係の管理
+	manage_parent_child_relationship();
+
+	// マップチップのクリア判定
+	gameCleared = mapchipHandler->is_goal_reached(player.get(), child.get());
+	if (gameCleared == 1) {
+		gameManagement_->SetClearFlag(true);
 	}
-	// マップチップの処理の更新
-	update_mapchip();
+	else if (gameCleared == 2) {
+		gameManagement_->SetFailedFlag(true);
+	}
 }
 
 void PlayerManager::begin_rendering()
@@ -65,105 +71,63 @@ void PlayerManager::draw() const {
 
 #ifdef _DEBUG
 void PlayerManager::debug_update() {
-	if (auto p = dynamic_cast<Player*>(player.get())) {
-		p->debug_update();
-	}
-	if (auto c = dynamic_cast<Child*>(child.get())) {
-		c->debug_update();
-	}
+	player->debug_update();
+	child->debug_update();
 }
-#endif // _DEBUG
+#endif
 
-void PlayerManager::update_mapchip() {
-
-	check_fall_conditions();
-}
-
-void PlayerManager::check_fall_conditions()
+void PlayerManager::manage_parent_child_relationship()
 {
-	if (auto p = dynamic_cast<Player*>(player.get())) {
-		// 落下するかどうかを計算
-		bool playerFalling = mapchipField_->getElement(std::round(playerPos.x), std::round(playerPos.z)) == 0;
-		bool childFalling = mapchipField_->getElement(std::round(childPos.x), std::round(childPos.z)) == 0;
+	if (!player->is_parent()) {
+		// 子をプレイヤーにくっつける処理
+		attach_child_to_player(player.get(), child.get());
+	}
+	else {
+		// 子をプレイヤーから切り離す処理
+		detach_child_from_player(player.get(), child.get());
+	}
+}
 
-		// 親がいない場合は個々で落下
-		if (!p->is_parent()) {
-			p->set_falling(playerFalling);
-			if (auto c = dynamic_cast<Child*>(child.get())) {
-				c->set_falling(childFalling);
+void PlayerManager::attach_child_to_player(Player* player, Child* child)
+{
+	if (!player->is_moved()) return;
+
+	Vector3 directions[] = {
+		{1.0f, 0.0f, 0.0f},   // 右
+		{-1.0f, 0.0f, 0.0f},  // 左
+		{0.0f, 0.0f, 1.0f},   // 前
+		{0.0f, 0.0f, -1.0f}   // 後ろ
+	};
+
+	for (const auto& direction : directions) {
+		Vector3 playerToChild = player->get_translate() - child->get_translate();
+		if (GameUtility::approximately_equal(playerToChild, direction)) {
+			child->get_object()->reparent(player->get_object());
+			player->set_parent(true);
+
+			// プレイヤーの回転を考慮してオフセットを生成
+			Quaternion parentRotation = player->get_rotation();
+			Vector3 adjustedOffset = direction * parentRotation;
+			// ごり押しで微調整
+			if (std::abs(adjustedOffset.x) == 1.0f || std::abs(adjustedOffset.z) == 1.0f) {
+				adjustedOffset *= -1.0f;
 			}
-		}
-		// 親がいた場合は二人とも同時に取る
-		else {
-			if (playerFalling && childFalling) {
-				p->set_falling(true);
-				if (auto c = dynamic_cast<Child*>(child.get())) {
-					c->set_falling(true);
-				}
-			}
+			// 子供のローカル座標を設定
+			child->set_translate(adjustedOffset);
+
+			break;
 		}
 	}
 }
 
-void PlayerManager::attach_child_to_player() {
-	if (auto p = dynamic_cast<Player*>(player.get())) {
-		if (p->is_moving()) {
-			Vector3 directions[] = {
-				{1.0f, 0.0f, 0.0f},   // 右
-				{-1.0f, 0.0f, 0.0f},    // 左
-				{0.0f, 0.0f, 1.0f},   // 前
-				{0.0f, 0.0f, -1.0f}     // 後ろ
-			};
-
-			for (const auto& direction : directions) {
-				// プレイヤーと子供の距離を計算
-				Vector3 playerToChild = p->get_translate() - child->get_translate();
-				// 近かったら結合
-				if (approximately_equal(playerToChild, direction)) {
-					child->get_object()->reparent(p->get_object());
-					// プレイヤーの回転を考慮してオフセットを生成
-					Quaternion parentRotation = p->get_rotation();
-					Vector3 adjustedOffset = direction * parentRotation;
-					// ごり押しで微調整
-					if (std::abs(adjustedOffset.x) == 1.0f || std::abs(adjustedOffset.z) == 1.0f) {
-						adjustedOffset *= -1.0f;
-					}
-					// 子供のローカル座標を設定
-					child->set_translate(adjustedOffset);
-					p->set_parent(true);
-					break;
-				}
-			}
-		}
-	}
-}
-
-void PlayerManager::detach_child_from_player() {
+void PlayerManager::detach_child_from_player(Player* player, Child* child)
+{
 	if (Input::GetInstance().IsTriggerKey(KeyID::Space)) {
-		if (auto p = dynamic_cast<Player*>(player.get())) {
-			// ペアレントを解消する
-			child->get_object()->reparent(nullptr);
-			// 子供のワールド座標を設定
-			child->set_translate({ std::round(childPos.x), std::round(childPos.y), std::round(childPos.z) });
-			// 親子付けフラグをオフにする
-			p->set_parent(false);
-		}
-	}
-}
-
-bool PlayerManager::approximately_equal(const Vector3& a, const Vector3& b, float epsilon) {
-	return std::fabs(a.x - b.x) < epsilon &&
-		std::fabs(a.y - b.y) < epsilon &&
-		std::fabs(a.z - b.z) < epsilon;
-}
-
-void PlayerManager::check_child_collision()
-{
-	// 回転中に子供が壁にぶつかる場合
-	if (auto p = dynamic_cast<Player*>(player.get())) {
-		Vector3 childNextPosition = childPos + p->get_direction() * deltaTime;
-		if (mapchipField_->getElement(childNextPosition.x, childNextPosition.z) == 2) {
-			p->cancel_rotation(true); // 回転を中断する処理
-		}
+		// ペアレントを解消する
+		child->get_object()->reparent(nullptr);
+		// 子供のワールド座標を設定
+		child->set_translate({ std::round(childPos.x), std::round(childPos.y), std::round(childPos.z) });
+		// 親子付けフラグをオフにする
+		player->set_parent(false);
 	}
 }
