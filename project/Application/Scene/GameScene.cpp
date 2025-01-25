@@ -45,7 +45,7 @@ void GameScene::initialize()
 	LevelLoader levelLoader{ 1 };
 
 	playerManager = std::make_unique<PlayerManager>();
-	playerManager->initialize();
+	playerManager->initialize(levelLoader);
 
 	fieldObjs = std::make_unique<MapchipField>();
 	fieldObjs->initialize(levelLoader);

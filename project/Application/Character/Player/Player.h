@@ -6,7 +6,7 @@
 
 class Player : public CharacterBase {
 public:
-    void initialize() override;
+    void initialize(const LevelLoader& level) override;
     void finalize() override;
     void update() override;
     void update(MapchipField* mapchipField);
@@ -47,6 +47,7 @@ private:
     Vector3 direction{};
     Vector3 preDirection{};
 
+    Vector3 startPosition;   // 移動の開始位置
     Vector3 targetPosition;  // 次の目標位置
     float moveTimer = 0.0f;  // 移動の進行状況を管理するタイマー
     float moveDuration = 0.3f;  // 移動にかける時間（秒）

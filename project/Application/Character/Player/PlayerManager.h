@@ -6,7 +6,7 @@
 
 class PlayerManager {
 public:
-    void initialize();
+    void initialize(const LevelLoader& level);
     void finalize();
     void update();
     void begin_rendering();

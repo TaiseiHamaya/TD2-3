@@ -42,7 +42,7 @@ LevelLoader::LevelLoader(uint32_t level) {
 				// 行要素の追加(メモリの確保)
 				auto& col = field.emplace_back();
 				col.reserve(array.size());
-				
+
 				for (auto& value : array) {
 					// 値の代入
 					col.emplace_back(value.get<uint32_t>());
@@ -57,7 +57,7 @@ LevelLoader::LevelLoader(uint32_t level) {
 				// 行要素の追加(メモリの確保)
 				auto& col = isZeroGravity.emplace_back();
 				col.reserve(array.size());
-				
+
 				for (auto& value : array) {
 					// 値の代入
 					col.emplace_back(value.get<uint32_t>());
@@ -65,4 +65,14 @@ LevelLoader::LevelLoader(uint32_t level) {
 			}
 		}
 	}
+}
+
+Vector3 LevelLoader::get_player_position() const
+{
+	return Vector3(static_cast<float>(playerRow), 1.0f, static_cast<float>(playerColumn));
+}
+
+Vector3 LevelLoader::get_child_position() const
+{
+	return Vector3(static_cast<float>(childRow), 1.0f, static_cast<float>(childColumn));
 }

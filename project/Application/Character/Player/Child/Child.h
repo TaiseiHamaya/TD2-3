@@ -3,7 +3,7 @@
 
 class Child : public CharacterBase {
 public:
-    void initialize() override;
+    void initialize(const LevelLoader& level) override;
     void finalize() override;
     void update() override;
     void begin_rendering() override;

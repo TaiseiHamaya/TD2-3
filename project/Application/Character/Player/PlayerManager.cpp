@@ -2,12 +2,12 @@
 #include "Engine/Runtime/Input/Input.h"
 #include <cmath>
 
-void PlayerManager::initialize() {
+void PlayerManager::initialize(const LevelLoader& level) {
 	player = std::make_unique<Player>();
-	player->initialize();
+	player->initialize(level);
 
 	child = std::make_unique<Child>();
-	child->initialize();
+	child->initialize(level);
 	
 	if (auto p = dynamic_cast<Player*>(player.get())) {
 		p->set_child(child.get());
@@ -83,8 +83,8 @@ void PlayerManager::check_fall_conditions()
 {
 	if (auto p = dynamic_cast<Player*>(player.get())) {
 		// 落下するかどうかを計算
-		bool playerFalling = mapchipField_->getElement(playerPos.x, playerPos.z) == 0;
-		bool childFalling = mapchipField_->getElement(childPos.x, childPos.z) == 0;
+		bool playerFalling = mapchipField_->getElement(std::round(playerPos.x), std::round(playerPos.z)) == 0;
+		bool childFalling = mapchipField_->getElement(std::round(childPos.x), std::round(childPos.z)) == 0;
 
 		// 親がいない場合は個々で落下
 		if (!p->is_parent()) {
@@ -144,7 +144,7 @@ void PlayerManager::detach_child_from_player() {
 			// ペアレントを解消する
 			child->get_object()->reparent(nullptr);
 			// 子供のワールド座標を設定
-			child->set_translate(childPos);
+			child->set_translate({ std::round(childPos.x), std::round(childPos.y), std::round(childPos.z) });
 			// 親子付けフラグをオフにする
 			p->set_parent(false);
 		}

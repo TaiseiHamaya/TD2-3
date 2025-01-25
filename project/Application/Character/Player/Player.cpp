@@ -2,11 +2,11 @@
 #include "Engine/Runtime/Input/Input.h"
 
 
-void Player::initialize()
+void Player::initialize(const LevelLoader& level)
 {
 	object_ = std::make_unique<MeshInstance>();
 	object_->reset_mesh("ParentObj.obj");
-	object_->get_transform().set_translate({ 3.0f, 1.0f, 1.0f });
+	object_->get_transform().set_translate(level.get_player_position());
 	targetPosition = object_->get_transform().get_translate();
 }
 
@@ -61,6 +61,13 @@ void Player::move(MapchipField* mapchipField)
 	}
 
 	if (isMoving) {
+		// 移動できなければフラグ取り消し
+		if (check_collision_during_translation(mapchipField)) {
+			moveTimer = moveDuration;
+			isMoving = false;
+			return;
+		}
+
 		// 移動中なら補間処理を実行
 		moveTimer += deltaTime;
 
@@ -94,12 +101,13 @@ void Player::move(MapchipField* mapchipField)
 			// 回転の準備
 			start_rotation(mapchipField);
 
+			// 移動の開始位置に現在の位置を入れておく
+			startPosition = object_->get_transform().get_translate();
 			// 次の目標位置
 			Vector3 nextPos = object_->get_transform().get_translate() + direction;
 
 			// 移動可能かを判定
-			if (can_move_to(nextPos, mapchipField) &&
-				check_collision_during_translation(mapchipField)) {
+			if (can_move_to(nextPos, mapchipField)) {
 				// 移動の準備
 				targetPosition = nextPos;
 				moveTimer = 0.0f;
@@ -173,6 +181,8 @@ void Player::start_rotation(MapchipField* mapchipField)
 
 	// 回転中の衝突チェック
 	if (check_collision_during_rotation(mapchipField)) {
+		// プレイヤーの向いている方向を前フレームの物に戻す
+		direction = preDirection;
 		return; // 衝突した場合は処理を中断
 	}
 }
@@ -183,18 +193,34 @@ bool Player::check_collision_during_rotation(MapchipField* mapchipField)
 		return false; // 回転していない場合や子供がいない場合は何もしない
 	}
 
-	// 回転が必要であれば
+	// 今回で移動していない場合は
 	if (direction == preDirection) {
 		return false;
+	}
+
+	auto check_collision = [&](const Vector3& pos) {
+		return mapchipField->getElement(std::round(pos.x), std::round(pos.z)) == 2;
+		};
+
+	Vector3 childDirection;
+
+	if (std::round(child_->get_translate().x) == 1.0f) {
+		childDirection = rotate_direction_90_left(direction);
+	}
+	else if (std::round(child_->get_translate().x) == -1.0f) {
+		childDirection = rotate_direction_90_right(direction);
+	}
+	else {
+		childDirection = direction;
 	}
 
 	// 今の子供の位置
 	Vector3 nowChildPos = object_->get_transform().get_translate() + child_->get_translate() * startRotation;
 	// 移動予定の位置
-	Vector3 nextChildPos = object_->get_transform().get_translate() + direction;
+	Vector3 nextChildPos = object_->get_transform().get_translate() + childDirection;
 
-	// ゴールの位置にブロックが
-	if (mapchipField->getElement(std::round(nextChildPos.x), std::round(nextChildPos.z)) == 2) {
+	// ゴールの位置にブロックがある場合
+	if (check_collision(nextChildPos)) {
 		// 壁に衝突した場合は回転を中断
 		rotateTimer = 0.0f;
 		isRotating = false;
@@ -203,9 +229,9 @@ bool Player::check_collision_during_rotation(MapchipField* mapchipField)
 	}
 
 	// 一回転しない場合の経由点
-	Vector3 midChildPos = nowChildPos + direction;
+	Vector3 midChildPos = nowChildPos + childDirection;
 
-	if (mapchipField->getElement(std::round(midChildPos.x), std::round(midChildPos.z)) == 2) {
+	if (check_collision(midChildPos)) {
 		// 壁に衝突した場合は回転を中断
 		rotateTimer = 0.0f;
 		isRotating = false;
@@ -213,29 +239,32 @@ bool Player::check_collision_during_rotation(MapchipField* mapchipField)
 		return true;
 	}
 
-	Vector3 leftDirection = rotate_direction_90_left(direction);
-	Vector3 rightDirection = rotate_direction_90_right(direction);
-	Vector3 leftMidPos = object_->get_transform().get_translate() + leftDirection;
-	Vector3 rightMidPos = object_->get_transform().get_translate() + rightDirection;
-
-	if (mapchipField->getElement(std::round(leftMidPos.x), std::round(leftMidPos.z)) == 2) {
-		// 左側が埋まってたら逆回転
-		isReverseRotation = true;
-		midRotation = Quaternion::FromToRotation({ 0.0f, 0.0f, -1.0f }, rightDirection);
-		if (mapchipField->getElement(std::round(rightMidPos.x), std::round(rightMidPos.z)) == 2) {
-			// 両方埋まってたら終了
-			rotateTimer = 0.0f;
-			isRotating = false;
-			object_->get_transform().set_quaternion(startRotation); // 元の回転に戻す
-			return true;
-		}
+	if (std::abs(direction.x + preDirection.x) > 0.01f ||
+		std::abs(direction.z + preDirection.z) > 0.01f) {
+		return false; // 180度ではない場合は終了
 	}
+	auto check_side_collisions = [&](const Vector3& primaryDirection, const Vector3& secondaryDirection) {
+		Vector3 firstPos = object_->get_transform().get_translate() + primaryDirection;
+		Vector3 secondPos = firstPos + secondaryDirection;
+		Vector3 thirdPos = secondPos + secondaryDirection;
+		if (childDirection != direction) {
+			firstPos -= childDirection;
+			secondPos -= childDirection;
+			thirdPos -= childDirection;
+		}
 
-	if (mapchipField->getElement(std::round(rightMidPos.x), std::round(rightMidPos.z)) == 2) {
+		return check_collision(firstPos) || check_collision(secondPos) || check_collision(thirdPos);
+		};
+
+	Vector3 leftDirection = rotate_direction_90_left(childDirection);
+	Vector3 rightDirection = rotate_direction_90_right(childDirection);
+
+	if (check_side_collisions(rightDirection, childDirection)) {
 		// 右側が埋まってたら逆回転
 		isReverseRotation = true;
 		midRotation = Quaternion::FromToRotation({ 0.0f, 0.0f, -1.0f }, leftDirection);
-		if (mapchipField->getElement(std::round(leftMidPos.x), std::round(leftMidPos.z)) == 2) {
+
+		if (check_side_collisions(leftDirection, childDirection)) {
 			// 両方埋まってたら終了
 			rotateTimer = 0.0f;
 			isRotating = false;
@@ -243,22 +272,39 @@ bool Player::check_collision_during_rotation(MapchipField* mapchipField)
 			return true;
 		}
 	}
+
+	if (check_side_collisions(leftDirection, childDirection)) {
+		// 左側が埋まってたら逆回転
+		if (childDirection == direction) {
+			isReverseRotation = true;
+		}
+		midRotation = Quaternion::FromToRotation({ 0.0f, 0.0f, -1.0f }, rightDirection);
+
+		if (check_side_collisions(rightDirection, childDirection)) {
+			// 両方埋まってたら終了
+			rotateTimer = 0.0f;
+			isRotating = false;
+			object_->get_transform().set_quaternion(startRotation); // 元の回転に戻す
+			return true;
+		}
+	}
+
 
 	return false; // 衝突がなければ回転を続行
 }
 
 bool Player::check_collision_during_translation(MapchipField* mapchipField)
 {
-	if (isMoving || !isParent) {
-		return true; // 移動していない場合や子供がいない場合はそのまま通す
+	if (!isMoving || !isParent) {
+		return false; // 移動していない場合や子供がいない場合はそのまま通す
 	}
 
-	Vector3 nextPos = object_->get_transform().get_translate() + (direction * 2);
-
-	if (mapchipField->getElement(nextPos.x, nextPos.z) != 2) {
-		return true;
+	Vector3 nowChildPos = startPosition + child_->get_translate() * targetRotation;
+	Vector3 nextPos = nowChildPos + direction;
+	if (mapchipField->getElement(std::round(nextPos.x), std::round(nextPos.z)) != 2) {
+		return false;
 	}
-	return false;
+	return true;
 }
 
 bool Player::approximately_equal(const Vector3& a, const Vector3& b, float epsilon)
