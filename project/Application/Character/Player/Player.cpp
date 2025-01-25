@@ -5,7 +5,7 @@
 void Player::initialize(const LevelLoader& level)
 {
 	object_ = std::make_unique<MeshInstance>();
-	object_->reset_mesh("ParentObj.obj");
+	object_->reset_mesh("ParentKoala.obj");
 	object_->get_transform().set_translate(level.get_player_position());
 	targetPosition = object_->get_transform().get_translate();
 }
