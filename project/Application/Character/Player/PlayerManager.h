@@ -3,7 +3,7 @@
 #include "Application/Character/Player/Player.h"
 #include "Application/Character/Child/Child.h"
 #include "Application/Mapchip/MapchipHandler.h"
-#include <Application/GameManagement.h>
+#include "Application/Scene/GameManagement.h"
 
 
 class PlayerManager {

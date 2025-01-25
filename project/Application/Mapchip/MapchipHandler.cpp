@@ -17,6 +17,9 @@ bool MapchipHandler::can_player_move_to(Player* player, Child* child, const Vect
 	Vector3 nextPos = player->get_translate() + direction;
 
 	if (!player->is_parent()) {
+		if (nextPos == child->get_translate()) {
+			return false;
+		}
 		auto element = mapchipField_->getElement(nextPos.x, nextPos.z);
 		return element == 1 || element == 3;
 	}
