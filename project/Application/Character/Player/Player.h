@@ -1,67 +1,77 @@
 #pragma once
 #include "Application/Character/CharacterBase.h"
-#include <Application/MapchipField.h>
 #include "Engine/Runtime/WorldClock/WorldClock.h"
-#include "Application/Character/Player/Child/Child.h"
+#include <Application/Mapchip/MapchipHandler.h>
+
 
 class Player : public CharacterBase {
 public:
-    void initialize(const LevelLoader& level) override;
-    void finalize() override;
-    void update() override;
-    void update(MapchipField* mapchipField);
-    void begin_rendering() override;
-    void draw() const override;
+	void initialize(const LevelLoader& level, MapchipHandler* mapchipHandler) override;
+	void finalize() override;
+	void update() override;
+
+	void begin_rendering() override;
+	void draw() const override;
+
+	// アクセッサ
+	void set_child(Child* child) { child_ = child; }
+
+	Vector3 get_translate() const { return object_->get_transform().get_translate(); }
+	void set_translate(const Vector3& position) { object_->get_transform().set_translate(position); }
+
+	Quaternion get_rotation() const { return object_->get_transform().get_quaternion(); }
+	void set_rotation(const Quaternion& rotation) { object_->get_transform().set_quaternion(rotation); }
+
+	bool is_parent() const { return isParent; }
+	void set_parent(bool flag) { isParent = flag; }
+
+	bool is_falling() const { return isFalling; }
+	void set_falling(bool flag) { isFalling = flag; }
+
+	bool is_moving() const { return isMoving; }
+	void set_moving(bool flag) { isMoving = flag; }
+
+	bool is_moved() const { return isMove; }
+
+	Vector3 get_previous_direction() const { return preDirection; }
+
+	void set_reverse_rotation(bool flag) { isReverseRotation = flag; }
+
+	void set_mid_rotation(Quaternion Rotation) { midRotation = Rotation; }
 
 #ifdef _DEBUG
-    void debug_update();
+	void debug_update();
 #endif
-    // アクセッサ
-    Vector3 get_translate() const { return object_->get_transform().get_translate(); }
-    Vector3 get_direction() const { return direction; }
+private:
 
-    void set_child(CharacterBase* child) { child_ = child; }
-    bool is_parent() const { return isParent; }
-    void set_parent(bool flag) { isParent = flag; }
-    void set_falling(bool flag) { isFall = flag; }
-    bool is_moving() const { return isMove; }
-    void cancel_rotation(bool flag) { isCancelRotate = flag; }
+	void handle_input();
+	void fall_update();
+	void move_update();
+	void rotate_update();
 
 private:
-    void move(MapchipField* mapchipField);
-    void rotate(MapchipField* mapchipField);
-    bool can_move_to(const Vector3& position, MapchipField* mapchipField);
-    void start_rotation(MapchipField* mapchipField);
-    bool check_collision_during_rotation(MapchipField* mapchipField);
-    bool check_collision_during_translation(MapchipField* mapchipField);
-    bool approximately_equal(const Vector3& a, const Vector3& b, float epsilon = 1e-5f);
-    Vector3 rotate_direction_90_left(const Vector3& direction);
-    Vector3 rotate_direction_90_right(const Vector3& direction);
+	MapchipHandler* mapchipHandler_;
+	Child* child_; // 子オブジェクトへの参照
 
-private:
-    CharacterBase* child_;
+	bool isMove = false; // 今フレームで移動をしたかどうか
+	bool isParent = false; // 子供を持つかどうか
+	bool isFalling = false; // 落下中かどうか
+	Vector3 direction{}; // 移動方向
+	Vector3 preDirection{}; // 移動方向
 
-    bool isParent = false;
-    bool isMove = false;
-    bool isFall = false;
-    Vector3 direction{};
-    Vector3 preDirection{};
+	Vector3 startPosition;   // 移動の開始位置
+	Vector3 targetPosition;  // 次の目標位置
+	float moveTimer = 0.0f;  // 移動の進行状況を管理するタイマー
+	float moveDuration = 0.3f;  // 移動にかける時間（秒）
+	bool isMoving = false;   // 現在移動中かどうかのフラグ
 
-    Vector3 startPosition;   // 移動の開始位置
-    Vector3 targetPosition;  // 次の目標位置
-    float moveTimer = 0.0f;  // 移動の進行状況を管理するタイマー
-    float moveDuration = 0.3f;  // 移動にかける時間（秒）
-    bool isMoving = false;   // 現在移動中かどうかのフラグ
+	Quaternion targetRotation;  // 次の目標回転
+	Quaternion startRotation;   // 補間の開始回転
+	Quaternion midRotation;     // 180度回転するときの中間点
+	float rotateTimer = 0.0f;    // 回転の進行状況を管理するタイマー
+	float rotateDuration = 0.3f; // 回転にかける時間（秒）
+	bool isRotating = false;     // 現在回転中かどうかのフラグ
+	bool isReverseRotation = false; // 回転を反転
 
-    Quaternion targetRotation;  // 次の目標回転
-    Quaternion startRotation;   // 補間の開始回転
-    Quaternion midRotation;     // 180度回転するときの中間点
-    float rotateTimer = 0.0f;    // 回転の進行状況を管理するタイマー
-    float rotateDuration = 0.3f; // 回転にかける時間（秒）
-    bool isRotating = false;     // 現在回転中かどうかのフラグ
-    bool isReverseRotation = false; // 回転を反転
-
-    bool isCancelRotate = false; // 回転が途中でさえぎられた場合の処理
-
-    float deltaTime = WorldClock::DeltaSeconds();
+	float deltaTime = WorldClock::DeltaSeconds(); // 時間管理
 };

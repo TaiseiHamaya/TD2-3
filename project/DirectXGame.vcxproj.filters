@@ -20,7 +20,6 @@
     <FxCompile Include="EngineResources\HLSL\Wireframe\Wireframe3d.VS.hlsl" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="Application\Character\Player\Child\Child.cpp" />
     <ClCompile Include="Application\GameManagement.cpp" />
     <ClCompile Include="Application\Character\CharacterBase.cpp" />
     <ClCompile Include="Engine\Module\DrawExecutor\LineGroupDrawExecutor\LineGroupDrawExecutor.cpp" />
@@ -138,9 +137,11 @@
     <ClCompile Include="TestCode\SceneDemo.cpp" />
     <ClCompile Include="Engine\Resources\Texture\TextureResourceBuilder.cpp" />
     <ClCompile Include="Engine\Module\World\WorldInstanceManager.cpp" />
+    <ClCompile Include="Application\Utility\GameUtility.cpp" />
+    <ClCompile Include="Application\Character\Child\Child.cpp" />
+    <ClCompile Include="Application\Mapchip\MapchipHandler.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="Application\Character\Player\Child\Child.h" />
     <ClInclude Include="Application\GameManagement.h" />
     <ClInclude Include="Application\Character\CharacterBase.h" />
     <ClInclude Include="Engine\Module\DrawExecutor\LineGroupDrawExecutor\LineGroupDrawExecutor.h" />
@@ -283,6 +284,9 @@
     <ClInclude Include="TestCode\SceneDemo.h" />
     <ClInclude Include="Engine\Resources\Texture\TextureResourceBuilder.h" />
     <ClInclude Include="Engine\Module\World\WorldInstanceManager.h" />
+    <ClInclude Include="Application\Utility\GameUtility.h" />
+    <ClInclude Include="Application\Character\Child\Child.h" />
+    <ClInclude Include="Application\Mapchip\MapchipHandler.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="EngineResources\HLSL\3DObject\Object3d.hlsli" />

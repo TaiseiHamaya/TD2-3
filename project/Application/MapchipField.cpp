@@ -42,6 +42,7 @@ void MapchipField::initialize(const LevelLoader& level) {
 }
 
 void MapchipField::update() {
+
 }
 
 void MapchipField::begin_rendering() {
