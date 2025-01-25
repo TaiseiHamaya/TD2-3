@@ -15,7 +15,7 @@ void Child::update()
 {
 	if (isFall) {
 		Vector3 position = object_->get_transform().get_translate();
-		//position.y -= 0.1f;
+		position.y -= 0.1f;
 		object_->get_transform().set_translate(position);
 	}
 }
