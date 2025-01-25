@@ -164,10 +164,50 @@ void Player::rotate(MapchipField* mapchipField)
 	}
 }
 
-bool Player::can_move_to(const Vector3& position, MapchipField* mapchipField) const
+bool Player::can_move_to(const Vector3& position, MapchipField* mapchipField) 
 {
-	auto element = mapchipField->getElement(position.x, position.z);
-	return element == 1 || element == 3;
+	
+	if (!isParent) {
+		auto element = mapchipField->getElement(position.x, position.z);
+		return element == 1 || element == 3;
+	}
+	else {
+		Vector3 childDirection{};
+		Vector3 nextChildPos{};
+		//Vector3 rotatedChildPos{};
+		
+		if (std::round(child_->get_translate().x) == 1.0f) {
+			childDirection = rotate_direction_90_left(direction);
+		}
+		else if (std::round(child_->get_translate().x) == -1.0f) {
+			childDirection = rotate_direction_90_right(direction);
+		}
+		else {
+			childDirection = direction;
+		}
+
+
+		nextChildPos = object_->get_transform().get_translate() + childDirection + direction;
+
+		//auto elementNowPlayer = mapchipField->getElement(std::round(object_->get_transform().get_translate().x), std::round(object_->get_transform().get_translate().z));
+		//auto elementRotatedChild = mapchipField->getElement(std::round(rotatedChildPos.x), std::round(rotatedChildPos.z));
+
+		auto elementNextPlayer = mapchipField->getElement(std::round(position.x), std::round(position.z));
+		auto elementChild = mapchipField->getElement(std::round(nextChildPos.x), std::round(nextChildPos.z));
+
+		//if (elementNowPlayer == 0 || elementNowPlayer == 2) {
+		//	if (elementRotatedChild == 0 || elementRotatedChild == 2) {
+		//		isRotating = false;
+		//		return false;
+		//	}
+		//}
+		if (elementNextPlayer == 0 || elementNextPlayer == 2) {
+			if (elementChild == 0 || elementChild == 2) {
+				return false;
+			}
+		}
+		return true;
+	}
 }
 
 void Player::start_rotation(MapchipField* mapchipField)
@@ -214,10 +254,32 @@ bool Player::check_collision_during_rotation(MapchipField* mapchipField)
 		childDirection = direction;
 	}
 
+	// 現在のプレイヤーの位置
+	Vector3 nowPlayerPos = object_->get_transform().get_translate();
 	// 今の子供の位置
-	Vector3 nowChildPos = object_->get_transform().get_translate() + child_->get_translate() * startRotation;
+	Vector3 nowChildPos = nowPlayerPos + child_->get_translate() * startRotation;
 	// 移動予定の位置
-	Vector3 nextChildPos = object_->get_transform().get_translate() + childDirection;
+	Vector3 nextChildPos = nowPlayerPos + childDirection;
+	// 一回転しない場合の経由点
+	Vector3 midChildPos = nowChildPos + childDirection;
+
+	if (mapchipField->getElement(std::round(nowPlayerPos.x), std::round(nowPlayerPos.z)) == 0) {
+		if (mapchipField->getElement(std::round(nextChildPos.x), std::round(nextChildPos.z)) == 0) {
+			// 回転後がプレイヤーと子のどちらも穴の場合中断
+			rotateTimer = 0.0f;
+			isRotating = false;
+			object_->get_transform().set_quaternion(startRotation); // 元の回転に戻す
+			return true;
+		}
+		// 半回転後落ちる場合
+		if (mapchipField->getElement(std::round(midChildPos.x), std::round(midChildPos.z)) == 0) {
+			// 回転後がプレイヤーと子のどちらも穴の場合中断
+			rotateTimer = 0.0f;
+			isRotating = false;
+			object_->get_transform().set_quaternion(startRotation); // 元の回転に戻す
+			return true;
+		}
+	}
 
 	// ゴールの位置にブロックがある場合
 	if (check_collision(nextChildPos)) {
@@ -228,9 +290,7 @@ bool Player::check_collision_during_rotation(MapchipField* mapchipField)
 		return true;
 	}
 
-	// 一回転しない場合の経由点
-	Vector3 midChildPos = nowChildPos + childDirection;
-
+	// 半回転するときの判定
 	if (check_collision(midChildPos)) {
 		// 壁に衝突した場合は回転を中断
 		rotateTimer = 0.0f;
@@ -243,8 +303,9 @@ bool Player::check_collision_during_rotation(MapchipField* mapchipField)
 		std::abs(direction.z + preDirection.z) > 0.01f) {
 		return false; // 180度ではない場合は終了
 	}
+
 	auto check_side_collisions = [&](const Vector3& primaryDirection, const Vector3& secondaryDirection) {
-		Vector3 firstPos = object_->get_transform().get_translate() + primaryDirection;
+		Vector3 firstPos = nowPlayerPos + primaryDirection;
 		Vector3 secondPos = firstPos + secondaryDirection;
 		Vector3 thirdPos = secondPos + secondaryDirection;
 		if (childDirection != direction) {
