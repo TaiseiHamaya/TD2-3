@@ -22,7 +22,7 @@ void GameScene::load()
 {
 	//PolygonMeshManager::RegisterLoadQue("./EngineResources/Models/Primitive/Sphere.obj");
 	PolygonMeshManager::RegisterLoadQue("./GameResources/Models/ParentObj/ParentObj.obj");
-	PolygonMeshManager::RegisterLoadQue("./GameResources/Models/ChildObj/ChildObj.obj");
+	PolygonMeshManager::RegisterLoadQue("./GameResources/Models/ChiledKoala/ChiledKoala.obj");
 	TextureManager::RegisterLoadQue("./GameResources/Texture/ClearTex.png");
 	TextureManager::RegisterLoadQue("./GameResources/Texture/FailedTex.png");
 

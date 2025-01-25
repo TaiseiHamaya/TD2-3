@@ -3,7 +3,7 @@
 void Child::initialize(const LevelLoader& level)
 {
 	object_ = std::make_unique<MeshInstance>();
-	object_->reset_mesh("ChildObj.obj");
+	object_->reset_mesh("ChiledKoala.obj");
 	object_->get_transform().set_translate(level.get_child_position());
 }
 
