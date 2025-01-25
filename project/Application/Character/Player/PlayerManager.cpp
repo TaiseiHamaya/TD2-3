@@ -22,7 +22,7 @@ void PlayerManager::finalize() {
 void PlayerManager::update() {
 	// プレイヤーと子供の位置を計算
 	if (auto p = dynamic_cast<Player*>(player.get())) {
-		playerPos = p->get_translate_instance();
+		playerPos = p->get_translate();
 		childPos = child->get_translate();
 
 		if (p->is_parent()) {
@@ -117,7 +117,7 @@ void PlayerManager::attach_child_to_player() {
 
 			for (const auto& direction : directions) {
 				// プレイヤーと子供の距離を計算
-				Vector3 playerToChild = p->get_translate_instance() - child->get_translate();
+				Vector3 playerToChild = p->get_translate() - child->get_translate();
 				// 近かったら結合
 				if (approximately_equal(playerToChild, direction)) {
 					child->get_object()->reparent(p->get_object());
