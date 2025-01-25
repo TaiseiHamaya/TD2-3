@@ -17,7 +17,7 @@ public:
     void debug_update();
 #endif
     // アクセッサ
-    Vector3 get_translate_instance() const { return targetPosition; }
+    Vector3 get_translate() const { return object_->get_transform().get_translate(); }
     Vector3 get_direction() const { return direction; }
 
     void set_child(CharacterBase* child) { child_ = child; }
@@ -30,7 +30,7 @@ public:
 private:
     void move(MapchipField* mapchipField);
     void rotate(MapchipField* mapchipField);
-    bool can_move_to(const Vector3& position, MapchipField* mapchipField) const;
+    bool can_move_to(const Vector3& position, MapchipField* mapchipField);
     void start_rotation(MapchipField* mapchipField);
     bool check_collision_during_rotation(MapchipField* mapchipField);
     bool check_collision_during_translation(MapchipField* mapchipField);
