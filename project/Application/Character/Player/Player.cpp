@@ -17,6 +17,7 @@ void Player::finalize()
 void Player::update()
 {
 	isMove = false;
+	moveNumOnIce = 1;
 
 	// 入力処理
 	handle_input();
@@ -74,6 +75,17 @@ void Player::handle_input()
 			if (mapchipHandler_->can_player_move_to(this, child_, direction)) {
 				targetPosition = nextPosition;
 				moveTimer = 0.0f;
+				moveDuration = 0.15f;
+				isMoving = true;
+			}else 
+				// 進行先が氷かどうかチェック
+			if (mapchipHandler_->can_player_move_on_ice(this, child_, direction)) {
+				if (moveNumOnIce == 0) {
+					return;
+				}
+				targetPosition = get_translate() + direction * static_cast<float>(moveNumOnIce);
+				moveTimer = 0.0f;
+				moveDuration = 0.15f * static_cast<float>(moveNumOnIce);
 				isMoving = true;
 			}
 
