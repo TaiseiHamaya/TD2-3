@@ -5,13 +5,12 @@
 
 class RenderPath;
 class Camera3D;
+class LevelLoader;
 
 #include "Application/Character/Player/PlayerManager.h"
 #include "Application/Mapchip/MapchipField.h"
 #include "Application/Scene/GameManagement.h"
-#include "Engine/Module/Render/RenderNode/Sprite/SpriteNode.h"
-
-
+#include "Engine/Module/Render/RenderNode/2D/Sprite/SpriteNode.h"
 
 class GameScene : public BaseScene
 {
@@ -50,5 +49,7 @@ private:
 
 	std::unique_ptr<Camera3D> camera3D;
 	std::unique_ptr<DirectionalLightInstance> directionalLight;
+
+	std::unique_ptr<LevelLoader> levelLoader;
 };
 

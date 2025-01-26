@@ -39,6 +39,12 @@ public:
 
 	void set_mid_rotation(Quaternion Rotation) { midRotation = Rotation; }
 
+	//Vector3 get_target_pos() const { return targetPosition; }
+	//void set_target_pos(const Vector3& target) { targetPosition = target; }
+
+	int get_move_num_on_ice() { return moveNumOnIce; }
+	void set_move_num_on_ice(int num) { moveNumOnIce = num; }
+
 #ifdef _DEBUG
 	void debug_update();
 #endif
@@ -62,8 +68,13 @@ private:
 	Vector3 startPosition;   // 移動の開始位置
 	Vector3 targetPosition;  // 次の目標位置
 	float moveTimer = 0.0f;  // 移動の進行状況を管理するタイマー
-	float moveDuration = 0.3f;  // 移動にかける時間（秒）
+	float moveDuration = 0.15f;  // 移動にかける時間（秒）
 	bool isMoving = false;   // 現在移動中かどうかのフラグ
+
+	int moveNumOnIce = 1;
+	//float moveTimerOnIce = 0.0f;  // 移動の進行状況を管理するタイマー
+	//float moveDurationOnIce = 0.15f;  // 氷上の移動にかける時間（秒）
+	//bool isMovingOnIce = false;   // 現在移動中かどうかのフラグ
 
 	Quaternion targetRotation;  // 次の目標回転
 	Quaternion startRotation;   // 補間の開始回転
@@ -72,6 +83,8 @@ private:
 	float rotateDuration = 0.3f; // 回転にかける時間（秒）
 	bool isRotating = false;     // 現在回転中かどうかのフラグ
 	bool isReverseRotation = false; // 回転を反転
+
+	float fallSpeed = 6.0f;//落下中の速度
 
 	float deltaTime = WorldClock::DeltaSeconds(); // 時間管理
 };

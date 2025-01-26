@@ -8,7 +8,7 @@
 
 class PlayerManager {
 public:
-    void initialize(const LevelLoader& level, MapchipField* mapchipField);
+    void initialize(Reference<const LevelLoader> level, MapchipField* mapchipField);
     void finalize();
     void update();
     void begin_rendering();
@@ -21,6 +21,7 @@ public:
     void set_game_management(GameManagement* gameManagement) { gameManagement_ = gameManagement; }
 private:
     void manage_parent_child_relationship();
+    void set_child_rotate();
 
     void attach_child_to_player(Player* player, Child* child);
     void detach_child_from_player(Player* player, Child* child);

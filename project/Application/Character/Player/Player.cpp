@@ -17,6 +17,7 @@ void Player::finalize()
 void Player::update()
 {
 	isMove = false;
+	moveNumOnIce = 1;
 
 	// 入力処理
 	handle_input();
@@ -74,6 +75,17 @@ void Player::handle_input()
 			if (mapchipHandler_->can_player_move_to(this, child_, direction)) {
 				targetPosition = nextPosition;
 				moveTimer = 0.0f;
+				moveDuration = 0.15f;
+				isMoving = true;
+			}else 
+				// 進行先が氷かどうかチェック
+			if (mapchipHandler_->can_player_move_on_ice(this, child_, direction)) {
+				if (moveNumOnIce == 0) {
+					return;
+				}
+				targetPosition = get_translate() + direction * static_cast<float>(moveNumOnIce);
+				moveTimer = 0.0f;
+				moveDuration = 0.15f * static_cast<float>(moveNumOnIce);
 				isMoving = true;
 			}
 
@@ -104,7 +116,7 @@ void Player::fall_update()
 {
 	if (isFalling) {
 		Vector3 position = object_->get_transform().get_translate();
-		position.y -= 0.1f;
+		position.y -= fallSpeed * WorldClock::DeltaSeconds();
 		object_->get_transform().set_translate(position);
 	}
 }
@@ -117,7 +129,7 @@ void Player::move_update()
 	};
 
 	// 移動中なら補間処理を実行
-	moveTimer += deltaTime;
+	moveTimer += WorldClock::DeltaSeconds();
 
 	if (moveTimer >= moveDuration) {
 		// 移動完了
@@ -134,7 +146,7 @@ void Player::move_update()
 
 void Player::rotate_update()
 {
-	rotateTimer += deltaTime;
+	rotateTimer += WorldClock::DeltaSeconds();
 
 	// 回転完了チェック
 	if (rotateTimer >= rotateDuration) {
