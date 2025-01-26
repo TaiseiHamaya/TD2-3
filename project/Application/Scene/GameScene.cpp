@@ -43,7 +43,7 @@ void GameScene::initialize()
 		{3,8,-10}
 		});
 
-	LevelLoader levelLoader{ 1 };
+	LevelLoader levelLoader{ 10 };
 
 	fieldObjs = std::make_unique<MapchipField>();
 	fieldObjs->initialize(levelLoader);
