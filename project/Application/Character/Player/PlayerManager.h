@@ -8,7 +8,7 @@
 
 class PlayerManager {
 public:
-    void initialize(const LevelLoader& level, MapchipField* mapchipField);
+    void initialize(Reference<const LevelLoader> level, MapchipField* mapchipField);
     void finalize();
     void update();
     void begin_rendering();

@@ -43,7 +43,7 @@ void GameScene::initialize()
 		{3,8,-10}
 		});
 
-	LevelLoader levelLoader{ 1 };
+	levelLoader = eps::CreateUnique<LevelLoader>(1);
 
 	fieldObjs = std::make_unique<MapchipField>();
 	fieldObjs->initialize(levelLoader);
@@ -82,6 +82,11 @@ void GameScene::finalize()
 
 void GameScene::begin()
 {
+	managementUI->begin();
+	if (managementUI->is_reset()) {
+		fieldObjs->initialize(levelLoader);
+		playerManager->initialize(levelLoader, fieldObjs.get());
+	}
 }
 
 void GameScene::update()

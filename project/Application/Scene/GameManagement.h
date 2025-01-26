@@ -4,25 +4,29 @@
 
 class SpriteInstance;
 
-class GameManagement{
+class GameManagement {
 public:
-    GameManagement();
-    ~GameManagement();
+	GameManagement();
+	~GameManagement();
 
-    void init();
-    void update();
-    void begin_rendering();
-    void darw();
+	void init();
+	void begin();
+	void update();
+	void begin_rendering();
+	void darw();
 
-    //アクセッサ
-    void SetClearFlag(bool value){ clearFlag = value; }
-    void SetFailedFlag(bool value){ failedFlag = value; }
+public:
+	//アクセッサ
+	void SetClearFlag(bool value) { clearFlag = value; }
+	void SetFailedFlag(bool value) { failedFlag = value; }
+	bool is_reset() const { return isReset; }
 
 private:
-    std::unique_ptr<SpriteInstance> clearSprite;
-    std::unique_ptr<SpriteInstance> failedSprite;
+	std::unique_ptr<SpriteInstance> clearSprite;
+	std::unique_ptr<SpriteInstance> failedSprite;
 
-    bool clearFlag;
-    bool failedFlag;
+	bool clearFlag;
+	bool failedFlag;
 
+	bool isReset;
 };
