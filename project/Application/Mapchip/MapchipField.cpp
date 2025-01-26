@@ -1,12 +1,13 @@
 #include "Application/Mapchip/MapchipField.h"
 #include "Engine/Module/World/Mesh/MeshInstance.h"
 #include "Application/LevelLoader/LevelLoader.h"
+#include <Engine/Utility/Template/Reference.h>
 
 MapchipField::MapchipField() = default;
 
 MapchipField::~MapchipField() = default;
 
-void MapchipField::initialize(const LevelLoader& level) {
+void MapchipField::initialize(Reference<const LevelLoader> level) {
 	const std::string fieldFileName[] = {
 		"", // 穴
 		"RordObj.obj", // 床
@@ -15,8 +16,8 @@ void MapchipField::initialize(const LevelLoader& level) {
 		"IceObj.obj"   // 氷 
 	};
 
-	auto& fieldLevel = level.get_field();
-	auto& fieldZeroGravity = level.get_zerogravity();
+	auto& fieldLevel = level->get_field();
+	auto& fieldZeroGravity = level->get_zerogravity();
 
 
 	constexpr float boxSize = 1.0f;

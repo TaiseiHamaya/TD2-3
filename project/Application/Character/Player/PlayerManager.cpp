@@ -3,17 +3,17 @@
 #include <cmath>
 #include <Application/Utility/GameUtility.h>
 
-void PlayerManager::initialize(const LevelLoader& level, MapchipField* mapchipField) {
+void PlayerManager::initialize(Reference<const LevelLoader> level, MapchipField* mapchipField) {
 	mapchipField_ = mapchipField;
 
 	mapchipHandler = std::make_unique<MapchipHandler>();
 	mapchipHandler->initialize(mapchipField_);
 
 	child = std::make_unique<Child>();
-	child->initialize(level, mapchipHandler.get());
+	child->initialize(*level.ptr(), mapchipHandler.get());
 
 	player = std::make_unique<Player>();
-	player->initialize(level, mapchipHandler.get());
+	player->initialize(*level.ptr(), mapchipHandler.get());
 	player->set_child(child.get());
 
 	if (player) {
