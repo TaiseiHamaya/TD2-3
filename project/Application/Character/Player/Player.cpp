@@ -104,7 +104,7 @@ void Player::fall_update()
 {
 	if (isFalling) {
 		Vector3 position = object_->get_transform().get_translate();
-		position.y -= 0.1f;
+		position.y -= fallSpeed * WorldClock::DeltaSeconds();
 		object_->get_transform().set_translate(position);
 	}
 }
@@ -117,7 +117,7 @@ void Player::move_update()
 	};
 
 	// 移動中なら補間処理を実行
-	moveTimer += deltaTime;
+	moveTimer += WorldClock::DeltaSeconds();
 
 	if (moveTimer >= moveDuration) {
 		// 移動完了
@@ -134,7 +134,7 @@ void Player::move_update()
 
 void Player::rotate_update()
 {
-	rotateTimer += deltaTime;
+	rotateTimer += WorldClock::DeltaSeconds();
 
 	// 回転完了チェック
 	if (rotateTimer >= rotateDuration) {

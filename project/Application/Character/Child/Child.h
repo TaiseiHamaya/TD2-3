@@ -1,5 +1,6 @@
 #pragma once
 #include "Application/Character/CharacterBase.h"
+#include "Engine/Runtime/WorldClock/WorldClock.h"
 #include <Application/Mapchip/MapchipHandler.h>
 
 class Child : public CharacterBase {
@@ -19,4 +20,5 @@ public:
 #endif
 private:
     bool isFall = false;
+    float fallSpeed = 6.0f;//落下速度
 };
