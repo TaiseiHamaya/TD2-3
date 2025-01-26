@@ -10,7 +10,7 @@ class LevelLoader;
 #include "Application/Character/Player/PlayerManager.h"
 #include "Application/Mapchip/MapchipField.h"
 #include "Application/Scene/GameManagement.h"
-#include "Engine/Module/Render/RenderNode/Sprite/SpriteNode.h"
+#include "Engine/Module/Render/RenderNode/2D/Sprite/SpriteNode.h"
 
 class GameScene : public BaseScene
 {

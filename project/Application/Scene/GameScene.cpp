@@ -3,7 +3,7 @@
 #include "Engine/Module/Render/RenderPath/RenderPath.h"
 #include "Engine/Rendering/DirectX/DirectXSwapChain/DirectXSwapChain.h"
 #include "Engine/Module/Render/RenderTargetGroup/SingleRenderTarget.h"
-#include "Engine/Module/Render/RenderNode/Object3DNode/Object3DNode.h"
+#include "Engine/Module/Render/RenderNode/Forward/Object3DNode/Object3DNode.h"
 #include "Engine/Resources/PolygonMesh/PolygonMeshManager.h"
 #include "Engine/Resources/Animation/NodeAnimation/NodeAnimationManager.h"
 #include "Engine/Resources/Animation/Skeleton/SkeletonManager.h"
@@ -13,6 +13,10 @@
 #include <Engine/Runtime/WorldClock/WorldClock.h>
 
 #include "Application/LevelLoader/LevelLoader.h"
+
+#ifdef _DEBUG
+#include "Engine/Module/Render/RenderNode/Debug/PrimitiveLine/PrimitiveLineNode.h"
+#endif // _DEBUG
 
 GameScene::GameScene() = default;
 
@@ -64,12 +68,22 @@ void GameScene::initialize()
 	object3dNode->initialize();
 	object3dNode->set_render_target_SC(DirectXSwapChain::GetRenderTarget());
 
+#ifdef _DEBUG
+	std::shared_ptr<PrimitiveLineNode> primitiveLineNode;
+	primitiveLineNode = std::make_unique<PrimitiveLineNode>();
+	primitiveLineNode->initialize();
+#endif // _DEBUG
+
+
 	renderPath = eps::CreateUnique<RenderPath>();
+#ifdef _DEBUG
+	renderPath->initialize({object3dNode,spriteNode,primitiveLineNode });
+#else
 	renderPath->initialize({object3dNode,spriteNode });
+#endif // _DEBUG
 
 	managementUI = std::make_unique<GameManagement>();
 	playerManager->set_game_management(managementUI.get());
-
 }
 
 void GameScene::popped()
@@ -117,19 +131,28 @@ void GameScene::late_update()
 void GameScene::draw() const
 {
 	renderPath->begin();
-	camera3D->register_world(1);
-	directionalLight->register_world(3);
+	camera3D->register_world_projection(1);
+	camera3D->register_world_lighting(4);
+	directionalLight->register_world(5);
 
 	fieldObjs->draw();
 	playerManager->draw();
 
 #ifdef _DEBUG
-	camera3D->debug_draw();
+	camera3D->debug_draw_axis();
 #endif // _DEBUG
 
 	renderPath->next();
 	managementUI->darw();
 	renderPath->next();
+
+#ifdef _DEBUG
+	camera3D->register_world_projection(1);
+	camera3D->debug_draw_frustum();
+
+	renderPath->next();
+#endif // _DEBUG
+
 }
 
 #ifdef _DEBUG
@@ -140,6 +163,10 @@ void GameScene::debug_update()
 	ImGui::End();
 
 	playerManager->debug_update();
+
+	ImGui::Begin("WorldClock");
+	WorldClock::DebugGui();
+	ImGui::End();
 }
 #endif // _DEBUG
 
