@@ -56,11 +56,11 @@ bool MapchipHandler::can_player_move_to(Player* player, Child* child, const Vect
 
 bool MapchipHandler::can_player_rotate(Player* player, Child* child, const Vector3& direction) const
 {
-	if (!player->is_parent()) return true;
-
 	if (direction == player->get_previous_direction()) {
 		return false; // 同じ方向なら回転不要
 	}
+
+	if (!player->is_parent()) return true;
 
 	auto check_collision = [&](const Vector3& pos) {
 		return mapchipField_->getElement(std::round(pos.x), std::round(pos.z)) == 2;
@@ -107,14 +107,9 @@ bool MapchipHandler::can_player_rotate(Player* player, Child* child, const Vecto
 	}
 
 	auto check_side_collisions = [&](const Vector3& primaryDirection, const Vector3& secondaryDirection) {
-		Vector3 firstPos = nowPlayerPos + primaryDirection;
-		Vector3 secondPos = firstPos + secondaryDirection;
-		Vector3 thirdPos = secondPos + secondaryDirection;
-		if (childDirection != direction) {
-			firstPos -= childDirection;
-			secondPos -= childDirection;
-			thirdPos -= childDirection;
-		}
+		Vector3 firstPos = nowPlayerPos + primaryDirection - childDirection;
+		Vector3 secondPos = firstPos + secondaryDirection - childDirection;
+		Vector3 thirdPos = secondPos + secondaryDirection - childDirection;
 		return check_collision(firstPos) || check_collision(secondPos) || check_collision(thirdPos);
 		};
 
@@ -124,6 +119,12 @@ bool MapchipHandler::can_player_rotate(Player* player, Child* child, const Vecto
 	// 一回転するときは左右どちらも埋まってたら回転不可
 	if (check_side_collisions(leftDirection, childDirection)) {
 		if (check_side_collisions(rightDirection, childDirection)) {
+			player->set_moving(false);
+			return false;
+		}
+	}
+	if (check_side_collisions(rightDirection, childDirection)) {
+		if (check_side_collisions(leftDirection, childDirection)) {
 			player->set_moving(false);
 			return false;
 		}

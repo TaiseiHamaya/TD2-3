@@ -11,6 +11,9 @@ public:
     void begin_rendering() override;
     void draw() const override;
 
+
+    Quaternion get_rotation() const { return object_->get_transform().get_quaternion(); }
+    void set_rotation(const Quaternion& rotation) { object_->get_transform().set_quaternion(rotation); }
     void set_parent(MeshInstance* parent) { object_->reparent(parent); }
     void unset_parent() { object_->reparent(nullptr); }
     void set_falling(bool flag) { isFall = flag; }

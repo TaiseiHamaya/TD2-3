@@ -2,6 +2,7 @@
 #include "Engine/Runtime/Input/Input.h"
 #include <cmath>
 #include <Application/Utility/GameUtility.h>
+#include "Library/Math/Matrix4x4.h"
 
 void PlayerManager::initialize(const LevelLoader& level, MapchipField* mapchipField) {
 	mapchipField_ = mapchipField;
@@ -48,6 +49,8 @@ void PlayerManager::update() {
 	// 親子関係の管理
 	manage_parent_child_relationship();
 
+	set_child_rotate();
+
 	// マップチップのクリア判定
 	gameCleared = mapchipHandler->is_goal_reached(player.get(), child.get());
 	if (gameCleared == 1) {
@@ -88,6 +91,49 @@ void PlayerManager::manage_parent_child_relationship()
 	}
 }
 
+void PlayerManager::set_child_rotate()
+{
+	// 子からプレイヤーへの方向ベクトルを計算
+	 Vector3 childToPlayer = Vector3::Normalize(childPos, playerPos);
+	
+	 // 子からプレイヤーへの方向ベクトルの長さをチェック
+	 if (childToPlayer.length() == 0.0f) return;
+
+	 // 親オブジェクトの回転を考慮
+	 if (player->is_parent())
+	 {
+		 // 親の回転を取得
+		 Quaternion parentRotation = player->get_rotation();
+
+		 // 親の回転を適用して子からプレイヤーへの方向を調整
+		 childToPlayer = childToPlayer * parentRotation.inverse();
+	 }
+
+	// 基準方向を設定 (子のデフォルトの前方向、例: Z軸)
+	Vector3 defaultForward = { 0.0f, 0.0f, -1.0f };
+
+	// Y軸回転を計算
+	Quaternion targetRotation = Quaternion::FromToRotation(defaultForward, childToPlayer);
+
+	// 現在の回転を取得
+	Quaternion currentRotation = child->get_rotation();
+
+	// Slerpのロジックを利用して反転防止を実現
+	float dot = Vector3::DotProduct(currentRotation.vector(), targetRotation.vector()) + currentRotation.real() * targetRotation.real();
+	if (dot < 0.0f) {
+		targetRotation = targetRotation * -1.0f;
+	}
+
+	// 補間係数 (スムーズに回転する速さを調整)
+	float smoothFactor = 0.1f; // 値を小さくするとゆっくり、大きくすると速く回転
+
+	// Slerpを使って補間
+	Quaternion smoothedRotation = Quaternion::Slerp(currentRotation, targetRotation, smoothFactor);
+
+	// 補間後の回転を子に設定
+	child->set_rotation(targetRotation);
+}
+
 void PlayerManager::attach_child_to_player(Player* player, Child* child)
 {
 	if (!player->is_moved()) return;
@@ -112,8 +158,12 @@ void PlayerManager::attach_child_to_player(Player* player, Child* child)
 			if (std::abs(adjustedOffset.x) == 1.0f || std::abs(adjustedOffset.z) == 1.0f) {
 				adjustedOffset *= -1.0f;
 			}
+
+
+
 			// 子供のローカル座標を設定
 			child->set_translate(adjustedOffset);
+
 
 			break;
 		}

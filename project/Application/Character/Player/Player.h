@@ -69,7 +69,7 @@ private:
 	Quaternion startRotation;   // 補間の開始回転
 	Quaternion midRotation;     // 180度回転するときの中間点
 	float rotateTimer = 0.0f;    // 回転の進行状況を管理するタイマー
-	float rotateDuration = 1; // 回転にかける時間（秒）
+	float rotateDuration = 0.3f; // 回転にかける時間（秒）
 	bool isRotating = false;     // 現在回転中かどうかのフラグ
 	bool isReverseRotation = false; // 回転を反転
 

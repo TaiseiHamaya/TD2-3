@@ -21,6 +21,7 @@ public:
     void set_game_management(GameManagement* gameManagement) { gameManagement_ = gameManagement; }
 private:
     void manage_parent_child_relationship();
+    void set_child_rotate();
 
     void attach_child_to_player(Player* player, Child* child);
     void detach_child_from_player(Player* player, Child* child);
