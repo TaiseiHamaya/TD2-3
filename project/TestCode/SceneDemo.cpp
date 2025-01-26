@@ -61,6 +61,10 @@ void SceneDemo::load() {
 	PolygonMeshManager::RegisterLoadQue("./GameResources/Models/RordObj/RordObj.obj");
 	PolygonMeshManager::RegisterLoadQue("./GameResources/Models/WallObj/WallObj.obj");
 	PolygonMeshManager::RegisterLoadQue("./GameResources/Models/GoalObj/GoalObj.obj");
+	PolygonMeshManager::RegisterLoadQue("./GameResources/Models/ChiledKoala/ChiledKoala.gltf");
+	NodeAnimationManager::RegisterLoadQue("./GameResources/Models/ChiledKoala/ChiledKoala.gltf");
+	SkeletonManager::RegisterLoadQue("./GameResources/Models/ChiledKoala/ChiledKoala.gltf");
+
 
 }
 
@@ -96,7 +100,7 @@ void SceneDemo::initialize() {
 	debugCheckObj = std::make_unique<MeshInstance>();
 	debugCheckObj->reset_mesh("ParentObj.obj");
 
-	animatedMeshInstance = eps::CreateUnique<AnimatedMeshInstance>("Player.gltf", "Idle", true);
+	animatedMeshInstance = eps::CreateUnique<AnimatedMeshInstance>("ChiledKoala.gltf", "Idle", true);
 
 	parentCollider = std::make_unique<SphereCollider>(1.0f);
 	parentCollider->reparent(*parent);
@@ -265,7 +269,7 @@ void SceneDemo::draw() const {
 	renderPath->next();
 	directionalLight->register_world(3);
 	camera3D->register_world(1);
-	//animatedMeshInstance->draw();
+	animatedMeshInstance->draw();
 
 	renderPath->next();
 	camera3D->register_world(1);
