@@ -2,9 +2,14 @@
 
 #include <memory>
 #include <vector>
+
 #include <Engine/Runtime/Input/Input.h>
 
 class MeshInstance;
+
+template<typename T>
+class Reference;
+
 class LevelLoader;
 
 class MapchipField{
@@ -20,7 +25,7 @@ public:
 	~MapchipField();
 
 public:
-	void initialize(const LevelLoader& level);
+	void initialize(Reference<const LevelLoader> level);
 	void update();
 	void begin_rendering();
 	void draw();
