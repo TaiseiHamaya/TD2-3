@@ -13,13 +13,39 @@ void MapchipHandler::update_player_on_mapchip(Player* player, Child* child) {
 	check_fall_conditions(player, child);
 }
 
-bool MapchipHandler::can_player_move_to(Player* player, Child* child, const Vector3& direction) const {
+bool MapchipHandler::can_player_move_on_ice(Player* player, Child* child, const Vector3& direction) const {
+	Vector3 nextPos = player->get_translate() + direction;
+
+	// 次のチップを取得
+	int nextChip = mapchipField_->getElement(std::round(nextPos.x), std::round(nextPos.z));
+
+	if (nextChip != 4) {
+		return false;
+	}
+
+	while (true) {
+		int moveNum = player->get_move_num_on_ice();
+		Vector3 nextPos = player->get_translate() + direction * static_cast<float>(moveNum);
+
+		// 次のチップを取得
+		int nextChip = mapchipField_->getElement(std::round(nextPos.x), std::round(nextPos.z));
+
+		// 氷以外のチップに到達したら移動停止
+		if (nextChip != 4) {
+			break;
+		}
+
+		moveNum += 1;
+		player->set_move_num_on_ice(moveNum);
+	}
+	return true;
+}
+
+bool MapchipHandler::can_player_move_to(Player* player, Child* child, const Vector3& direction) const
+{
 	Vector3 nextPos = player->get_translate() + direction;
 
 	if (!player->is_parent()) {
-		if (nextPos == child->get_translate()) {
-			return false;
-		}
 		auto element = mapchipField_->getElement(nextPos.x, nextPos.z);
 		return element == 1 || element == 3;
 	}
