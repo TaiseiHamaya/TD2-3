@@ -29,6 +29,7 @@ void GameScene::load()
 	PolygonMeshManager::RegisterLoadQue("./GameResources/Models/RordObj/RordObj.obj");
 	PolygonMeshManager::RegisterLoadQue("./GameResources/Models/WallObj/WallObj.obj");
 	PolygonMeshManager::RegisterLoadQue("./GameResources/Models/GoalObj/GoalObj.obj");
+	PolygonMeshManager::RegisterLoadQue("./GameResources/Models/IceObj/IceObj.obj");
 }
 
 void GameScene::initialize()
