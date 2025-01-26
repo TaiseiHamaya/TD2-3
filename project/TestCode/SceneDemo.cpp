@@ -262,7 +262,7 @@ void SceneDemo::draw() const {
 	//debugCheckObj->draw();
 #ifdef _DEBUG
 	camera3D->debug_draw();
-	animatedMeshInstance->draw_skeleton();
+	//animatedMeshInstance->draw_skeleton();
 	DebugValues::ShowGrid();
 #endif // _DEBUG
 
