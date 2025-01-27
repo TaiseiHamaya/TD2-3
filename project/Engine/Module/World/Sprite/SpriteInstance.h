@@ -28,7 +28,10 @@ private:
 	SpriteInstance& operator=(const SpriteInstance&) = delete;
 
 public:
-	const Transform2D& get_transform() noexcept;
+	const Transform2D& get_transform() const noexcept;
+	Transform2D& get_transform() noexcept;
+	const Transform2D& get_uv_transform() const noexcept;
+	Transform2D& get_uv_transform() noexcept;
 	//void update();
 	void begin_rendering() noexcept;
 	void draw() const;
