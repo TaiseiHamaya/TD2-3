@@ -5,10 +5,10 @@
 
 class SpriteInstance;
 
-class UIManagement{
+class GameManagement{
 public:
-	UIManagement();
-	~UIManagement();
+	GameManagement();
+	~GameManagement();
 
 	void init();
 	void begin();

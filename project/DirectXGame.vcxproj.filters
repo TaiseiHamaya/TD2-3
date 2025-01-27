@@ -25,7 +25,6 @@
     <ClCompile Include="Engine\Module\DrawExecutor\PrimitiveLineDrawExecutor\PrimitiveLineDrawExecutor.cpp" />
     <ClCompile Include="Application\Character\Child\Child.cpp" />
     <ClCompile Include="Application\Scene\GameManagement.cpp" />
-    <ClCompile Include="Application\Scene\UIManagement.cpp" />
     <ClCompile Include="Application\Character\CharacterBase.cpp" />
     <ClCompile Include="Engine\Module\World\Collision\Collider\AABBCollider.cpp" />
     <ClCompile Include="Application\Scene\GameScene.cpp" />
@@ -156,7 +155,6 @@
     <ClInclude Include="Engine\Module\DrawExecutor\PrimitiveLineDrawExecutor\PrimitiveLineDrawExecutor.h" />
     <ClInclude Include="Application\Character\Child\Child.h" />
     <ClInclude Include="Application\Scene\GameManagement.h" />
-    <ClInclude Include="Application\Scene\UIManagement.h" />
     <ClInclude Include="Application\Character\CharacterBase.h" />
     <ClInclude Include="Engine\Module\World\Collision\Collider\AABBCollider.h" />
     <ClInclude Include="Application\Scene\GameScene.h" />

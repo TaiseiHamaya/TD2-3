@@ -89,7 +89,7 @@ void GameScene::initialize()
 	renderPath->initialize({object3dNode,spriteNode });
 #endif // _DEBUG
 
-	managementUI = std::make_unique<UIManagement>();
+	managementUI = std::make_unique<GameManagement>();
 	playerManager->set_game_management(managementUI.get());
 }
 
