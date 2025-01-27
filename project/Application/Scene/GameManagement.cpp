@@ -10,14 +10,20 @@ GameManagement::GameManagement(){
 GameManagement::~GameManagement(){}
 
 void GameManagement::init(){
-	clearFlag = false;
+	clearFlag = true;
 	failedFlag = false;
 	isReset = false;
 	clearSprite = std::make_unique<SpriteInstance>("ClearTex.png");
 	failedSprite = std::make_unique<SpriteInstance>("FailedTex.png");
 
+	nextUI = std::make_unique<SpriteInstance>("Next.png");
+	retryUI = std::make_unique<SpriteInstance>("Retry.png");
+	nextUI->get_transform().set_scale({ 0.5f, 1.0f });
+	nextUI->get_uv_transform().set_scale({ 0.5f, 1.0f });
+	retryUI->get_transform().set_scale({ 0.5f, 1.0f });
+	retryUI->get_uv_transform().set_scale({ 0.5f, 1.0f });
 
-	
+	selectFrame = std::make_unique<SpriteInstance>("SelectFrame.png");
 }
 
 void GameManagement::begin() {
@@ -28,20 +34,83 @@ void GameManagement::begin() {
 
 void GameManagement::update(){
 
+	selectFunc();
 	
 }
+#ifdef _DEBUG
 
+#include <imgui.h>
+void GameManagement::debug_update(){
+	
+	ImGui::Begin("next");
+	selectFrame->debug_gui();
+	ImGui::End();
+}
+#endif
 void GameManagement::begin_rendering(){
 	clearSprite->begin_rendering();
 	failedSprite->begin_rendering();
+	nextUI->begin_rendering();
+	retryUI->begin_rendering();
+	selectFrame->begin_rendering();
+
 }
 
 void GameManagement::darw(){
 	if(clearFlag)
 	{
 		clearSprite->draw();
+
+		nextUI->draw();
+		retryUI->draw();
+		selectFrame->draw();
 	} else 	if(failedFlag)
 	{
 		failedSprite->draw();
+		retryUI->draw();
+		selectFrame->draw();
 	}
+}
+
+void GameManagement::selectFunc(){
+	if(!clearFlag && !failedFlag){ return; }
+
+	if(failedFlag){
+		selectIndex = 0;
+		retryUI->get_transform().set_translate({ 485,137 });
+
+	} else if(clearFlag){
+		
+		if(Input::IsTriggerKey(KeyID::A)){
+			selectIndex--;
+		}
+		if(Input::IsTriggerKey(KeyID::D)){
+			selectIndex++;
+		}
+		selectIndex = std::clamp(selectIndex, 0, 1);
+
+		retryUI->get_transform().set_translate({ 302,215 });
+		nextUI->get_transform().set_translate({ 623,215 });
+
+	}
+
+	if(selectIndex == 0){
+		retryUI->get_uv_transform().set_translate_x(0);
+		nextUI->get_uv_transform().set_translate_x(0.5f);
+		selectFrame->get_transform().set_translate({ 302 - 16, 215 - 16 });
+
+		
+
+	} else
+	{
+		retryUI->get_uv_transform().set_translate_x(0.5f);
+		nextUI->get_uv_transform().set_translate_x(0);
+		selectFrame->get_transform().set_translate({ 623 - 16, 215 - 16 });
+
+	}
+
+	if(failedFlag){
+		selectFrame->get_transform().set_translate({ 485 - 16, 137 - 16 });
+	}
+
 }

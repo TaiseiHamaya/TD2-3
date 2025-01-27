@@ -14,6 +14,7 @@ public:
 
 	void init();
 	void update();
+	void debugUpdate();
 	void begin_rendering();
 	void darw();
 

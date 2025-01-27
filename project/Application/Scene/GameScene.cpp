@@ -44,6 +44,9 @@ void GameScene::load()
 	TextureManager::RegisterLoadQue("./GameResources/Texture/UI/ESCkey.png");
 	TextureManager::RegisterLoadQue("./GameResources/Texture/UI/ReleseUI.png");
 	TextureManager::RegisterLoadQue("./GameResources/Texture/UI/Tutorial1.png");
+	TextureManager::RegisterLoadQue("./GameResources/Texture/UI/Next.png");
+	TextureManager::RegisterLoadQue("./GameResources/Texture/UI/Retry.png");
+	TextureManager::RegisterLoadQue("./GameResources/Texture/UI/SelectFrame.png");
 
 }
 
@@ -179,7 +182,8 @@ void GameScene::debug_update()
 	ImGui::End();
 
 	playerManager->debug_update();
-
+	gameUI->debugUpdate();
+	managementUI->debug_update();
 	ImGui::Begin("WorldClock");
 	WorldClock::DebugGui();
 	ImGui::End();

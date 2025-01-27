@@ -34,17 +34,24 @@ void GameSceneUI::init(){
 
 
 }
-#ifdef _DEBUG
 
-#include <imgui.h>
 void GameSceneUI::update(){
 	for(int i = 0; i < uiIndex; i++)
 	{
 		keyControl(i);
 	}
+	
+	
+}
+#ifdef _DEBUG
+
+#include <imgui.h>
+void GameSceneUI::debugUpdate(){
+
 	ImGui::Begin("sprite");
 	tutorialUI->debug_gui();
 	ImGui::End();
+
 	/*for(int i = 0; i < uiIndex; i++)
 	{
 
