@@ -10,7 +10,7 @@ GameManagement::GameManagement(){
 GameManagement::~GameManagement(){}
 
 void GameManagement::init(){
-	clearFlag = true;
+	clearFlag = false;
 	failedFlag = false;
 	isReset = false;
 	clearSprite = std::make_unique<SpriteInstance>("ClearTex.png");
