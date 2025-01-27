@@ -13,6 +13,7 @@ void GameManagement::init(){
 	clearFlag = false;
 	failedFlag = false;
 	isReset = false;
+	isNext = false;
 	clearSprite = std::make_unique<SpriteInstance>("ClearTex.png");
 	failedSprite = std::make_unique<SpriteInstance>("FailedTex.png");
 
@@ -49,6 +50,12 @@ void GameManagement::begin() {
 	} else//カーソルがネクストを選んでる時
 	{
 		//スペースを押したら次のステージへ
+		if(Input::IsTriggerKey(KeyID::Space))
+		{
+			isNext = true;
+			clearFlag = false;
+			failedFlag = false;
+		}
 	}
 }
 

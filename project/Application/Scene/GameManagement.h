@@ -40,6 +40,7 @@ private:
 	bool failedFlag;
 
 	bool isReset;
+	bool isNext;
 
 	int selectIndex; //0がリトライ、1がネクスト
 	int failedSelectIndex;//0:子どもを置いてゴール 1:子コアラがゴール　2:コアラを落とす　3:ターン経過(まだない)
