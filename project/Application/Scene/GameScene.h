@@ -9,7 +9,7 @@ class LevelLoader;
 
 #include "Application/Character/Player/PlayerManager.h"
 #include "Application/Mapchip/MapchipField.h"
-#include "Application/Scene/GameManagement.h"
+#include "Application/Scene/UIManagement.h"
 #include "Engine/Module/Render/RenderNode/2D/Sprite/SpriteNode.h"
 
 class GameScene : public BaseScene
@@ -45,7 +45,7 @@ private:
 	// プレイヤーの生成
 	std::unique_ptr<PlayerManager> playerManager;
 	std::unique_ptr<MapchipField> fieldObjs;
-	std::unique_ptr<GameManagement> managementUI;//ゲームクリア、ゲームオーバーをまとめて管理してる
+	std::unique_ptr<UIManagement> managementUI;//ゲームクリア、ゲームオーバーをまとめて管理してる
 
 	std::unique_ptr<Camera3D> camera3D;
 	std::unique_ptr<DirectionalLightInstance> directionalLight;

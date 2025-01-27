@@ -1,37 +1,39 @@
-#include "Application/Scene/GameManagement.h"
+#include "Application/Scene/UIManagement.h"
 
 #include "Engine/Module/World/Sprite/SpriteInstance.h"
 #include <Engine/Runtime/Input/Input.h>
 
-GameManagement::GameManagement(){
+UIManagement::UIManagement(){
 	init();
 }
 
-GameManagement::~GameManagement(){}
+UIManagement::~UIManagement(){}
 
-void GameManagement::init(){
+void UIManagement::init(){
 	clearFlag = false;
 	failedFlag = false;
 	isReset = false;
 	clearSprite = std::make_unique<SpriteInstance>("ClearTex.png");
 	failedSprite = std::make_unique<SpriteInstance>("FailedTex.png");
 
+	wasdSprite[0] = std::make_unique<SpriteInstance>("Wkey.png");
+
 }
 
-void GameManagement::begin() {
+void UIManagement::begin() {
 	if (!(clearFlag || failedFlag)) {
 		isReset = Input::IsTriggerKey(KeyID::R);
 	}
 }
 
-void GameManagement::update(){}
+void UIManagement::update(){}
 
-void GameManagement::begin_rendering(){
+void UIManagement::begin_rendering(){
 	clearSprite->begin_rendering();
 	failedSprite->begin_rendering();
 }
 
-void GameManagement::darw(){
+void UIManagement::darw(){
 	if(clearFlag)
 	{
 		clearSprite->draw();
