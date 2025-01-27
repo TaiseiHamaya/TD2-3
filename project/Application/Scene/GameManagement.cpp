@@ -10,8 +10,8 @@ GameManagement::GameManagement(){
 GameManagement::~GameManagement(){}
 
 void GameManagement::init(){
-	clearFlag = true;
-	failedFlag = false;
+	clearFlag = false;
+	failedFlag = true;
 	isReset = false;
 	clearSprite = std::make_unique<SpriteInstance>("ClearTex.png");
 	failedSprite = std::make_unique<SpriteInstance>("FailedTex.png");
@@ -24,6 +24,10 @@ void GameManagement::init(){
 	retryUI->get_uv_transform().set_scale({ 0.5f, 1.0f });
 
 	selectFrame = std::make_unique<SpriteInstance>("SelectFrame.png");
+	failedUI = std::make_unique<SpriteInstance>("FailedUI_1.png");
+	failedUI->get_transform().set_scale({ 0.25f,1 });
+	failedUI->get_uv_transform().set_scale({ 0.25f,1 });
+	failedUI->get_transform().set_translate({ 257,220 });
 }
 
 void GameManagement::begin() {
@@ -43,7 +47,7 @@ void GameManagement::update(){
 void GameManagement::debug_update(){
 	
 	ImGui::Begin("next");
-	selectFrame->debug_gui();
+	failedUI->debug_gui();
 	ImGui::End();
 }
 #endif
@@ -53,6 +57,7 @@ void GameManagement::begin_rendering(){
 	nextUI->begin_rendering();
 	retryUI->begin_rendering();
 	selectFrame->begin_rendering();
+	failedUI->begin_rendering();
 
 }
 
@@ -69,6 +74,7 @@ void GameManagement::darw(){
 		failedSprite->draw();
 		retryUI->draw();
 		selectFrame->draw();
+		failedUI->draw();
 	}
 }
 
@@ -78,6 +84,7 @@ void GameManagement::selectFunc(){
 	if(failedFlag){
 		selectIndex = 0;
 		retryUI->get_transform().set_translate({ 485,137 });
+		failedUI->get_uv_transform().set_translate_x(0.25f * failedSelectIndex);
 
 	} else if(clearFlag){
 		

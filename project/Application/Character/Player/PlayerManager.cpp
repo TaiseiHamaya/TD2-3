@@ -58,6 +58,7 @@ void PlayerManager::update() {
 	}
 	else if (gameCleared == 2) {
 		gameManagement_->SetFailedFlag(true);
+
 	}
 }
 

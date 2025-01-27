@@ -47,6 +47,7 @@ void GameScene::load()
 	TextureManager::RegisterLoadQue("./GameResources/Texture/UI/Next.png");
 	TextureManager::RegisterLoadQue("./GameResources/Texture/UI/Retry.png");
 	TextureManager::RegisterLoadQue("./GameResources/Texture/UI/SelectFrame.png");
+	TextureManager::RegisterLoadQue("./GameResources/Texture/UI/FailedUI_1.png");
 
 }
 
