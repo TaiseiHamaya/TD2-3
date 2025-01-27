@@ -2,7 +2,8 @@
 
 #include <memory>
 #include "Engine/Debug/ImGui/ImGuiLoadManager/ImGuiLoadManager.h"
-
+#include "Library/Math/Transform2D.h"
+enum class KeyID;
 class SpriteInstance;
 
 
@@ -18,6 +19,9 @@ public:
 
 public:
 	//アクセッサ
+
+private:
+	void keyControl( int index);
 
 private:
 
