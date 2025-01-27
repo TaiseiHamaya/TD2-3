@@ -49,6 +49,7 @@ public:
 	void set_mid_rotation(Quaternion Rotation) { midRotation = Rotation; }
 
 	Quaternion get_target_rotation() { return targetRotation; }
+	void set_target_rotation(Quaternion rotation) { targetRotation = rotation; }
 
 	//Vector3 get_target_pos() const { return targetPosition; }
 	//void set_target_pos(const Vector3& target) { targetPosition = target; }

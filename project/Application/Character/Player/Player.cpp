@@ -153,7 +153,6 @@ void Player::rotate_update()
 	if (rotateTimer >= rotateDuration) {
 		rotateTimer = rotateDuration;
 		isRotating = false;
-		isMoving = true;
 	}
 
 	// 全体の進行度
@@ -178,6 +177,9 @@ void Player::rotate_update()
 		// 通常の回転（start → target）
 		float t = totalProgress;
 		currentRotation = Quaternion::Slerp(startRotation, targetRotation, t);
+	}
+	if (startRotation == targetRotation) {
+		direction = preDirection;
 	}
 
 	// 現在の回転を設定
