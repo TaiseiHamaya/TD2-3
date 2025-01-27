@@ -35,10 +35,10 @@ void GameScene::load()
 	PolygonMeshManager::RegisterLoadQue("./GameResources/Models/GoalObj/GoalObj.obj");
 	PolygonMeshManager::RegisterLoadQue("./GameResources/Models/IceObj/IceObj.obj");
 
-	PolygonMeshManager::RegisterLoadQue("./GameResources/Texure/UI/Wkey.png");
-	PolygonMeshManager::RegisterLoadQue("./GameResources/Texure/UI/Akey.png");
-	PolygonMeshManager::RegisterLoadQue("./GameResources/Texure/UI/Skey.png");
-	PolygonMeshManager::RegisterLoadQue("./GameResources/Texure/UI/Dkey.png");
+	TextureManager::RegisterLoadQue("./GameResources/Texture/UI/Wkey.png");
+	TextureManager::RegisterLoadQue("./GameResources/Texture/UI/Akey.png");
+	TextureManager::RegisterLoadQue("./GameResources/Texture/UI/Skey.png");
+	TextureManager::RegisterLoadQue("./GameResources/Texture/UI/Dkey.png");
 
 }
 

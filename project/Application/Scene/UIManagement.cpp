@@ -18,6 +18,8 @@ void UIManagement::init(){
 
 	wasdSprite[0] = std::make_unique<SpriteInstance>("Wkey.png");
 
+	//wasdSprite[0]
+	
 }
 
 void UIManagement::begin() {
@@ -25,12 +27,20 @@ void UIManagement::begin() {
 		isReset = Input::IsTriggerKey(KeyID::R);
 	}
 }
+#ifdef _DEBUG
 
-void UIManagement::update(){}
+#include <imgui.h>
+void UIManagement::update(){
 
+	ImGui::Begin("sprite");
+	wasdSprite[0]->debug_gui();
+	ImGui::End();
+}
+#endif
 void UIManagement::begin_rendering(){
 	clearSprite->begin_rendering();
 	failedSprite->begin_rendering();
+	wasdSprite[0]->begin_rendering();
 }
 
 void UIManagement::darw(){
@@ -41,4 +51,5 @@ void UIManagement::darw(){
 	{
 		failedSprite->draw();
 	}
+	wasdSprite[0]->draw();
 }

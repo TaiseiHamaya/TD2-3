@@ -1,10 +1,11 @@
 #pragma once
 #include <memory>
+#include "Engine/Debug/ImGui/ImGuiLoadManager/ImGuiLoadManager.h"
 
 
 class SpriteInstance;
 
-class UIManagement {
+class UIManagement{
 public:
 	UIManagement();
 	~UIManagement();
