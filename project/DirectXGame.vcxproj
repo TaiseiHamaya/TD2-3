@@ -134,6 +134,7 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClCompile Include="Application\Mapchip\MapchipField.cpp" />
     <ClCompile Include="Application\LevelLoader\LevelLoader.cpp" />
     <ClCompile Include="Application\Utility\GameUtility.cpp" />
+    <ClCompile Include="Application\Scene\GameSceneUI.cpp" />
     <ClCompile Include="Library\Math\Affine.cpp" />
     <ClCompile Include="Library\Math\Basis.cpp" />
     <ClCompile Include="Engine\Resources\Audio\AudioResourceBuilder.cpp" />
@@ -264,6 +265,7 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClInclude Include="Application\Mapchip\MapchipField.h" />
     <ClInclude Include="Application\LevelLoader\LevelLoader.h" />
     <ClInclude Include="Application\Utility\GameUtility.h" />
+    <ClInclude Include="Application\Scene\GameSceneUI.h" />
     <ClInclude Include="Library\Math\Affine.h" />
     <ClInclude Include="Library\Math\Basis.h" />
     <ClInclude Include="Engine\Resources\Audio\AudioResourceBuilder.h" />

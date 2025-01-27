@@ -147,6 +147,7 @@
     <ClCompile Include="Engine\Module\World\WorldInstanceManager.cpp" />
     <ClCompile Include="Application\Scene\SelectScene.cpp" />
     <ClCompile Include="Application\Scene\DebugScene.cpp" />
+    <ClCompile Include="Application\Scene\GameSceneUI.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Engine\Module\Render\RenderNode\Deferred\DeferredAdaptor.h" />
@@ -302,6 +303,7 @@
     <ClInclude Include="Engine\Module\World\WorldInstanceManager.h" />
     <ClInclude Include="Application\Scene\SelectScene.h" />
     <ClInclude Include="Application\Scene\DebugScene.h" />
+    <ClInclude Include="Application\Scene\GameSceneUI.h" />
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="EngineResources\HLSL\FullscreenShader.hlsl">
