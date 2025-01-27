@@ -10,8 +10,8 @@ GameManagement::GameManagement(){
 GameManagement::~GameManagement(){}
 
 void GameManagement::init(){
-	clearFlag = false;
-	failedFlag = true;
+	clearFlag = true;
+	failedFlag = false;
 	isReset = false;
 	clearSprite = std::make_unique<SpriteInstance>("ClearTex.png");
 	failedSprite = std::make_unique<SpriteInstance>("FailedTex.png");
@@ -96,15 +96,15 @@ void GameManagement::selectFunc(){
 		}
 		selectIndex = std::clamp(selectIndex, 0, 1);
 
-		retryUI->get_transform().set_translate({ 302,215 });
-		nextUI->get_transform().set_translate({ 623,215 });
+		retryUI->get_transform().set_translate({ 322,215 });
+		nextUI->get_transform().set_translate({ 653,215 });
 
 	}
 
 	if(selectIndex == 0){
 		retryUI->get_uv_transform().set_translate_x(0);
 		nextUI->get_uv_transform().set_translate_x(0.5f);
-		selectFrame->get_transform().set_translate({ 302 - 16, 215 - 16 });
+		selectFrame->get_transform().set_translate({ 322 - 16, 215 - 16 });
 
 		
 
@@ -112,7 +112,7 @@ void GameManagement::selectFunc(){
 	{
 		retryUI->get_uv_transform().set_translate_x(0.5f);
 		nextUI->get_uv_transform().set_translate_x(0);
-		selectFrame->get_transform().set_translate({ 623 - 16, 215 - 16 });
+		selectFrame->get_transform().set_translate({ 653 - 16, 215 - 16 });
 
 	}
 
