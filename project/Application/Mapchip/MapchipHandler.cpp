@@ -51,8 +51,14 @@ bool MapchipHandler::can_player_move_on_ice(Player* player, Child* child, const 
 
 			// 子と親どちらも穴だったら移動しない
 			if (nextChip == 0 && nextChildChip == 0) {
-				moveNum = 1;
-				return false;
+				// そもそも移動できなくする処理
+				//moveNum = 1;
+				//return false; 
+				
+				// 穴だったら止まる
+				moveNum -= 1;
+				player->set_move_num_on_ice(moveNum);
+				break;
 			}
 			// 壁だったら止まる
 			if (nextChip == 2 || nextChildChip == 2) {
@@ -103,8 +109,14 @@ bool MapchipHandler::can_player_move_on_ice(Player* player, Child* child, const 
 
 			// 穴だったら移動しない
 			if (nextChip == 0) {
-				moveNum = 1;
-				return false;
+				// そもそも移動できなくする処理
+				//moveNum = 1;
+				//return false;
+				
+				// 穴だったら止まる
+				moveNum -= 1;
+				player->set_move_num_on_ice(moveNum);
+				break;
 			}
 			// 壁だったら止まる
 			if (nextChip == 2) {
