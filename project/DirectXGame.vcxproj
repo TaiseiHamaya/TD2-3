@@ -122,6 +122,7 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     </FxCompile>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="Application\Scene\DebugScene.cpp" />
     <ClCompile Include="Engine\Module\Render\RenderNode\Deferred\Lighting\DirectionalLighingNode.cpp" />
     <ClCompile Include="Engine\Module\Render\RenderNode\Deferred\Mesh\MeshNodeDeferred.cpp" />
     <ClCompile Include="Engine\Module\DrawExecutor\PrimitiveLineDrawExecutor\PrimitiveLineDrawExecutor.cpp" />
@@ -166,6 +167,7 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClCompile Include="Application\Character\Player\PlayerManager.cpp" />
     <ClCompile Include="JsonReader.cpp" />
     <ClCompile Include="Application\Mapchip\MapchipHandler.cpp" />
+    <ClCompile Include="Application\Scene\SelectScene.cpp" />
     <ClCompile Include="TestCode\CallbackManagerDemo.cpp" />
     <ClCompile Include="Engine\Module\World\Collision\CollisionCallbackManager.cpp" />
     <ClCompile Include="Engine\Module\World\Light\DirectionalLight\DirectionalLightInstance.cpp" />
@@ -249,6 +251,7 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClCompile Include="Engine\Module\World\WorldInstanceManager.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="Application\Scene\DebugScene.h" />
     <ClInclude Include="Engine\Module\Render\RenderNode\Deferred\DeferredAdaptor.h" />
     <ClInclude Include="Engine\Module\Render\RenderNode\Deferred\Lighting\DirectionalLighingNode.h" />
     <ClInclude Include="Engine\Module\Render\RenderNode\Deferred\Mesh\MeshNodeDeferred.h" />
@@ -298,6 +301,7 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClInclude Include="JsonReader.h" />
     <ClInclude Include="Application\Character\Player\PlayerManager.h" />
     <ClInclude Include="Application\Mapchip\MapchipHandler.h" />
+    <ClInclude Include="Application\Scene\SelectScene.h" />
     <ClInclude Include="TestCode\CallbackManagerDemo.h" />
     <ClInclude Include="Engine\Module\World\Collision\CollisionCallbackManager.h" />
     <ClInclude Include="Engine\Module\World\Light\DirectionalLight\DirectionalLightInstance.h" />

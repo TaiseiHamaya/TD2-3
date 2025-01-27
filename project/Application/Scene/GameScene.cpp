@@ -1,4 +1,5 @@
 #include "GameScene.h"
+
 #include "Engine/Utility/Tools/SmartPointer.h"
 #include "Engine/Module/Render/RenderPath/RenderPath.h"
 #include "Engine/Rendering/DirectX/DirectXSwapChain/DirectXSwapChain.h"

@@ -37,8 +37,20 @@ SpriteInstance::SpriteInstance(SpriteInstance&&) noexcept = default;
 
 SpriteInstance& SpriteInstance::operator=(SpriteInstance&&) noexcept = default;
 
-const Transform2D& SpriteInstance::get_transform() noexcept {
+const Transform2D& SpriteInstance::get_transform() const noexcept {
 	return *transform;
+}
+
+Transform2D& SpriteInstance::get_transform() noexcept {
+	return *transform;
+}
+
+const Transform2D& SpriteInstance::get_uv_transform() const noexcept {
+	return *uvTransform;
+}
+
+Transform2D& SpriteInstance::get_uv_transform() noexcept {
+	return *uvTransform;
 }
 
 void SpriteInstance::begin_rendering() noexcept {
