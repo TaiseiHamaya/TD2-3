@@ -10,7 +10,7 @@ GameManagement::GameManagement(){
 GameManagement::~GameManagement(){}
 
 void GameManagement::init(){
-	clearFlag = true;
+	clearFlag = false;
 	failedFlag = false;
 	isReset = false;
 	clearSprite = std::make_unique<SpriteInstance>("ClearTex.png");
@@ -39,6 +39,16 @@ void GameManagement::begin() {
 void GameManagement::update(){
 
 	selectFunc();
+	if(!(clearFlag || failedFlag)){ return; }
+	//カーソルがリトライを選んでる時
+	if(selectIndex == 0){
+		isReset = Input::IsTriggerKey(KeyID::R);
+		clearFlag = false;
+		failedFlag = false;
+	} else//カーソルがネクストを選んでる時
+	{
+		//スペースを押したら次のステージへ
+	}
 	
 }
 #ifdef _DEBUG
