@@ -58,11 +58,11 @@ void GameScene::initialize()
 	camera3D->initialize();
 	camera3D->set_transform({
 		CVector3::BASIS,
-		Quaternion::EulerDegree(30,0,0),
-		{3,8,-10}
+		Quaternion::EulerDegree(40,0,0),
+		{3,10,-9}
 		});
 
-	levelLoader = eps::CreateUnique<LevelLoader>(1);
+	levelLoader = eps::CreateUnique<LevelLoader>(8);
 
 	fieldObjs = std::make_unique<MapchipField>();
 	fieldObjs->initialize(levelLoader);
