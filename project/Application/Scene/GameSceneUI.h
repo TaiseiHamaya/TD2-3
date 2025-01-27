@@ -21,11 +21,15 @@ public:
 	//アクセッサ
 
 private:
-	void keyControl( int index);
+	void keyControl(int index);
 
 private:
 
-	std::unique_ptr<SpriteInstance>wasdSprite[4];
+	static const  int uiIndex = 7;
+
+	std::array<std::unique_ptr<SpriteInstance>, uiIndex>wasdSprite;
+	//std::unique_ptr<SpriteInstance>wasdSprite[];
+	std::unique_ptr<SpriteInstance>tutorialUI;
 
 
 };

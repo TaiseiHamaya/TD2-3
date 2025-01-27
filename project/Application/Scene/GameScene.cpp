@@ -40,6 +40,10 @@ void GameScene::load()
 	TextureManager::RegisterLoadQue("./GameResources/Texture/UI/Akey.png");
 	TextureManager::RegisterLoadQue("./GameResources/Texture/UI/Skey.png");
 	TextureManager::RegisterLoadQue("./GameResources/Texture/UI/Dkey.png");
+	TextureManager::RegisterLoadQue("./GameResources/Texture/UI/ResetUI.png");
+	TextureManager::RegisterLoadQue("./GameResources/Texture/UI/ESCkey.png");
+	TextureManager::RegisterLoadQue("./GameResources/Texture/UI/ReleseUI.png");
+	TextureManager::RegisterLoadQue("./GameResources/Texture/UI/Tutorial1.png");
 
 }
 
