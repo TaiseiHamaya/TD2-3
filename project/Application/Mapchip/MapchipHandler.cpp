@@ -45,8 +45,10 @@ bool MapchipHandler::can_player_move_on_ice(Player* player, Child* child, const 
 
 		// 子供がいる場合
 		if (player->is_parent()) {
+			// 子供の位置の計算
 			Vector3 nextChildPos = calculate_child_position();
 			int nextChildChip = get_next_chip(nextChildPos);
+
 			// 子と親どちらも穴だったら移動しない
 			if (nextChip == 0 && nextChildChip == 0) {
 				moveNum = 1;
@@ -81,6 +83,24 @@ bool MapchipHandler::can_player_move_on_ice(Player* player, Child* child, const 
 		}
 		// parentしていない場合
 		else {
+			Vector3 nextPosLeftSide = nextPos + GameUtility::rotate_direction_90_left(direction);
+			Vector3 nextPosRightSide = nextPos + GameUtility::rotate_direction_90_right(direction);
+
+			if (std::round(nextPos.x) == std::round(child->get_translate().x) &&
+				std::round(nextPos.z) == std::round(child->get_translate().z)) {
+				moveNum -= 1;
+				player->set_move_num_on_ice(moveNum);
+				break;
+			}
+			else if (std::round(nextPosLeftSide.x) == std::round(child->get_translate().x) &&
+				std::round(nextPosLeftSide.z) == std::round(child->get_translate().z)) {
+				break;
+			}
+			else if (std::round(nextPosRightSide.x) == std::round(child->get_translate().x) &&
+				std::round(nextPosRightSide.z) == std::round(child->get_translate().z)) {
+				break;
+			}
+
 			// 穴だったら移動しない
 			if (nextChip == 0) {
 				moveNum = 1;
@@ -108,8 +128,17 @@ bool MapchipHandler::can_player_move_to(Player* player, Child* child, const Vect
 	Vector3 nextPos = player->get_translate() + direction;
 
 	if (!player->is_parent()) {
+		if (nextPos == child->get_translate()) {
+			player->set_on_ice(false);
+			return false;
+		}
 		auto element = mapchipField_->getElement(nextPos.x, nextPos.z);
-		player->set_on_ice(true);
+		if (element == 4) {
+			player->set_on_ice(true);
+		}
+		else {
+			player->set_on_ice(false);
+		}
 		return element == 1 || element == 3;
 	}
 	else {

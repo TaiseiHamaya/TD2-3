@@ -31,8 +31,14 @@ public:
 	bool is_moving() const { return isMoving; }
 	void set_moving(bool flag) { isMoving = flag; }
 
+	bool is_rotating() const { return isRotating; }
+	void set_rotating(bool flag) { isRotating = flag; }
+
 	bool is_on_ice() const { return isOnIce; }
 	void set_on_ice(bool flag) { isOnIce = flag; }
+
+	int is_parent_on_ice() const { return isParentOnIce; }
+	void set_parent_on_ice(int index) { isParentOnIce = index; }
 
 	bool is_moved() const { return isMove; }
 
@@ -76,11 +82,9 @@ private:
 	float moveDuration = 0.15f;  // 移動にかける時間（秒）
 	bool isMoving = false;   // 現在移動中かどうかのフラグ
 
-	int moveNumOnIce = 1;
-	bool isOnIce = false;
-	//float moveTimerOnIce = 0.0f;  // 移動の進行状況を管理するタイマー
-	//float moveDurationOnIce = 0.15f;  // 氷上の移動にかける時間（秒）
-	//bool isMovingOnIce = false;   // 現在移動中かどうかのフラグ
+	int moveNumOnIce = 1; // 氷の上を何マス
+	bool isOnIce = false; // 氷の上を移動するか否か
+	int isParentOnIce = 0; // 氷上での子供との接触フラグ(0:無し 1:正面 2:左 3:右)
 
 	Quaternion targetRotation;  // 次の目標回転
 	Quaternion startRotation;   // 補間の開始回転

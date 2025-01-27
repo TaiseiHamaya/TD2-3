@@ -18,6 +18,7 @@ void Player::update()
 {
 	isMove = false;
 	moveNumOnIce = 1;
+	isOnIce = false;
 
 	// 入力処理
 	handle_input();
@@ -85,6 +86,7 @@ void Player::handle_input()
 				targetPosition = get_translate() + direction * static_cast<float>(moveNumOnIce);
 				moveTimer = 0.0f;
 				moveDuration = 0.15f * static_cast<float>(moveNumOnIce);
+				isOnIce = true;
 				isMoving = true;
 			}
 
@@ -105,7 +107,6 @@ void Player::handle_input()
 				rotateTimer = 0.0f;
 				isRotating = false;
 			}
-
 
 			break;
 		}

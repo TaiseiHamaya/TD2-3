@@ -93,6 +93,10 @@ void PlayerManager::manage_parent_child_relationship()
 
 void PlayerManager::set_child_rotate()
 {
+	if (player->is_falling() || child->is_falling()) {
+		return;
+	}
+
 	// 子からプレイヤーへの方向ベクトルを計算
 	 Vector3 childToPlayer = Vector3::Normalize(childPos, playerPos);
 	
@@ -145,6 +149,7 @@ void PlayerManager::attach_child_to_player(Player* player, Child* child)
 		{0.0f, 0.0f, -1.0f}   // 後ろ
 	};
 
+
 	for (const auto& direction : directions) {
 		Vector3 playerToChild = player->get_translate() - child->get_translate();
 		if (GameUtility::approximately_equal(playerToChild, direction)) {
@@ -167,6 +172,12 @@ void PlayerManager::attach_child_to_player(Player* player, Child* child)
 void PlayerManager::detach_child_from_player(Player* player, Child* child)
 {
 	if (Input::GetInstance().IsTriggerKey(KeyID::Space)) {
+		if (player->is_moving() && !player->is_on_ice()) {
+			return;
+		}
+		if (player->is_rotating()) {
+			return;
+		}
 		// ペアレントを解消する
 		child->get_object()->reparent(nullptr);
 		// 子供のワールド座標を設定
