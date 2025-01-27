@@ -91,6 +91,8 @@ void GameScene::initialize()
 
 	managementUI = std::make_unique<GameManagement>();
 	playerManager->set_game_management(managementUI.get());
+
+	gameUI = std::make_unique<GameSceneUI>();
 }
 
 void GameScene::popped()
@@ -118,6 +120,7 @@ void GameScene::update()
 	fieldObjs->update();
 	directionalLight->update();
 	managementUI->update();
+	gameUI->update();
 }
 
 void GameScene::begin_rendering()
@@ -128,7 +131,7 @@ void GameScene::begin_rendering()
 	camera3D->update_matrix();
 	directionalLight->begin_rendering();
 	managementUI->begin_rendering();
-
+	gameUI->begin_rendering();
 }
 
 void GameScene::late_update()
@@ -150,7 +153,9 @@ void GameScene::draw() const
 #endif // _DEBUG
 
 	renderPath->next();
+
 	managementUI->darw();
+	gameUI->darw();
 	renderPath->next();
 
 #ifdef _DEBUG

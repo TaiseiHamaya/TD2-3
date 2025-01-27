@@ -10,6 +10,7 @@ class LevelLoader;
 #include "Application/Character/Player/PlayerManager.h"
 #include "Application/Mapchip/MapchipField.h"
 #include "Application/Scene/GameManagement.h"
+#include "Application/Scene/GameSceneUI.h"
 #include "Engine/Module/Render/RenderNode/2D/Sprite/SpriteNode.h"
 
 class GameScene : public BaseScene
@@ -51,5 +52,8 @@ private:
 	std::unique_ptr<DirectionalLightInstance> directionalLight;
 
 	std::unique_ptr<LevelLoader> levelLoader;
+
+	//UI
+	std::unique_ptr< GameSceneUI> gameUI;
 };
 

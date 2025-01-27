@@ -27,6 +27,10 @@ void GameSceneUI::update(){
 void GameSceneUI::begin_rendering(){
 	wasdSprite[0]->begin_rendering();
 
+	if(Input::GetInstance().IsTriggerKey(KeyID::W)){
+
+	}
+
 }
 
 void GameSceneUI::darw(){
