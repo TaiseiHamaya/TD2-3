@@ -66,6 +66,7 @@ private:
 	void fall_update();
 	void move_update();
 	void rotate_update();
+	void wall_move();
 
 private:
 	MapchipHandler* mapchipHandler_;
@@ -82,6 +83,12 @@ private:
 	float moveTimer = 0.0f;  // 移動の進行状況を管理するタイマー
 	float moveDuration = 0.15f;  // 移動にかける時間（秒）
 	bool isMoving = false;   // 現在移動中かどうかのフラグ
+
+	Vector3 wallStartPosition;   // 移動の開始位置
+	Vector3 wallTargetPosition;  // 次の目標位置
+	float wallMoveTimer = 0.0f; //現在の移動時間
+	float wallMoveDuration = 0.15f; // 移動にかける時間（秒）
+	bool isWallMoveing = false; //フラグ
 
 	int moveNumOnIce = 1; // 氷の上を何マス
 	bool isOnIce = false; // 氷の上を移動するか否か
