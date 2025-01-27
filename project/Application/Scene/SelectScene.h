@@ -6,10 +6,12 @@
 
 #include <Engine/Module/Render/RenderPath/RenderPath.h>
 
+class SpriteInstance;
+
 class SelectScene : public BaseScene {
 public:
-	SelectScene() = default;
-	~SelectScene() = default;
+	SelectScene();
+	~SelectScene();
 
 public:
 	void load() override;
@@ -31,4 +33,8 @@ public:
 
 private:
 	std::unique_ptr<RenderPath> renderPath;
+
+	int32_t selectIndex;
+	std::unique_ptr<SpriteInstance> selectUi;
+	std::unique_ptr<SpriteInstance> numberUi;
 };
