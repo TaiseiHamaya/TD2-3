@@ -3,7 +3,7 @@
 #include "Application/Character/Player/Player.h"
 #include "Application/Character/Child/Child.h"
 #include "Application/Mapchip/MapchipHandler.h"
-#include "Application/Scene/GameManagement.h"
+#include "Application/Scene/UIManagement.h"
 
 
 class PlayerManager {
@@ -18,7 +18,7 @@ public:
     void debug_update();
 #endif
 
-    void set_game_management(GameManagement* gameManagement) { gameManagement_ = gameManagement; }
+    void set_game_management(UIManagement* gameManagement) { gameManagement_ = gameManagement; }
 private:
     void manage_parent_child_relationship();
     void set_child_rotate();
@@ -31,7 +31,7 @@ private:
     std::unique_ptr<Player> player;
     std::unique_ptr<Child> child;
     std::unique_ptr<MapchipHandler> mapchipHandler;
-    GameManagement* gameManagement_;
+    UIManagement* gameManagement_;
     MapchipField* mapchipField_;
 
     Vector3 playerPos{}; // プレイヤーの現在位置

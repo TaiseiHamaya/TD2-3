@@ -4,10 +4,10 @@
 
 class SpriteInstance;
 
-class GameManagement {
+class UIManagement {
 public:
-	GameManagement();
-	~GameManagement();
+	UIManagement();
+	~UIManagement();
 
 	void init();
 	void begin();
@@ -24,6 +24,8 @@ public:
 private:
 	std::unique_ptr<SpriteInstance> clearSprite;
 	std::unique_ptr<SpriteInstance> failedSprite;
+
+	std::unique_ptr<SpriteInstance>wasdSprite[4];
 
 	bool clearFlag;
 	bool failedFlag;

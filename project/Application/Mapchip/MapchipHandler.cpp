@@ -51,8 +51,14 @@ bool MapchipHandler::can_player_move_on_ice(Player* player, Child* child, const 
 
 			// 子と親どちらも穴だったら移動しない
 			if (nextChip == 0 && nextChildChip == 0) {
-				moveNum = 1;
-				return false;
+				// そもそも移動できなくする処理
+				//moveNum = 1;
+				//return false; 
+
+				// 穴だったら止まる
+				moveNum -= 1;
+				player->set_move_num_on_ice(moveNum);
+				break;
 			}
 			// 壁だったら止まる
 			if (nextChip == 2 || nextChildChip == 2) {
@@ -103,8 +109,14 @@ bool MapchipHandler::can_player_move_on_ice(Player* player, Child* child, const 
 
 			// 穴だったら移動しない
 			if (nextChip == 0) {
-				moveNum = 1;
-				return false;
+				// そもそも移動できなくする処理
+				//moveNum = 1;
+				//return false;
+
+				// 穴だったら止まる
+				moveNum -= 1;
+				player->set_move_num_on_ice(moveNum);
+				break;
 			}
 			// 壁だったら止まる
 			if (nextChip == 2) {
@@ -211,7 +223,7 @@ bool MapchipHandler::can_player_rotate(Player* player, Child* child, const Vecto
 	// 一回転しない場合の経由点
 	Vector3 midChildPos = nowChildPos + childDirection;
 
-	// 穴や壁のチェック
+	// 回転後もしくは回転中に穴に落ちる場合は回転させない
 	if (mapchipField_->getElement(std::round(nowPlayerPos.x), std::round(nowPlayerPos.z)) == 0) {
 		if (mapchipField_->getElement(std::round(nextChildPos.x), std::round(nextChildPos.z)) == 0 ||
 			mapchipField_->getElement(std::round(midChildPos.x), std::round(midChildPos.z)) == 0) {
@@ -221,7 +233,12 @@ bool MapchipHandler::can_player_rotate(Player* player, Child* child, const Vecto
 	}
 
 	// 障害物チェック
-	if (check_collision(nextChildPos) || check_collision(midChildPos)) {
+	if (check_collision(nextChildPos)) {
+		player->set_moving(false);
+		return true;
+	}
+	// すぐ隣にブロックがあったらそのまま
+	if (check_collision(midChildPos)) {
 		player->set_moving(false);
 		return false;
 	}
@@ -262,11 +279,6 @@ void MapchipHandler::setup_rotation_parameters(Player* player, Child* child, con
 {
 	if (!player->is_parent()) return;
 
-	if (std::abs(direction.x + player->get_previous_direction().x) > 0.01f ||
-		std::abs(direction.z + player->get_previous_direction().z) > 0.01f) {
-		return; // 180度ではない場合は回転可能
-	}
-
 	auto check_collision = [&](const Vector3& pos) {
 		return mapchipField_->getElement(std::round(pos.x), std::round(pos.z)) == 2;
 		};
@@ -291,6 +303,32 @@ void MapchipHandler::setup_rotation_parameters(Player* player, Child* child, con
 	// 一回転しない場合の経由点
 	Vector3 midChildPos = nowChildPos + childDirection;
 
+	Vector3 leftDirection = GameUtility::rotate_direction_90_left(childDirection);
+	Vector3 rightDirection = GameUtility::rotate_direction_90_right(childDirection);
+
+	// 障害物チェック
+	if (check_collision(nextChildPos)) {
+		player->set_moving(false);
+		player->set_reverse_rotation(true);
+		if (std::round(child->get_translate().x) == 1.0f) {
+			player->set_mid_rotation(Quaternion::FromToRotation({ 0.0f, 0.0f, -1.0f }, rightDirection));
+		}
+		else if (std::round(child->get_translate().x) == -1.0f) {
+			player->set_mid_rotation(Quaternion::FromToRotation({ 0.0f, 0.0f, -1.0f }, leftDirection));
+		}
+		else {
+			player->set_mid_rotation(Quaternion::FromToRotation({ 0.0f, 0.0f, -1.0f }, childDirection));
+		}
+		player->set_target_rotation(player->get_rotation());
+		return;
+	}
+
+	if (std::abs(direction.x + player->get_previous_direction().x) > 0.01f ||
+		std::abs(direction.z + player->get_previous_direction().z) > 0.01f) {
+		return; // 180度ではない場合は回転可能
+	}
+
+
 	auto check_side_collisions = [&](const Vector3& primaryDirection, const Vector3& secondaryDirection) {
 		Vector3 firstPos = nowPlayerPos + primaryDirection;
 		Vector3 secondPos = firstPos + secondaryDirection;
@@ -303,8 +341,6 @@ void MapchipHandler::setup_rotation_parameters(Player* player, Child* child, con
 		return check_collision(firstPos) || check_collision(secondPos) || check_collision(thirdPos);
 		};
 
-	Vector3 leftDirection = GameUtility::rotate_direction_90_left(childDirection);
-	Vector3 rightDirection = GameUtility::rotate_direction_90_right(childDirection);
 
 	if (check_side_collisions(leftDirection, childDirection)) {
 		// 左側が埋まってたら逆回転

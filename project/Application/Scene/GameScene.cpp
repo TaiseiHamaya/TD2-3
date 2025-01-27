@@ -35,6 +35,12 @@ void GameScene::load()
 	PolygonMeshManager::RegisterLoadQue("./GameResources/Models/WallObj/WallObj.obj");
 	PolygonMeshManager::RegisterLoadQue("./GameResources/Models/GoalObj/GoalObj.obj");
 	PolygonMeshManager::RegisterLoadQue("./GameResources/Models/IceObj/IceObj.obj");
+
+	PolygonMeshManager::RegisterLoadQue("./GameResources/Texure/UI/Wkey.png");
+	PolygonMeshManager::RegisterLoadQue("./GameResources/Texure/UI/Akey.png");
+	PolygonMeshManager::RegisterLoadQue("./GameResources/Texure/UI/Skey.png");
+	PolygonMeshManager::RegisterLoadQue("./GameResources/Texure/UI/Dkey.png");
+
 }
 
 void GameScene::initialize()
@@ -83,7 +89,7 @@ void GameScene::initialize()
 	renderPath->initialize({object3dNode,spriteNode });
 #endif // _DEBUG
 
-	managementUI = std::make_unique<GameManagement>();
+	managementUI = std::make_unique<UIManagement>();
 	playerManager->set_game_management(managementUI.get());
 }
 
