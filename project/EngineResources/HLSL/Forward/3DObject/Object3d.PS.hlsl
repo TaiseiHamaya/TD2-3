@@ -46,7 +46,7 @@ float4 main(VertexShaderOutput input) : SV_Target0 {
 	// ライティングなし
 	if (gMaterial.lightingType == 0) {
 		output.rgb = baseColor.rgb;
-		output.a = 1.0f;
+		output.a = textureColor.a;
 	}
 	// Lambert
 	else if (gMaterial.lightingType == 1) {
@@ -54,7 +54,7 @@ float4 main(VertexShaderOutput input) : SV_Target0 {
 		float cos = saturate(NdotL);
 		output.rgb = baseColor * gDirectionalLight.color * cos * gDirectionalLight.intensity;
 		output.rgb += specular;
-		output.a = 1.0f;
+		output.a = textureColor.a;
 	}
 	// Half Lambert
 	else if (gMaterial.lightingType == 2) {
@@ -62,7 +62,7 @@ float4 main(VertexShaderOutput input) : SV_Target0 {
 		float cos = pow(NdotL * 0.5f + 0.5f, 2.0f);
 		output.rgb = baseColor * gDirectionalLight.color * cos * gDirectionalLight.intensity;
 		output.rgb += specular;
-		output.a = 1.0f;
+		output.a = textureColor.a;
 	}
 	// それ以外は異常値なので、黒を出力
 	else {
