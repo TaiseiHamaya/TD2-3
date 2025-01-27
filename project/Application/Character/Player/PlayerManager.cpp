@@ -20,6 +20,7 @@ void PlayerManager::initialize(Reference<const LevelLoader> level, MapchipField*
 	if (player) {
 		player->set_parent(false);
 	}
+	gameCleared = 0;
 }
 
 void PlayerManager::finalize() {
