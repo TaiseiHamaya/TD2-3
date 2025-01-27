@@ -56,6 +56,7 @@ void Player::debug_update()
 void Player::handle_input()
 {
 	if (isMoving) return; // 移動中は入力を無視
+	if (isRotating) return; // 回転中は入力を無視
 
 	Vector3 directions[] = {
 		{0.0f, 0.0f, 1.0f},  // 前
@@ -77,12 +78,10 @@ void Player::handle_input()
 				moveTimer = 0.0f;
 				moveDuration = 0.15f;
 				isMoving = true;
-			}else 
-				// 進行先が氷かどうかチェック
+			}
+			else
+			// 進行先が氷かどうかチェック
 			if (mapchipHandler_->can_player_move_on_ice(this, child_, direction)) {
-				if (moveNumOnIce == 0) {
-					return;
-				}
 				targetPosition = get_translate() + direction * static_cast<float>(moveNumOnIce);
 				moveTimer = 0.0f;
 				moveDuration = 0.15f * static_cast<float>(moveNumOnIce);
@@ -107,6 +106,7 @@ void Player::handle_input()
 				isRotating = false;
 			}
 
+
 			break;
 		}
 	}
@@ -123,7 +123,7 @@ void Player::fall_update()
 
 void Player::move_update()
 {
-	if (!isMoving) { 
+	if (!isMoving) {
 		targetPosition = object_->get_transform().get_translate();
 		return;
 	};

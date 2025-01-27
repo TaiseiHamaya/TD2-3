@@ -150,7 +150,6 @@ void PlayerManager::attach_child_to_player(Player* player, Child* child)
 		if (GameUtility::approximately_equal(playerToChild, direction)) {
 			child->get_object()->reparent(player->get_object());
 			player->set_parent(true);
-
 			// プレイヤーの回転を考慮してオフセットを生成
 			Quaternion parentRotation = player->get_rotation();
 			Vector3 adjustedOffset = direction * parentRotation;
@@ -158,13 +157,8 @@ void PlayerManager::attach_child_to_player(Player* player, Child* child)
 			if (std::abs(adjustedOffset.x) == 1.0f || std::abs(adjustedOffset.z) == 1.0f) {
 				adjustedOffset *= -1.0f;
 			}
-
-
-
 			// 子供のローカル座標を設定
 			child->set_translate(adjustedOffset);
-
-
 			break;
 		}
 	}

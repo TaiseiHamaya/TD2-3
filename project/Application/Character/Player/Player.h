@@ -31,6 +31,9 @@ public:
 	bool is_moving() const { return isMoving; }
 	void set_moving(bool flag) { isMoving = flag; }
 
+	bool is_on_ice() const { return isOnIce; }
+	void set_on_ice(bool flag) { isOnIce = flag; }
+
 	bool is_moved() const { return isMove; }
 
 	Vector3 get_previous_direction() const { return preDirection; }
@@ -38,6 +41,8 @@ public:
 	void set_reverse_rotation(bool flag) { isReverseRotation = flag; }
 
 	void set_mid_rotation(Quaternion Rotation) { midRotation = Rotation; }
+
+	Quaternion get_target_rotation() { return targetRotation; }
 
 	//Vector3 get_target_pos() const { return targetPosition; }
 	//void set_target_pos(const Vector3& target) { targetPosition = target; }
@@ -72,6 +77,7 @@ private:
 	bool isMoving = false;   // 現在移動中かどうかのフラグ
 
 	int moveNumOnIce = 1;
+	bool isOnIce = false;
 	//float moveTimerOnIce = 0.0f;  // 移動の進行状況を管理するタイマー
 	//float moveDurationOnIce = 0.15f;  // 氷上の移動にかける時間（秒）
 	//bool isMovingOnIce = false;   // 現在移動中かどうかのフラグ
