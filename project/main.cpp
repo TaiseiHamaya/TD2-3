@@ -1,28 +1,34 @@
 #include "Engine/Application/WinApp.h"
 
+#include "Application/Scene/DebugScene.h"
+#include "Application/Scene/SelectScene.h"
+
 #include "Engine/Runtime/Scene/SceneManager.h"
 #include "TestCode/SceneDemo.h"
-#include "Application/Scene/DebugScene.h"
 
-int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
+int WINAPI WinMain(HINSTANCE,HINSTANCE,LPSTR,int) {
 	WinApp::Initialize();
 
-#ifdef _DEBUG
+	#ifdef _DEBUG
 	WorldClock::IsFixDeltaTime(false);
-#endif // _DEBUG
+	#endif // _DEBUG
 
+	#ifdef _DEBUG
 	SceneManager::Initialize(std::make_unique<DebugScene>());
+	#else
+	SceneManager::Initialize(std::make_unique<SelectScene>());
+	#endif // _DEBUG
 
 	WinApp::ShowAppWindow();
 
-	while (true) {
+	while(true) {
 		WinApp::BeginFrame();
 
 		SceneManager::Begin();
 
 		WinApp::ProcessMessage();
 
-		if (WinApp::IsEndApp()) {
+		if(WinApp::IsEndApp()) {
 			break;
 		}
 
@@ -30,9 +36,9 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 
 		SceneManager::Draw();
 
-#ifdef _DEBUG
+		#ifdef _DEBUG
 		SceneManager::DebugGui();
-#endif // _DEBUG
+		#endif // _DEBUG
 
 		WinApp::EndFrame();
 	}
