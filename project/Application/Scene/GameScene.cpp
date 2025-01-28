@@ -1,5 +1,7 @@
 #include "GameScene.h"
 
+#include <Library/Math/Definition.h>
+
 #include "Engine/Module/Render/RenderNode/2D/Sprite/SpriteNode.h"
 #include "Engine/Module/Render/RenderNode/Forward/Object3DNode/Object3DNode.h"
 #include "Engine/Module/Render/RenderNode/Forward/SkinningMesh/SkinningMeshNode.h"
@@ -71,10 +73,10 @@ void GameScene::initialize() {
 	camera3D->initialize();
 	camera3D->set_transform({
 		CVector3::BASIS,
-		Quaternion::EulerDegree(40,0,0),
-		{3,10,-9}
+		 Quaternion::EulerDegree(40,0,0),//Quaternion::AngleAxis(CVector3::BASIS_Y, -PI /4) *
+		{2,10,-8}//{10,10,-6.3f}
 		});
-
+	
 	levelLoader = eps::CreateUnique<LevelLoader>(currentLevel);
 
 	fieldObjs = std::make_unique<MapchipField>();
@@ -164,6 +166,7 @@ void GameScene::update() {
 	directionalLight->update();
 	managementUI->update();
 	gameUI->update();
+	gameUI->setIsCanRelese(playerManager->get_isParent());
 }
 
 void GameScene::begin_rendering() {

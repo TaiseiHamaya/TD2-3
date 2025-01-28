@@ -24,7 +24,7 @@ public:
 	void SetFailedFlag(bool value) { failedFlag = value; }
 	bool is_reset() const { return isReset; }
 	bool is_next() const { return isNext; }
-	bool is_escape_game() const { return toSelectTimer >= 1.0f; }
+	bool is_escape_game() const { return toSelectTimer >= 0.1f; }
 	void SetFailedSelect(int value){ failedSelectIndex = value; }
 
 private:

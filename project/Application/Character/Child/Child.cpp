@@ -5,6 +5,8 @@ void Child::initialize(const LevelLoader& level, MapchipHandler* mapchipHandler)
 	object_ = std::make_unique<AnimatedMeshInstance>();
 	object_->reset_animated_mesh("ChiledKoala.gltf", "Standby", true);
 	object_->get_transform().set_translate(level.get_child_position());
+
+	
 }
 
 void Child::finalize()
@@ -22,6 +24,7 @@ void Child::update()
 		if (position.y <= -3.0f) {
 			isFalled = true;
 		}
+	
 	}
 
 	object_->update();
