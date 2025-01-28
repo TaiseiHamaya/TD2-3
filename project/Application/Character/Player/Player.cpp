@@ -5,7 +5,7 @@
 void Player::initialize(const LevelLoader& level, MapchipHandler* mapchipHandler)
 {
 	object_ = std::make_unique<AnimatedMeshInstance>();
-	object_->reset_animated_mesh("ParentKoala.gltf", "standby", true);
+	object_->reset_animated_mesh("ParentKoala.gltf", "Standby", true);
 	object_->get_transform().set_translate(level.get_player_position());
 	mapchipHandler_ = mapchipHandler;
 }
