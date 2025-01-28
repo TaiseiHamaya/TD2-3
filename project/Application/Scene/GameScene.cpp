@@ -1,5 +1,6 @@
 #include "GameScene.h"
 
+#include "Engine/Module/Render/RenderNode/2D/Sprite/SpriteNode.h"
 #include "Engine/Module/Render/RenderNode/Forward/Object3DNode/Object3DNode.h"
 #include "Engine/Module/Render/RenderPath/RenderPath.h"
 #include "Engine/Module/Render/RenderTargetGroup/SingleRenderTarget.h"
@@ -26,7 +27,7 @@
 GameScene::GameScene() : GameScene(1) {
 }
 
-GameScene::GameScene(uint32_t level) {
+GameScene::GameScene(int32_t level) {
 	currentLevel = level;
 }
 ;

@@ -1,6 +1,8 @@
 #pragma once
 #include "Engine/Runtime/Scene/BaseScene.h"
+
 #include <memory>
+
 #include "Engine/Module/World/Light/DirectionalLight/DirectionalLightInstance.h"
 
 class RenderPath;
@@ -11,13 +13,12 @@ class LevelLoader;
 #include "Application/Mapchip/MapchipField.h"
 #include "Application/Scene/GameManagement.h"
 #include "Application/Scene/GameSceneUI.h"
-#include "Engine/Module/Render/RenderNode/2D/Sprite/SpriteNode.h"
 
 class GameScene : public BaseScene
 {
 public:
 	GameScene();
-	GameScene(uint32_t level);
+	GameScene(int32_t level);
 	~GameScene();
 
 public:
@@ -51,7 +52,7 @@ private:
 	std::unique_ptr<Camera3D> camera3D;
 	std::unique_ptr<DirectionalLightInstance> directionalLight;
 
-	uint32_t currentLevel;
+	int32_t currentLevel;
 	std::unique_ptr<LevelLoader> levelLoader;
 
 	//UI

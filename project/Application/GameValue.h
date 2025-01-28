@@ -1,12 +1,12 @@
 #pragma once
 
-#include <numeric>
+#include <cstdint>
 
 namespace GameValue {
 
 /// <summary>
 /// ステージ数
 /// </summary>
-uint32_t MaxLevel = 10;
+inline int32_t MaxLevel = 10;
 
 };
