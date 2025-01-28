@@ -432,6 +432,11 @@ void MapchipHandler::check_fall_conditions(Player* player, Child* child) {
 
 int MapchipHandler::is_goal_reached(Player* player, Child* child) const
 {
+	// 回転中だったら判定を取らない
+	if (player->is_rotating()) {
+		return 0;
+	}
+
 	// 親の位置を取得
 	Vector3 playerPos = player->get_translate();
 	int playerChip = mapchipField_->getElement(std::round(playerPos.x), std::round(playerPos.z));
