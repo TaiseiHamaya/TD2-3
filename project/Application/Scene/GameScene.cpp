@@ -135,15 +135,15 @@ void GameScene::begin() {
 		playerManager->initialize(levelLoader, fieldObjs.get());
 	}
 	else if (managementUI->is_next()) {
-		// �Ō�̃��x���ł͂Ȃ��ꍇ
+		// 最大レベルではない場合
 		if (currentLevel < GameValue::MaxLevel) {
 			SceneManager::SetSceneChange(
 				eps::CreateUnique<GameScene>(currentLevel + 1), 1.0
 			);
 		}
-		// �Ō�̃��x���̏ꍇ
+		// 最大レベルの場合
 		else {
-			// TODO : �����ɍŌ�̃��x���̏ꍇ�̏��������
+			// TODO : ここに最大レベル時の遷移を実装する
 		}
 	}
 	else if (managementUI->is_escape_game()) {
