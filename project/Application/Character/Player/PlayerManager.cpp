@@ -3,6 +3,7 @@
 #include <cmath>
 #include <Application/Utility/GameUtility.h>
 #include "Library/Math/Matrix4x4.h"
+#include"Engine/Resources/Animation/NodeAnimation/NodeAnimationPlayer.h"
 
 void PlayerManager::initialize(Reference<const LevelLoader> level, MapchipField* mapchipField) {
 	mapchipField_ = mapchipField;
@@ -99,13 +100,20 @@ void PlayerManager::debug_update() {
 
 void PlayerManager::manage_parent_child_relationship()
 {
+	// 1フレーム前の親子付け
+	bool preParent = player->is_parent();
+
 	if (!player->is_parent()) {
 		// 子をプレイヤーにくっつける処理
 		attach_child_to_player(player.get(), child.get());
+		if (child->get_object()->get_animation()->is_end()) {
+			child->get_object()->reset_animated_mesh("ChiledKoala.gltf", "Standby", false);
+		}
 	}
 	else {
 		// 子をプレイヤーから切り離す処理
 		detach_child_from_player(player.get(), child.get());
+
 	}
 }
 
@@ -182,6 +190,7 @@ void PlayerManager::attach_child_to_player(Player* player, Child* child)
 			}
 			// 子供のローカル座標を設定
 			child->set_translate(adjustedOffset);
+			child->get_object()->reset_animated_mesh("ChiledKoala.gltf", "Hold", false);
 			break;
 		}
 	}
@@ -202,5 +211,7 @@ void PlayerManager::detach_child_from_player(Player* player, Child* child)
 		child->set_translate({ std::round(childPos.x), std::round(childPos.y), std::round(childPos.z) });
 		// 親子付けフラグをオフにする
 		player->set_parent(false);
+		// アニメーションをセット
+		child->get_object()->reset_animated_mesh("ChiledKoala.gltf", "Relese", false);
 	}
 }
