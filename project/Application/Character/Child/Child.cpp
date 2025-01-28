@@ -2,8 +2,8 @@
 
 void Child::initialize(const LevelLoader& level, MapchipHandler* mapchipHandler)
 {
-	object_ = std::make_unique<MeshInstance>();
-	object_->reset_mesh("ChiledKoala.obj");
+	object_ = std::make_unique<AnimatedMeshInstance>();
+	object_->reset_animated_mesh("ChiledKoala.gltf", "Standby", true);
 	object_->get_transform().set_translate(level.get_child_position());
 }
 
@@ -13,6 +13,8 @@ void Child::finalize()
 
 void Child::update()
 {
+	object_->begin();
+
 	if (isFall) {
 		Vector3 position = object_->get_transform().get_translate();
 		position.y -= fallSpeed * WorldClock::DeltaSeconds();
@@ -22,7 +24,7 @@ void Child::update()
 		}
 	}
 
-
+	object_->update();
 }
 
 void Child::begin_rendering()
