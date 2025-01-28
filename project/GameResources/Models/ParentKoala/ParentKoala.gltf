@@ -685,7 +685,7 @@
 					}
 				}
 			],
-			"name":"Stundby",
+			"name":"Standby",
 			"samplers":[
 				{
 					"input":55,
