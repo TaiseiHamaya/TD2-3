@@ -239,7 +239,7 @@ bool MapchipHandler::can_player_move_to(Player* player, Child* child, const Vect
 bool MapchipHandler::can_player_rotate(Player* player, Child* child, const Vector3& direction) const
 {
 	if (direction == player->get_previous_direction()) {
-		//return false; // 同じ方向なら回転不要
+		return false; // 同じ方向なら回転不要
 	}
 
 	if (!player->is_parent()) return true;
