@@ -116,7 +116,7 @@ void PlayerManager::set_child_rotate()
 	}
 
 	// 子からプレイヤーへの方向ベクトルを計算
-	 Vector3 childToPlayer = Vector3::Normalize(playerPos, childPos);
+	 Vector3 childToPlayer = Vector3::Normalize(childPos, playerPos);
 	
 	 // 子からプレイヤーへの方向ベクトルの長さをチェック
 	 if (childToPlayer.length() == 0.0f) return;
