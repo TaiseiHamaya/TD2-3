@@ -168,7 +168,9 @@ void PlayerManager::set_child_rotate()
 
 void PlayerManager::attach_child_to_player(Player* player, Child* child)
 {
+	// 今フレームで移動していなければ返す
 	if (!player->is_moved()) return;
+
 
 	Vector3 directions[] = {
 		{1.0f, 0.0f, 0.0f},   // 右

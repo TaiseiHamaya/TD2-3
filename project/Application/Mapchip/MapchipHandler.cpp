@@ -129,7 +129,7 @@ bool MapchipHandler::can_player_move_on_ice(Player* player, Child* child, const 
 			}
 
 			// 床だったらそのまま出る
-			if (nextChip == 0 || nextChip == 0) {
+			if (nextChip == 0) {
 				break;
 			}
 
@@ -141,19 +141,22 @@ bool MapchipHandler::can_player_move_on_ice(Player* player, Child* child, const 
 	return true;
 }
 
-bool MapchipHandler::player_move_to_wall_or_holl(Player* player, Child* child, const Vector3& direction) const{
+bool MapchipHandler::player_move_to_wall_or_holl(Player* player, Child* child, const Vector3& direction) const {
 	Vector3 nextPos = player->get_translate() + direction;
-	if(!player->is_parent()) {
+	if (!player->is_parent()) {
 		auto element = mapchipField_->getElement(nextPos.x, nextPos.z);
-		if(element == 0 || element == 2){ return true; }//移動先が壁か穴ならtrue
-	} else{
+		if (element == 0 || element == 2) { return true; }//移動先が壁か穴ならtrue
+	}
+	else {
 		Vector3 childDirection{};
 		Vector3 nextChildPos{};
-		if(std::round(child->get_translate().x) == 1.0f) {
+		if (std::round(child->get_translate().x) == 1.0f) {
 			childDirection = GameUtility::rotate_direction_90_left(direction);
-		} else if(std::round(child->get_translate().x) == -1.0f) {
+		}
+		else if (std::round(child->get_translate().x) == -1.0f) {
 			childDirection = GameUtility::rotate_direction_90_right(direction);
-		} else {
+		}
+		else {
 			childDirection = direction;
 		}
 
@@ -163,12 +166,12 @@ bool MapchipHandler::player_move_to_wall_or_holl(Player* player, Child* child, c
 		auto elementChild = mapchipField_->getElement(std::round(nextChildPos.x), std::round(nextChildPos.z));
 
 		// 移動先がどちらも穴だったらtrue
-		if(elementNextPlayer == 0 && elementChild == 0) {
+		if (elementNextPlayer == 0 && elementChild == 0) {
 			player->set_on_ice(false);
 			return true;
 		}
 		// 移動先のどちらかが壁だったらtrue
-		if(elementNextPlayer == 2 || elementChild == 2) {
+		if (elementNextPlayer == 2 || elementChild == 2) {
 			player->set_on_ice(false);
 			return true;
 		}
@@ -185,7 +188,8 @@ bool MapchipHandler::can_player_move_to(Player* player, Child* child, const Vect
 		// 移動後の座標が子供と重なってたら移動不可
 		if (nextPos == child->get_translate()) {
 			player->set_on_ice(false);
-			return false;
+			player->set_on_child(true);
+			return true;
 		}
 		// 移動先のマップチップ番号を取得
 		auto element = mapchipField_->getElement(nextPos.x, nextPos.z);
@@ -242,7 +246,11 @@ bool MapchipHandler::can_player_rotate(Player* player, Child* child, const Vecto
 		return false; // 同じ方向なら回転不要
 	}
 
+	// 今フレームで移動していたら抜ける(くっつく処理をしている)
+	if (player->is_moved()) return false;
+
 	if (!player->is_parent()) return true;
+
 
 	auto check_collision = [&](const Vector3& pos) {
 		return mapchipField_->getElement(std::round(pos.x), std::round(pos.z)) == 2;
@@ -286,11 +294,6 @@ bool MapchipHandler::can_player_rotate(Player* player, Child* child, const Vecto
 		player->set_moving(false);
 		return true;
 	}
-	//// すぐ隣にブロックがあったらそのまま
-	//if (check_collision(midChildPos)) {
-	//	player->set_moving(false);
-	//	return true;
-	//}
 
 	if (std::abs(direction.x + player->get_previous_direction().x) > 0.01f ||
 		std::abs(direction.z + player->get_previous_direction().z) > 0.01f) {
@@ -299,8 +302,8 @@ bool MapchipHandler::can_player_rotate(Player* player, Child* child, const Vecto
 
 	auto check_side_collisions = [&](const Vector3& primaryDirection, const Vector3& secondaryDirection) {
 		Vector3 firstPos = nowPlayerPos + primaryDirection - childDirection;
-		Vector3 secondPos = firstPos + secondaryDirection - childDirection;
-		Vector3 thirdPos = secondPos + secondaryDirection - childDirection;
+		Vector3 secondPos = firstPos + secondaryDirection/* - childDirection*/;
+		Vector3 thirdPos = secondPos + secondaryDirection/* - childDirection*/;
 		return check_collision(firstPos) || check_collision(secondPos) || check_collision(thirdPos);
 		};
 
@@ -361,6 +364,7 @@ void MapchipHandler::setup_rotation_parameters(Player* player, Child* child, con
 	// 右斜め方向を計算
 	Vector3 rightDiagonalDirection = (childDirection + rightDirection).normalize();
 
+
 	// 移動の終了位置に障害物があるか
 	if (check_collision(nextChildPos)) {
 		player->set_moving(false);
@@ -389,7 +393,9 @@ void MapchipHandler::setup_rotation_parameters(Player* player, Child* child, con
 			player->set_mid_rotation(Quaternion::FromToRotation({ 0.0f, 0.0f, -1.0f }, leftDiagonalDirection));
 		}
 		else {
-			player->set_mid_rotation(Quaternion::FromToRotation({ 0.0f, 0.0f, -1.0f }, childDirection));
+			// プレイヤーと子が向かい合ってるときの斜め方向
+			Vector3 childDiagonalDirection = (childDirection + player->get_previous_direction()).normalize();
+			player->set_mid_rotation(Quaternion::FromToRotation({ 0.0f, 0.0f, -1.0f }, childDiagonalDirection));
 		}
 		player->set_target_rotation(player->get_rotation());
 		return;
@@ -425,6 +431,7 @@ void MapchipHandler::setup_rotation_parameters(Player* player, Child* child, con
 		else {
 			player->set_mid_rotation(Quaternion::FromToRotation({ 0.0f, 0.0f, -1.0f }, rightDirection));
 		}
+		return;
 	}
 
 	if (check_side_collisions(rightDirection, childDirection)) {
@@ -439,6 +446,7 @@ void MapchipHandler::setup_rotation_parameters(Player* player, Child* child, con
 		else {
 			player->set_mid_rotation(Quaternion::FromToRotation({ 0.0f, 0.0f, -1.0f }, leftDirection));
 		}
+		return;
 	}
 }
 
