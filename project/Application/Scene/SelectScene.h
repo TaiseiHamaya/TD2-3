@@ -37,5 +37,6 @@ private:
 
 	int32_t selectIndex;
 	std::unique_ptr<SpriteInstance> selectUi;
+	std::unique_ptr<SpriteInstance> startUi;
 	std::unique_ptr<SpriteInstance> numberUi;
 };
