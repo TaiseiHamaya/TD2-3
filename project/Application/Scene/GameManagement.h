@@ -1,8 +1,6 @@
 #pragma once
-#include <memory>
-#include "Engine/Debug/ImGui/ImGuiLoadManager/ImGuiLoadManager.h"
-#include "Library/Math/Transform2D.h"
 
+#include <memory>
 
 class SpriteInstance;
 
@@ -26,6 +24,7 @@ public:
 	void SetFailedFlag(bool value) { failedFlag = value; }
 	bool is_reset() const { return isReset; }
 	bool is_next() const { return isNext; }
+	bool is_escape_game() const { return toSelectTimer >= 1.0f; }
 	void SetFailedSelect(int value){ failedSelectIndex = value; }
 
 private:
@@ -45,5 +44,6 @@ private:
 
 	int selectIndex; //0がリトライ、1がネクスト
 	int failedSelectIndex;//0:子どもを置いてゴール 1:子コアラがゴール　2:コアラを落とす　3:ターン経過(まだない)
-
+	
+	float toSelectTimer;
 };

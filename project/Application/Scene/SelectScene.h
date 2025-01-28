@@ -11,6 +11,7 @@ class SpriteInstance;
 class SelectScene : public BaseScene {
 public:
 	SelectScene();
+	SelectScene(uint32_t selectLevel);
 	~SelectScene();
 
 public:

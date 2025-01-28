@@ -1,19 +1,22 @@
 #include "SelectScene.h"
 
+#include <Engine/Module/Render/RenderNode/Forward/Object3DNode/Object3DNode.h>
+#include <Engine/Module/World/Camera/Camera2D.h>
+#include <Engine/Module/World/Sprite/SpriteInstance.h>
+#include <Engine/Rendering/DirectX/DirectXSwapChain/DirectXSwapChain.h>
+#include <Engine/Resources/PolygonMesh/PolygonMeshManager.h>
+#include <Engine/Resources/Texture/TextureManager.h>
 #include <Engine/Runtime/Input/Input.h>
 #include <Engine/Runtime/Scene/SceneManager.h>
 #include <Engine/Utility/Tools/SmartPointer.h>
-#include <Engine/Runtime/Scene/SceneManager.h>
-#include <Engine/Rendering/DirectX/DirectXSwapChain/DirectXSwapChain.h>
-#include <Engine/Module/Render/RenderNode/Forward/Object3DNode/Object3DNode.h>
-#include <Engine/Resources/PolygonMesh/PolygonMeshManager.h>
-#include <Engine/Resources/Texture/TextureManager.h>
-#include <Engine/Module/World/Sprite/SpriteInstance.h>
-#include <Engine/Module/World/Camera/Camera2D.h>
 
 #include "Application/Scene/GameScene.h"
 
-SelectScene::SelectScene() = default;
+SelectScene::SelectScene() : SelectScene(0) {};
+
+SelectScene::SelectScene(uint32_t selectLevel) :
+	selectIndex(selectLevel) {
+}
 
 SelectScene::~SelectScene() = default;
 
@@ -77,7 +80,7 @@ void SelectScene::late_update() {
 void SelectScene::draw() const {
 	renderPath->begin();
 	// Mesh
-	
+
 	renderPath->next();
 	// Sprite
 	numberUi->draw();

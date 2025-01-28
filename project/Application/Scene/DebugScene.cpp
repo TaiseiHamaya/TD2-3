@@ -2,11 +2,11 @@
 
 #ifdef _DEBUG
 
-#include <Engine/Utility/Tools/SmartPointer.h>
+#include <Engine/Module/Render/RenderNode/Forward/Object3DNode/Object3DNode.h>
+#include <Engine/Rendering/DirectX/DirectXSwapChain/DirectXSwapChain.h>
 #include <Engine/Runtime/Input/Input.h>
 #include <Engine/Runtime/Scene/SceneManager.h>
-#include <Engine/Rendering/DirectX/DirectXSwapChain/DirectXSwapChain.h>
-#include <Engine/Module/Render/RenderNode/Forward/Object3DNode/Object3DNode.h>
+#include <Engine/Utility/Tools/SmartPointer.h>
 
 #include "Application/Scene/GameScene.h"
 #include "Application/Scene/SelectScene.h"

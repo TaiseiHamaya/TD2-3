@@ -42,7 +42,6 @@ public:
 #endif // _DEBUG
 
 private:
-
 	std::unique_ptr<RenderPath> renderPath;
 	// プレイヤーの生成
 	std::unique_ptr<PlayerManager> playerManager;
