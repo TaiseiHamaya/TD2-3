@@ -9,15 +9,15 @@
 int WINAPI WinMain(HINSTANCE,HINSTANCE,LPSTR,int) {
 	WinApp::Initialize();
 
-	#ifdef _DEBUG
+#ifdef _DEBUG
 	WorldClock::IsFixDeltaTime(false);
-	#endif // _DEBUG
+#endif // _DEBUG
 
-	#ifdef _DEBUG
+#ifdef _DEBUG
 	SceneManager::Initialize(std::make_unique<DebugScene>());
-	#else
+#else
 	SceneManager::Initialize(std::make_unique<SelectScene>());
-	#endif // _DEBUG
+#endif // _DEBUG
 
 	WinApp::ShowAppWindow();
 
@@ -36,9 +36,9 @@ int WINAPI WinMain(HINSTANCE,HINSTANCE,LPSTR,int) {
 
 		SceneManager::Draw();
 
-		#ifdef _DEBUG
+#ifdef _DEBUG
 		SceneManager::DebugGui();
-		#endif // _DEBUG
+#endif // _DEBUG
 
 		WinApp::EndFrame();
 	}
