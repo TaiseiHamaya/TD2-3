@@ -14,7 +14,7 @@
 #include "Application/GameValue.h"
 #include "Application/Scene/GameScene.h"
 
-SelectScene::SelectScene() : SelectScene(0) {};
+SelectScene::SelectScene() : SelectScene(1) {};
 
 SelectScene::SelectScene(int32_t selectLevel) :
 	selectIndex(selectLevel) {
@@ -24,14 +24,19 @@ SelectScene::~SelectScene() = default;
 
 void SelectScene::load() {
 	TextureManager::RegisterLoadQue("./GameResources/Texture/UI/StageSelectUI.png");
+	TextureManager::RegisterLoadQue("./GameResources/Texture/UI/start.png");
 	TextureManager::RegisterLoadQue("./GameResources/Texture/UI/number.png");
 }
 
 void SelectScene::initialize() {
 	// Instance
 	Camera2D::Initialize();
-	selectUi = eps::CreateUnique<SpriteInstance>("StageSelectUI.png");
-	numberUi = eps::CreateUnique<SpriteInstance>("number.png");
+	startUi = eps::CreateUnique<SpriteInstance>("start.png", Vector2{ 0.5f, 0.5f });
+	startUi->get_transform().set_translate({ 640.0f,140 });
+	selectUi = eps::CreateUnique<SpriteInstance>("StageSelectUI.png", Vector2{ 0.5f, 0.5f });
+	selectUi->get_transform().set_translate({ 640.0f,550.0f });
+	numberUi = eps::CreateUnique<SpriteInstance>("number.png", Vector2{ 0.5f, 0.5f });
+	numberUi->get_transform().set_translate({ 640.0f,360.0f });
 	numberUi->get_transform().set_scale({ 0.1f,1.0f });
 	numberUi->get_uv_transform().set_scale({ 0.1f,1.0f });
 
@@ -80,6 +85,7 @@ void SelectScene::update() {
 void SelectScene::begin_rendering() {
 	numberUi->begin_rendering();
 	selectUi->begin_rendering();
+	startUi->begin_rendering();
 }
 
 void SelectScene::late_update() {
@@ -93,12 +99,22 @@ void SelectScene::draw() const {
 	// Sprite
 	numberUi->draw();
 	selectUi->draw();
+	startUi->draw();
 
 	renderPath->next();
 }
 
 #ifdef _DEBUG
 void SelectScene::debug_update() {
+	ImGui::Begin("SelectUi");
+	selectUi->debug_gui();
+	ImGui::End();
+	ImGui::Begin("numberUi");
+	numberUi->debug_gui();
+	ImGui::End();
+	ImGui::Begin("startUi");
+	startUi->debug_gui();
+	ImGui::End();
 
 }
 #endif // _DEBUG
