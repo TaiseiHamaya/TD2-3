@@ -41,6 +41,10 @@ public:
 	void set_parent_on_ice(int index) { isParentOnIce = index; }
 
 	bool is_moved() const { return isMove; }
+	void set_moved(bool flag) { isMove = flag; }
+
+	bool is_on_child() const { return isOnChild; }
+	void set_on_child(bool flag) { isOnChild = flag; }
 
 	Vector3 get_previous_direction() const { return preDirection; }
 
@@ -85,6 +89,7 @@ private:
 	float moveTimer = 0.0f;  // 移動の進行状況を管理するタイマー
 	float moveDuration = 0.15f;  // 移動にかける時間（秒）
 	bool isMoving = false;   // 現在移動中かどうかのフラグ
+	bool isOnChild = false; // 移動先が子供かどうか
 
 	Vector3 wallStartPosition;   // 移動の開始位置
 	Vector3 wallTargetPosition;  // 次の目標位置
