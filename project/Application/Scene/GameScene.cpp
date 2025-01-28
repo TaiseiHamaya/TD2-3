@@ -166,6 +166,7 @@ void GameScene::update() {
 	directionalLight->update();
 	managementUI->update();
 	gameUI->update();
+	gameUI->setIsCanRelese(playerManager->get_isParent());
 }
 
 void GameScene::begin_rendering() {

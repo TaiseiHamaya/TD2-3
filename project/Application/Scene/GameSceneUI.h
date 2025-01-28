@@ -20,7 +20,7 @@ public:
 
 public:
 	//アクセッサ
-
+	void setIsCanRelese(bool value) { isCanRelese = value; }
 private:
 	void keyControl(int index);
 
@@ -31,6 +31,8 @@ private:
 	std::array<std::unique_ptr<SpriteInstance>, uiIndex>wasdSprite;
 	//std::unique_ptr<SpriteInstance>wasdSprite[];
 	std::unique_ptr<SpriteInstance>tutorialUI;
+
+	bool isCanRelese;
 
 
 };

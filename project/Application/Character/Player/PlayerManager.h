@@ -19,6 +19,7 @@ public:
 #endif
 
     void set_game_management(GameManagement* gameManagement) { gameManagement_ = gameManagement; }
+    bool get_isParent() {return isParent;}
 private:
     void manage_parent_child_relationship();
     void set_child_rotate();
@@ -39,4 +40,5 @@ private:
 
     int stageSituation = 0; // クリア状態を管理(0:通常 1:クリア 2:子が先 3:子を置いてく 4:コアラを落とす)
 
+    bool isParent;
 };

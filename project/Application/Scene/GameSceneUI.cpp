@@ -32,16 +32,17 @@ void GameSceneUI::init(){
 
 	tutorialUI->get_transform().set_translate({ 924,524 });
 
-
+	isCanRelese = false;
 }
 
 void GameSceneUI::update(){
-	for(int i = 0; i < uiIndex; i++)
+	for(int i = 0; i < uiIndex-1; i++)
 	{
 		keyControl(i);
 	}
 	
-	
+	wasdSprite[6]->get_uv_transform().set_translate_x(0.5f * !isCanRelese);
+
 }
 #ifdef _DEBUG
 
@@ -80,7 +81,7 @@ void GameSceneUI::darw(){
 }
 
 void GameSceneUI::keyControl(int index){
-	KeyID keys[] = { KeyID::W, KeyID::A, KeyID::S, KeyID::D,KeyID::R,KeyID::Escape,KeyID::Space };
+	KeyID keys[] = { KeyID::W, KeyID::A, KeyID::S, KeyID::D,KeyID::R,KeyID::Escape/*,KeyID::Space*/ };
 
 	if(Input::IsPressKey(keys[index])){
 		wasdSprite[index]->get_uv_transform().set_translate_x(0.5f);

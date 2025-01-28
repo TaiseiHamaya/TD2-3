@@ -21,6 +21,7 @@ void PlayerManager::initialize(Reference<const LevelLoader> level, MapchipField*
 		player->set_parent(false);
 	}
 	stageSituation = 0;
+	isParent = false;
 }
 
 void PlayerManager::finalize() {
@@ -40,6 +41,7 @@ void PlayerManager::update() {
 		childPos = playerPos + childPos * player->get_rotation();
 	}
 
+	isParent = player->is_parent();//プレイヤーのくっつき状態のフラグを取得
 	// マップチップ関連の更新
 	mapchipHandler->update_player_on_mapchip(player.get(), child.get());
 
