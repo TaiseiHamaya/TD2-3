@@ -443,6 +443,7 @@ void MapchipHandler::setup_rotation_parameters(Player* player, Child* child, con
 }
 
 void MapchipHandler::check_fall_conditions(Player* player, Child* child) {
+
 	Vector3 playerPos = player->get_translate();
 	Vector3 childPos = child->get_translate();
 
@@ -450,19 +451,47 @@ void MapchipHandler::check_fall_conditions(Player* player, Child* child) {
 		childPos = playerPos + childPos * player->get_rotation();
 	}
 
-	bool playerFalling = mapchipField_->getElement(std::round(playerPos.x), std::round(playerPos.z)) == 0;
-	bool childFalling = mapchipField_->getElement(std::round(childPos.x), std::round(childPos.z)) == 0;
+	bool prePlayerChip = playerFalling;
+	bool preChildChip = child->is_out_ground();
+
+	playerFalling = mapchipField_->getElement(std::round(playerPos.x), std::round(playerPos.z)) == 0;
+	child->set_out_ground(mapchipField_->getElement(std::round(childPos.x), std::round(childPos.z)) == 0);
+
+	if (prePlayerChip != playerFalling) {
+		if (playerFalling) {
+			player->get_object()->reset_animated_mesh("ChiledKoala.gltf", "Flustered", true);
+		}
+		else {
+			player->get_object()->reset_animated_mesh("ChiledKoala.gltf", "Standby", true);
+		}
+	}
+
+	if (preChildChip != child->is_out_ground()) {
+		if (child->is_out_ground()) {
+			child->get_object()->reset_animated_mesh("ChiledKoala.gltf", "Flustered", true);
+		}
+		else {
+			child->get_object()->reset_animated_mesh("ChiledKoala.gltf", "Hold", false);
+		}
+	}
+
+	//if (!player->is_parent()) {
+	//	if (preChildChip != childFalling) {
+	//		child->get_object()->reset_animated_mesh("ChiledKoala.gltf", "Falling", true);
+	//	}
+	//}
 
 	if (!player->is_parent()) {
 		player->set_falling(playerFalling);
-		child->set_falling(childFalling);
+		child->set_falling(child->is_out_ground());
 	}
 	else {
-		if (playerFalling && childFalling) {
+		if (playerFalling && child->is_out_ground()) {
 			player->set_falling(true);
 			child->set_falling(true);
 		}
 	}
+
 }
 
 int MapchipHandler::is_goal_reached(Player* player, Child* child) const

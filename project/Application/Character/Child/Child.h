@@ -20,6 +20,9 @@ public:
     bool is_falling() const { return isFall; }
     void set_falling(bool flag) { isFall = flag; }
 
+    bool is_out_ground() const { return isOutGround; }
+    void set_out_ground(bool flag) { isOutGround = flag; }
+
     bool is_falled()const { return isFalled; }
 
 #ifdef _DEBUG
@@ -29,4 +32,6 @@ private:
     bool isFall = false;
     float fallSpeed = 6.0f;//落下速度
     bool isFalled = false;
+    // 
+    bool isOutGround = false; 
 };
