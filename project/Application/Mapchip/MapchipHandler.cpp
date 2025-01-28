@@ -443,8 +443,6 @@ void MapchipHandler::setup_rotation_parameters(Player* player, Child* child, con
 }
 
 void MapchipHandler::check_fall_conditions(Player* player, Child* child) {
-	bool prePlayerFalling = player->is_falling();
-	bool preChildFalling = child->is_falling();
 
 	Vector3 playerPos = player->get_translate();
 	Vector3 childPos = child->get_translate();
@@ -453,36 +451,47 @@ void MapchipHandler::check_fall_conditions(Player* player, Child* child) {
 		childPos = playerPos + childPos * player->get_rotation();
 	}
 
-	bool playerFalling = false;
-	bool childFalling = false;
+	bool prePlayerChip = playerFalling;
+	bool preChildChip = child->is_out_ground();
+
+	playerFalling = mapchipField_->getElement(std::round(playerPos.x), std::round(playerPos.z)) == 0;
+	child->set_out_ground(mapchipField_->getElement(std::round(childPos.x), std::round(childPos.z)) == 0);
+
+	if (prePlayerChip != playerFalling) {
+		if (playerFalling) {
+			player->get_object()->reset_animated_mesh("ChiledKoala.gltf", "Flustered", true);
+		}
+		else {
+			player->get_object()->reset_animated_mesh("ChiledKoala.gltf", "Standby", true);
+		}
+	}
+
+	if (preChildChip != child->is_out_ground()) {
+		if (child->is_out_ground()) {
+			child->get_object()->reset_animated_mesh("ChiledKoala.gltf", "Flustered", true);
+		}
+		else {
+			child->get_object()->reset_animated_mesh("ChiledKoala.gltf", "Hold", false);
+		}
+	}
+
+	//if (!player->is_parent()) {
+	//	if (preChildChip != childFalling) {
+	//		child->get_object()->reset_animated_mesh("ChiledKoala.gltf", "Falling", true);
+	//	}
+	//}
 
 	if (!player->is_parent()) {
-		if (mapchipField_->getElement(std::round(playerPos.x), std::round(playerPos.z)) == 0) {
-			playerFalling = true;
+		player->set_falling(playerFalling);
+		child->set_falling(child->is_out_ground());
+	}
+	else {
+		if (playerFalling && child->is_out_ground()) {
+			player->set_falling(true);
+			child->set_falling(true);
 		}
-		if (mapchipField_->getElement(std::round(childPos.x), std::round(childPos.z)) == 0) {
-			childFalling = true;
-		}
-	}
-	else if (mapchipField_->getElement(std::round(playerPos.x), std::round(playerPos.z)) == 0 &&
-		mapchipField_->getElement(std::round(childPos.x), std::round(childPos.z)) == 0) {
-		playerFalling = true;
-		childFalling = true;
 	}
 
-	player->set_falling(playerFalling);
-	child->set_falling(childFalling);
-
-	// フラグが切り替わった瞬間を検出
-	if (prePlayerFalling != playerFalling) {
-
-
-	}
-
-	if (preChildFalling != childFalling) {
-		// 子供の落下モーション
-		child->get_object()->reset_animated_mesh("ChiledKoala.gltf", "Falling", true);
-	}
 }
 
 int MapchipHandler::is_goal_reached(Player* player, Child* child) const

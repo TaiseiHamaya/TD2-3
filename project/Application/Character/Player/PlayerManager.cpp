@@ -124,20 +124,20 @@ void PlayerManager::set_child_rotate()
 	}
 
 	// 子からプレイヤーへの方向ベクトルを計算
-	 Vector3 childToPlayer = Vector3::Normalize(childPos, playerPos);
-	
-	 // 子からプレイヤーへの方向ベクトルの長さをチェック
-	 if (childToPlayer.length() == 0.0f) return;
+	Vector3 childToPlayer = Vector3::Normalize(childPos, playerPos);
 
-	 // 親オブジェクトの回転を考慮
-	 if (player->is_parent())
-	 {
-		 // 親の回転を取得
-		 Quaternion parentRotation = player->get_rotation();
+	// 子からプレイヤーへの方向ベクトルの長さをチェック
+	if (childToPlayer.length() == 0.0f) return;
 
-		 // 親の回転を適用して子からプレイヤーへの方向を調整
-		 childToPlayer = childToPlayer * parentRotation.inverse();
-	 }
+	// 親オブジェクトの回転を考慮
+	if (player->is_parent())
+	{
+		// 親の回転を取得
+		Quaternion parentRotation = player->get_rotation();
+
+		// 親の回転を適用して子からプレイヤーへの方向を調整
+		childToPlayer = childToPlayer * parentRotation.inverse();
+	}
 
 	// 基準方向を設定 (子のデフォルトの前方向、例: Z軸)
 	Vector3 defaultForward = { 0.0f, 0.0f, -1.0f };
@@ -212,6 +212,11 @@ void PlayerManager::detach_child_from_player(Player* player, Child* child)
 		// 親子付けフラグをオフにする
 		player->set_parent(false);
 		// アニメーションをセット
-		child->get_object()->reset_animated_mesh("ChiledKoala.gltf", "Relese", false);
+		if (!child->is_out_ground()) {
+			child->get_object()->reset_animated_mesh("ChiledKoala.gltf", "Relese", false);
+		}
+		else {
+			child->get_object()->reset_animated_mesh("ChiledKoala.gltf", "Falling", true);
+		}
 	}
 }
