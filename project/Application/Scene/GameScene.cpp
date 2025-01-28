@@ -87,22 +87,25 @@ void GameScene::initialize() {
 
 	directionalLight = eps::CreateUnique<DirectionalLightInstance>();
 
-	std::shared_ptr<SpriteNode> spriteNode;
-	spriteNode = std::make_unique<SpriteNode>();
-	spriteNode->initialize();
-	spriteNode->set_config(RenderNodeConfig::ContinueDrawAfter | RenderNodeConfig::ContinueDrawBefore);
-	spriteNode->set_render_target_SC(DirectXSwapChain::GetRenderTarget());
-
 	std::shared_ptr<Object3DNode> object3dNode;
 	object3dNode = std::make_unique<Object3DNode>();
 	object3dNode->initialize();
+	object3dNode->set_config(RenderNodeConfig::ContinueUseDpehtBefore);
 	object3dNode->set_render_target_SC(DirectXSwapChain::GetRenderTarget());
 
 	std::shared_ptr<SkinningMeshNode> skinningMeshNode;
 	skinningMeshNode = std::make_unique<SkinningMeshNode>();
 	skinningMeshNode->initialize();
-	skinningMeshNode->set_config(RenderNodeConfig::ContinueDrawAfter | RenderNodeConfig::ContinueDrawBefore);
+	skinningMeshNode->set_config(RenderNodeConfig::ContinueDrawAfter | RenderNodeConfig::ContinueDrawBefore | RenderNodeConfig::ContinueUseDpehtAfter);
 	skinningMeshNode->set_render_target_SC(DirectXSwapChain::GetRenderTarget());
+
+	std::shared_ptr<SpriteNode> spriteNode;
+	spriteNode = std::make_unique<SpriteNode>();
+	spriteNode->initialize();
+	spriteNode->set_config(
+		RenderNodeConfig::ContinueDrawAfter | RenderNodeConfig::ContinueDrawBefore
+	);
+	spriteNode->set_render_target_SC(DirectXSwapChain::GetRenderTarget());
 
 #ifdef _DEBUG
 	std::shared_ptr<PrimitiveLineNode> primitiveLineNode;
