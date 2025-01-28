@@ -57,6 +57,8 @@ public:
 	int get_move_num_on_ice() { return moveNumOnIce; }
 	void set_move_num_on_ice(int num) { moveNumOnIce = num; }
 
+	bool is_falled()const { return isFalled; }
+
 #ifdef _DEBUG
 	void debug_update();
 #endif
@@ -96,6 +98,7 @@ private:
 	bool isReverseRotation = false; // 回転を反転
 
 	float fallSpeed = 6.0f;//落下中の速度
+	bool isFalled = false; // 落下終了フラグ
 
 	float deltaTime = WorldClock::DeltaSeconds(); // 時間管理
 };
