@@ -25,7 +25,7 @@ private:
 
     void attach_child_to_player(Player* player, Child* child);
     void detach_child_from_player(Player* player, Child* child);
-    bool is_game_cleared() const { return gameCleared; }
+    bool is_game_cleared() const { return stageSituation; }
 
 private:
     std::unique_ptr<Player> player;
@@ -37,6 +37,6 @@ private:
     Vector3 playerPos{}; // プレイヤーの現在位置
     Vector3 childPos{};  // 子オブジェクトの現在位置
 
-    int gameCleared = 0; // クリア状態を管理(0:通常 1:クリア 2:子が先 3:子を置いてく 4:コアラを落とす)
+    int stageSituation = 0; // クリア状態を管理(0:通常 1:クリア 2:子が先 3:子を置いてく 4:コアラを落とす)
 
 };

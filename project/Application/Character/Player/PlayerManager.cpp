@@ -20,7 +20,7 @@ void PlayerManager::initialize(Reference<const LevelLoader> level, MapchipField*
 	if (player) {
 		player->set_parent(false);
 	}
-	gameCleared = 0;
+	stageSituation = 0;
 }
 
 void PlayerManager::finalize() {
@@ -30,7 +30,7 @@ void PlayerManager::finalize() {
 
 void PlayerManager::update() {
 	// クリアか失敗のフラグが立ってたら早期リターン
-	if (gameCleared != 0) return;
+	if (stageSituation != 0) return;
 
 	// プレイヤーと子供の位置を計算
 	playerPos = player->get_translate();
@@ -53,27 +53,27 @@ void PlayerManager::update() {
 	set_child_rotate();
 
 	// マップチップのクリア判定
-	gameCleared = mapchipHandler->is_goal_reached(player.get(), child.get());
+	stageSituation = mapchipHandler->is_goal_reached(player.get(), child.get());
 	// 子コアラを落とした
-	if (child->is_falled()) {
-		gameCleared = 4;
+	if (child->is_falled() || player->is_falled()) {
+		stageSituation = 4;
 	}
 	// 子を連れて親が先にゴール
-	if (gameCleared == 1) {
+	if (stageSituation == 1) {
 		gameManagement_->SetClearFlag(true);
 	}
 	// 子供が先にゴール
-	else if (gameCleared == 2) {
+	else if (stageSituation == 2) {
 		gameManagement_->SetFailedFlag(true);
 		gameManagement_->SetFailedSelect(1);
 	}
 	// 子を置いていく
-	else if (gameCleared == 3) {
+	else if (stageSituation == 3) {
 		gameManagement_->SetFailedFlag(true);
 		gameManagement_->SetFailedSelect(0);
 	}
 	// コアラを落とす
-	else if (gameCleared == 4) {
+	else if (stageSituation == 4) {
 		gameManagement_->SetFailedFlag(true);
 		gameManagement_->SetFailedSelect(2);
 	}
