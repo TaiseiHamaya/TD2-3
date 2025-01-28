@@ -141,6 +141,41 @@ bool MapchipHandler::can_player_move_on_ice(Player* player, Child* child, const 
 	return true;
 }
 
+bool MapchipHandler::player_move_to_wall_or_holl(Player* player, Child* child, const Vector3& direction) const{
+	Vector3 nextPos = player->get_translate() + direction;
+	if(!player->is_parent()) {
+		auto element = mapchipField_->getElement(nextPos.x, nextPos.z);
+		if(element == 0 || element == 2){ return true; }//移動先が壁か穴ならtrue
+	} else{
+		Vector3 childDirection{};
+		Vector3 nextChildPos{};
+		if(std::round(child->get_translate().x) == 1.0f) {
+			childDirection = GameUtility::rotate_direction_90_left(direction);
+		} else if(std::round(child->get_translate().x) == -1.0f) {
+			childDirection = GameUtility::rotate_direction_90_right(direction);
+		} else {
+			childDirection = direction;
+		}
+
+		nextChildPos = player->get_translate() + childDirection + direction;
+
+		auto elementNextPlayer = mapchipField_->getElement(std::round(nextPos.x), std::round(nextPos.z));
+		auto elementChild = mapchipField_->getElement(std::round(nextChildPos.x), std::round(nextChildPos.z));
+
+		// 移動先がどちらも穴だったらtrue
+		if(elementNextPlayer == 0 && elementChild == 0) {
+			player->set_on_ice(false);
+			return true;
+		}
+		// 移動先のどちらかが壁だったらtrue
+		if(elementNextPlayer == 2 || elementChild == 2) {
+			player->set_on_ice(false);
+			return true;
+		}
+	}
+	return false;
+}
+
 bool MapchipHandler::can_player_move_to(Player* player, Child* child, const Vector3& direction) const
 {
 	// プレイヤーの移動予定地
