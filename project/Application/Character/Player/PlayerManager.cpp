@@ -3,6 +3,7 @@
 #include <cmath>
 #include <Application/Utility/GameUtility.h>
 #include "Library/Math/Matrix4x4.h"
+#include"Engine/Resources/Animation/NodeAnimation/NodeAnimationPlayer.h"
 
 void PlayerManager::initialize(Reference<const LevelLoader> level, MapchipField* mapchipField) {
 	mapchipField_ = mapchipField;
@@ -101,13 +102,20 @@ void PlayerManager::debug_update() {
 
 void PlayerManager::manage_parent_child_relationship()
 {
+	// 1フレーム前の親子付け
+	bool preParent = player->is_parent();
+
 	if (!player->is_parent()) {
 		// 子をプレイヤーにくっつける処理
 		attach_child_to_player(player.get(), child.get());
+		if (child->get_object()->get_animation()->is_end()) {
+			child->get_object()->reset_animated_mesh("ChiledKoala.gltf", "Standby", false);
+		}
 	}
 	else {
 		// 子をプレイヤーから切り離す処理
 		detach_child_from_player(player.get(), child.get());
+
 	}
 }
 
@@ -118,20 +126,20 @@ void PlayerManager::set_child_rotate()
 	}
 
 	// 子からプレイヤーへの方向ベクトルを計算
-	 Vector3 childToPlayer = Vector3::Normalize(childPos, playerPos);
-	
-	 // 子からプレイヤーへの方向ベクトルの長さをチェック
-	 if (childToPlayer.length() == 0.0f) return;
+	Vector3 childToPlayer = Vector3::Normalize(childPos, playerPos);
 
-	 // 親オブジェクトの回転を考慮
-	 if (player->is_parent())
-	 {
-		 // 親の回転を取得
-		 Quaternion parentRotation = player->get_rotation();
+	// 子からプレイヤーへの方向ベクトルの長さをチェック
+	if (childToPlayer.length() == 0.0f) return;
 
-		 // 親の回転を適用して子からプレイヤーへの方向を調整
-		 childToPlayer = childToPlayer * parentRotation.inverse();
-	 }
+	// 親オブジェクトの回転を考慮
+	if (player->is_parent())
+	{
+		// 親の回転を取得
+		Quaternion parentRotation = player->get_rotation();
+
+		// 親の回転を適用して子からプレイヤーへの方向を調整
+		childToPlayer = childToPlayer * parentRotation.inverse();
+	}
 
 	// 基準方向を設定 (子のデフォルトの前方向、例: Z軸)
 	Vector3 defaultForward = { 0.0f, 0.0f, -1.0f };
@@ -183,6 +191,7 @@ void PlayerManager::attach_child_to_player(Player* player, Child* child)
 			}
 			// 子供のローカル座標を設定
 			child->set_translate(adjustedOffset);
+			child->get_object()->reset_animated_mesh("ChiledKoala.gltf", "Hold", false);
 			break;
 		}
 	}
@@ -203,5 +212,12 @@ void PlayerManager::detach_child_from_player(Player* player, Child* child)
 		child->set_translate({ std::round(childPos.x), std::round(childPos.y), std::round(childPos.z) });
 		// 親子付けフラグをオフにする
 		player->set_parent(false);
+		// アニメーションをセット
+		if (!child->is_out_ground()) {
+			child->get_object()->reset_animated_mesh("ChiledKoala.gltf", "Relese", false);
+		}
+		else {
+			child->get_object()->reset_animated_mesh("ChiledKoala.gltf", "Falling", true);
+		}
 	}
 }

@@ -24,4 +24,7 @@ public:
 private:
 
     MapchipField* mapchipField_;
+
+    bool playerFalling = false;
+
 };
