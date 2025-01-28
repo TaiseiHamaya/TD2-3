@@ -116,7 +116,7 @@ void PlayerManager::set_child_rotate()
 	}
 
 	// 子からプレイヤーへの方向ベクトルを計算
-	 Vector3 childToPlayer = Vector3::Normalize(childPos, playerPos);
+	 Vector3 childToPlayer = Vector3::Normalize(playerPos, childPos);
 	
 	 // 子からプレイヤーへの方向ベクトルの長さをチェック
 	 if (childToPlayer.length() == 0.0f) return;
@@ -166,7 +166,6 @@ void PlayerManager::attach_child_to_player(Player* player, Child* child)
 		{0.0f, 0.0f, 1.0f},   // 前
 		{0.0f, 0.0f, -1.0f}   // 後ろ
 	};
-
 
 	for (const auto& direction : directions) {
 		Vector3 playerToChild = player->get_translate() - child->get_translate();
