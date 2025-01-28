@@ -12,6 +12,9 @@
 #include "Engine/Module/World/Camera/Camera3D.h"
 #include "Engine/Resources/Texture/TextureManager.h"
 #include <Engine/Runtime/WorldClock/WorldClock.h>
+#include <Engine/Runtime/Scene/SceneManager.h>
+
+#include "Application/GameValue.h"
 
 #include "Application/LevelLoader/LevelLoader.h"
 
@@ -19,7 +22,13 @@
 #include "Engine/Module/Render/RenderNode/Debug/PrimitiveLine/PrimitiveLineNode.h"
 #endif // _DEBUG
 
-GameScene::GameScene() = default;
+GameScene::GameScene() : GameScene(1) {
+}
+
+GameScene::GameScene(uint32_t level) {
+	currentLevel = level;
+}
+;
 
 GameScene::~GameScene() = default;
 
@@ -62,7 +71,7 @@ void GameScene::initialize()
 		{3,10,-9}
 		});
 
-	levelLoader = eps::CreateUnique<LevelLoader>(8);
+	levelLoader = eps::CreateUnique<LevelLoader>(currentLevel);
 
 	fieldObjs = std::make_unique<MapchipField>();
 	fieldObjs->initialize(levelLoader);
@@ -117,6 +126,18 @@ void GameScene::begin()
 	if (managementUI->is_reset()) {
 		fieldObjs->initialize(levelLoader);
 		playerManager->initialize(levelLoader, fieldObjs.get());
+	}
+	else if (managementUI->is_next()) {
+		// 最後のレベルではない場合
+		if (currentLevel < GameValue::MaxLevel) {
+			SceneManager::SetSceneChange(
+				eps::CreateUnique<GameScene>(currentLevel + 1), 1.0
+			);
+		}
+		// 最後のレベルの場合
+		else {
+			// TODO : ここに最後のレベルの場合の処理を書く
+		}
 	}
 }
 

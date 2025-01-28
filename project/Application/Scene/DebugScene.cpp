@@ -22,11 +22,11 @@ void DebugScene::initialize() {
 }
 
 void DebugScene::update() {
-	if (Input::IsPressKey(KeyID::One)) {
+	if (Input::IsPressKey(KeyID::F1)) {
 		SceneManager::SetSceneChange(std::make_unique<SelectScene>(), 0);
 	}
-	else if (Input::IsPressKey(KeyID::Two)) {
-		SceneManager::SetSceneChange(std::make_unique<GameScene>(), 0);
+	else if (Input::IsPressKey(KeyID::F2)) {
+		SceneManager::SetSceneChange(std::make_unique<GameScene>(level), 0);
 	}
 }
 
@@ -41,8 +41,9 @@ void DebugScene::debug_update() {
 		SceneManager::SetSceneChange(std::make_unique<SelectScene>(), 0);
 	}
 	if (ImGui::Button("Game(Key : 2)")) {
-		SceneManager::SetSceneChange(std::make_unique<GameScene>(), 0);
+		SceneManager::SetSceneChange(std::make_unique<GameScene>(level), 0);
 	}
+	ImGui::InputScalar("Level", ImGuiDataType_U32, &level);
 	ImGui::End();
 }
 

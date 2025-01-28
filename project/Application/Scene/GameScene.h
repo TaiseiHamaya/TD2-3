@@ -17,6 +17,7 @@ class GameScene : public BaseScene
 {
 public:
 	GameScene();
+	GameScene(uint32_t level);
 	~GameScene();
 
 public:
@@ -51,6 +52,7 @@ private:
 	std::unique_ptr<Camera3D> camera3D;
 	std::unique_ptr<DirectionalLightInstance> directionalLight;
 
+	uint32_t currentLevel;
 	std::unique_ptr<LevelLoader> levelLoader;
 
 	//UI

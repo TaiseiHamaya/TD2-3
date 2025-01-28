@@ -25,6 +25,7 @@ public:
 	void SetClearFlag(bool value) { clearFlag = value; }
 	void SetFailedFlag(bool value) { failedFlag = value; }
 	bool is_reset() const { return isReset; }
+	bool is_next() const { return isNext; }
 	void SetFailedSelect(int value){ failedSelectIndex = value; }
 
 private:

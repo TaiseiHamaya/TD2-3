@@ -22,6 +22,7 @@ public:
 
 private:
 	std::unique_ptr<RenderPath> renderPath;
+	uint32_t level;
 };
 
 #endif // _DEBUG
