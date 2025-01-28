@@ -54,12 +54,28 @@ void PlayerManager::update() {
 
 	// マップチップのクリア判定
 	gameCleared = mapchipHandler->is_goal_reached(player.get(), child.get());
+	// 子コアラを落とした
+	if (child->is_falled()) {
+		gameCleared = 4;
+	}
+	// 子を連れて親が先にゴール
 	if (gameCleared == 1) {
 		gameManagement_->SetClearFlag(true);
 	}
+	// 子供が先にゴール
 	else if (gameCleared == 2) {
 		gameManagement_->SetFailedFlag(true);
-
+		gameManagement_->SetFailedSelect(1);
+	}
+	// 子を置いていく
+	else if (gameCleared == 3) {
+		gameManagement_->SetFailedFlag(true);
+		gameManagement_->SetFailedSelect(0);
+	}
+	// コアラを落とす
+	else if (gameCleared == 4) {
+		gameManagement_->SetFailedFlag(true);
+		gameManagement_->SetFailedSelect(2);
 	}
 }
 

@@ -20,10 +20,13 @@ public:
     bool is_falling() const { return isFall; }
     void set_falling(bool flag) { isFall = flag; }
 
+    bool is_falled()const { return isFalled; }
+
 #ifdef _DEBUG
     void debug_update();
 #endif
 private:
     bool isFall = false;
     float fallSpeed = 6.0f;//落下速度
+    bool isFalled = false;
 };

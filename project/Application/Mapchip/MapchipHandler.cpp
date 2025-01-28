@@ -92,21 +92,6 @@ bool MapchipHandler::can_player_move_on_ice(Player* player, Child* child, const 
 			Vector3 nextPosLeftSide = nextPos + GameUtility::rotate_direction_90_left(direction);
 			Vector3 nextPosRightSide = nextPos + GameUtility::rotate_direction_90_right(direction);
 
-			if (std::round(nextPos.x) == std::round(child->get_translate().x) &&
-				std::round(nextPos.z) == std::round(child->get_translate().z)) {
-				moveNum -= 1;
-				player->set_move_num_on_ice(moveNum);
-				break;
-			}
-			else if (std::round(nextPosLeftSide.x) == std::round(child->get_translate().x) &&
-				std::round(nextPosLeftSide.z) == std::round(child->get_translate().z)) {
-				break;
-			}
-			else if (std::round(nextPosRightSide.x) == std::round(child->get_translate().x) &&
-				std::round(nextPosRightSide.z) == std::round(child->get_translate().z)) {
-				break;
-			}
-
 			// 穴だったら移動しない
 			if (nextChip == 0) {
 				// そもそも移動できなくする処理
@@ -126,6 +111,21 @@ bool MapchipHandler::can_player_move_on_ice(Player* player, Child* child, const 
 			}
 			// 氷意外だったら
 			if (nextChip != 4) {
+				break;
+			}
+
+			if (std::round(nextPos.x) == std::round(child->get_translate().x) &&
+				std::round(nextPos.z) == std::round(child->get_translate().z)) {
+				moveNum -= 1;
+				player->set_move_num_on_ice(moveNum);
+				break;
+			}
+			else if (std::round(nextPosLeftSide.x) == std::round(child->get_translate().x) &&
+				std::round(nextPosLeftSide.z) == std::round(child->get_translate().z)) {
+				break;
+			}
+			else if (std::round(nextPosRightSide.x) == std::round(child->get_translate().x) &&
+				std::round(nextPosRightSide.z) == std::round(child->get_translate().z)) {
 				break;
 			}
 		}
@@ -396,23 +396,34 @@ void MapchipHandler::check_fall_conditions(Player* player, Child* child) {
 
 int MapchipHandler::is_goal_reached(Player* player, Child* child) const
 {
-	if (!player->is_parent()) return 0;
-
+	// 親の位置を取得
 	Vector3 playerPos = player->get_translate();
 	int playerChip = mapchipField_->getElement(std::round(playerPos.x), std::round(playerPos.z));
 
-	// 子オブジェクトの現在位置を取得
-	Vector3 childPos = child->get_translate();
-	childPos = playerPos + childPos * player->get_rotation();
-	int childChip = mapchipField_->getElement(std::round(childPos.x), std::round(childPos.z));
-
-	// プレイヤーまたは子供がゴールに到達しているかを確認
-	const int GOAL_CHIP = 3; // 3: ゴールとするマップチップのID
-	if (playerChip == GOAL_CHIP) {
-		return 1;
+	// ペアレントしていれば
+	if (!player->is_parent()) {
+		// 子供を置いていった
+		if (playerChip == 3) {
+			return 3;
+		}
 	}
-	if (childChip == GOAL_CHIP) {
-		return 2;
+	// 以降はペアレントしている場合
+	else {
+		// 子オブジェクトの現在位置を取得
+		Vector3 childPos = child->get_translate();
+		childPos = playerPos + childPos * player->get_rotation();
+		int childChip = mapchipField_->getElement(std::round(childPos.x), std::round(childPos.z));
+
+		// プレイヤーまたは子供がゴールに到達しているかを確認
+		const int GOAL_CHIP = 3; // 3: ゴールとするマップチップのID
+		// 親が先にゴールについた
+		if (playerChip == GOAL_CHIP) {
+			return 1;
+		}
+		// 子供が先にゴールについた
+		if (childChip == GOAL_CHIP) {
+			return 2;
+		}
 	}
 
 	return 0;

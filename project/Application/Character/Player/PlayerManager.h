@@ -37,6 +37,6 @@ private:
     Vector3 playerPos{}; // プレイヤーの現在位置
     Vector3 childPos{};  // 子オブジェクトの現在位置
 
-    int gameCleared = 0; // クリア状態を管理(0:通常 1:クリア 2:失敗)
+    int gameCleared = 0; // クリア状態を管理(0:通常 1:クリア 2:子が先 3:子を置いてく 4:コアラを落とす)
 
 };
