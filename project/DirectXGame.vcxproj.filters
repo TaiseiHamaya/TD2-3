@@ -304,6 +304,7 @@
     <ClInclude Include="Application\Scene\SelectScene.h" />
     <ClInclude Include="Application\Scene\DebugScene.h" />
     <ClInclude Include="Application\Scene\GameSceneUI.h" />
+    <ClInclude Include="Application\GameValue.h" />
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="EngineResources\HLSL\FullscreenShader.hlsl">

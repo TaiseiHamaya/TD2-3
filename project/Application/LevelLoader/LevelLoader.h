@@ -6,7 +6,7 @@
 
 class LevelLoader {
 public:
-	LevelLoader(uint32_t level);
+	LevelLoader(int32_t level);
 	~LevelLoader() = default;
 
 public:

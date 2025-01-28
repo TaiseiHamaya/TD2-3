@@ -1,19 +1,24 @@
 #include "SelectScene.h"
 
+#include "Engine/Module/Render/RenderNode/2D/Sprite/SpriteNode.h"
+#include <Engine/Module/Render/RenderNode/Forward/Object3DNode/Object3DNode.h>
+#include <Engine/Module/World/Camera/Camera2D.h>
+#include <Engine/Module/World/Sprite/SpriteInstance.h>
+#include <Engine/Rendering/DirectX/DirectXSwapChain/DirectXSwapChain.h>
+#include <Engine/Resources/PolygonMesh/PolygonMeshManager.h>
+#include <Engine/Resources/Texture/TextureManager.h>
 #include <Engine/Runtime/Input/Input.h>
 #include <Engine/Runtime/Scene/SceneManager.h>
 #include <Engine/Utility/Tools/SmartPointer.h>
-#include <Engine/Runtime/Scene/SceneManager.h>
-#include <Engine/Rendering/DirectX/DirectXSwapChain/DirectXSwapChain.h>
-#include <Engine/Module/Render/RenderNode/Forward/Object3DNode/Object3DNode.h>
-#include <Engine/Resources/PolygonMesh/PolygonMeshManager.h>
-#include <Engine/Resources/Texture/TextureManager.h>
-#include <Engine/Module/World/Sprite/SpriteInstance.h>
-#include <Engine/Module/World/Camera/Camera2D.h>
 
+#include "Application/GameValue.h"
 #include "Application/Scene/GameScene.h"
 
-SelectScene::SelectScene() = default;
+SelectScene::SelectScene() : SelectScene(0) {};
+
+SelectScene::SelectScene(int32_t selectLevel) :
+	selectIndex(selectLevel) {
+}
 
 SelectScene::~SelectScene() = default;
 
@@ -56,14 +61,20 @@ void SelectScene::begin() {
 }
 
 void SelectScene::update() {
-	if (Input::IsTriggerKey(KeyID::D)) {
+	if (Input::IsTriggerKey(KeyID::D) && selectIndex < GameValue::MaxLevel) {
 		++selectIndex;
 	}
-	else if (Input::IsTriggerKey(KeyID::A)) {
+	else if (Input::IsTriggerKey(KeyID::A) && selectIndex > 1) {
 		--selectIndex;
 	}
 
 	numberUi->get_uv_transform().set_translate_x(selectIndex * 0.1f);
+
+	if (Input::IsTriggerKey(KeyID::Space)) {
+		SceneManager::SetSceneChange(
+			eps::CreateUnique<GameScene>(selectIndex), 1.0f
+		);
+	}
 }
 
 void SelectScene::begin_rendering() {
@@ -77,7 +88,7 @@ void SelectScene::late_update() {
 void SelectScene::draw() const {
 	renderPath->begin();
 	// Mesh
-	
+
 	renderPath->next();
 	// Sprite
 	numberUi->draw();
