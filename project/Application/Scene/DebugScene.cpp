@@ -43,7 +43,7 @@ void DebugScene::debug_update() {
 	if (ImGui::Button("Game(Key : 2)")) {
 		SceneManager::SetSceneChange(std::make_unique<GameScene>(level), 0);
 	}
-	ImGui::InputScalar("Level", ImGuiDataType_U32, &level);
+	ImGui::InputInt("Level", &level);
 	ImGui::End();
 }
 
