@@ -1,6 +1,6 @@
 #pragma once
 #include <memory>
-#include "Engine/Module/World/Mesh/MeshInstance.h"
+#include "Engine/Module/World/AnimatedMesh/AnimatedMeshInstance.h"
 #include "Application/LevelLoader/LevelLoader.h"
 #include "Application/Mapchip/MapchipHandler.h"
 
@@ -18,8 +18,8 @@ public:
     void set_translate(const Vector3& translate) { object_->get_transform().set_translate(translate); }
 
     Quaternion get_rotation() const { return object_->get_transform().get_quaternion(); }
-    MeshInstance* get_object() const { return object_.get(); }
+	AnimatedMeshInstance* get_object() const { return object_.get(); }
 
 protected:
-    std::unique_ptr<MeshInstance> object_;
+    std::unique_ptr<AnimatedMeshInstance> object_;
 };

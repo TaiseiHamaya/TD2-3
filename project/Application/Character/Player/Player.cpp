@@ -4,8 +4,8 @@
 
 void Player::initialize(const LevelLoader& level, MapchipHandler* mapchipHandler)
 {
-	object_ = std::make_unique<MeshInstance>();
-	object_->reset_mesh("ParentKoala.obj");
+	object_ = std::make_unique<AnimatedMeshInstance>();
+	object_->reset_animated_mesh("ParentKoala.gltf", "standby", true);
 	object_->get_transform().set_translate(level.get_player_position());
 	mapchipHandler_ = mapchipHandler;
 }
@@ -16,6 +16,7 @@ void Player::finalize()
 
 void Player::update()
 {
+	object_->begin();
 	isMove = false;
 	moveNumOnIce = 1;
 	isOnIce = false;
@@ -31,6 +32,8 @@ void Player::update()
 	}
 
 	fall_update();
+
+	object_->update();
 
 	preDirection = direction;
 }
