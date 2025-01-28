@@ -113,7 +113,7 @@ void GameScene::initialize() {
 #ifdef _DEBUG
 	renderPath->initialize({ object3dNode,skinningMeshNode,spriteNode,primitiveLineNode });
 #else
-	renderPath->initialize({ object3dNode,spriteNode });
+	renderPath->initialize({object3dNode,skinningMeshNode,spriteNode });
 #endif // _DEBUG
 
 	managementUI = std::make_unique<GameManagement>();

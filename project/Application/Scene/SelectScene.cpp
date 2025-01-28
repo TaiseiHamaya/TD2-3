@@ -97,6 +97,8 @@ void SelectScene::draw() const {
 	renderPath->next();
 }
 
+#ifdef _DEBUG
 void SelectScene::debug_update() {
 
 }
+#endif // _DEBUG
