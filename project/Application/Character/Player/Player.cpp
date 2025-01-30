@@ -29,7 +29,7 @@ void Player::update() {
 	object_->begin();
 	isMove = false;
 	moveNumOnIce = 1;
-	isOnIce = false;
+	
 	isOnChild = false;
 
 	// 入力処理
@@ -101,6 +101,7 @@ void Player::handle_input() {
 				moveDuration = 0.15f * static_cast<float>(moveNumOnIce);
 				isOnIce = true;
 				isMoving = true;
+
 			}
 
 			// 回転中の衝突チェック
@@ -161,7 +162,14 @@ void Player::move_update() {
 
 	//移動時の音。moveTimerが加算される前に処理して一回だけ鳴らす
 	if (moveTimer <= 0) {
-		moveAudio->restart();
+		//氷と通常床で音を変える
+		if (isOnIce) {
+			iceMove->restart();
+		}
+		else {
+			moveAudio->restart();
+
+		}
 	}
 	// 移動中なら補間処理を実行
 	moveTimer += WorldClock::DeltaSeconds();
@@ -171,6 +179,7 @@ void Player::move_update() {
 		moveTimer = moveDuration;
 		isMoving = false;
 		isMove = true;
+		isOnIce = false;//この処理がupdate序盤にあると、床→氷に移動する時に音がならなかったので、ここに移動してる
 	}
 
 	// 現在の位置を補間
