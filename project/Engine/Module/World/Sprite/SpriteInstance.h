@@ -32,6 +32,8 @@ public:
 	Transform2D& get_transform() noexcept;
 	const Transform2D& get_uv_transform() const noexcept;
 	Transform2D& get_uv_transform() noexcept;
+	Color4& get_color() const;
+
 	//void update();
 	void begin_rendering() noexcept;
 	void draw() const;
