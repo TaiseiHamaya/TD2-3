@@ -73,6 +73,8 @@ void GameScene::load() {
 	AudioManager::RegisterLoadQue("./GameResources/Audio/fall.wav");
 	AudioManager::RegisterLoadQue("./GameResources/Audio/unmovable.wav");
 	AudioManager::RegisterLoadQue("./GameResources/Audio/iceMove.wav");
+	AudioManager::RegisterLoadQue("./GameResources/Audio/decision.wav");
+	AudioManager::RegisterLoadQue("./GameResources/Audio/operation.wav");
 
 }
 
