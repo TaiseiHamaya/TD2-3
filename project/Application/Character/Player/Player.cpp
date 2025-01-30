@@ -18,6 +18,8 @@ void Player::initialize(const LevelLoader& level, MapchipHandler* mapchipHandler
 	fall->initialize("fall.wav");
 	iceMove = std::make_unique<AudioPlayer>();
 	iceMove->initialize("iceMove.wav");
+	rotatAudio = std::make_unique<AudioPlayer>();
+	rotatAudio->initialize("rotate.wav");
 
 	fallSoundFlag = false;
 	unmovableFlag = false;
@@ -189,6 +191,11 @@ void Player::move_update() {
 }
 
 void Player::rotate_update() {
+
+	if (rotateTimer <= 0) {
+		rotatAudio->restart();
+	}
+
 	rotateTimer += WorldClock::DeltaSeconds();
 
 	// 回転完了チェック

@@ -122,5 +122,6 @@ private:
 	std::unique_ptr<AudioPlayer> fall;//落下音
 	bool fallSoundFlag;
 	std::unique_ptr<AudioPlayer> iceMove;//通常移動
+	std::unique_ptr<AudioPlayer> rotatAudio;//回転時間
 
 };
