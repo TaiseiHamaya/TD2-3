@@ -4,6 +4,7 @@
 #include "Application/LevelLoader/LevelLoader.h"
 #include "Application/Mapchip/MapchipHandler.h"
 
+
 class CharacterBase {
 public:
     virtual ~CharacterBase() = default;

@@ -2,6 +2,7 @@
 #include "Application/Character/CharacterBase.h"
 #include "Engine/Runtime/WorldClock/WorldClock.h"
 #include <Application/Mapchip/MapchipHandler.h>
+#include "Engine/Resources/Audio/AudioPlayer.h"
 
 
 class Player : public CharacterBase {
@@ -113,4 +114,13 @@ private:
 	bool isFalled = false; // 落下終了フラグ
 
 	float deltaTime = WorldClock::DeltaSeconds(); // 時間管理
+
+	//音関連
+	std::unique_ptr<AudioPlayer> moveAudio;//通常移動
+	std::unique_ptr<AudioPlayer> unmovable;//動けない所に移動しようとしてる音。穴や壁で移動がキャンセルされる時に鳴らす
+	bool unmovableFlag;
+	std::unique_ptr<AudioPlayer> fall;//落下音
+	bool fallSoundFlag;
+	std::unique_ptr<AudioPlayer> iceMove;//通常移動
+
 };

@@ -16,6 +16,7 @@
 #include "Engine/Utility/Tools/SmartPointer.h"
 #include <Engine/Runtime/Scene/SceneManager.h>
 #include <Engine/Runtime/WorldClock/WorldClock.h>
+#include "Engine/Resources/Audio/AudioManager.h"
 
 #include "Application/GameValue.h"
 #include "Application/Scene/SelectScene.h"
@@ -64,6 +65,14 @@ void GameScene::load() {
 	TextureManager::RegisterLoadQue("./GameResources/Texture/UI/Retry.png");
 	TextureManager::RegisterLoadQue("./GameResources/Texture/UI/SelectFrame.png");
 	TextureManager::RegisterLoadQue("./GameResources/Texture/UI/FailedUI_1.png");
+
+
+	AudioManager::RegisterLoadQue("./GameResources/Audio/move.wav");
+	AudioManager::RegisterLoadQue("./GameResources/Audio/hold.wav");
+	AudioManager::RegisterLoadQue("./GameResources/Audio/release.wav");
+	AudioManager::RegisterLoadQue("./GameResources/Audio/fall.wav");
+	AudioManager::RegisterLoadQue("./GameResources/Audio/unmovable.wav");
+	AudioManager::RegisterLoadQue("./GameResources/Audio/iceMove.wav");
 
 }
 

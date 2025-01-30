@@ -23,6 +23,12 @@ void PlayerManager::initialize(Reference<const LevelLoader> level, MapchipField*
 	}
 	stageSituation = 0;
 	isParent = false;
+
+	//音関連
+	holdAudio = std::make_unique<AudioPlayer>();
+	holdAudio->initialize("hold.wav");
+	releaseAudio = std::make_unique<AudioPlayer>();
+	releaseAudio->initialize("release.wav");
 }
 
 void PlayerManager::finalize() {
@@ -111,10 +117,20 @@ void PlayerManager::manage_parent_child_relationship()
 		if (child->get_object()->get_animation()->is_end()) {
 			child->get_object()->reset_animated_mesh("ChiledKoala.gltf", "Standby", false);
 		}
+		
+		//前フレ子なし、今フレ子ありならholdを鳴らす
+		if (!preParent && player->is_parent()) {
+			holdAudio->restart();
+		}
 	}
 	else {
 		// 子をプレイヤーから切り離す処理
 		detach_child_from_player(player.get(), child.get());
+
+		//前フレ子あり、今フレ子なしならreleaseを鳴らす
+		if (preParent && !player->is_parent()) {
+			releaseAudio->restart();
+		}
 
 	}
 }

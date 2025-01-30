@@ -8,6 +8,20 @@ void Player::initialize(const LevelLoader& level, MapchipHandler* mapchipHandler
 	object_->reset_animated_mesh("ParentKoala.gltf", "Standby", true);
 	object_->get_transform().set_translate(level.get_player_position());
 	mapchipHandler_ = mapchipHandler;
+
+	//音関連
+
+	moveAudio = std::make_unique<AudioPlayer>();
+	moveAudio->initialize("move.wav");
+	unmovable = std::make_unique<AudioPlayer>();
+	unmovable->initialize("unmovable.wav");
+	fall = std::make_unique<AudioPlayer>();
+	fall->initialize("fall.wav");
+	iceMove = std::make_unique<AudioPlayer>();
+	iceMove->initialize("iceMove.wav");
+
+	fallSoundFlag = false;
+	unmovableFlag = false;
 }
 
 void Player::finalize() {}
@@ -128,6 +142,11 @@ void Player::handle_input() {
 void Player::fall_update() {
 	if (isFalling) {
 		Vector3 position = object_->get_transform().get_translate();
+		if (!fallSoundFlag) {
+			fall->play();
+			fallSoundFlag = true;
+		}
+
 		position.y -= fallSpeed * WorldClock::DeltaSeconds();
 		object_->get_transform().set_translate(position);
 		if (position.y <= -3.0f) {
@@ -142,6 +161,10 @@ void Player::move_update() {
 		return;
 	};
 
+	//移動時の音。moveTimerが加算される前に処理して一回だけ鳴らす
+	if (moveTimer <= 0) {
+		moveAudio->restart();
+	}
 	// 移動中なら補間処理を実行
 	moveTimer += WorldClock::DeltaSeconds();
 
@@ -215,6 +238,7 @@ void Player::wall_move() {
 	{
 		newPos = Vector3::Lerp(wallTargetPosition, wallStartPosition, wallMoveTimer / (wallMoveDuration * 0.5f));
 
+		
 	}
 
 	if (wallMoveTimer >= wallMoveDuration) {
