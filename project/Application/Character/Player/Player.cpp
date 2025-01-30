@@ -2,8 +2,7 @@
 #include "Engine/Runtime/Input/Input.h"
 #include "Application/Utility/GameUtility.h"
 
-void Player::initialize(const LevelLoader& level, MapchipHandler* mapchipHandler)
-{
+void Player::initialize(const LevelLoader& level, MapchipHandler* mapchipHandler) {
 	object_ = std::make_unique<AnimatedMeshInstance>();
 	object_->reset_animated_mesh("ParentKoala.gltf", "Standby", true);
 	object_->get_transform().set_translate(level.get_player_position());
@@ -26,8 +25,7 @@ void Player::initialize(const LevelLoader& level, MapchipHandler* mapchipHandler
 
 void Player::finalize() {}
 
-void Player::update()
-{
+void Player::update() {
 	object_->begin();
 	isMove = false;
 	moveNumOnIce = 1;
@@ -228,16 +226,23 @@ void Player::wall_move() {
 
 	Vector3 newPos = { 0,0,0 };
 
+
 	//時間の半分はスタート位置から壁に向かって移動
 	//多分正確に半分を計測できる訳じゃないから微妙に戻りすぎる説ある
 	if (wallMoveTimer <= wallMoveDuration * 0.5f) {
 		newPos = Vector3::Lerp(wallStartPosition, wallTargetPosition, wallMoveTimer / (wallMoveDuration * 0.5f));
 
 	}
-	else
-	{
+	else {
 		newPos = Vector3::Lerp(wallTargetPosition, wallStartPosition, wallMoveTimer / (wallMoveDuration * 0.5f));
 
+	}
+
+	if (wallMoveTimer >= wallMoveDuration * 0.5f) {
+		if (!unmovableFlag) {
+			unmovable->restart();
+			unmovableFlag = true;
+		}
 		
 	}
 
@@ -245,6 +250,7 @@ void Player::wall_move() {
 		wallMoveTimer = wallMoveDuration;
 		isWallMoveing = false;
 		newPos = wallStartPosition;
+		unmovableFlag = false;
 	}
 	object_->get_transform().set_translate(newPos);
 }
