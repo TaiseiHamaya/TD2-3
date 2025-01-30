@@ -115,7 +115,9 @@ void PlayerManager::manage_parent_child_relationship()
 		// 子をプレイヤーにくっつける処理
 		attach_child_to_player(player.get(), child.get());
 		if (child->get_object()->get_animation()->is_end()) {
-			child->get_object()->reset_animated_mesh("ChiledKoala.gltf", "Standby", false);
+			//child->get_object()->reset_animated_mesh("ChiledKoala.gltf", "Standby", false);
+			child->get_object()->get_animation()->reset_animation("Standby");
+			child->get_object()->get_animation()->set_loop(false);
 		}
 		
 		//前フレ子なし、今フレ子ありならholdを鳴らす
@@ -209,7 +211,9 @@ void PlayerManager::attach_child_to_player(Player* player, Child* child)
 			}
 			// 子供のローカル座標を設定
 			child->set_translate(adjustedOffset);
-			child->get_object()->reset_animated_mesh("ChiledKoala.gltf", "Hold", false);
+			//child->get_object()->reset_animated_mesh("ChiledKoala.gltf", "Hold", false);
+			child->get_object()->get_animation()->reset_animation("Hold");
+			child->get_object()->get_animation()->set_loop(false);
 			break;
 		}
 	}
@@ -232,10 +236,13 @@ void PlayerManager::detach_child_from_player(Player* player, Child* child)
 		player->set_parent(false);
 		// アニメーションをセット
 		if (!child->is_out_ground()) {
-			child->get_object()->reset_animated_mesh("ChiledKoala.gltf", "Relese", false);
+			child->get_object()->get_animation()->reset_animation("Relese");
+			child->get_object()->get_animation()->set_loop(false);
 		}
 		else {
-			child->get_object()->reset_animated_mesh("ChiledKoala.gltf", "Falling", true);
+			//child->get_object()->reset_animated_mesh("ChiledKoala.gltf", "Falling", true);
+			child->get_object()->get_animation()->reset_animation("Falling");
+			child->get_object()->get_animation()->set_loop(true);
 		}
 	}
 }
