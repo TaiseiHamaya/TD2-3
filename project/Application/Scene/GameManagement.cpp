@@ -39,6 +39,11 @@ void GameManagement::init() {
 	decision->initialize("decision.wav");
 	operation = std::make_unique<AudioPlayer>();
 	operation->initialize("operation.wav");
+	clearAudio = std::make_unique<AudioPlayer>();
+	clearAudio->initialize("clearSound.wav");
+	failedAudio = std::make_unique<AudioPlayer>();
+	failedAudio->initialize("failedSound.wav");
+	resultSoundFlag = false;
 }
 
 void GameManagement::begin() {
@@ -54,6 +59,17 @@ void GameManagement::begin() {
 		}
 	}
 	else {
+		//resultSoundFlagを使って効果音を鳴らす
+
+		if (!resultSoundFlag) {
+			if (clearFlag) {
+				clearAudio->restart();
+			}
+			else if (failedFlag) {
+				failedAudio->restart();
+			}
+			resultSoundFlag = true;
+		}
 		toSelectTimer = 0;
 		if (Input::IsTriggerKey(KeyID::Space)) {
 

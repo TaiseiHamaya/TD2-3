@@ -51,5 +51,8 @@ private:
 	//音関連
 	std::unique_ptr<AudioPlayer> decision;//確定音
 	std::unique_ptr<AudioPlayer> operation;//切り替え音
+	std::unique_ptr<AudioPlayer> clearAudio;//切り替え音
+	std::unique_ptr<AudioPlayer> failedAudio;//切り替え音
+	bool resultSoundFlag;
 
 };

@@ -75,6 +75,8 @@ void GameScene::load() {
 	AudioManager::RegisterLoadQue("./GameResources/Audio/iceMove.wav");
 	AudioManager::RegisterLoadQue("./GameResources/Audio/decision.wav");
 	AudioManager::RegisterLoadQue("./GameResources/Audio/operation.wav");
+	AudioManager::RegisterLoadQue("./GameResources/Audio/clearSound.wav");
+	AudioManager::RegisterLoadQue("./GameResources/Audio/failedSound.wav");
 
 }
 
