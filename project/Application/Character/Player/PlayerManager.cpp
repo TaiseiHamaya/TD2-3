@@ -59,7 +59,7 @@ void PlayerManager::update() {
 	child->update();
 
 	if (player->is_stack_movement()) {
-		emplace_log();
+		emplace_log(player->move_start_position(), player->start_rotation());
 	}
 
 	// 親子関係の管理
@@ -93,10 +93,7 @@ void PlayerManager::update() {
 		gameManagement_->SetFailedSelect(2);
 	}
 
-	if (stageSituation == 0 && isStackMovement) {
-		emplace_log();
-	}
-
+	// この条件式でできない理由 is 何
 	if (stageSituation == 0 && moveLogger->can_undo() && Input::IsTriggerKey(KeyID::Z)) {
 		undo();
 	}
@@ -126,7 +123,8 @@ void PlayerManager::manage_parent_child_relationship() {
 	if (!player->is_parent()) {
 
 		Vector3 playerToChild = player->get_translate() - child->get_translate();
-		if (playerToChild.length() <= 1.0f) {
+		float distance = playerToChild.length();
+		if (distance <= 1.01f) {
 			// 子をプレイヤーにくっつける処理
 			attach_child_to_player(player.get(), child.get());
 			if (child->get_object()->get_animation()->is_end()) {
@@ -144,8 +142,8 @@ void PlayerManager::manage_parent_child_relationship() {
 	else {
 		// 子をプレイヤーから切り離す処理
 		if (Input::GetInstance().IsTriggerKey(KeyID::Space)) {
-			isStackMovement = true;
-			detach_child_from_player(player.get(), child.get(), true);
+			emplace_log(player->get_translate(), player->get_rotation());
+			detach_child_from_player(player.get(), child.get());
 		}
 
 		//前フレ子あり、今フレ子なしならreleaseを鳴らす
@@ -208,11 +206,13 @@ void PlayerManager::attach_child_to_player(Player* player, Child* child) {
 	child->get_object()->reparent(player->get_object());
 	child->get_object()->look_at(*player->get_object());
 	player->set_parent(true);
-	child->get_object()->get_animation()->reset_animation("Hold");
-	child->get_object()->get_animation()->set_loop(false);
+	NodeAnimationPlayer* anim = child->get_object()->get_animation();
+	anim->reset_animation("Hold");
+	anim->set_loop(false);
+	anim->restart();
 }
 
-void PlayerManager::detach_child_from_player(Player* player, Child* child, bool isDetachAnimation) {
+void PlayerManager::detach_child_from_player(Player* player, Child* child) {
 	if (player->is_moving() && !player->is_on_ice()) {
 		return;
 	}
@@ -227,26 +227,22 @@ void PlayerManager::detach_child_from_player(Player* player, Child* child, bool 
 	// 親子付けフラグをオフにする
 	player->set_parent(false);
 	// アニメーションをセット
+	NodeAnimationPlayer* anim = child->get_object()->get_animation();
 	if (!child->is_out_ground()) {
-		if (isDetachAnimation) {
-			child->get_object()->get_animation()->reset_animation("Relese");
-			child->get_object()->get_animation()->set_loop(false);
-		}
-		else {
-			child->get_object()->get_animation()->reset_animation("Standby");
-			child->get_object()->get_animation()->set_loop(true);
-		}
+		anim->reset_animation("Relese");
+		anim->set_loop(false);
+		anim->restart();
 	}
 	else {
-		child->get_object()->get_animation()->reset_animation("Falling");
-		child->get_object()->get_animation()->set_loop(true);
+		anim->reset_animation("Falling");
+		anim->set_loop(true);
+		anim->restart();
 	}
 }
 
-void PlayerManager::emplace_log() {
-	Vector3 playerPosition = player->move_start_position();
+void PlayerManager::emplace_log(const Vector3& playerPosition, const Quaternion& playerRotation) {
 	moveLogger->emplace({
-		{ playerPosition.x,playerPosition.z, player->start_rotation() },
+		{ playerPosition.x,playerPosition.z, playerRotation },
 		{ child->get_translate().x,child->get_translate().z, child->get_rotation() },
 		player->is_parent()
 		});
@@ -266,13 +262,6 @@ void PlayerManager::undo() {
 		childY = 1.0f;
 	}
 
-	child->on_undo(
-		{ popped.child.x, childY, popped.child.y },
-		player->get_translate(),
-		popped.isSticking,
-		isChildOnGround
-	);
-
 	player->on_undo(
 		{ popped.player.x, 1.0f, popped.player.y },
 		popped.player.rotation,
@@ -280,10 +269,30 @@ void PlayerManager::undo() {
 		isPlayerOnGround
 	);
 
+	child->on_undo(
+		{ popped.child.x, childY, popped.child.y },
+		player->get_translate(),
+		popped.isSticking,
+		isChildOnGround
+	);
+
 	if (popped.isSticking) {
-		attach_child_to_player(player.get(), child.get());
+		child->get_object()->reparent(player->get_object(), false);
+		child->get_object()->look_at(*player->get_object());
+		player->set_parent(true);
+		child->get_object()->get_animation()->reset_animation("Hold");
+		child->get_object()->get_animation()->set_loop(false);
 	}
 	else {
-		detach_child_from_player(player.get(), child.get(), false);
+		// ペアレントを解消する
+		child->get_object()->reparent(nullptr, false);
+		child->get_object()->look_at(*player->get_object());
+		// 子供のワールド座標を設定
+		//child->set_translate({ std::round(childPos.x), std::round(childPos.y), std::round(childPos.z) });
+		// 親子付けフラグをオフにする
+		player->set_parent(false);
+		// アニメーションをセット
+		child->get_object()->get_animation()->reset_animation("Standby");
+		child->get_object()->get_animation()->set_loop(false);
 	}
-	}
+}

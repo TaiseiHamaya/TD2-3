@@ -85,6 +85,7 @@ void Player::on_undo(Vector3 position, Quaternion rotation, bool setParent, bool
 #ifdef _DEBUG
 void Player::debug_update() {
 	ImGui::Begin("Player");
+	ImGui::Text("%d", isParent);
 	object_->debug_gui();
 	ImGui::End();
 }

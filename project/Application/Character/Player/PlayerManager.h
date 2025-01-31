@@ -28,9 +28,9 @@ private:
 	void set_child_rotate();
 
 	void attach_child_to_player(Player* player, Child* child);
-	void detach_child_from_player(Player* player, Child* child, bool isDetachAnimation);
+	void detach_child_from_player(Player* player, Child* child);
 	bool is_game_cleared() const { return stageSituation; }
-	void emplace_log();
+	void emplace_log(const Vector3& playerPosition, const Quaternion& playerRotation);
 	void undo();
 
 private:
