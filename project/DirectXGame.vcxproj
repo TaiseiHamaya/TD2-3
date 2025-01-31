@@ -171,6 +171,7 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClCompile Include="JsonReader.cpp" />
     <ClCompile Include="Application\Mapchip\MapchipHandler.cpp" />
     <ClCompile Include="Application\Scene\SelectScene.cpp" />
+    <ClCompile Include="Application\Character\Player\MoveLogger\MoveLogger.cpp" />
     <ClCompile Include="TestCode\CallbackManagerDemo.cpp" />
     <ClCompile Include="Engine\Module\World\Collision\CollisionCallbackManager.cpp" />
     <ClCompile Include="Engine\Module\World\Light\DirectionalLight\DirectionalLightInstance.cpp" />
@@ -307,6 +308,7 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClInclude Include="Application\Character\Player\PlayerManager.h" />
     <ClInclude Include="Application\Mapchip\MapchipHandler.h" />
     <ClInclude Include="Application\Scene\SelectScene.h" />
+    <ClInclude Include="Application\Character\Player\MoveLogger\MoveLogger.h" />
     <ClInclude Include="TestCode\CallbackManagerDemo.h" />
     <ClInclude Include="Engine\Module\World\Collision\CollisionCallbackManager.h" />
     <ClInclude Include="Engine\Module\World\Light\DirectionalLight\DirectionalLightInstance.h" />

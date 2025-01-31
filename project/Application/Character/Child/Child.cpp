@@ -1,5 +1,7 @@
 #include "Child.h"
 
+#include <Engine/Resources/Animation/NodeAnimation/NodeAnimationPlayer.h>
+
 void Child::initialize(const LevelLoader& level, MapchipHandler* mapchipHandler)
 {
 	object_ = std::make_unique<AnimatedMeshInstance>();
@@ -38,6 +40,23 @@ void Child::begin_rendering()
 void Child::draw() const
 {
 	object_->draw();
+}
+
+void Child::on_undo(Vector3 position, Vector3 lookat, bool isParent, bool onGround) {
+	object_->get_transform().set_translate(position);
+	//object_->look_at(lookat);
+	
+	if (isParent) {
+		if (onGround) {
+			object_->get_animation()->reset_animation("Standby");
+		}
+		else {
+			object_->get_animation()->reset_animation("Flustered");
+		}
+	}
+	else {
+		object_->get_animation()->reset_animation("Standby");
+	}
 }
 
 #ifdef _DEBUG

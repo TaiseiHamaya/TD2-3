@@ -63,6 +63,11 @@ public:
 
 	bool is_falled()const { return isFalled; }
 
+	bool is_stack_movement() const { return isStackMovement; }
+	void on_undo(Vector3 position, Quaternion direction, bool isParent, bool onGround);
+	Vector3 move_start_position() const { return moveStartPosition; }
+	Quaternion start_rotation() const { return startRotation; }
+
 #ifdef _DEBUG
 	void debug_update();
 #endif
@@ -84,7 +89,7 @@ private:
 	Vector3 direction{}; // 移動方向
 	Vector3 preDirection{}; // 移動方向
 
-	Vector3 startPosition;   // 移動の開始位置
+	Vector3 moveStartPosition;   // 移動の開始位置
 	Vector3 targetPosition;  // 次の目標位置
 	float moveTimer = 0.0f;  // 移動の進行状況を管理するタイマー
 	float moveDuration = 0.15f;  // 移動にかける時間（秒）
@@ -111,6 +116,8 @@ private:
 
 	float fallSpeed = 6.0f;//落下中の速度
 	bool isFalled = false; // 落下終了フラグ
+
+	bool isStackMovement{ false };
 
 	float deltaTime = WorldClock::DeltaSeconds(); // 時間管理
 };
