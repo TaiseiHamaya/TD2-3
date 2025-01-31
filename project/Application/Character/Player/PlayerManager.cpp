@@ -223,7 +223,7 @@ void PlayerManager::detach_child_from_player(Player* player, Child* child) {
 	child->get_object()->reparent(nullptr);
 	child->get_object()->look_at(*player->get_object());
 	// 子供のワールド座標を設定
-	//child->set_translate({ std::round(childPos.x), std::round(childPos.y), std::round(childPos.z) });
+	child->set_translate({ std::round(childPos.x), std::round(childPos.y), std::round(childPos.z) });
 	// 親子付けフラグをオフにする
 	player->set_parent(false);
 	// アニメーションをセット
