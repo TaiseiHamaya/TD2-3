@@ -3,6 +3,8 @@
 #include "Application/Character/Player/Player.h"
 #include "Application/Character/Child/Child.h"
 
+#include <Engine/Resources/Animation/NodeAnimation/NodeAnimationPlayer.h>
+
 void MapchipHandler::initialize(MapchipField* mapchipField)
 {
 	mapchipField_ = mapchipField;
@@ -467,19 +469,27 @@ void MapchipHandler::check_fall_conditions(Player* player, Child* child) {
 
 	if (prePlayerChip != playerFalling) {
 		if (playerFalling) {
-			player->get_object()->reset_animated_mesh("ChiledKoala.gltf", "Flustered", true);
+			//player->get_object()->reset_animated_mesh("ChiledKoala.gltf", "Flustered", true);
+			player->get_object()->get_animation()->reset_animation("Flustered");
+			player->get_object()->get_animation()->set_loop(true);
 		}
 		else {
-			player->get_object()->reset_animated_mesh("ChiledKoala.gltf", "Standby", true);
+			//player->get_object()->reset_animated_mesh("ChiledKoala.gltf", "Standby", true);
+			player->get_object()->get_animation()->reset_animation("Standby");
+			player->get_object()->get_animation()->set_loop(true);
 		}
 	}
 
 	if (preChildChip != child->is_out_ground()) {
 		if (child->is_out_ground()) {
-			child->get_object()->reset_animated_mesh("ChiledKoala.gltf", "Flustered", true);
+			//child->get_object()->reset_animated_mesh("ChiledKoala.gltf", "Flustered", true);
+			child->get_object()->get_animation()->reset_animation("Flustered");
+			child->get_object()->get_animation()->set_loop(true);
 		}
 		else {
-			child->get_object()->reset_animated_mesh("ChiledKoala.gltf", "Hold", false);
+			//child->get_object()->reset_animated_mesh("ChiledKoala.gltf", "Hold", false);
+			child->get_object()->get_animation()->reset_animation("Hold");
+			child->get_object()->get_animation()->set_loop(false);
 		}
 	}
 

@@ -53,6 +53,10 @@ Transform2D& SpriteInstance::get_uv_transform() noexcept {
 	return *uvTransform;
 }
 
+Color4& SpriteInstance::get_color() const {
+	return color;
+}
+
 void SpriteInstance::begin_rendering() noexcept {
 	*transformMatrix->get_data() = transform->get_matrix4x4_transform() * Camera2D::GetVPMatrix();
 	material->get_data()->uvTransform = uvTransform->get_matrix4x4_transform();

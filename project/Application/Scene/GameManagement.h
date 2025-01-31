@@ -1,6 +1,7 @@
 #pragma once
 
 #include <memory>
+#include "Engine/Resources/Audio/AudioPlayer.h"
 
 class SpriteInstance;
 
@@ -46,4 +47,12 @@ private:
 	int failedSelectIndex;//0:子どもを置いてゴール 1:子コアラがゴール　2:コアラを落とす　3:ターン経過(まだない)
 	
 	float toSelectTimer;
+
+	//音関連
+	std::unique_ptr<AudioPlayer> decision;//確定音
+	std::unique_ptr<AudioPlayer> operation;//切り替え音
+	std::unique_ptr<AudioPlayer> clearAudio;//切り替え音
+	std::unique_ptr<AudioPlayer> failedAudio;//切り替え音
+	bool resultSoundFlag;
+
 };

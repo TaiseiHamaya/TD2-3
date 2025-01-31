@@ -2,6 +2,8 @@
 #include "Application/Character/CharacterBase.h"
 #include "Engine/Runtime/WorldClock/WorldClock.h"
 #include <Application/Mapchip/MapchipHandler.h>
+#include "Engine/Resources/Audio/AudioPlayer.h"
+
 
 class Child : public CharacterBase {
 public:
@@ -36,4 +38,8 @@ private:
     bool isFalled = false;
     // 
     bool isOutGround = false; 
+
+    //音関連
+
+
 };

@@ -26,6 +26,12 @@ void PlayerManager::initialize(Reference<const LevelLoader> level, MapchipField*
 	stageSituation = 0;
 	isParent = false;
 
+	//音関連
+	holdAudio = std::make_unique<AudioPlayer>();
+	holdAudio->initialize("hold.wav");
+	releaseAudio = std::make_unique<AudioPlayer>();
+	releaseAudio->initialize("release.wav");
+
 	moveLogger = std::make_unique<MoveLogger>();
 	moveLogger->initialize();
 }
@@ -118,10 +124,21 @@ void PlayerManager::manage_parent_child_relationship() {
 	bool preParent = player->is_parent();
 
 	if (!player->is_parent()) {
-		// 子をプレイヤーにくっつける処理
-		attach_child_to_player(player.get(), child.get());
-		if (child->get_object()->get_animation()->is_end()) {
-			child->get_object()->reset_animated_mesh("ChiledKoala.gltf", "Standby", false);
+
+		Vector3 playerToChild = player->get_translate() - child->get_translate();
+		if (playerToChild.length() <= 1.0f) {
+			// 子をプレイヤーにくっつける処理
+			attach_child_to_player(player.get(), child.get());
+			if (child->get_object()->get_animation()->is_end()) {
+				//child->get_object()->reset_animated_mesh("ChiledKoala.gltf", "Standby", false);
+				child->get_object()->get_animation()->reset_animation("Standby");
+				child->get_object()->get_animation()->set_loop(false);
+			}
+
+			//前フレ子なし、今フレ子ありならholdを鳴らす
+			if (!preParent && player->is_parent()) {
+				holdAudio->restart();
+			}
 		}
 	}
 	else {
@@ -129,6 +146,11 @@ void PlayerManager::manage_parent_child_relationship() {
 		if (Input::GetInstance().IsTriggerKey(KeyID::Space)) {
 			isStackMovement = true;
 			detach_child_from_player(player.get(), child.get(), true);
+		}
+
+		//前フレ子あり、今フレ子なしならreleaseを鳴らす
+		if (preParent && !player->is_parent()) {
+			releaseAudio->restart();
 		}
 
 	}
@@ -183,15 +205,11 @@ void PlayerManager::attach_child_to_player(Player* player, Child* child) {
 	// 今フレームで移動していなければ返す
 	if (!player->is_moved()) return;
 
-	Vector3 playerToChild = player->get_translate() - child->get_translate();
-	if (playerToChild.length() > 1.0f) {
-		return;
-	}
-
 	child->get_object()->reparent(player->get_object());
 	child->get_object()->look_at(*player->get_object());
 	player->set_parent(true);
-	child->get_object()->reset_animated_mesh("ChiledKoala.gltf", "Hold", false);
+	child->get_object()->get_animation()->reset_animation("Hold");
+	child->get_object()->get_animation()->set_loop(false);
 }
 
 void PlayerManager::detach_child_from_player(Player* player, Child* child, bool isDetachAnimation) {
@@ -211,14 +229,17 @@ void PlayerManager::detach_child_from_player(Player* player, Child* child, bool 
 	// アニメーションをセット
 	if (!child->is_out_ground()) {
 		if (isDetachAnimation) {
-			child->get_object()->reset_animated_mesh("ChiledKoala.gltf", "Relese", false);
+			child->get_object()->get_animation()->reset_animation("Relese");
+			child->get_object()->get_animation()->set_loop(false);
 		}
 		else {
-			child->get_object()->reset_animated_mesh("ChiledKoala.gltf", "Standby", false);
+			child->get_object()->get_animation()->reset_animation("Standby");
+			child->get_object()->get_animation()->set_loop(true);
 		}
 	}
 	else {
-		child->get_object()->reset_animated_mesh("ChiledKoala.gltf", "Falling", true);
+		child->get_object()->get_animation()->reset_animation("Falling");
+		child->get_object()->get_animation()->set_loop(true);
 	}
 }
 

@@ -9,6 +9,22 @@ void Player::initialize(const LevelLoader& level, MapchipHandler* mapchipHandler
 	object_->reset_animated_mesh("ParentKoala.gltf", "Standby", true);
 	object_->get_transform().set_translate(level.get_player_position());
 	mapchipHandler_ = mapchipHandler;
+
+	//音関連
+
+	moveAudio = std::make_unique<AudioPlayer>();
+	moveAudio->initialize("move.wav");
+	unmovable = std::make_unique<AudioPlayer>();
+	unmovable->initialize("unmovable.wav");
+	fall = std::make_unique<AudioPlayer>();
+	fall->initialize("fall.wav");
+	iceMove = std::make_unique<AudioPlayer>();
+	iceMove->initialize("iceMove.wav");
+	rotatAudio = std::make_unique<AudioPlayer>();
+	rotatAudio->initialize("rotate.wav");
+
+	fallSoundFlag = false;
+	unmovableFlag = false;
 }
 
 void Player::finalize() {}
@@ -18,7 +34,7 @@ void Player::update() {
 	object_->begin();
 	isMove = false;
 	moveNumOnIce = 1;
-	isOnIce = false;
+	
 	isOnChild = false;
 
 	// 入力処理
@@ -111,6 +127,7 @@ void Player::handle_input() {
 				moveDuration = 0.15f * static_cast<float>(moveNumOnIce);
 				isOnIce = true;
 				isMoving = true;
+
 			}
 
 			// 回転中の衝突チェック
@@ -150,6 +167,11 @@ void Player::handle_input() {
 void Player::fall_update() {
 	if (isFalling) {
 		Vector3 position = object_->get_transform().get_translate();
+		if (!fallSoundFlag) {
+			fall->play();
+			fallSoundFlag = true;
+		}
+
 		position.y -= fallSpeed * WorldClock::DeltaSeconds();
 		object_->get_transform().set_translate(position);
 		if (position.y <= -3.0f) {
@@ -164,6 +186,17 @@ void Player::move_update() {
 		return;
 	};
 
+	//移動時の音。moveTimerが加算される前に処理して一回だけ鳴らす
+	if (moveTimer <= 0) {
+		//氷と通常床で音を変える
+		if (isOnIce) {
+			iceMove->restart();
+		}
+		else {
+			moveAudio->restart();
+
+		}
+	}
 	// 移動中なら補間処理を実行
 	moveTimer += WorldClock::DeltaSeconds();
 
@@ -172,6 +205,7 @@ void Player::move_update() {
 		moveTimer = moveDuration;
 		isMoving = false;
 		isMove = true;
+		isOnIce = false;//この処理がupdate序盤にあると、床→氷に移動する時に音がならなかったので、ここに移動してる
 		isStackMovement = true;
 	}
 
@@ -182,6 +216,11 @@ void Player::move_update() {
 }
 
 void Player::rotate_update() {
+
+	if (rotateTimer <= 0) {
+		rotatAudio->restart();
+	}
+
 	rotateTimer += WorldClock::DeltaSeconds();
 
 	// 回転完了チェック
@@ -228,6 +267,7 @@ void Player::wall_move() {
 
 	Vector3 newPos = { 0,0,0 };
 
+
 	//時間の半分はスタート位置から壁に向かって移動
 	//多分正確に半分を計測できる訳じゃないから微妙に戻りすぎる説ある
 	if (wallMoveTimer <= wallMoveDuration * 0.5f) {
@@ -239,10 +279,19 @@ void Player::wall_move() {
 
 	}
 
+	if (wallMoveTimer >= wallMoveDuration * 0.5f) {
+		if (!unmovableFlag) {
+			unmovable->restart();
+			unmovableFlag = true;
+		}
+		
+	}
+
 	if (wallMoveTimer >= wallMoveDuration) {
 		wallMoveTimer = wallMoveDuration;
 		isWallMoveing = false;
 		newPos = wallStartPosition;
+		unmovableFlag = false;
 	}
 	object_->get_transform().set_translate(newPos);
 }

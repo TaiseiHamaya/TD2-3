@@ -7,6 +7,7 @@
 #include "Application/Character/Player/Player.h"
 #include "Application/Mapchip/MapchipHandler.h"
 #include "Application/Scene/GameManagement.h"
+#include "Engine/Resources/Audio/AudioPlayer.h"
 
 class PlayerManager {
 public:
@@ -46,7 +47,11 @@ private:
 
 	int stageSituation = 0; // クリア状態を管理(0:通常 1:クリア 2:子が先 3:子を置いてく 4:コアラを落とす)
 
-	bool isParent;
+    bool isParent;
 
+    //音関連
+    std::unique_ptr<AudioPlayer> holdAudio;//くっつき音
+    std::unique_ptr<AudioPlayer> releaseAudio;//離れる音
+	
 	bool isStackMovement;
 };

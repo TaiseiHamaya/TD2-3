@@ -8,6 +8,8 @@ void Child::initialize(const LevelLoader& level, MapchipHandler* mapchipHandler)
 	object_->reset_animated_mesh("ChiledKoala.gltf", "Standby", true);
 	object_->get_transform().set_translate(level.get_child_position());
 
+	//音関連
+
 	
 }
 

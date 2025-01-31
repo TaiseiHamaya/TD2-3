@@ -34,6 +34,16 @@ void GameManagement::init() {
 	failedUI->get_transform().set_scale({ 0.25f,1 });
 	failedUI->get_uv_transform().set_scale({ 0.25f,1 });
 	failedUI->get_transform().set_translate({ 257,220 });
+
+	decision = std::make_unique<AudioPlayer>();
+	decision->initialize("decision.wav");
+	operation = std::make_unique<AudioPlayer>();
+	operation->initialize("operation.wav");
+	clearAudio = std::make_unique<AudioPlayer>();
+	clearAudio->initialize("clearSound.wav");
+	failedAudio = std::make_unique<AudioPlayer>();
+	failedAudio->initialize("failedSound.wav");
+	resultSoundFlag = false;
 }
 
 void GameManagement::begin() {
@@ -49,8 +59,21 @@ void GameManagement::begin() {
 		}
 	}
 	else {
+		//resultSoundFlagを使って効果音を鳴らす
+
+		if (!resultSoundFlag) {
+			if (clearFlag) {
+				clearAudio->restart();
+			}
+			else if (failedFlag) {
+				failedAudio->restart();
+			}
+			resultSoundFlag = true;
+		}
 		toSelectTimer = 0;
 		if (Input::IsTriggerKey(KeyID::Space)) {
+
+			decision->restart();//確定の音
 			// カーソルがリトライを選んでる時
 			if (selectIndex == 0) {
 				isReset = true;
@@ -124,9 +147,11 @@ void GameManagement::selectFunc() {
 
 		if (Input::IsTriggerKey(KeyID::A)) {
 			selectIndex--;
+			operation->restart();//選択時の音
 		}
 		if (Input::IsTriggerKey(KeyID::D)) {
 			selectIndex++;
+			operation->restart();//選択時の音
 		}
 		selectIndex = std::clamp(selectIndex, 0, 1);
 
