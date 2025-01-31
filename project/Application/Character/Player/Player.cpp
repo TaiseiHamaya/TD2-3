@@ -19,6 +19,7 @@ void Player::update()
 	moveNumOnIce = 1;
 	isOnIce = false;
 	isOnChild = false;
+	isTurnSuccess = true;
 
 	// 入力処理
 	handle_input();
@@ -98,8 +99,7 @@ void Player::handle_input() {
 				midRotation = targetRotation;
 				rotateTimer = 0.0f;
 				isRotating = true;
-				isReverseRotation = false;
-
+				// 回転のパラメータを設定する
 				mapchipHandler_->setup_rotation_parameters(this, child_, direction);
 			}
 			else {
@@ -173,7 +173,7 @@ void Player::rotate_update() {
 	Quaternion currentRotation;
 
 	// 回転方向が逆の場合、進行度を反転し区間ごとに補間
-	if (isReverseRotation) {
+	if (rotateDirection != RotationDirection::None) {
 		if (totalProgress <= 0.5f) {
 			// 前半区間（start → mid）
 			float t = totalProgress / 0.5f; // 正規化した進行度
@@ -190,6 +190,7 @@ void Player::rotate_update() {
 		float t = totalProgress;
 		currentRotation = Quaternion::Slerp(startRotation, targetRotation, t);
 	}
+
 	if (startRotation == targetRotation) {
 		direction = preDirection;
 	}

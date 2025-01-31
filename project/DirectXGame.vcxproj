@@ -254,6 +254,7 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClCompile Include="Engine\Module\World\WorldInstanceManager.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="Application\Character\Player\CharacterStates.h" />
     <ClInclude Include="Application\Scene\DebugScene.h" />
     <ClInclude Include="Application\GameValue.h" />
     <ClInclude Include="Engine\Module\Render\RenderNode\Deferred\DeferredAdaptor.h" />

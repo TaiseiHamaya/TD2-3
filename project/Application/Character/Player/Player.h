@@ -2,6 +2,7 @@
 #include "Application/Character/CharacterBase.h"
 #include "Engine/Runtime/WorldClock/WorldClock.h"
 #include <Application/Mapchip/MapchipHandler.h>
+#include "CharacterStates.h"
 
 
 class Player : public CharacterBase {
@@ -13,20 +14,11 @@ public:
 	void begin_rendering() override;
 	void draw() const override;
 
-	// アクセッサ
+public: // アクセッサ
 	void set_child(Child* child) { child_ = child; }
-
-	Vector3 get_translate() const { return object_->get_transform().get_translate(); }
-	void set_translate(const Vector3& position) { object_->get_transform().set_translate(position); }
-
-	Quaternion get_rotation() const { return object_->get_transform().get_quaternion(); }
-	void set_rotation(const Quaternion& rotation) { object_->get_transform().set_quaternion(rotation); }
 
 	bool is_parent() const { return isParent; }
 	void set_parent(bool flag) { isParent = flag; }
-
-	bool is_falling() const { return isFalling; }
-	void set_falling(bool flag) { isFalling = flag; }
 
 	bool is_moving() const { return isMoving; }
 	void set_moving(bool flag) { isMoving = flag; }
@@ -46,17 +38,18 @@ public:
 	bool is_on_child() const { return isOnChild; }
 	void set_on_child(bool flag) { isOnChild = flag; }
 
+	bool is_turn_success() const { return isTurnSuccess; }
+	void set_turn_success(bool flag) { isTurnSuccess = flag; }
+
 	Vector3 get_previous_direction() const { return preDirection; }
 
-	void set_reverse_rotation(bool flag) { isReverseRotation = flag; }
+	RotationDirection get_how_rotation() { return rotateDirection; }
+	void set_how_rotation(RotationDirection rotate) { rotateDirection = rotate; }
 
 	void set_mid_rotation(Quaternion Rotation) { midRotation = Rotation; }
 
 	Quaternion get_target_rotation() { return targetRotation; }
 	void set_target_rotation(Quaternion rotation) { targetRotation = rotation; }
-
-	//Vector3 get_target_pos() const { return targetPosition; }
-	//void set_target_pos(const Vector3& target) { targetPosition = target; }
 
 	int get_move_num_on_ice() { return moveNumOnIce; }
 	void set_move_num_on_ice(int num) { moveNumOnIce = num; }
@@ -75,12 +68,20 @@ private:
 	void wall_move();
 
 private:
+	// 回転の仕方をまとめたenum
+	RotationDirection rotateDirection;
+	// プレイヤーの状態
+	PlayerState playerState;
+	// なぜ回転が失敗したのか
+	RotationFailReason howRotateFail;
+	// 橋渡しみたいに移動するか
+	MoveType moveType;
+
 	MapchipHandler* mapchipHandler_;
 	Child* child_; // 子オブジェクトへの参照
 
 	bool isMove = false; // 今フレームで移動をしたかどうか
 	bool isParent = false; // 子供を持つかどうか
-	bool isFalling = false; // 落下中かどうか
 	Vector3 direction{}; // 移動方向
 	Vector3 preDirection{}; // 移動方向
 
@@ -91,11 +92,15 @@ private:
 	bool isMoving = false;   // 現在移動中かどうかのフラグ
 	bool isOnChild = false; // 移動先が子供かどうか
 
+	bool isTurnSuccess; // 回転が成功したかどうか
+
 	Vector3 wallStartPosition;   // 移動の開始位置
 	Vector3 wallTargetPosition;  // 次の目標位置
 	float wallMoveTimer = 0.0f; //現在の移動時間
 	float wallMoveDuration = 0.15f; // 移動にかける時間（秒）
-	bool isWallMoveing = false; //フラグ
+	bool isWallMoveing = false; // 壁に向かって移動した時のフラグ
+
+
 
 	int moveNumOnIce = 1; // 氷の上を何マス
 	bool isOnIce = false; // 氷の上を移動するか否か
@@ -107,10 +112,8 @@ private:
 	float rotateTimer = 0.0f;    // 回転の進行状況を管理するタイマー
 	float rotateDuration = 0.3f; // 回転にかける時間（秒）
 	bool isRotating = false;     // 現在回転中かどうかのフラグ
-	bool isReverseRotation = false; // 回転を反転
+	bool canRotate = false; // 回転可能かどうかのフラグ
 
-	float fallSpeed = 6.0f;//落下中の速度
-	bool isFalled = false; // 落下終了フラグ
 
 	float deltaTime = WorldClock::DeltaSeconds(); // 時間管理
 };
