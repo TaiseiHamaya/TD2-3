@@ -18,6 +18,8 @@ public:
 
     bool is_falled()const { return isFalled; }
 
+	void on_undo(Vector3 position, Vector3 lookat, bool isParent, bool onGround);
+
 #ifdef _DEBUG
     void debug_update();
 #endif

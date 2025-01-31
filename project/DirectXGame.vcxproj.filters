@@ -148,6 +148,7 @@
     <ClCompile Include="Application\Scene\SelectScene.cpp" />
     <ClCompile Include="Application\Scene\DebugScene.cpp" />
     <ClCompile Include="Application\Scene\GameSceneUI.cpp" />
+    <ClCompile Include="Application\Character\Player\MoveLogger\MoveLogger.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Engine\Module\Render\RenderNode\Deferred\DeferredAdaptor.h" />
@@ -306,6 +307,7 @@
     <ClInclude Include="Application\Scene\GameSceneUI.h" />
     <ClInclude Include="Application\GameValue.h" />
     <ClInclude Include="Application\Character\Player\CharacterStates.h" />
+    <ClInclude Include="Application\Character\Player\MoveLogger\MoveLogger.h" />
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="EngineResources\HLSL\FullscreenShader.hlsl">

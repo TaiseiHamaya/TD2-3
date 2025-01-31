@@ -1,44 +1,52 @@
 #pragma once
+
 #include <memory>
-#include "Application/Character/Player/Player.h"
+
+#include "./MoveLogger/MoveLogger.h"
 #include "Application/Character/Child/Child.h"
+#include "Application/Character/Player/Player.h"
 #include "Application/Mapchip/MapchipHandler.h"
 #include "Application/Scene/GameManagement.h"
 
-
 class PlayerManager {
 public:
-    void initialize(Reference<const LevelLoader> level, MapchipField* mapchipField);
-    void finalize();
-    void update();
-    void begin_rendering();
-    void draw() const;
+	void initialize(Reference<const LevelLoader> level, MapchipField* mapchipField);
+	void finalize();
+	void update();
+	void begin_rendering();
+	void draw() const;
 
 #ifdef _DEBUG
-    void debug_update();
+	void debug_update();
 #endif
 
-    void set_game_management(GameManagement* gameManagement) { gameManagement_ = gameManagement; }
-    bool get_isParent() {return isParent;}
+	void set_game_management(GameManagement* gameManagement) { gameManagement_ = gameManagement; }
+	bool get_isParent() { return isParent; }
 private:
-    void manage_parent_child_relationship();
-    void set_child_rotate();
+	void manage_parent_child_relationship();
+	void set_child_rotate();
 
-    void attach_child_to_player(Player* player, Child* child);
-    void detach_child_from_player(Player* player, Child* child);
-    bool is_game_cleared() const { return stageSituation; }
+	void attach_child_to_player(Player* player, Child* child);
+	void detach_child_from_player(Player* player, Child* child, bool isDetachAnimation);
+	bool is_game_cleared() const { return stageSituation; }
+	void emplace_log();
+	void undo();
 
 private:
-    std::unique_ptr<Player> player;
-    std::unique_ptr<Child> child;
-    std::unique_ptr<MapchipHandler> mapchipHandler;
-    GameManagement* gameManagement_;
-    MapchipField* mapchipField_;
+	std::unique_ptr<Player> player;
+	std::unique_ptr<Child> child;
+	std::unique_ptr<MapchipHandler> mapchipHandler;
+	std::unique_ptr<MoveLogger> moveLogger;
 
-    Vector3 playerPos{}; // プレイヤーの現在位置
-    Vector3 childPos{};  // 子オブジェクトの現在位置
+	GameManagement* gameManagement_;
+	MapchipField* mapchipField_;
 
-    int stageSituation = 0; // クリア状態を管理(0:通常 1:クリア 2:子が先 3:子を置いてく 4:コアラを落とす)
+	Vector3 playerPos{}; // プレイヤーの現在位置
+	Vector3 childPos{};  // 子オブジェクトの現在位置
 
-    bool isParent;
+	int stageSituation = 0; // クリア状態を管理(0:通常 1:クリア 2:子が先 3:子を置いてく 4:コアラを落とす)
+
+	bool isParent;
+
+	bool isStackMovement;
 };

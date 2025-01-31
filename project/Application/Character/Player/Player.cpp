@@ -2,8 +2,9 @@
 #include "Engine/Runtime/Input/Input.h"
 #include "Application/Utility/GameUtility.h"
 
-void Player::initialize(const LevelLoader& level, MapchipHandler* mapchipHandler)
-{
+#include <Engine/Resources/Animation/NodeAnimation/NodeAnimationPlayer.h>
+
+void Player::initialize(const LevelLoader& level, MapchipHandler* mapchipHandler) {
 	object_ = std::make_unique<AnimatedMeshInstance>();
 	object_->reset_animated_mesh("ParentKoala.gltf", "Standby", true);
 	object_->get_transform().set_translate(level.get_player_position());
@@ -12,8 +13,8 @@ void Player::initialize(const LevelLoader& level, MapchipHandler* mapchipHandler
 
 void Player::finalize() {}
 
-void Player::update()
-{
+void Player::update() {
+	isStackMovement = false;
 	object_->begin();
 	isMove = false;
 	moveNumOnIce = 1;
@@ -45,6 +46,25 @@ void Player::begin_rendering() {
 
 void Player::draw() const {
 	object_->draw();
+}
+
+void Player::on_undo(Vector3 position, Quaternion rotation, bool setParent, bool onGround) {
+	object_->get_transform().set_translate(position);
+	object_->get_transform().set_quaternion(
+		rotation
+	);
+	direction = -CVector3::BASIS_Z * rotation;
+	isParent = setParent;
+	if (isParent) {
+		if (onGround) {
+			object_->get_animation()->reset_animation("Standby");
+		}else{
+			object_->get_animation()->reset_animation("Flustered");
+		}
+	}
+	else {
+		object_->get_animation()->reset_animation("Standby");
+	}
 }
 
 #ifdef _DEBUG
@@ -79,8 +99,10 @@ void Player::handle_input() {
 				if (!isOnChild) {
 					targetPosition = nextPosition;
 				}
+				startRotation = object_->get_transform().get_quaternion();
 				moveTimer = 0.0f;
 				moveDuration = 0.15f;
+				moveStartPosition = object_->get_transform().get_translate();
 				isMoving = true;
 			}
 			// 進行先が氷かどうかチェック
@@ -150,6 +172,7 @@ void Player::move_update() {
 		moveTimer = moveDuration;
 		isMoving = false;
 		isMove = true;
+		isStackMovement = true;
 	}
 
 	// 現在の位置を補間
@@ -212,8 +235,7 @@ void Player::wall_move() {
 		newPos = Vector3::Lerp(wallStartPosition, wallTargetPosition, wallMoveTimer / (wallMoveDuration * 0.5f));
 
 	}
-	else
-	{
+	else {
 		newPos = Vector3::Lerp(wallTargetPosition, wallStartPosition, wallMoveTimer / (wallMoveDuration * 0.5f));
 
 	}
