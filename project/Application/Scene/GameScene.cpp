@@ -65,6 +65,7 @@ void GameScene::load() {
 	TextureManager::RegisterLoadQue("./GameResources/Texture/UI/Retry.png");
 	TextureManager::RegisterLoadQue("./GameResources/Texture/UI/SelectFrame.png");
 	TextureManager::RegisterLoadQue("./GameResources/Texture/UI/FailedUI_1.png");
+	TextureManager::RegisterLoadQue("./GameResources/Texture/UI/undoRetry.png");
 
 
 	AudioManager::RegisterLoadQue("./GameResources/Audio/move.wav");

@@ -19,21 +19,29 @@ void GameManagement::init() {
 	failedFlag = false;
 	isReset = false;
 	isNext = false;
+	selectIndex = 1;//リトライ時に最初に選んでる方　0リトライ　1ネクスト、1手前からリスタート
 	clearSprite = std::make_unique<SpriteInstance>("ClearTex.png");
 	failedSprite = std::make_unique<SpriteInstance>("FailedTex.png");
 
-	nextUI = std::make_unique<SpriteInstance>("Next.png");
-	retryUI = std::make_unique<SpriteInstance>("Retry.png");
-	nextUI->get_transform().set_scale({ 0.5f, 1.0f });
-	nextUI->get_uv_transform().set_scale({ 0.5f, 1.0f });
-	retryUI->get_transform().set_scale({ 0.5f, 1.0f });
-	retryUI->get_uv_transform().set_scale({ 0.5f, 1.0f });
+	nextUI = std::make_unique<SpriteInstance>("Next.png",Vector2(0.5f,0.5f));
+	retryUI = std::make_unique<SpriteInstance>("Retry.png",Vector2(0.5f,0.5f));
+	nextUI->get_transform().set_scale({0.5f,1.0f});
+	nextUI->get_uv_transform().set_scale({0.5f,1.0f});
+	nextUI->get_transform().set_translate({789,247});
 
-	selectFrame = std::make_unique<SpriteInstance>("SelectFrame.png");
+	retryUI->get_transform().set_scale({0.5f,1.0f});
+	retryUI->get_uv_transform().set_scale({0.5f,1.0f});
+
+	selectFrame = std::make_unique<SpriteInstance>("SelectFrame.png",Vector2(0.5f,0.5f));
 	failedUI = std::make_unique<SpriteInstance>("FailedUI_1.png");
-	failedUI->get_transform().set_scale({ 0.25f,1 });
-	failedUI->get_uv_transform().set_scale({ 0.25f,1 });
-	failedUI->get_transform().set_translate({ 257,220 });
+	failedUI->get_transform().set_scale({0.25f,1});
+	failedUI->get_uv_transform().set_scale({0.25f,1});
+	failedUI->get_transform().set_translate({257,220});
+
+	undoRetryUI= std::make_unique<SpriteInstance>("undoRetry.png",Vector2(0.5f,0.5f));
+	undoRetryUI->get_transform().set_scale({0.5f,1.0f});
+	undoRetryUI->get_uv_transform().set_scale({0.5f,1.0f});
+	undoRetryUI->get_transform().set_translate({789,169});
 
 	decision = std::make_unique<AudioPlayer>();
 	decision->initialize("decision.wav");
@@ -48,34 +56,32 @@ void GameManagement::init() {
 
 void GameManagement::begin() {
 	// クリア、失敗状態ではない
-	if (!(clearFlag || failedFlag)) {
+	if(!(clearFlag || failedFlag)) {
 		isReset = Input::IsTriggerKey(KeyID::R);
 		// 長押し対応
-		if (Input::IsPressKey(KeyID::Escape)) {
+		if(Input::IsPressKey(KeyID::Escape)) {
 			toSelectTimer += WorldClock::DeltaSeconds();
-		}
-		else {
+		} else {
 			toSelectTimer = 0;
 		}
-	}
-	else {
+
+	} else {
 		//resultSoundFlagを使って効果音を鳴らす
 
-		if (!resultSoundFlag) {
-			if (clearFlag) {
+		if(!resultSoundFlag) {
+			if(clearFlag) {
 				clearAudio->restart();
-			}
-			else if (failedFlag) {
+			} else if(failedFlag) {
 				failedAudio->restart();
 			}
 			resultSoundFlag = true;
 		}
 		toSelectTimer = 0;
-		if (Input::IsTriggerKey(KeyID::Space)) {
+		if(Input::IsTriggerKey(KeyID::Space)) {
 
 			decision->restart();//確定の音
 			// カーソルがリトライを選んでる時
-			if (selectIndex == 0) {
+			if(selectIndex == 0) {
 				isReset = true;
 				clearFlag = false;
 				failedFlag = false;
@@ -104,7 +110,7 @@ void GameManagement::update() {
 void GameManagement::debug_update() {
 
 	ImGui::Begin("next");
-	failedUI->debug_gui();
+	undoRetryUI->debug_gui();
 	ImGui::End();
 }
 #endif
@@ -115,68 +121,73 @@ void GameManagement::begin_rendering() {
 	retryUI->begin_rendering();
 	selectFrame->begin_rendering();
 	failedUI->begin_rendering();
+	undoRetryUI->begin_rendering();
 
 }
 
 void GameManagement::darw() {
-	if (clearFlag) {
+	if(clearFlag) {
 		clearSprite->draw();
 
 		nextUI->draw();
 		retryUI->draw();
 		selectFrame->draw();
-	}
-	else 	if (failedFlag) {
+	} else if(failedFlag) {
 		failedSprite->draw();
 		retryUI->draw();
 		selectFrame->draw();
 		failedUI->draw();
+		undoRetryUI->draw();
 	}
 }
 
 void GameManagement::selectFunc() {
-	if (!clearFlag && !failedFlag) { return; }
+	if(!clearFlag && !failedFlag) {
+		return;
+	}
+	if(Input::IsTriggerKey(KeyID::A)) {
+		selectIndex--;
+		operation->restart();//選択時の音
+	}
+	if(Input::IsTriggerKey(KeyID::D)) {
+		selectIndex++;
+		operation->restart();//選択時の音
+	}
+	selectIndex = std::clamp(selectIndex,0,1);
 
-	if (failedFlag) {
-		selectIndex = 0;
-		retryUI->get_transform().set_translate({ 485,137 });
+	if(failedFlag) {
+		//selectIndex = 0;
+		retryUI->get_transform().set_translate({458,169});
 		failedUI->get_uv_transform().set_translate_x(0.25f * failedSelectIndex);
 
-	}
-	else if (clearFlag) {
+	} else if(clearFlag) {
 
-		if (Input::IsTriggerKey(KeyID::A)) {
-			selectIndex--;
-			operation->restart();//選択時の音
-		}
-		if (Input::IsTriggerKey(KeyID::D)) {
-			selectIndex++;
-			operation->restart();//選択時の音
-		}
-		selectIndex = std::clamp(selectIndex, 0, 1);
 
-		retryUI->get_transform().set_translate({ 322,215 });
-		nextUI->get_transform().set_translate({ 653,215 });
+		retryUI->get_transform().set_translate({458,247});
 
 	}
 
-	if (selectIndex == 0) {
+	if(selectIndex == 0) {
 		retryUI->get_uv_transform().set_translate_x(0);
 		nextUI->get_uv_transform().set_translate_x(0.5f);
-		selectFrame->get_transform().set_translate({ 322 - 16, 215 - 16 });
+		undoRetryUI->get_uv_transform().set_translate_x(0.5f);
 
 
-
-	}
-	else {
+		selectFrame->get_transform().set_translate(retryUI->get_transform().get_translate());
+	} else {
 		retryUI->get_uv_transform().set_translate_x(0.5f);
 		nextUI->get_uv_transform().set_translate_x(0);
-		selectFrame->get_transform().set_translate({ 653 - 16, 215 - 16 });
+		undoRetryUI->get_uv_transform().set_translate_x(0);
 
-	}
+		//選択中のUIの位置にフレームを移動
+		if(clearFlag){
+			selectFrame->get_transform().set_translate(nextUI->get_transform().get_translate());
 
-	if (failedFlag) {
-		selectFrame->get_transform().set_translate({ 485 - 16, 137 - 16 });
+		} else if(failedFlag){
+			selectFrame->get_transform().set_translate(undoRetryUI->get_transform().get_translate());
+
+		}
+
 	}
 
 }

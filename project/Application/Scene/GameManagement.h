@@ -34,6 +34,7 @@ private:
 
 	std::unique_ptr<SpriteInstance>nextUI;
 	std::unique_ptr<SpriteInstance>retryUI;
+	std::unique_ptr<SpriteInstance>undoRetryUI;
 	std::unique_ptr<SpriteInstance>selectFrame;
 	std::unique_ptr<SpriteInstance>failedUI;//0:子どもを置いてゴール 1:子コアラがゴール　2:コアラを落とす　3:ターン経過
 
