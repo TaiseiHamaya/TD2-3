@@ -111,9 +111,9 @@ void Player::handle_input() {
 					targetPosition = nextPosition;
 				}
 				startRotation = object_->get_transform().get_quaternion();
+				moveStartPosition = object_->get_transform().get_translate();
 				moveTimer = 0.0f;
 				moveDuration = 0.15f;
-				moveStartPosition = object_->get_transform().get_translate();
 				isMoving = true;
 			}
 			// 進行先が氷かどうかチェック
@@ -123,6 +123,8 @@ void Player::handle_input() {
 				moveDuration = 0.15f * static_cast<float>(moveNumOnIce);
 				isOnIce = true;
 				isMoving = true;
+				startRotation = object_->get_transform().get_quaternion();
+				moveStartPosition = object_->get_transform().get_translate();
 
 			}
 
