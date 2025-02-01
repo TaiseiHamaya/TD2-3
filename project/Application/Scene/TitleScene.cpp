@@ -60,10 +60,10 @@ void TitleScene::begin() {}
 
 void TitleScene::update() {
 
-	/*if (Input::IsTriggerKey(KeyID::Space)) {
+	if (Input::IsTriggerKey(KeyID::Space)) {
 		SceneManager::SetSceneChange(
-			eps::CreateUnique<SelectScene>);
-	}*/
+			eps::CreateUnique<SelectScene>(), 1.0f);
+	}
 }
 
 void TitleScene::begin_rendering() {
