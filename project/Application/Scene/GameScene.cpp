@@ -255,5 +255,6 @@ void GameScene::debug_update() {
 	ImGui::Begin("WorldClock");
 	WorldClock::DebugGui();
 	ImGui::End();
+
 }
 #endif // _DEBUG

@@ -55,6 +55,7 @@ void GameSceneUI::debugUpdate(){
 	wasdSprite[6]->debug_gui();
 	ImGui::End();
 
+
 	/*for(int i = 0; i < uiIndex; i++)
 	{
 
