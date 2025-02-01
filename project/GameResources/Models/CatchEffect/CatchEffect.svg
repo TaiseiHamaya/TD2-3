@@ -1,0 +1,191 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!-- Created with Inkscape (http://www.inkscape.org/) -->
+
+<svg
+   version="1.1"
+   id="svg1"
+   width="1365.3333"
+   height="1365.3333"
+   viewBox="0 0 1365.3333 1365.3333"
+   sodipodi:docname="CatchEffect.png"
+   inkscape:version="0.0 (0e150ed6c4, 2023-07-21)"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns:xlink="http://www.w3.org/1999/xlink"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:svg="http://www.w3.org/2000/svg">
+  <defs
+     id="defs1">
+    <linearGradient
+       id="linearGradient19"
+       inkscape:collect="always">
+      <stop
+         style="stop-color:#cf5c14;stop-opacity:1;"
+         offset="0"
+         id="stop17" />
+      <stop
+         style="stop-color:#a56b15;stop-opacity:1;"
+         offset="0.5"
+         id="stop18" />
+      <stop
+         style="stop-color:#ffe500;stop-opacity:1;"
+         offset="1"
+         id="stop19" />
+    </linearGradient>
+    <linearGradient
+       id="linearGradient16"
+       inkscape:collect="always">
+      <stop
+         style="stop-color:#ff9300;stop-opacity:1;"
+         offset="0"
+         id="stop14" />
+      <stop
+         style="stop-color:#f3c000;stop-opacity:1;"
+         offset="0.5"
+         id="stop15" />
+      <stop
+         style="stop-color:#fffa00;stop-opacity:1;"
+         offset="1"
+         id="stop16" />
+    </linearGradient>
+    <linearGradient
+       id="linearGradient7"
+       inkscape:collect="always">
+      <stop
+         style="stop-color:#eeba3c;stop-opacity:1;"
+         offset="0"
+         id="stop7" />
+      <stop
+         style="stop-color:#d0d134;stop-opacity:1;"
+         offset="0.5"
+         id="stop9" />
+      <stop
+         style="stop-color:#a1ff3e;stop-opacity:1;"
+         offset="1"
+         id="stop8" />
+    </linearGradient>
+    <linearGradient
+       id="linearGradient6"
+       inkscape:collect="always">
+      <stop
+         style="stop-color:#ffd7b5;stop-opacity:1;"
+         offset="0"
+         id="stop4" />
+      <stop
+         style="stop-color:#f3e7aa;stop-opacity:1;"
+         offset="0.5"
+         id="stop5" />
+      <stop
+         style="stop-color:#fdffe6;stop-opacity:1;"
+         offset="1"
+         id="stop6" />
+    </linearGradient>
+    <linearGradient
+       inkscape:collect="always"
+       xlink:href="#linearGradient6"
+       id="linearGradient3"
+       gradientUnits="userSpaceOnUse"
+       gradientTransform="matrix(0.887866,0,0,0.887866,73.283222,108.9012)"
+       x1="665.55969"
+       y1="533.17212"
+       x2="660.2522"
+       y2="816.05542" />
+    <linearGradient
+       inkscape:collect="always"
+       xlink:href="#linearGradient19"
+       id="linearGradient8"
+       x1="667.80365"
+       y1="548.07977"
+       x2="663.07141"
+       y2="800.30341"
+       gradientUnits="userSpaceOnUse"
+       gradientTransform="matrix(0.99579264,0,0,0.99579264,-0.78292903,36.512803)" />
+    <filter
+       inkscape:collect="always"
+       style="color-interpolation-filters:sRGB"
+       id="filter12"
+       x="-0.10088382"
+       y="-0.37640877"
+       width="1.2017676"
+       height="1.7528175">
+      <feGaussianBlur
+         inkscape:collect="always"
+         stdDeviation="40.470381"
+         id="feGaussianBlur12" />
+    </filter>
+    <linearGradient
+       inkscape:collect="always"
+       xlink:href="#linearGradient16"
+       id="linearGradient13"
+       gradientUnits="userSpaceOnUse"
+       gradientTransform="matrix(0.86120423,0,0,0.86120423,91.580266,93.092904)"
+       x1="665.55969"
+       y1="533.17212"
+       x2="660.2522"
+       y2="816.05542" />
+    <linearGradient
+       inkscape:collect="always"
+       xlink:href="#linearGradient7"
+       id="linearGradient14"
+       gradientUnits="userSpaceOnUse"
+       gradientTransform="matrix(0.96588995,0,0,0.96588995,19.738251,22.878274)"
+       x1="667.80365"
+       y1="548.07977"
+       x2="663.07141"
+       y2="800.30341" />
+  </defs>
+  <sodipodi:namedview
+     id="namedview1"
+     pagecolor="#ffffff"
+     bordercolor="#000000"
+     borderopacity="0.25"
+     inkscape:showpageshadow="2"
+     inkscape:pageopacity="0.0"
+     inkscape:pagecheckerboard="0"
+     inkscape:deskcolor="#d1d1d1"
+     inkscape:zoom="0.38531798"
+     inkscape:cx="498.28976"
+     inkscape:cy="800.63745"
+     inkscape:window-width="1920"
+     inkscape:window-height="1017"
+     inkscape:window-x="1912"
+     inkscape:window-y="167"
+     inkscape:window-maximized="1"
+     inkscape:current-layer="g1" />
+  <g
+     inkscape:groupmode="layer"
+     inkscape:label="Image"
+     id="g1">
+    <rect
+       style="display:none;opacity:1;fill:#000000;fill-opacity:1;stroke:none;stroke-width:0;stroke-linecap:round;stroke-linejoin:round;stroke-dasharray:none;stroke-opacity:0.790899;paint-order:stroke fill markers"
+       id="rect6"
+       width="1759.5857"
+       height="1801.1099"
+       x="-145.33452"
+       y="-202.43021"
+       ry="0.375" />
+    <text
+       xml:space="preserve"
+       style="font-size:320.784px;line-height:1.4;font-family:MISHIMISHI;-inkscape-font-specification:MISHIMISHI;letter-spacing:0px;opacity:1;fill:url(#linearGradient13);fill-opacity:1;stroke:url(#linearGradient14);stroke-width:23.0848;stroke-linecap:round;stroke-linejoin:round;stroke-dasharray:none;paint-order:stroke fill markers;filter:url(#filter12)"
+       x="131.16548"
+       y="815.07367"
+       id="text9"
+       transform="matrix(1.0309587,0,0,1.0309587,-21.132205,12.926191)"><tspan
+         sodipodi:role="line"
+         id="tspan9"
+         x="131.16548"
+         y="815.07367"
+         style="fill:url(#linearGradient13);fill-opacity:1;stroke:url(#linearGradient14);stroke-width:23.0848;stroke-dasharray:none;stroke-opacity:0.790899">キャッチ</tspan></text>
+    <text
+       xml:space="preserve"
+       style="font-size:330.715px;line-height:1.4;font-family:MISHIMISHI;-inkscape-font-specification:MISHIMISHI;letter-spacing:0px;opacity:1;fill:url(#linearGradient3);fill-opacity:1;stroke:url(#linearGradient8);stroke-width:23.7994;stroke-linecap:round;stroke-linejoin:round;stroke-dasharray:none;paint-order:stroke fill markers"
+       x="114.09393"
+       y="853.23346"
+       id="text3"><tspan
+         sodipodi:role="line"
+         id="tspan3"
+         x="114.09393"
+         y="853.23346"
+         style="fill:url(#linearGradient3);fill-opacity:1;stroke:url(#linearGradient8);stroke-width:23.7994;stroke-dasharray:none;stroke-opacity:0.790899">キャッチ</tspan></text>
+  </g>
+</svg>
