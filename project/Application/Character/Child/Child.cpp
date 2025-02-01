@@ -1,6 +1,7 @@
 #include "Child.h"
 
 #include <Engine/Resources/Animation/NodeAnimation/NodeAnimationPlayer.h>
+#include "Engine/Rendering/DirectX/DirectXResourceObject/ConstantBuffer/Material/Material.h"
 
 void Child::initialize(const LevelLoader& level, MapchipHandler* mapchipHandler)
 {
@@ -8,6 +9,10 @@ void Child::initialize(const LevelLoader& level, MapchipHandler* mapchipHandler)
 	object_->reset_animated_mesh("ChiledKoala.gltf", "Standby", true);
 	object_->get_transform().set_translate(level.get_child_position());
 
+	auto& objMat = object_->get_materials();
+	for (auto& mat : objMat) {
+		mat.lightingType = LighingType::None;
+	}
 	//音関連
 
 	

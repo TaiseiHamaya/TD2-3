@@ -2,6 +2,8 @@
 #include "Engine/Module/World/Mesh/MeshInstance.h"
 #include "Application/LevelLoader/LevelLoader.h"
 #include <Engine/Utility/Template/Reference.h>
+#include "Engine/Rendering/DirectX/DirectXResourceObject/ConstantBuffer/Material/Material.h"
+
 
 MapchipField::MapchipField() = default;
 
@@ -29,6 +31,11 @@ void MapchipField::initialize(Reference<const LevelLoader> level) {
 			field[row][column].type = fieldLevel[row][column];
 			if (field[row][column].type != 0) {
 				field[row][column].mesh = std::make_unique<MeshInstance>(fieldFileName[field[row][column].type]);
+				//field[row][column].mesh->get_materials()
+					auto& objMat = field[row][column].mesh->get_materials();
+				for (auto& mat : objMat) {
+					mat.lightingType = LighingType::None;
+				}
 			}
 			else {
 				field[row][column].mesh = std::make_unique<MeshInstance>();
