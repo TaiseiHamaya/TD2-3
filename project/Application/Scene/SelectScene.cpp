@@ -10,6 +10,8 @@
 #include <Engine/Runtime/Input/Input.h>
 #include <Engine/Runtime/Scene/SceneManager.h>
 #include <Engine/Utility/Tools/SmartPointer.h>
+#include "Engine/Resources/Audio/AudioManager.h"
+
 
 #include "Application/GameValue.h"
 #include "Application/Scene/GameScene.h"
@@ -26,6 +28,8 @@ void SelectScene::load() {
 	TextureManager::RegisterLoadQue("./GameResources/Texture/UI/StageSelectUI.png");
 	TextureManager::RegisterLoadQue("./GameResources/Texture/UI/start.png");
 	TextureManager::RegisterLoadQue("./GameResources/Texture/UI/number.png");
+	AudioManager::RegisterLoadQue("./GameResources/Audio/BGM/Title.wav");
+
 }
 
 void SelectScene::initialize() {
@@ -54,6 +58,12 @@ void SelectScene::initialize() {
 
 	renderPath = eps::CreateUnique<RenderPath>();
 	renderPath->initialize({ object3dNode,spriteNode });
+
+	bgm = std::make_unique<AudioPlayer>();
+	bgm->initialize("Title.wav");
+	bgm->set_loop(true);
+	bgm->set_volume(0.1f);
+	bgm->play();
 }
 
 void SelectScene::popped() {

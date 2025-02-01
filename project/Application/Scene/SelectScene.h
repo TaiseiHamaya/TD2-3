@@ -5,6 +5,7 @@
 #include <memory>
 
 #include <Engine/Module/Render/RenderPath/RenderPath.h>
+#include "Engine/Resources/Audio/AudioPlayer.h"
 
 class SpriteInstance;
 
@@ -39,4 +40,6 @@ private:
 	std::unique_ptr<SpriteInstance> selectUi;
 	std::unique_ptr<SpriteInstance> startUi;
 	std::unique_ptr<SpriteInstance> numberUi;
+
+	std::unique_ptr<AudioPlayer> bgm;
 };
