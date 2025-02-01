@@ -15,7 +15,7 @@ int WINAPI WinMain(HINSTANCE,HINSTANCE,LPSTR,int) {
 #endif // _DEBUG
 
 #ifdef _DEBUG
-	SceneManager::Initialize(std::make_unique<TitleScene>());
+	SceneManager::Initialize(std::make_unique<SelectScene>());
 #else
 	SceneManager::Initialize(std::make_unique<SelectScene>());
 #endif // _DEBUG

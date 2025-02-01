@@ -161,6 +161,7 @@ void GameScene::finalize() {
 void GameScene::begin() {
 	managementUI->begin();
 	managementUI->SetCurLevel(currentLevel);
+	gameUI->SetCurLevel(currentLevel);
 	if (managementUI->is_reset()) {
 		fieldObjs->initialize(levelLoader);
 		playerManager->initialize(levelLoader, fieldObjs.get());
