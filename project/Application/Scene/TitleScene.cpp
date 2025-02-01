@@ -13,7 +13,7 @@
 
 
 #include "Application/GameValue.h"
-#include "Application/Scene/GameScene.h"
+#include "Application/Scene/SelectScene.h"
 
 
 TitleScene::TitleScene() {}
@@ -55,7 +55,13 @@ void TitleScene::finalize() {}
 
 void TitleScene::begin() {}
 
-void TitleScene::update() {}
+void TitleScene::update() {
+
+	/*if (Input::IsTriggerKey(KeyID::Space)) {
+		SceneManager::SetSceneChange(
+			eps::CreateUnique<SelectScene>);
+	}*/
+}
 
 void TitleScene::begin_rendering() {
 	startUi->begin_rendering();
