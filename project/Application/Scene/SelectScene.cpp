@@ -60,7 +60,7 @@ void SelectScene::initialize() {
 	renderPath->initialize({ object3dNode,spriteNode });
 
 	bgm = std::make_unique<AudioPlayer>();
-	bgm->initialize("Title.wav");
+	bgm->initialize("Game.wav");
 	bgm->set_loop(true);
 	bgm->set_volume(0.1f);
 	bgm->play();

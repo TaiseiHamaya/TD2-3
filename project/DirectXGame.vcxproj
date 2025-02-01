@@ -253,6 +253,7 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClCompile Include="TestCode\SceneDemo.cpp" />
     <ClCompile Include="Engine\Resources\Texture\TextureResourceBuilder.cpp" />
     <ClCompile Include="Engine\Module\World\WorldInstanceManager.cpp" />
+    <ClCompile Include="Application\Scene\TitleScene.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Application\Scene\DebugScene.h" />
@@ -411,6 +412,7 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClInclude Include="TestCode\SceneDemo.h" />
     <ClInclude Include="Engine\Resources\Texture\TextureResourceBuilder.h" />
     <ClInclude Include="Engine\Module\World\WorldInstanceManager.h" />
+    <ClInclude Include="Application\Scene\TitleScene.h" />
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="EngineResources\HLSL\Forward\3DObject\Object3d.PS.hlsl">

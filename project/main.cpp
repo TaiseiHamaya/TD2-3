@@ -2,6 +2,7 @@
 
 #include "Application/Scene/DebugScene.h"
 #include "Application/Scene/SelectScene.h"
+#include "Application/Scene/TitleScene.h"
 
 #include "Engine/Runtime/Scene/SceneManager.h"
 #include "TestCode/SceneDemo.h"
@@ -14,7 +15,7 @@ int WINAPI WinMain(HINSTANCE,HINSTANCE,LPSTR,int) {
 #endif // _DEBUG
 
 #ifdef _DEBUG
-	SceneManager::Initialize(std::make_unique<DebugScene>());
+	SceneManager::Initialize(std::make_unique<TitleScene>());
 #else
 	SceneManager::Initialize(std::make_unique<SelectScene>());
 #endif // _DEBUG
