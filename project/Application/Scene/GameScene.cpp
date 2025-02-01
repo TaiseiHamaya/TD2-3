@@ -153,6 +153,7 @@ void GameScene::begin() {
 	if (managementUI->is_reset()) {
 		fieldObjs->initialize(levelLoader);
 		playerManager->initialize(levelLoader, fieldObjs.get());
+		managementUI->init();
 	}
 	else if (managementUI->is_next()) {
 		// 最大レベルではない場合
