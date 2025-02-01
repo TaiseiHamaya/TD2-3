@@ -35,6 +35,7 @@ public:
 	std::unique_ptr<RenderPath> renderPath;
 
 	std::unique_ptr<SpriteInstance> startUi;
+	std::unique_ptr<SpriteInstance> titleLogo;
 
 };
 

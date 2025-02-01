@@ -23,6 +23,7 @@ TitleScene::~TitleScene() {}
 void TitleScene::load() {
 
 	TextureManager::RegisterLoadQue("./GameResources/Texture/UI/start.png");
+	TextureManager::RegisterLoadQue("./GameResources/Texture/TitleLogo.png");
 
 }
 
@@ -30,6 +31,8 @@ void TitleScene::initialize() {
 	Camera2D::Initialize();
 	startUi = eps::CreateUnique<SpriteInstance>("start.png", Vector2{ 0.5f, 0.5f });
 	startUi->get_transform().set_translate({ 640.0f,140 });
+	titleLogo = eps::CreateUnique<SpriteInstance>("TitleLogo.png", Vector2{ 0.5f, 0.5f });
+	titleLogo->get_transform().set_translate({ 640.0f,440 });
 
 	// Node&Path
 	std::shared_ptr<Object3DNode> object3dNode;
@@ -65,6 +68,7 @@ void TitleScene::update() {
 
 void TitleScene::begin_rendering() {
 	startUi->begin_rendering();
+	titleLogo->begin_rendering();
 }
 
 void TitleScene::late_update() {}
@@ -76,6 +80,7 @@ void TitleScene::draw() const {
 	renderPath->next();
 	// Sprite
 	startUi->draw();
+	titleLogo->draw();
 
 	renderPath->next();
 }
