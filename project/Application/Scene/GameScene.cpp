@@ -81,6 +81,7 @@ void GameScene::load() {
 	AudioManager::RegisterLoadQue("./GameResources/Audio/clearSound.wav");
 	AudioManager::RegisterLoadQue("./GameResources/Audio/failedSound.wav");
 	AudioManager::RegisterLoadQue("./GameResources/Audio/rotate.wav");
+	AudioManager::RegisterLoadQue("./GameResources/Audio/BGM/Game.wav");
 
 }
 
@@ -143,6 +144,12 @@ void GameScene::initialize() {
 	managementUI->SetMaxLevel(GameValue::MaxLevel);
 	managementUI->SetCurLevel(currentLevel);
 	gameUI = std::make_unique<GameSceneUI>();
+
+	bgm = std::make_unique<AudioPlayer>();
+	bgm->initialize("Game.wav");
+	bgm->set_loop(true);
+	bgm->set_volume(0.1f);
+	bgm->play();
 }
 
 void GameScene::popped() {

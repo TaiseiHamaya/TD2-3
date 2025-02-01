@@ -57,5 +57,8 @@ private:
 
 	//UI
 	std::unique_ptr< GameSceneUI> gameUI;
+
+	//BGM
+	std::unique_ptr<AudioPlayer>bgm;
 };
 
