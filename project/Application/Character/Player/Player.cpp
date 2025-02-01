@@ -2,6 +2,8 @@
 #include "Engine/Runtime/Input/Input.h"
 #include "Application/Utility/GameUtility.h"
 
+#include <Engine/Resources/Animation/NodeAnimation/NodeAnimationPlayer.h>
+
 void Player::initialize(const LevelLoader& level, MapchipHandler* mapchipHandler) {
 	object_ = std::make_unique<AnimatedMeshInstance>();
 	object_->reset_animated_mesh("ParentKoala.gltf", "Standby", true);
@@ -28,6 +30,7 @@ void Player::initialize(const LevelLoader& level, MapchipHandler* mapchipHandler
 void Player::finalize() {}
 
 void Player::update() {
+	isStackMovement = false;
 	object_->begin();
 	isMove = false;
 	moveNumOnIce = 1;
@@ -60,9 +63,29 @@ void Player::draw() const {
 	object_->draw();
 }
 
+void Player::on_undo(Vector3 position, Quaternion rotation, bool setParent, bool onGround) {
+	object_->get_transform().set_translate(position);
+	object_->get_transform().set_quaternion(
+		rotation
+	);
+	direction = -CVector3::BASIS_Z * rotation;
+	isParent = setParent;
+	if (isParent) {
+		if (onGround) {
+			object_->get_animation()->reset_animation("Standby");
+		}else{
+			object_->get_animation()->reset_animation("Flustered");
+		}
+	}
+	else {
+		object_->get_animation()->reset_animation("Standby");
+	}
+}
+
 #ifdef _DEBUG
 void Player::debug_update() {
 	ImGui::Begin("Player");
+	ImGui::Text("%d", isParent);
 	object_->debug_gui();
 	ImGui::End();
 }
@@ -92,8 +115,10 @@ void Player::handle_input() {
 				if (!isOnChild) {
 					targetPosition = nextPosition;
 				}
+				startRotation = object_->get_transform().get_quaternion();
 				moveTimer = 0.0f;
 				moveDuration = 0.15f;
+				moveStartPosition = object_->get_transform().get_translate();
 				isMoving = true;
 			}
 			// 進行先が氷かどうかチェック
@@ -182,6 +207,7 @@ void Player::move_update() {
 		isMoving = false;
 		isMove = true;
 		isOnIce = false;//この処理がupdate序盤にあると、床→氷に移動する時に音がならなかったので、ここに移動してる
+		isStackMovement = true;
 	}
 
 	// 現在の位置を補間

@@ -44,13 +44,21 @@ Affine WorldInstance::create_world_affine() const {
 }
 
 void WorldInstance::reparent(Reference<const WorldInstance> instance, bool isKeepPose) {
-	//const Affine& worldAffine = this->world_affine();
-	//if (hierarchy.has_parent()) {
-	//	const Affine& parentAffineInv = hierarchy.get_parent()->world_affine().inverse();
-	//}
-	//else {
-
-	//}
+	const Affine& worldAffine = this->world_affine();
+	if (instance) {
+		const Affine& parentAffineInv = instance->world_affine().inverse();
+		const Affine local = worldAffine * parentAffineInv;
+		const Basis& basis = local.get_basis();
+		transform.set_scale(basis.to_scale());
+		transform.set_quaternion(basis.to_quaternion());
+		transform.set_translate(local.get_origin());
+	}
+	else {
+		const Basis& basis = worldAffine.get_basis();
+		transform.set_scale(basis.to_scale());
+		transform.set_quaternion(basis.to_quaternion());
+		transform.set_translate(worldAffine.get_origin());
+	}
 	hierarchy.set_parent(*instance.ptr());
 }
 
