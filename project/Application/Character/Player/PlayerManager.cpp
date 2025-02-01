@@ -42,9 +42,9 @@ void PlayerManager::finalize() {
 }
 
 void PlayerManager::update() {
+	isStackMovement = false;
 	// クリアか失敗のフラグが立ってたら早期リターン
 	if (stageSituation != 0) return;
-	isStackMovement = false;
 
 	// プレイヤーと子供の位置を計算
 	playerPos = player->get_translate();
@@ -94,7 +94,9 @@ void PlayerManager::update() {
 	}
 
 	// この条件式でできない理由 is 何
-	if (stageSituation == 0 && moveLogger->can_undo() && Input::IsTriggerKey(KeyID::Z)) {
+	if (stageSituation == 0 &&
+		!(player->is_rotating() || player->is_moving() || player->is_falling() || child->is_falling()) &&
+		moveLogger->can_undo() && Input::IsTriggerKey(KeyID::Z)) {
 		undo();
 	}
 }
@@ -140,6 +142,9 @@ void PlayerManager::manage_parent_child_relationship() {
 		}
 	}
 	else {
+		if (player->is_moving()) {
+			return;
+		}
 		// 子をプレイヤーから切り離す処理
 		if (Input::GetInstance().IsTriggerKey(KeyID::Space)) {
 			emplace_log(player->get_translate(), player->get_rotation());
