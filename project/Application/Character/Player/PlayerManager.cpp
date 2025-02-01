@@ -256,9 +256,6 @@ void PlayerManager::emplace_log(const Vector3& playerPosition, const Quaternion&
 void PlayerManager::undo() {
 	auto popped = moveLogger->pop();
 
-	bool isPlayerOnGround = mapchipField_->getElement(popped.player.x, popped.player.y) == 1;
-	bool isChildOnGround = mapchipField_->getElement(popped.child.x, popped.child.y) == 1;
-
 	float childY;
 	if (popped.isSticking) {
 		childY = 0.0f;
@@ -267,37 +264,79 @@ void PlayerManager::undo() {
 		childY = 1.0f;
 	}
 
+	// Translate設定
 	player->on_undo(
 		{ popped.player.x, 1.0f, popped.player.y },
 		popped.player.rotation,
-		popped.isSticking,
-		isPlayerOnGround
+		popped.isSticking
 	);
-
 	child->on_undo(
 		{ popped.child.x, childY, popped.child.y },
-		player->get_translate(),
-		popped.isSticking,
-		isChildOnGround
+		player->get_translate()
 	);
 
+	AnimatedMeshInstance* childMesh = child->get_object();
+	AnimatedMeshInstance* playerMesh = player->get_object();
+	NodeAnimationPlayer* childAnimation = childMesh->get_animation();
+	NodeAnimationPlayer* playerAnimation = playerMesh->get_animation();
+
+	// 親子付け設定
+	// つかみ状態
 	if (popped.isSticking) {
-		child->get_object()->reparent(player->get_object(), false);
-		child->get_object()->look_at(*player->get_object());
+		childMesh->reparent(playerMesh, false);
+		childMesh->look_at(*playerMesh);
 		player->set_parent(true);
-		child->get_object()->get_animation()->reset_animation("Hold");
-		child->get_object()->get_animation()->set_loop(false);
 	}
+	// 非つかみ状態
 	else {
 		// ペアレントを解消する
-		child->get_object()->reparent(nullptr, false);
-		child->get_object()->look_at(*player->get_object());
-		// 子供のワールド座標を設定
-		//child->set_translate({ std::round(childPos.x), std::round(childPos.y), std::round(childPos.z) });
+		childMesh->reparent(nullptr, false);
+		childMesh->look_at(*playerMesh);
+		// 補正
+		child->set_translate({ std::round(childPos.x), std::round(childPos.y), std::round(childPos.z) });
 		// 親子付けフラグをオフにする
 		player->set_parent(false);
-		// アニメーションをセット
-		child->get_object()->get_animation()->reset_animation("Standby");
-		child->get_object()->get_animation()->set_loop(false);
+	}
+
+	player->begin_rendering();
+	child->begin_rendering();
+
+	// アニメーション設定
+	// くっつき状態
+	if (popped.isSticking) {
+		// 足元情報
+		Vector3 playerWorld = player->get_object()->world_position();
+		Vector3 childWorld = child->get_object()->world_position();
+		bool isPlayerOnGround = mapchipField_->getElement(playerWorld.x, playerWorld.z) == 1;
+		bool isChildOnGround = mapchipField_->getElement(childWorld.x, childWorld.z) == 1;
+		// 親
+		// 足元が地面
+		if (isPlayerOnGround) {
+			playerAnimation->reset_animation("Standby");
+			playerAnimation->set_loop(true);
+		}
+		else {
+			playerAnimation->reset_animation("Flustered");
+			playerAnimation->set_loop(true);
+		}
+		// 子
+		// 足元が地面
+		if (isChildOnGround) {
+			childAnimation->reset_animation("Hold");
+			childAnimation->set_time_force(1000);
+			childAnimation->set_loop(false);
+		}
+		else {
+			childAnimation->reset_animation("Flustered");
+			childAnimation->set_time_force(1000);
+			childAnimation->set_loop(true);
+		}
+	}
+	// 非くっつき状態
+	else {
+		playerAnimation->reset_animation("Standby");
+		playerAnimation->set_loop(true);
+		childAnimation->reset_animation("Standby");
+		childAnimation->set_loop(true);
 	}
 }

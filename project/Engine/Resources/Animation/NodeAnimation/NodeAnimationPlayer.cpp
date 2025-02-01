@@ -91,6 +91,10 @@ void NodeAnimationPlayer::set_loop(bool isLoop_) {
 	isLoop = isLoop_;
 }
 
+void NodeAnimationPlayer::set_time_force(float timer_) {
+	timer = timer_;
+}
+
 void NodeAnimationPlayer::animation_speed(float speed) {
 	animationSpeed = speed;
 }

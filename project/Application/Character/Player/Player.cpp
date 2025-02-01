@@ -63,23 +63,13 @@ void Player::draw() const {
 	object_->draw();
 }
 
-void Player::on_undo(Vector3 position, Quaternion rotation, bool setParent, bool onGround) {
+void Player::on_undo(Vector3 position, Quaternion rotation, bool setParent) {
 	object_->get_transform().set_translate(position);
 	object_->get_transform().set_quaternion(
 		rotation
 	);
 	direction = -CVector3::BASIS_Z * rotation;
 	isParent = setParent;
-	if (isParent) {
-		if (onGround) {
-			object_->get_animation()->reset_animation("Standby");
-		}else{
-			object_->get_animation()->reset_animation("Flustered");
-		}
-	}
-	else {
-		object_->get_animation()->reset_animation("Standby");
-	}
 }
 
 #ifdef _DEBUG

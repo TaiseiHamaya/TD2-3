@@ -44,21 +44,9 @@ void Child::draw() const
 	object_->draw();
 }
 
-void Child::on_undo(Vector3 position, Vector3 lookat, bool isParent, bool onGround) {
+void Child::on_undo(Vector3 position, Vector3 lookat) {
 	object_->get_transform().set_translate(position);
-	//object_->look_at(lookat);
-	
-	if (isParent) {
-		if (onGround) {
-			object_->get_animation()->reset_animation("Standby");
-		}
-		else {
-			object_->get_animation()->reset_animation("Flustered");
-		}
-	}
-	else {
-		object_->get_animation()->reset_animation("Standby");
-	}
+	object_->look_at(lookat);
 }
 
 #ifdef _DEBUG

@@ -65,7 +65,7 @@ public:
 	bool is_falled()const { return isFalled; }
 
 	bool is_stack_movement() const { return isStackMovement; }
-	void on_undo(Vector3 position, Quaternion direction, bool isParent, bool onGround);
+	void on_undo(Vector3 position, Quaternion direction, bool isParent);
 	Vector3 move_start_position() const { return moveStartPosition; }
 	Quaternion start_rotation() const { return startRotation; }
 
