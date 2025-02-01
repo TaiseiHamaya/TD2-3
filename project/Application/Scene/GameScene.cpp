@@ -66,6 +66,7 @@ void GameScene::load() {
 	TextureManager::RegisterLoadQue("./GameResources/Texture/UI/SelectFrame.png");
 	TextureManager::RegisterLoadQue("./GameResources/Texture/UI/FailedUI_1.png");
 	TextureManager::RegisterLoadQue("./GameResources/Texture/UI/undoRetry.png");
+	TextureManager::RegisterLoadQue("./GameResources/Texture/UI/GoSelect.png");
 
 
 	AudioManager::RegisterLoadQue("./GameResources/Audio/move.wav");
@@ -138,7 +139,8 @@ void GameScene::initialize() {
 
 	managementUI = std::make_unique<GameManagement>();
 	playerManager->set_game_management(managementUI.get());
-
+	managementUI->SetMaxLevel(GameValue::MaxLevel);
+	managementUI->SetCurLevel(currentLevel);
 	gameUI = std::make_unique<GameSceneUI>();
 }
 
@@ -150,12 +152,14 @@ void GameScene::finalize() {
 
 void GameScene::begin() {
 	managementUI->begin();
+	managementUI->SetCurLevel(currentLevel);
 	if (managementUI->is_reset()) {
 		fieldObjs->initialize(levelLoader);
 		playerManager->initialize(levelLoader, fieldObjs.get());
 		managementUI->init();
 	}
 	else if (managementUI->is_next()) {
+		managementUI->init();
 		// 最大レベルではない場合
 		if (currentLevel < GameValue::MaxLevel) {
 			SceneManager::SetSceneChange(
@@ -165,6 +169,7 @@ void GameScene::begin() {
 		// 最大レベルの場合
 		else {
 			// TODO : ここに最大レベル時の遷移を実装する
+			
 		}
 	}
 	else if (managementUI->is_escape_game()) {

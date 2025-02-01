@@ -23,7 +23,13 @@ void GameManagement::init() {
 	clearSprite = std::make_unique<SpriteInstance>("ClearTex.png");
 	failedSprite = std::make_unique<SpriteInstance>("FailedTex.png");
 
+
+	goSelect = std::make_unique<SpriteInstance>("GoSelect.png",Vector2(0.5f,0.5f));
+	goSelect->get_transform().set_scale({0.5f,1.0f});
+	goSelect->get_uv_transform().set_scale({0.5f,1.0f});
+	goSelect->get_transform().set_translate({789,247});
 	nextUI = std::make_unique<SpriteInstance>("Next.png",Vector2(0.5f,0.5f));
+
 	retryUI = std::make_unique<SpriteInstance>("Retry.png",Vector2(0.5f,0.5f));
 	nextUI->get_transform().set_scale({0.5f,1.0f});
 	nextUI->get_uv_transform().set_scale({0.5f,1.0f});
@@ -122,6 +128,7 @@ void GameManagement::begin_rendering() {
 	selectFrame->begin_rendering();
 	failedUI->begin_rendering();
 	undoRetryUI->begin_rendering();
+	goSelect->begin_rendering();
 
 }
 
@@ -129,7 +136,13 @@ void GameManagement::darw() {
 	if(clearFlag) {
 		clearSprite->draw();
 
-		nextUI->draw();
+		if(curLevel>=maxLevel){
+			goSelect->draw();
+		} else
+		{
+			nextUI->draw();
+
+		}
 		retryUI->draw();
 		selectFrame->draw();
 	} else if(failedFlag) {
@@ -170,6 +183,7 @@ void GameManagement::selectFunc() {
 	if(selectIndex == 0) {
 		retryUI->get_uv_transform().set_translate_x(0);
 		nextUI->get_uv_transform().set_translate_x(0.5f);
+		goSelect->get_uv_transform().set_translate_x(0.5f);
 		undoRetryUI->get_uv_transform().set_translate_x(0.5f);
 
 
@@ -177,6 +191,7 @@ void GameManagement::selectFunc() {
 	} else {
 		retryUI->get_uv_transform().set_translate_x(0.5f);
 		nextUI->get_uv_transform().set_translate_x(0);
+		goSelect->get_uv_transform().set_translate_x(0);
 		undoRetryUI->get_uv_transform().set_translate_x(0);
 
 		//選択中のUIの位置にフレームを移動

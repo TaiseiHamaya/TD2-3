@@ -27,6 +27,8 @@ public:
 	bool is_next() const { return isNext; }
 	bool is_escape_game() const { return toSelectTimer >= 0.1f; }
 	void SetFailedSelect(int value){ failedSelectIndex = value; }
+	void SetCurLevel(int value){curLevel=value;}
+	void SetMaxLevel(int value){maxLevel=value;}
 
 private:
 	std::unique_ptr<SpriteInstance> clearSprite;
@@ -35,6 +37,7 @@ private:
 	std::unique_ptr<SpriteInstance>nextUI;
 	std::unique_ptr<SpriteInstance>retryUI;
 	std::unique_ptr<SpriteInstance>undoRetryUI;
+	std::unique_ptr<SpriteInstance>goSelect;
 	std::unique_ptr<SpriteInstance>selectFrame;
 	std::unique_ptr<SpriteInstance>failedUI;//0:子どもを置いてゴール 1:子コアラがゴール　2:コアラを落とす　3:ターン経過
 
@@ -48,6 +51,8 @@ private:
 	int failedSelectIndex;//0:子どもを置いてゴール 1:子コアラがゴール　2:コアラを落とす　3:ターン経過(まだない)
 	
 	float toSelectTimer;
+	int curLevel;
+	int maxLevel;
 
 	//音関連
 	std::unique_ptr<AudioPlayer> decision;//確定音
