@@ -41,23 +41,34 @@ void Player::update() {
 	moveNumOnIce = 1;
 	
 	isOnChild = false;
+	isTurnSuccess = true;
 
-	// 入力処理
-	handle_input();
-
-	if (isRotating) {
-		rotate_update();
-	}
-	else {
+	switch (playerState) {
+	case PlayerState::Idle:
+		rotateDirection = RotationDirection::Default;
+		rotateType = RotateType::None;
+		moveType = MoveType::Normal;
+		break;
+	case PlayerState::Falling:
+		fall_update();
+		break;
+	case PlayerState::Moving:
 		move_update();
+		break;
+	case PlayerState::Rotating:
+		rotate_update();
+		break;
+	case PlayerState::MoveFailed:
 		wall_move();
+		break;
+	case PlayerState::RotationFailed:
+		rotate_failed_update();
+		break;
 	}
-
-	fall_update();
 
 	object_->update();
 
-	preDirection = direction;
+	preMoveDirection = moveDirection;
 }
 
 void Player::begin_rendering() {
@@ -73,7 +84,7 @@ void Player::on_undo(Vector3 position, Quaternion rotation, bool setParent) {
 	object_->get_transform().set_quaternion(
 		rotation
 	);
-	direction = -CVector3::BASIS_Z * rotation;
+	moveDirection = -CVector3::BASIS_Z * rotation;
 	isParent = setParent;
 }
 
@@ -86,81 +97,6 @@ void Player::debug_update() {
 }
 #endif // _DEBUG
 
-void Player::handle_input() {
-	if (isMoving) return; // 移動中は入力を無視
-	if (isRotating) return; // 回転中は入力を無視
-	if (isWallMoveing) { return; }//壁に向かって移動している時は早期リターン
-
-	Vector3 directions[] = {
-		{0.0f, 0.0f, 1.0f},  // 前
-		{-1.0f, 0.0f, 0.0f}, // 左
-		{0.0f, 0.0f, -1.0f}, // 後ろ
-		{1.0f, 0.0f, 0.0f}   // 右
-	};
-
-	KeyID keys[] = { KeyID::W, KeyID::A, KeyID::S, KeyID::D };
-
-	for (size_t i = 0; i < 4; ++i) {
-		if (Input::GetInstance().IsTriggerKey(keys[i])) {
-			direction = directions[i];
-			Vector3 nextPosition = get_translate() + direction;
-
-			// MapchipHandlerに移動可能かを問い合わせ
-			if (mapchipHandler_->can_player_move_to(this, child_, direction)) {
-				if (!isOnChild) {
-					targetPosition = nextPosition;
-				}
-				startRotation = object_->get_transform().get_quaternion();
-				moveStartPosition = object_->get_transform().get_translate();
-				moveTimer = 0.0f;
-				moveDuration = 0.15f;
-				isMoving = true;
-			}
-			// 進行先が氷かどうかチェック
-			else if (mapchipHandler_->can_player_move_on_ice(this, child_, direction)) {
-				targetPosition = get_translate() + direction * static_cast<float>(moveNumOnIce);
-				moveTimer = 0.0f;
-				moveDuration = 0.15f * static_cast<float>(moveNumOnIce);
-				isOnIce = true;
-				isMoving = true;
-				startRotation = object_->get_transform().get_quaternion();
-				moveStartPosition = object_->get_transform().get_translate();
-
-			}
-
-			// 回転中の衝突チェック
-			if (mapchipHandler_->can_player_rotate(this, child_, direction)) {
-				startRotation = object_->get_transform().get_quaternion();
-				targetRotation = Quaternion::FromToRotation({ 0.0f, 0.0f, -1.0f }, direction);
-				midRotation = targetRotation;
-				rotateTimer = 0.0f;
-				isRotating = true;
-				isReverseRotation = false;
-
-				mapchipHandler_->setup_rotation_parameters(this, child_, direction);
-			}
-			else {
-				// プレイヤーの向いている方向を前フレームの物に戻す
-				direction = preDirection;
-				rotateTimer = 0.0f;
-				isRotating = false;
-			}
-
-			//進行先が壁か穴かを判定
-			// 回転途中に壁がある時に上手く回転しないバグによってこっちもバグってる
-			//条件を「入力方向に回転する時引っかからない」かつ「進行方向が壁か穴」だと上手く行く
-			if (mapchipHandler_->player_move_to_wall_or_holl(this, child_, direction)) {
-				wallTargetPosition = get_translate() + direction * 0.5f;
-				wallMoveTimer = 0.0f;
-				wallMoveDuration = 0.15f;
-				isWallMoveing = true;
-				wallStartPosition = object_->get_transform().get_translate();
-			}
-
-			break;
-		}
-	}
-}
 
 void Player::fall_update() {
 	if (isFalling) {
@@ -200,6 +136,7 @@ void Player::move_update() {
 
 	if (moveTimer >= moveDuration) {
 		// 移動完了
+		playerState = PlayerState::Idle;
 		moveTimer = moveDuration;
 		isMoving = false;
 		isMove = true;
@@ -221,8 +158,15 @@ void Player::rotate_update() {
 
 	rotateTimer += WorldClock::DeltaSeconds();
 
+	if (rotateType != RotateType::Normal &&
+	rotateType != RotateType::Rotate90_Normal &&
+	rotateType != RotateType::None) {
+		playerState = PlayerState::RotationFailed;
+	}
+
 	// 回転完了チェック
 	if (rotateTimer >= rotateDuration) {
+		playerState = PlayerState::Moving;
 		rotateTimer = rotateDuration;
 		isRotating = false;
 	}
@@ -233,7 +177,7 @@ void Player::rotate_update() {
 	Quaternion currentRotation;
 
 	// 回転方向が逆の場合、進行度を反転し区間ごとに補間
-	if (isReverseRotation) {
+	if (rotateDirection != RotationDirection::Default) {
 		if (totalProgress <= 0.5f) {
 			// 前半区間（start → mid）
 			float t = totalProgress / 0.5f; // 正規化した進行度
@@ -250,8 +194,9 @@ void Player::rotate_update() {
 		float t = totalProgress;
 		currentRotation = Quaternion::Slerp(startRotation, targetRotation, t);
 	}
+
 	if (startRotation == targetRotation) {
-		direction = preDirection;
+		moveDirection = preMoveDirection;
 	}
 
 	// 現在の回転を設定
@@ -259,22 +204,20 @@ void Player::rotate_update() {
 }
 
 void Player::wall_move() {
-	if (!isWallMoveing) { return; }//壁に向かって移動していない時は早期リターン
+	//if (!isWallMoveing) { return; }//壁に向かって移動していない時は早期リターン
 	wallMoveTimer += WorldClock::DeltaSeconds();
 
 
-	Vector3 newPos = { 0,0,0 };
+	Vector3 newPos = { 0,1,0 };
 
 
 	//時間の半分はスタート位置から壁に向かって移動
 	//多分正確に半分を計測できる訳じゃないから微妙に戻りすぎる説ある
 	if (wallMoveTimer <= wallMoveDuration * 0.5f) {
 		newPos = Vector3::Lerp(wallStartPosition, wallTargetPosition, wallMoveTimer / (wallMoveDuration * 0.5f));
-
 	}
 	else {
 		newPos = Vector3::Lerp(wallTargetPosition, wallStartPosition, wallMoveTimer / (wallMoveDuration * 0.5f));
-
 	}
 
 	if (wallMoveTimer >= wallMoveDuration * 0.5f) {
@@ -289,7 +232,51 @@ void Player::wall_move() {
 		wallMoveTimer = wallMoveDuration;
 		isWallMoveing = false;
 		newPos = wallStartPosition;
+		playerState = PlayerState::Idle;
 		unmovableFlag = false;
 	}
-	object_->get_transform().set_translate(newPos);
+	//object_->get_transform().set_translate(newPos);
+}
+
+void Player::rotate_failed_update() {
+	rotateTimer += WorldClock::DeltaSeconds();
+
+	// 回転完了チェック
+	if (rotateTimer >= rotateDuration) {
+		playerState = PlayerState::MoveFailed;
+		rotateTimer = rotateDuration;
+		isRotating = false;
+	}
+
+	// 全体の進行度
+	float totalProgress = rotateTimer / rotateDuration;
+
+	Quaternion currentRotation;
+
+	// 回転方向が逆の場合、進行度を反転し区間ごとに補間
+	if (rotateDirection != RotationDirection::Default) {
+		if (totalProgress <= 0.5f) {
+			// 前半区間（start → mid）
+			float t = totalProgress / 0.5f; // 正規化した進行度
+			currentRotation = Quaternion::Slerp(startRotation, midRotation, t);
+		}
+		else {
+			// 後半区間（mid → target）
+			float t = (totalProgress - 0.5f) / 0.5f; // 正規化した進行度
+			currentRotation = Quaternion::Slerp(midRotation, targetRotation, t);
+		}
+	}
+	else {
+		// 通常の回転（start → target）
+		float t = totalProgress;
+		currentRotation = Quaternion::Slerp(startRotation, targetRotation, t);
+	}
+
+	if (startRotation == targetRotation) {
+		moveDirection = preMoveDirection;
+	}
+
+	// 現在の回転を設定
+	object_->get_transform().set_quaternion(currentRotation);
+
 }

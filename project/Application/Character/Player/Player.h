@@ -2,6 +2,7 @@
 #include "Application/Character/CharacterBase.h"
 #include "Engine/Runtime/WorldClock/WorldClock.h"
 #include <Application/Mapchip/MapchipHandler.h>
+#include "CharacterStates.h"
 #include "Engine/Resources/Audio/AudioPlayer.h"
 
 
@@ -14,26 +15,20 @@ public:
 	void begin_rendering() override;
 	void draw() const override;
 
-	// アクセッサ
+public: // アクセッサ
 	void set_child(Child* child) { child_ = child; }
-
-	Vector3 get_translate() const { return object_->get_transform().get_translate(); }
-	void set_translate(const Vector3& position) { object_->get_transform().set_translate(position); }
-
-	Quaternion get_rotation() const { return object_->get_transform().get_quaternion(); }
-	void set_rotation(const Quaternion& rotation) { object_->get_transform().set_quaternion(rotation); }
 
 	bool is_parent() const { return isParent; }
 	void set_parent(bool flag) { isParent = flag; }
-
-	bool is_falling() const { return isFalling; }
-	void set_falling(bool flag) { isFalling = flag; }
 
 	bool is_moving() const { return isMoving; }
 	void set_moving(bool flag) { isMoving = flag; }
 
 	bool is_rotating() const { return isRotating; }
 	void set_rotating(bool flag) { isRotating = flag; }
+
+	void set_rotate_timer(float time) { rotateTimer = time; }
+	void set_rotate_duration(float time) { rotateDuration = time; }
 
 	bool is_on_ice() const { return isOnIce; }
 	void set_on_ice(bool flag) { isOnIce = flag; }
@@ -47,17 +42,30 @@ public:
 	bool is_on_child() const { return isOnChild; }
 	void set_on_child(bool flag) { isOnChild = flag; }
 
-	Vector3 get_previous_direction() const { return preDirection; }
+	bool is_turn_success() const { return isTurnSuccess; }
+	void set_turn_success(bool flag) { isTurnSuccess = flag; }
 
-	void set_reverse_rotation(bool flag) { isReverseRotation = flag; }
+	Vector3 get_previous_direction() const { return preMoveDirection; }
+
+	RotationDirection get_how_rotation() { return rotateDirection; }
+	void set_how_rotation(RotationDirection rotate) { rotateDirection = rotate; }
+
+	PlayerState get_state() { return playerState; }
+	void set_state(PlayerState state) { playerState = state; }
+
+	MoveType get_move_type() { return moveType; }
+	void set_move_type(MoveType type) { moveType = type; }
+
+	RotateType get_rotate_type() { return rotateType; }
+	void set_rotate_type(RotateType type) { rotateType = type; }
 
 	void set_mid_rotation(Quaternion Rotation) { midRotation = Rotation; }
 
+	Quaternion get_start_rotation() { return startRotation; }
+	void set_start_rotation(Quaternion rotation) { startRotation = rotation; }
+
 	Quaternion get_target_rotation() { return targetRotation; }
 	void set_target_rotation(Quaternion rotation) { targetRotation = rotation; }
-
-	//Vector3 get_target_pos() const { return targetPosition; }
-	//void set_target_pos(const Vector3& target) { targetPosition = target; }
 
 	int get_move_num_on_ice() { return moveNumOnIce; }
 	void set_move_num_on_ice(int num) { moveNumOnIce = num; }
@@ -67,28 +75,51 @@ public:
 	bool is_stack_movement() const { return isStackMovement; }
 	void on_undo(Vector3 position, Quaternion direction, bool isParent);
 	Vector3 move_start_position() const { return moveStartPosition; }
+	void set_start_position(const Vector3& pos) { moveStartPosition = pos; }
+
+	//Vector3 get_target_pos() const { return targetPosition; }
+	void get_target_pos(const Vector3& pos) { targetPosition = pos; }
+
 	Quaternion start_rotation() const { return startRotation; }
+
+	void set_move_duration(float time) { moveDuration = time; };
+	void set_move_timer(float timer) { moveTimer = timer; };
 
 #ifdef _DEBUG
 	void debug_update();
 #endif
 private:
 
-	void handle_input();
 	void fall_update();
 	void move_update();
 	void rotate_update();
 	void wall_move();
+	void rotate_failed_update();
 
 private:
+	// 回転の仕方をまとめたenum
+	RotationDirection rotateDirection;
+	// プレイヤーの状態
+	PlayerState playerState;
+	// なぜ回転が失敗したのか
+	RotateType rotateType;
+	// 橋渡しみたいに移動するか
+	MoveType moveType;
+
+	//struct MoveParameter {
+	//	bool canMoving; // 移動可能かどうか
+	//	Vector3 targetPos;
+	//	float moveTimer; // 移動の状況を管理するタイマー
+	//	float moveDduration; // 移動に掛ける時間(1マス0.15f)
+	//};
+
 	MapchipHandler* mapchipHandler_;
 	Child* child_; // 子オブジェクトへの参照
 
 	bool isMove = false; // 今フレームで移動をしたかどうか
 	bool isParent = false; // 子供を持つかどうか
-	bool isFalling = false; // 落下中かどうか
-	Vector3 direction{}; // 移動方向
-	Vector3 preDirection{}; // 移動方向
+	Vector3 moveDirection{}; // 移動方向
+	Vector3 preMoveDirection{}; // 前回の移動方向を保存
 
 	Vector3 moveStartPosition;   // 移動の開始位置
 	Vector3 targetPosition;  // 次の目標位置
@@ -97,11 +128,15 @@ private:
 	bool isMoving = false;   // 現在移動中かどうかのフラグ
 	bool isOnChild = false; // 移動先が子供かどうか
 
+	bool isTurnSuccess; // 回転が成功したかどうか
+
 	Vector3 wallStartPosition;   // 移動の開始位置
 	Vector3 wallTargetPosition;  // 次の目標位置
 	float wallMoveTimer = 0.0f; //現在の移動時間
 	float wallMoveDuration = 0.15f; // 移動にかける時間（秒）
-	bool isWallMoveing = false; //フラグ
+	bool isWallMoveing = false; // 壁に向かって移動した時のフラグ
+
+
 
 	int moveNumOnIce = 1; // 氷の上を何マス
 	bool isOnIce = false; // 氷の上を移動するか否か
@@ -113,10 +148,8 @@ private:
 	float rotateTimer = 0.0f;    // 回転の進行状況を管理するタイマー
 	float rotateDuration = 0.3f; // 回転にかける時間（秒）
 	bool isRotating = false;     // 現在回転中かどうかのフラグ
-	bool isReverseRotation = false; // 回転を反転
+	bool canRotate = false; // 回転可能かどうかのフラグ
 
-	float fallSpeed = 6.0f;//落下中の速度
-	bool isFalled = false; // 落下終了フラグ
 
 	bool isStackMovement{ false };
 

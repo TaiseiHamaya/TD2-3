@@ -13,17 +13,10 @@ public:
     void begin_rendering() override;
     void draw() const override;
 
-
-    Quaternion get_rotation() const { return object_->get_transform().get_quaternion(); }
-    void set_rotation(const Quaternion& rotation) { object_->get_transform().set_quaternion(rotation); }
     void set_parent(MeshInstance* parent) { object_->reparent(parent); }
     void unset_parent() { object_->reparent(nullptr); }
 
-    bool is_falling() const { return isFall; }
-    void set_falling(bool flag) { isFall = flag; }
 
-    bool is_out_ground() const { return isOutGround; }
-    void set_out_ground(bool flag) { isOutGround = flag; }
 
     bool is_falled()const { return isFalled; }
 
@@ -34,12 +27,12 @@ public:
 #endif
 private:
     bool isFall = false;
-    float fallSpeed = 6.0f;//è½ä¸‹é€Ÿåº¦
+    float fallSpeed = 6.0f;//—‰º‘¬“x
     bool isFalled = false;
     // 
     bool isOutGround = false; 
 
-    //éŸ³é–¢é€£
+    //‰¹ŠÖ˜A
 
 
 };
