@@ -26,7 +26,7 @@ private:
 
 private:
 
-	static const  int uiIndex = 7;
+	static const  int uiIndex = 8;
 
 	std::array<std::unique_ptr<SpriteInstance>, uiIndex>wasdSprite;
 	//std::unique_ptr<SpriteInstance>wasdSprite[];

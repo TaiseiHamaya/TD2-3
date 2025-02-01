@@ -13,7 +13,8 @@ void GameSceneUI::init(){
 	wasdSprite[3] = std::make_unique<SpriteInstance>("Dkey.png");
 	wasdSprite[4] = std::make_unique<SpriteInstance>("ResetUI.png");
 	wasdSprite[5] = std::make_unique<SpriteInstance>("ESCkey.png");
-	wasdSprite[6] = std::make_unique<SpriteInstance>("ReleseUI.png");
+	wasdSprite[6] = std::make_unique<SpriteInstance>("Undo.png");
+	wasdSprite[7] = std::make_unique<SpriteInstance>("ReleseUI.png");
 	tutorialUI = std::make_unique<SpriteInstance>("Tutorial1.png");
 
 	for(int i = 0; i < uiIndex; i++)
@@ -22,13 +23,14 @@ void GameSceneUI::init(){
 		wasdSprite[i]->get_uv_transform().set_scale({ 0.5f, 1.0f });
 
 	}
-	wasdSprite[0]->get_transform().set_translate({ 76.2f,85 });
-	wasdSprite[1]->get_transform().set_translate({ 7.3f,16 });
-	wasdSprite[2]->get_transform().set_translate({ 76.2f,16 });
-	wasdSprite[3]->get_transform().set_translate({ 143.7f,16 });
+	wasdSprite[0]->get_transform().set_translate({ 106.2f,103 });
+	wasdSprite[1]->get_transform().set_translate({ 37.3f,30 });
+	wasdSprite[2]->get_transform().set_translate({ 106.2f,30 });
+	wasdSprite[3]->get_transform().set_translate({ 173.7f,30 });
 	wasdSprite[4]->get_transform().set_translate({ 10,218 });
-	wasdSprite[5]->get_transform().set_translate({ 1141,16 });
-	wasdSprite[6]->get_transform().set_translate({ 10,315 });
+	wasdSprite[5]->get_transform().set_translate({ 1141,30 });
+	wasdSprite[6]->get_transform().set_translate({ 151,218 });
+	wasdSprite[7]->get_transform().set_translate({ 10,315 });
 
 	tutorialUI->get_transform().set_translate({ 924,524 });
 
@@ -41,7 +43,7 @@ void GameSceneUI::update(){
 		keyControl(i);
 	}
 	
-	wasdSprite[6]->get_uv_transform().set_translate_x(0.5f * !isCanRelese);
+	wasdSprite[7]->get_uv_transform().set_translate_x(0.5f * !isCanRelese);
 
 }
 #ifdef _DEBUG
@@ -50,7 +52,7 @@ void GameSceneUI::update(){
 void GameSceneUI::debugUpdate(){
 
 	ImGui::Begin("sprite");
-	tutorialUI->debug_gui();
+	wasdSprite[6]->debug_gui();
 	ImGui::End();
 
 	/*for(int i = 0; i < uiIndex; i++)
@@ -81,7 +83,7 @@ void GameSceneUI::darw(){
 }
 
 void GameSceneUI::keyControl(int index){
-	KeyID keys[] = { KeyID::W, KeyID::A, KeyID::S, KeyID::D,KeyID::R,KeyID::Escape/*,KeyID::Space*/ };
+	KeyID keys[] = { KeyID::W, KeyID::A, KeyID::S, KeyID::D,KeyID::R,KeyID::Escape,KeyID::Z };
 
 	if(Input::IsPressKey(keys[index])){
 		wasdSprite[index]->get_uv_transform().set_translate_x(0.5f);
