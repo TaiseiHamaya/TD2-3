@@ -1,13 +1,18 @@
 #include "Player.h"
 #include "Engine/Runtime/Input/Input.h"
 #include "Application/Utility/GameUtility.h"
-
+#include "Engine/Rendering/DirectX/DirectXResourceObject/ConstantBuffer/Material/Material.h"
 #include <Engine/Resources/Animation/NodeAnimation/NodeAnimationPlayer.h>
 
 void Player::initialize(const LevelLoader& level, MapchipHandler* mapchipHandler) {
 	object_ = std::make_unique<AnimatedMeshInstance>();
 	object_->reset_animated_mesh("ParentKoala.gltf", "Standby", true);
 	object_->get_transform().set_translate(level.get_player_position());
+	
+	auto& objMat = object_->get_materials();
+	for (auto& mat:objMat ) {
+		mat.lightingType = LighingType::None;
+	}
 	mapchipHandler_ = mapchipHandler;
 
 	//音関連
