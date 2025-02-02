@@ -46,7 +46,7 @@ float4 main(PixelShaderInput input) : SV_TARGET0 {
 	
 	float weight = saturate(length(difference));
 	
-	if (weight > 0.0005f) {
+	if (weight > 0.00008f) {
 		return float4(0.0f, 0.0f, 0.0f, 1.0f);
 	}
 	else {

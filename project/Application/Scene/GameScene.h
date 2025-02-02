@@ -14,6 +14,8 @@ class LevelLoader;
 #include "Application/Scene/GameManagement.h"
 #include "Application/Scene/GameSceneUI.h"
 
+#include "Engine/Module/Render/RenderNode/Posteffect/Outline/OutlineNode.h"
+
 class GameScene : public BaseScene
 {
 public:
@@ -44,6 +46,8 @@ public:
 
 private:
 	std::unique_ptr<RenderPath> renderPath;
+
+	std::shared_ptr<OutlineNode> outlineNode;
 	// プレイヤーの生成
 	std::unique_ptr<PlayerManager> playerManager;
 	std::unique_ptr<MapchipField> fieldObjs;
