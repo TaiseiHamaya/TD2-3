@@ -15,12 +15,13 @@ void MapchipHandler::update_player_on_mapchip(Player* player, Child* child) {
 }
 
 int MapchipHandler::can_player_move_on_ice(Player* player, Child* child, const Vector3& direction) const {
-	//if (!player->is_on_ice())return false;
-
 	// マップチップを取得
 	auto get_next_chip = [&](const Vector3& position) -> int {
 		return mapchipField_->getElement(std::round(position.x), std::round(position.z));
 	};
+
+	// 移動量を宣言
+	int moveNum = 1;
 
 	// 子供の位置を取得
 	auto calculate_child_position = [&]() -> Vector3 {
@@ -32,10 +33,8 @@ int MapchipHandler::can_player_move_on_ice(Player* player, Child* child, const V
 		else if (std::round(child->get_translate().x) == -1.0f) {
 			childDirection = GameUtility::rotate_direction_90_right(direction);
 		}
-		return player->get_translate() + childDirection + direction * static_cast<float>(player->get_move_num_on_ice());
+		return player->get_translate() + childDirection + direction * static_cast<float>(moveNum);
 	};
-	// 移動量を宣言
-	int moveNum = 1;
 
 	// 氷以外のブロックを見つけるまで探索
 	while (true) {
@@ -259,8 +258,8 @@ bool MapchipHandler::can_player_move_to(Player* player, Child* child, const Vect
 			player->set_move_type(MoveType::HitRock);
 			return false;
 		}
-		// 移動先のどちらかが氷だったらtrue
-		if (elementNextPlayer == 4 && elementChild == 4) {
+		// 移動先がどちらも氷またはどちらかが氷どちらかが穴の場合
+		if ((elementNextPlayer == 4 || elementNextPlayer == 0) && (elementChild == 4 || elementChild == 0)) {
 			player->set_move_type(MoveType::SlidingOnIce);
 			return true;
 		}
