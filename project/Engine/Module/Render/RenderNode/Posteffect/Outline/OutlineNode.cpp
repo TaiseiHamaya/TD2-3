@@ -55,7 +55,7 @@ void OutlineNode::create_pipeline_state() {
 	psoBuilder->rootsignature(rootSignatureBuilder.build());
 	psoBuilder->shaders(shaderManager);
 	psoBuilder->primitivetopologytype();
-	psoBuilder->rendertarget();
+	psoBuilder->rendertarget(DXGI_FORMAT_R8G8B8A8_UNORM);
 
 	pipelineState = std::make_unique<PipelineState>();
 	pipelineState->initialize(psoBuilder->get_rootsignature(), psoBuilder->build());
