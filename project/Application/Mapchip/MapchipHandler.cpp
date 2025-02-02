@@ -5,8 +5,7 @@
 
 #include <Engine/Resources/Animation/NodeAnimation/NodeAnimationPlayer.h>
 
-void MapchipHandler::initialize(MapchipField* mapchipField)
-{
+void MapchipHandler::initialize(MapchipField* mapchipField) {
 	mapchipField_ = mapchipField;
 }
 
@@ -187,6 +186,12 @@ bool MapchipHandler::player_move_to_wall_or_holl(Player* player, Child* child, c
 }
 
 bool MapchipHandler::can_player_move_to(Player* player, Child* child, const Vector3& direction) const {
+	// 既に回転のほうが失敗していたら回転も失敗
+	if (player->get_move_type() == MoveType::FallIntoHole ||
+		player->get_move_type() == MoveType::HitRock) {
+		return false;
+	}
+
 	// 落下中だったら移動不可
 	if (player->is_falling()) return false;
 	// プレイヤーの移動予定地
@@ -199,7 +204,6 @@ bool MapchipHandler::can_player_move_to(Player* player, Child* child, const Vect
 			//player->set_on_ice(false);
 			//player->set_on_child(true);
 			player->set_move_type(MoveType::MoveOnChild);
-			// 特例でtrue(移動不可なら本来はfalse)
 			return false;
 		}
 		// 移動先のマップチップ番号を取得
@@ -209,9 +213,23 @@ bool MapchipHandler::can_player_move_to(Player* player, Child* child, const Vect
 			player->set_move_type(MoveType::SlidingOnIce);
 			return true;
 		}
+		// もし穴だったら
+		if (element == 0) {
+			player->set_move_type(MoveType::FallIntoHole);
+			return false;
+		}
+		// もし壁だったら
+		if (element == 2) {
+			player->set_move_type(MoveType::HitRock);
+			return false;
+		}
 
-		player->set_move_type(MoveType::Normal);
-		return element == 1 || element == 3;
+		if (element == 1 || element == 3) {
+			player->set_move_type(MoveType::Normal);
+			return true;
+		}
+		// ここまで来たら普通に通る
+		return true;
 	}
 	else {
 		Vector3 childDirection{};
@@ -301,13 +319,8 @@ bool MapchipHandler::can_player_rotate(Player* player, Child* child, const Vecto
 	// 一回転しない場合の経由点
 	Vector3 midChildPos = nowChildPos + childDirection;
 
-	float dot = Vector3::DotProduct(nowRotate.normalize().vector(), nextRotate.normalize().vector()) + nowRotate.normalize().real() * nextRotate.normalize().real();
-	dot = std::clamp(dot, -1.0f, 1.0f); // 精度の問題で範囲外になるのを防ぐ
-
-	float angle = 2.0f * std::acos(dot);
-
-	//if (std::abs(angle - RAD_90) < EPSILON) {
-	if (dot != 0.0f) {
+	// 回転が90度ならばそれ用の処理をする
+	if (GameUtility::IsRotation90Degrees(nowRotate, nextRotate)) {
 		// 斜め前方向に障害物
 		if (check_collision_wall(midChildPos)) {
 			player->set_moving(false);
@@ -343,6 +356,8 @@ bool MapchipHandler::can_player_rotate(Player* player, Child* child, const Vecto
 		player->set_rotate_type(RotateType::Rotate90_Normal);
 		return true;
 	}
+
+	// ここまで来たら180度回転なのでそれ用の回転の変数を用意
 
 	// 左右に障害物があるか判定
 	auto check_side_collisions_wall = [&](const Vector3& primaryDirection, const Vector3& secondaryDirection) {
@@ -436,40 +451,6 @@ bool MapchipHandler::can_player_rotate(Player* player, Child* child, const Vecto
 	return true; // 衝突がなければ回転を続行
 }
 
-//void MapchipHandler::setup_rotation_parameters(Player* player, Child* child, const Vector3& direction) {
-//	if (!player->is_parent()) return;
-//
-//	Vector3 childDirection;
-//	if (std::round(child->get_translate().x) == 1.0f) {
-//		childDirection = GameUtility::rotate_direction_90_left(direction);
-//	}
-//	else if (std::round(child->get_translate().x) == -1.0f) {
-//		childDirection = GameUtility::rotate_direction_90_right(direction);
-//	}
-//	else {
-//		childDirection = direction;
-//	}
-//
-//	// 現在のプレイヤーの位置
-//	Vector3 nowPlayerPos = player->get_translate();
-//	// 今の子供の位置
-//	Vector3 nowChildPos = nowPlayerPos + child->get_translate() * player->get_rotation();
-//	// 移動予定の位置
-//	Vector3 nextChildPos = nowPlayerPos + childDirection;
-//	// 一回転しない場合の経由点
-//	Vector3 midChildPos = nowChildPos + childDirection;
-//
-//	// 左方向
-//	Vector3 leftDirection = GameUtility::rotate_direction_90_left(childDirection);
-//	// 右方向
-//	Vector3 rightDirection = GameUtility::rotate_direction_90_right(childDirection);
-//	// 左斜め方向を計算
-//	Vector3 leftDiagonalDirection = (childDirection + leftDirection).normalize();
-//	// 右斜め方向を計算
-//	Vector3 rightDiagonalDirection = (childDirection + rightDirection).normalize();
-//
-//}
-
 void MapchipHandler::check_fall_conditions(Player* player, Child* child) {
 	// 回転中は判定しない
 	if (player->is_rotating()) return;
@@ -516,6 +497,9 @@ void MapchipHandler::check_fall_conditions(Player* player, Child* child) {
 	// 親と繋がっているか判定
 	if (!player->is_parent()) {
 		// 繋がっていなければ別々で判定
+		if (player->is_out_ground()) {
+			player->set_state(PlayerState::Falling);
+		}
 		player->set_falling(player->is_out_ground());
 		child->set_falling(child->is_out_ground());
 	}

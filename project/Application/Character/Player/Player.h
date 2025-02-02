@@ -47,27 +47,27 @@ public: // アクセッサ
 
 	Vector3 get_previous_direction() const { return preMoveDirection; }
 
-	RotationDirection get_how_rotation() { return rotateDirection; }
+	RotationDirection get_how_rotation() const { return rotateDirection; }
 	void set_how_rotation(RotationDirection rotate) { rotateDirection = rotate; }
 
-	PlayerState get_state() { return playerState; }
+	PlayerState get_state() const { return playerState; }
 	void set_state(PlayerState state) { playerState = state; }
 
-	MoveType get_move_type() { return moveType; }
+	MoveType get_move_type() const { return moveType; }
 	void set_move_type(MoveType type) { moveType = type; }
 
-	RotateType get_rotate_type() { return rotateType; }
+	RotateType get_rotate_type() const { return rotateType; }
 	void set_rotate_type(RotateType type) { rotateType = type; }
 
 	void set_mid_rotation(Quaternion Rotation) { midRotation = Rotation; }
 
-	Quaternion get_start_rotation() { return startRotation; }
+	Quaternion get_start_rotation() const { return startRotation; }
 	void set_start_rotation(Quaternion rotation) { startRotation = rotation; }
 
-	Quaternion get_target_rotation() { return targetRotation; }
+	Quaternion get_target_rotation() const { return targetRotation; }
 	void set_target_rotation(Quaternion rotation) { targetRotation = rotation; }
 
-	int get_move_num_on_ice() { return moveNumOnIce; }
+	int get_move_num_on_ice() const { return moveNumOnIce; }
 	void set_move_num_on_ice(int num) { moveNumOnIce = num; }
 
 	bool is_falled()const { return isFalled; }
@@ -84,6 +84,12 @@ public: // アクセッサ
 
 	void set_move_duration(float time) { moveDuration = time; };
 	void set_move_timer(float timer) { moveTimer = timer; };
+
+	void set_wall_start_pos(const Vector3& pos) { wallStartPosition = pos; }
+	void set_wall_target_pos(const Vector3& pos) { wallTargetPosition = pos; }
+	void set_wall_timer(float timer) { wallMoveTimer = timer; }
+	void set_wall_duration(float time) { wallMoveDuration = time; }
+	void set_wall_moving(bool flag) { isWallMoveing = flag; }
 
 #ifdef _DEBUG
 	void debug_update();
@@ -105,13 +111,6 @@ private:
 	RotateType rotateType;
 	// 橋渡しみたいに移動するか
 	MoveType moveType;
-
-	//struct MoveParameter {
-	//	bool canMoving; // 移動可能かどうか
-	//	Vector3 targetPos;
-	//	float moveTimer; // 移動の状況を管理するタイマー
-	//	float moveDduration; // 移動に掛ける時間(1マス0.15f)
-	//};
 
 	MapchipHandler* mapchipHandler_;
 	Child* child_; // 子オブジェクトへの参照

@@ -132,6 +132,14 @@ void PlayerManager::handle_input() {
 			//player->set = directions[i];
 			Vector3 nextPosition = player->get_translate() + directions[i];
 
+			// 回転中の衝突チェック
+			if (mapchipHandler->can_player_rotate(player.get(), child.get(), directions[i])) {
+				set_rotate_parameters(directions[i]);
+			}
+			else {
+				set_rotate_failed_parameters(directions[i]);
+			}
+
 			// MapchipHandlerに移動可能かを問い合わせ
 			if (mapchipHandler->can_player_move_to(player.get(), child.get(), directions[i])) {
 				// 成功時のパラメータ設定
@@ -141,23 +149,6 @@ void PlayerManager::handle_input() {
 				set_move_failed_parameters(directions[i]);
 			}
 
-			// 回転中の衝突チェック
-			if (mapchipHandler->can_player_rotate(player.get(), child.get(), directions[i])) {
-				set_rotate_parameters(directions[i]);
-			}
-			else {
-				set_rotate_failed_parameters(directions[i]);
-			}
-			//進行先が壁か穴かを判定
-			// 回転途中に壁がある時に上手く回転しないバグによってこっちもバグってる
-			//条件を「入力方向に回転する時引っかからない」かつ「進行方向が壁か穴」だと上手く行く
-			//if (mapchipHandler->player_move_to_wall_or_holl(player.get(), child.get(), directions[i])) {
-			//	wallTargetPosition = get_translate() + direction * 0.5f;
-			//	wallMoveTimer = 0.0f;
-			//	wallMoveDuration = 0.15f;
-			//	isWallMoveing = true;
-			//	wallStartPosition = object_->get_transform().get_translate();
-			//}
 			// いろいろと判定が完了したらプレイヤーの状態を回転にする
 			player->set_state(PlayerState::Rotating);
 			break;
@@ -429,21 +420,21 @@ void PlayerManager::set_move_failed_parameters(const Vector3& direction) {
 		player->set_start_position(player->get_translate());
 		break;
 	case MoveType::HitRock:
-		nextPosition = player->get_translate();
-		player->get_target_pos(nextPosition);
-		player->set_move_timer(0.0f);
-		player->set_move_duration(0.01f);
-		player->set_start_position(player->get_translate());
+		//条件を「入力方向に回転する時引っかからない」かつ「進行方向が壁か穴」だと上手く行く
+		player->set_wall_target_pos(player->get_translate() + direction * 0.5f);
+		player->set_wall_timer(0.0f);
+		player->set_wall_duration(0.15f);
+		player->set_wall_moving(true);
+		player->set_wall_start_pos(player->get_translate());
 		break;
 	case MoveType::FallIntoHole:
-		nextPosition = player->get_translate();
-		player->get_target_pos(nextPosition);
-		player->set_move_timer(0.0f);
-		player->set_move_duration(0.01f);
-		player->set_start_position(player->get_translate());
+		player->set_wall_target_pos(player->get_translate() + direction * 0.5f);
+		player->set_wall_timer(0.0f);
+		player->set_wall_duration(0.15f);
+		player->set_wall_moving(true);
+		player->set_wall_start_pos(player->get_translate());
 		break;
 	}
-
 }
 
 void PlayerManager::set_rotate_parameters(const Vector3& direction) {
@@ -551,6 +542,9 @@ void PlayerManager::set_rotate_failed_parameters(const Vector3& direction) {
 		player->set_rotate_duration(0.01f);
 		break;
 	case RotateType::Rotate90_HitObstacleDiagonalFront:
+		// 壁にぶつかる移動をセットしておく
+		player->set_move_type(MoveType::HitRock);
+
 		player->set_how_rotation(RotationDirection::Reverce);
 
 		if (std::round(child->get_translate().x) == 1.0f) {
@@ -599,7 +593,24 @@ void PlayerManager::set_rotate_failed_parameters(const Vector3& direction) {
 		break;
 
 	case RotateType::Rotate90_HitObstacleNextPosition:
+		// 壁にぶつかる移動をセットしておく
+		player->set_move_type(MoveType::HitRock);
+
+		player->set_how_rotation(RotationDirection::Reverce);
+		if (std::round(child->get_translate().x) == 1.0f) {
+			player->set_mid_rotation(Quaternion::FromToRotation({ 0.0f, 0.0f, -1.0f }, rightDirection));
+		}
+		else if (std::round(child->get_translate().x) == -1.0f) {
+			player->set_mid_rotation(Quaternion::FromToRotation({ 0.0f, 0.0f, -1.0f }, leftDirection));
+		}
+		else {
+			player->set_mid_rotation(Quaternion::FromToRotation({ 0.0f, 0.0f, -1.0f }, childDirection));
+		}
+		break;
 	case RotateType::Rotate90_NextPositionIsHole:
+		// 穴に落下する時の移動をセットしておく
+		player->set_move_type(MoveType::FallIntoHole);
+
 		player->set_how_rotation(RotationDirection::Reverce);
 		if (std::round(child->get_translate().x) == 1.0f) {
 			player->set_mid_rotation(Quaternion::FromToRotation({ 0.0f, 0.0f, -1.0f }, rightDirection));
@@ -612,6 +623,9 @@ void PlayerManager::set_rotate_failed_parameters(const Vector3& direction) {
 		}
 		break;
 	case RotateType::HitDiagonalFrontWall:
+		// 壁にぶつかる移動をセットしておく
+		player->set_move_type(MoveType::HitRock);
+
 		if (player->get_how_rotation() == RotationDirection::Left) {
 			player->set_mid_rotation(rotate15Left * player->get_rotation());
 		}
@@ -621,6 +635,9 @@ void PlayerManager::set_rotate_failed_parameters(const Vector3& direction) {
 		break;
 
 	case RotateType::HitSideWall:
+		// 壁にぶつかる移動をセットしておく
+		player->set_move_type(MoveType::HitRock);
+
 		if (player->get_how_rotation() == RotationDirection::Left) {
 			player->set_mid_rotation(rotate90Left * player->get_rotation());
 		}
@@ -629,6 +646,9 @@ void PlayerManager::set_rotate_failed_parameters(const Vector3& direction) {
 		}
 		break;
 	case RotateType::NextTileIsHole:
+		// 穴に落下する時の移動をセットしておく
+		player->set_move_type(MoveType::FallIntoHole);
+
 		if (player->get_how_rotation() == RotationDirection::Left) {
 			player->set_mid_rotation(rotate90Left * player->get_rotation());
 		}
@@ -637,6 +657,9 @@ void PlayerManager::set_rotate_failed_parameters(const Vector3& direction) {
 		}
 		break;
 	case RotateType::HitDiagonalBackWall:
+		// 壁にぶつかる移動をセットしておく
+		player->set_move_type(MoveType::HitRock);
+
 		if (player->get_how_rotation() == RotationDirection::Left) {
 			player->set_mid_rotation(rotate135Left * player->get_rotation());
 		}
@@ -645,6 +668,9 @@ void PlayerManager::set_rotate_failed_parameters(const Vector3& direction) {
 		}
 		break;
 	case RotateType::HitBackWall:
+		// 壁にぶつかる移動をセットしておく
+		player->set_move_type(MoveType::HitRock);
+
 		if (player->get_how_rotation() == RotationDirection::Left) {
 			player->set_mid_rotation(rotate175Left * player->get_rotation());
 		}
@@ -653,6 +679,9 @@ void PlayerManager::set_rotate_failed_parameters(const Vector3& direction) {
 		}
 		break;
 	case RotateType::BackTileIsHole:
+		// 穴に落下する時の移動をセットしておく
+		player->set_move_type(MoveType::FallIntoHole);
+
 		if (player->get_how_rotation() == RotationDirection::Left) {
 			player->set_mid_rotation(rotate175Left * player->get_rotation());
 		}

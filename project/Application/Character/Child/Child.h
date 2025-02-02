@@ -27,12 +27,12 @@ public:
 #endif
 private:
     bool isFall = false;
-    float fallSpeed = 6.0f;//—‰º‘¬“x
+    float fallSpeed = 6.0f;//è½ä¸‹é€Ÿåº¦
     bool isFalled = false;
     // 
     bool isOutGround = false; 
 
-    //‰¹ŠÖ˜A
+    //éŸ³é–¢é€£
 
 
 };

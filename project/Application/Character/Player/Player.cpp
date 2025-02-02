@@ -8,9 +8,9 @@ void Player::initialize(const LevelLoader& level, MapchipHandler* mapchipHandler
 	object_ = std::make_unique<AnimatedMeshInstance>();
 	object_->reset_animated_mesh("ParentKoala.gltf", "Standby", true);
 	object_->get_transform().set_translate(level.get_player_position());
-	
+
 	auto& objMat = object_->get_materials();
-	for (auto& mat:objMat ) {
+	for (auto& mat : objMat) {
 		mat.lightingType = LighingType::None;
 	}
 	mapchipHandler_ = mapchipHandler;
@@ -39,7 +39,7 @@ void Player::update() {
 	object_->begin();
 	isMove = false;
 	moveNumOnIce = 1;
-	
+
 	isOnChild = false;
 	isTurnSuccess = true;
 
@@ -99,26 +99,30 @@ void Player::debug_update() {
 
 
 void Player::fall_update() {
-	if (isFalling) {
-		Vector3 position = object_->get_transform().get_translate();
-		if (!fallSoundFlag) {
-			fall->play();
-			fallSoundFlag = true;
-		}
-
-		position.y -= fallSpeed * WorldClock::DeltaSeconds();
-		object_->get_transform().set_translate(position);
-		if (position.y <= -3.0f) {
-			isFalled = true;
-		}
+	//if (isFalling) {
+	Vector3 position = object_->get_transform().get_translate();
+	if (!fallSoundFlag) {
+		fall->play();
+		fallSoundFlag = true;
 	}
+
+	position.y -= fallSpeed * WorldClock::DeltaSeconds();
+	object_->get_transform().set_translate(position);
+	if (position.y <= -3.0f) {
+		isFalled = true;
+	}
+	//}
 }
 
 void Player::move_update() {
-	if (!isMoving) {
-		targetPosition = object_->get_transform().get_translate();
+	if (moveType != MoveType::Normal &&
+		moveType != MoveType::ParentCarriesChild &&
+		moveType != MoveType::ChildCarriesParent &&
+		moveType != MoveType::SlidingOnIce &&
+		moveType != MoveType::MoveOnChild) {
+		playerState = PlayerState::MoveFailed;
 		return;
-	};
+	}
 
 	//移動時の音。moveTimerが加算される前に処理して一回だけ鳴らす
 	if (moveTimer <= 0) {
@@ -160,7 +164,7 @@ void Player::rotate_update() {
 
 	if (rotateType != RotateType::Normal &&
 	rotateType != RotateType::Rotate90_Normal &&
-	rotateType != RotateType::None) {
+		rotateType != RotateType::None) {
 		playerState = PlayerState::RotationFailed;
 	}
 
@@ -207,9 +211,7 @@ void Player::wall_move() {
 	//if (!isWallMoveing) { return; }//壁に向かって移動していない時は早期リターン
 	wallMoveTimer += WorldClock::DeltaSeconds();
 
-
 	Vector3 newPos = { 0,1,0 };
-
 
 	//時間の半分はスタート位置から壁に向かって移動
 	//多分正確に半分を計測できる訳じゃないから微妙に戻りすぎる説ある
@@ -225,7 +227,7 @@ void Player::wall_move() {
 			unmovable->restart();
 			unmovableFlag = true;
 		}
-		
+
 	}
 
 	if (wallMoveTimer >= wallMoveDuration) {
@@ -235,7 +237,7 @@ void Player::wall_move() {
 		playerState = PlayerState::Idle;
 		unmovableFlag = false;
 	}
-	//object_->get_transform().set_translate(newPos);
+	object_->get_transform().set_translate(newPos);
 }
 
 void Player::rotate_failed_update() {
@@ -243,7 +245,7 @@ void Player::rotate_failed_update() {
 
 	// 回転完了チェック
 	if (rotateTimer >= rotateDuration) {
-		playerState = PlayerState::MoveFailed;
+		playerState = PlayerState::Idle;
 		rotateTimer = rotateDuration;
 		isRotating = false;
 	}
