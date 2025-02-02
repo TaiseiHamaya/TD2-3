@@ -166,6 +166,7 @@ void Player::rotate_update() {
 	rotateType != RotateType::Rotate90_Normal &&
 		rotateType != RotateType::None) {
 		playerState = PlayerState::RotationFailed;
+		return;
 	}
 
 	// 回転完了チェック
