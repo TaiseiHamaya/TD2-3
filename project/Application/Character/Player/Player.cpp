@@ -127,12 +127,11 @@ void Player::move_update() {
 	//移動時の音。moveTimerが加算される前に処理して一回だけ鳴らす
 	if (moveTimer <= 0) {
 		//氷と通常床で音を変える
-		if (isOnIce) {
+		if (moveType == MoveType::SlidingOnIce) {
 			iceMove->restart();
 		}
 		else {
 			moveAudio->restart();
-
 		}
 	}
 	// 移動中なら補間処理を実行
@@ -246,6 +245,7 @@ void Player::rotate_failed_update() {
 
 	// 回転完了チェック
 	if (rotateTimer >= rotateDuration) {
+		unmovable->restart();
 		playerState = PlayerState::Idle;
 		rotateTimer = rotateDuration;
 		isRotating = false;
