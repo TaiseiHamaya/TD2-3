@@ -536,10 +536,6 @@ void PlayerManager::set_rotate_failed_parameters(const Vector3& direction) {
 	player->set_rotating(true);
 	player->set_moving(false);
 
-	// デバッグ用変数
-	Quaternion nowPlayer;
-	Quaternion nextMidPlayer;
-
 	switch (player->get_rotate_type()) {
 	case RotateType::None:
 		player->set_target_rotation(Quaternion::FromToRotation({ 0.0f, 0.0f, -1.0f }, direction));
@@ -552,10 +548,11 @@ void PlayerManager::set_rotate_failed_parameters(const Vector3& direction) {
 		player->set_how_rotation(RotationDirection::Reverce);
 
 		if (std::round(child->get_translate().x) == 1.0f) {
-			player->set_mid_rotation(Quaternion::FromToRotation({ 0.0f, 0.0f, -1.0f }, rightDiagonalDirection));
+			player->set_mid_rotation(rotate15Right * player->get_rotation());
 		}
 		else if (std::round(child->get_translate().x) == -1.0f) {
-			player->set_mid_rotation(Quaternion::FromToRotation({ 0.0f, 0.0f, -1.0f }, leftDiagonalDirection));
+			//player->set_mid_rotation(Quaternion::FromToRotation({ 0.0f, 0.0f, -1.0f }, leftDiagonalDirection));
+			player->set_mid_rotation(rotate15Left * player->get_rotation());
 		}
 		else {
 			Vector3 playerForward = Vector3(0.0f, 0.0f, -1.0f) * player->get_rotation();
@@ -685,8 +682,6 @@ void PlayerManager::set_rotate_failed_parameters(const Vector3& direction) {
 	case RotateType::BackTileIsHole:
 		// 穴に落下する時の移動をセットしておく
 		player->set_move_type(MoveType::FallIntoHole);
-
-
 
 		if (player->get_how_rotation() == RotationDirection::Left) {
 			player->set_mid_rotation(rotate175Left * player->get_rotation());
