@@ -31,6 +31,8 @@ void PlayerManager::initialize(Reference<const LevelLoader> level, MapchipField*
 	holdAudio->initialize("hold.wav");
 	releaseAudio = std::make_unique<AudioPlayer>();
 	releaseAudio->initialize("release.wav");
+	undoAudio = std::make_unique<AudioPlayer>();
+	undoAudio->initialize("undo.wav");
 
 	moveLogger = std::make_unique<MoveLogger>();
 	moveLogger->initialize();
@@ -100,6 +102,7 @@ void PlayerManager::update() {
 		!(player->get_state() != PlayerState::Idle || player->is_falling() || child->is_falling()) &&
 		moveLogger->can_undo() && Input::IsTriggerKey(KeyID::Z)) {
 		undo();
+		undoAudio->restart();
 	}
 }
 

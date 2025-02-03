@@ -125,6 +125,7 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="Application\Scene\DebugScene.cpp" />
+    <ClCompile Include="Application\UI\ClearUI.cpp" />
     <ClCompile Include="Application\GameSprite\BackGround.cpp" />
     <ClCompile Include="Engine\Module\Render\RenderNode\Deferred\Lighting\DirectionalLighingNode.cpp" />
     <ClCompile Include="Engine\Module\Render\RenderNode\Deferred\Mesh\MeshNodeDeferred.cpp" />
@@ -137,6 +138,7 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClCompile Include="Application\Mapchip\MapchipField.cpp" />
     <ClCompile Include="Application\LevelLoader\LevelLoader.cpp" />
     <ClCompile Include="Application\Utility\GameUtility.cpp" />
+    <ClCompile Include="Application\UI\FailedUI.cpp" />
     <ClCompile Include="Application\GameSprite\GameSceneUI.cpp" />
     <ClCompile Include="Library\Math\Affine.cpp" />
     <ClCompile Include="Library\Math\Basis.cpp" />
@@ -261,6 +263,7 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClInclude Include="Application\Character\Player\CharacterStates.h" />
     <ClInclude Include="Application\Scene\DebugScene.h" />
     <ClInclude Include="Application\GameValue.h" />
+    <ClInclude Include="Application\UI\ClearUI.h" />
     <ClInclude Include="Application\GameSprite\BackGround.h" />
     <ClInclude Include="Engine\Module\Render\RenderNode\Deferred\DeferredAdaptor.h" />
     <ClInclude Include="Engine\Module\Render\RenderNode\Deferred\Lighting\DirectionalLighingNode.h" />
@@ -274,6 +277,7 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClInclude Include="Application\Mapchip\MapchipField.h" />
     <ClInclude Include="Application\LevelLoader\LevelLoader.h" />
     <ClInclude Include="Application\Utility\GameUtility.h" />
+    <ClInclude Include="Application\UI\FailedUI.h" />
     <ClInclude Include="Application\GameSprite\GameSceneUI.h" />
     <ClInclude Include="Library\Math\Affine.h" />
     <ClInclude Include="Library\Math\Basis.h" />

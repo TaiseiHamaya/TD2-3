@@ -69,6 +69,21 @@ void GameScene::load() {
 	TextureManager::RegisterLoadQue("./GameResources/Texture/UI/Undo.png");
 	TextureManager::RegisterLoadQue("./GameResources/Texture/backGround.png");
 	TextureManager::RegisterLoadQue("./GameResources/Texture/backGround2.png");
+	TextureManager::RegisterLoadQue("./GameResources/Texture/Failed/Failed.png");
+	TextureManager::RegisterLoadQue("./GameResources/Texture/Failed/F.png");
+	TextureManager::RegisterLoadQue("./GameResources/Texture/Failed/a.png");
+	TextureManager::RegisterLoadQue("./GameResources/Texture/Failed/i.png");
+	TextureManager::RegisterLoadQue("./GameResources/Texture/Failed/l.png");
+	TextureManager::RegisterLoadQue("./GameResources/Texture/Failed/e.png");
+	TextureManager::RegisterLoadQue("./GameResources/Texture/Failed/d.png");
+	TextureManager::RegisterLoadQue("./GameResources/Texture/Failed/ten.png");
+	TextureManager::RegisterLoadQue("./GameResources/Texture/Clear/Clear.png");
+	TextureManager::RegisterLoadQue("./GameResources/Texture/Clear/C.png");
+	TextureManager::RegisterLoadQue("./GameResources/Texture/Clear/L.png");
+	TextureManager::RegisterLoadQue("./GameResources/Texture/Clear/E.png");
+	TextureManager::RegisterLoadQue("./GameResources/Texture/Clear/A.png");
+	TextureManager::RegisterLoadQue("./GameResources/Texture/Clear/R.png");
+	TextureManager::RegisterLoadQue("./GameResources/Texture/Clear/!.png");
 
 
 	AudioManager::RegisterLoadQue("./GameResources/Audio/move.wav");
@@ -82,6 +97,7 @@ void GameScene::load() {
 	AudioManager::RegisterLoadQue("./GameResources/Audio/clearSound.wav");
 	AudioManager::RegisterLoadQue("./GameResources/Audio/failedSound.wav");
 	AudioManager::RegisterLoadQue("./GameResources/Audio/rotate.wav");
+	AudioManager::RegisterLoadQue("./GameResources/Audio/undo.wav");
 	AudioManager::RegisterLoadQue("./GameResources/Audio/BGM/Game.wav");
 
 }
@@ -190,6 +206,11 @@ void GameScene::begin() {
 		fieldObjs->initialize(levelLoader);
 		playerManager->initialize(levelLoader, fieldObjs.get());
 		managementUI->init();
+	}else if (managementUI->is_undoRestart()) {
+		//fieldObjs->initialize(levelLoader);
+		//playerManager->initialize(levelLoader, fieldObjs.get());
+		managementUI->init();
+		//ここで一手戻す処理をする
 	}
 	else if (managementUI->is_next()) {
 		managementUI->init();
@@ -268,7 +289,9 @@ void GameScene::draw() const {
 
 	// 前景スプライト
 	renderPath->next();
+	managementUI->darw();
 	gameUI->darw();
+
 	renderPath->next();
 
 #ifdef _DEBUG
