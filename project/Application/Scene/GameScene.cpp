@@ -97,6 +97,7 @@ void GameScene::load() {
 	AudioManager::RegisterLoadQue("./GameResources/Audio/clearSound.wav");
 	AudioManager::RegisterLoadQue("./GameResources/Audio/failedSound.wav");
 	AudioManager::RegisterLoadQue("./GameResources/Audio/rotate.wav");
+	AudioManager::RegisterLoadQue("./GameResources/Audio/undo.wav");
 	AudioManager::RegisterLoadQue("./GameResources/Audio/BGM/Game.wav");
 
 }

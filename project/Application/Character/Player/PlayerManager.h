@@ -60,6 +60,7 @@ private:
     //音関連
     std::unique_ptr<AudioPlayer> holdAudio;//くっつき音
     std::unique_ptr<AudioPlayer> releaseAudio;//離れる音
+    std::unique_ptr<AudioPlayer> undoAudio;//undoの音
 	
 	bool isStackMovement;
 };
