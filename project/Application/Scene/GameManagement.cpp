@@ -111,7 +111,7 @@ void GameManagement::begin() {
 void GameManagement::update() {
 
 	selectFunc();
-
+	if (failedFlag) { failedUI->update(); }
 }
 #ifdef _DEBUG
 

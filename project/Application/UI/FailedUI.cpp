@@ -23,9 +23,20 @@ void FailedUI::init() {
 	endPos[5] = { 786.f,endPosHeight };
 	endPos[6] = { 919.f,endPosHeight };
 	
+	for (int i = 0; i < 7; i++) {
+		curEaseT[i] = 0;
+		failedLetter[i]->get_transform().set_translate_x(endPos[i].x);
+	}
 }
 
-void FailedUI::update() {}
+void FailedUI::update() {
+
+	for (int i = 0; i < 7; i++) {
+		curEaseT[i] += WorldClock::DeltaSeconds();
+		EaseChange(i, curEaseT[i]);
+	}
+
+}
 #ifdef _DEBUG
 
 #include <imgui.h>
@@ -51,4 +62,22 @@ void FailedUI::draw() {
 	for (int i = 0; i < 7; i++) {
 		failedLetter[i]->draw();
 	}
+}
+
+void FailedUI::EaseChange(int index, float easeT) {
+
+	float ratio = std::clamp(easeT / totalEaseT, 0.f, 1.f);
+	//色
+	failedLetter[index]->get_color().LerpElement(
+		{ 1.f,1.f,1.f,0.f },
+		{ 1.f,1.f,1.f,0.f }, 
+		{0.f,0.f,0.f,ratio });//Easing::Out::Expo(ratio)
+
+	//座標
+	failedLetter[index]->get_transform().set_translate_y(
+	std::lerp(
+		endPosHeight+moveLength,
+		endPosHeight,
+		ratio)
+	);
 }
