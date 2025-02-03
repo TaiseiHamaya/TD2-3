@@ -40,10 +40,6 @@ void GameManagement::init() {
 	retryUI->get_uv_transform().set_scale({0.5f,1.0f});
 
 	selectFrame = std::make_unique<SpriteInstance>("SelectFrame.png",Vector2(0.5f,0.5f));
-	failedReasonUI = std::make_unique<SpriteInstance>("FailedUI_1.png");
-	failedReasonUI->get_transform().set_scale({0.25f,1});
-	failedReasonUI->get_uv_transform().set_scale({0.25f,1});
-	failedReasonUI->get_transform().set_translate({257,220});
 
 	undoRetryUI= std::make_unique<SpriteInstance>("undoRetry.png",Vector2(0.5f,0.5f));
 	undoRetryUI->get_transform().set_scale({0.5f,1.0f});
@@ -130,7 +126,6 @@ void GameManagement::begin_rendering() {
 	nextUI->begin_rendering();
 	retryUI->begin_rendering();
 	selectFrame->begin_rendering();
-	failedReasonUI->begin_rendering();
 	undoRetryUI->begin_rendering();
 	goSelect->begin_rendering();
 
@@ -151,10 +146,12 @@ void GameManagement::darw() {
 		selectFrame->draw();
 	} else if(failedFlag) {
 		failedUI->draw();
-		retryUI->draw();
-		selectFrame->draw();
-		failedReasonUI->draw();
-		undoRetryUI->draw();
+		if (failedUI->GetUiVisible()) {
+			retryUI->draw();
+			selectFrame->draw();
+			undoRetryUI->draw();
+		}
+		
 	}
 }
 
@@ -175,7 +172,6 @@ void GameManagement::selectFunc() {
 	if(failedFlag) {
 		//selectIndex = 0;
 		retryUI->get_transform().set_translate({458,169});
-		failedReasonUI->get_uv_transform().set_translate_x(0.25f * failedSelectIndex);
 
 	} else if(clearFlag) {
 

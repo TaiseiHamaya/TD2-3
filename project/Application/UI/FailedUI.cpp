@@ -31,6 +31,17 @@ void FailedUI::init() {
 	}
 	curDelayTime = 0;
 	curIndex = 0;
+
+	failedReasonUI = std::make_unique<SpriteInstance>("FailedUI_1.png",Vector2(0.5f,0.5f));
+	failedReasonUI->get_transform().set_scale({ 0.25f,1 });
+	failedReasonUI->get_uv_transform().set_scale({ 0.25f,1 });
+	failedReasonUI->get_transform().set_translate({ 640,265 });
+	reaCurEaseT = 0;
+	newScale = CVector2::ZERO;
+	reaUpdateFlag = false;
+	failedReasonUI->get_transform().set_scale(CVector2::ZERO);
+
+	uiVisibleFlag = false;
 }
 
 void FailedUI::update() {
@@ -48,7 +59,8 @@ void FailedUI::update() {
 		curEaseT[i] += WorldClock::DeltaSeconds();
 		EaseChange(i, curEaseT[i]);
 	}
-
+	if (curEaseT[6] > totalEaseT) { reaUpdateFlag = true; }
+	updateReason();
 }
 #ifdef _DEBUG
 
@@ -68,6 +80,7 @@ void FailedUI::begin_rendering() {
 	for (int i = 0; i < 7; i++) {
 		failedLetter[i]->begin_rendering();
 	}
+	failedReasonUI->begin_rendering();
 }
 
 void FailedUI::draw() {
@@ -75,6 +88,8 @@ void FailedUI::draw() {
 	for (int i = 0; i < 7; i++) {
 		failedLetter[i]->draw();
 	}
+	failedReasonUI->draw();
+
 }
 
 void FailedUI::EaseChange(int index, float easeT) {
@@ -94,4 +109,18 @@ void FailedUI::EaseChange(int index, float easeT) {
 		Easing::Out::Quad(ratio)) }
 	
 	);
+}
+
+void FailedUI::updateReason() {
+	if (!reaUpdateFlag) { return; }
+	reaCurEaseT += WorldClock::DeltaSeconds();
+	float ratio = std::clamp(reaCurEaseT / reaTotalEaseT, 0.f, 1.f);
+
+	newScale.x = 0.25f;//std::lerp(0.f, 0.25f, Easing::Out::Expo(ratio))
+	newScale.y = std::lerp(0.f, 1.f, Easing::Out::Back(ratio));
+	failedReasonUI->get_transform().set_scale(newScale);
+
+	failedReasonUI->get_uv_transform().set_translate_x(0.25f * reasonIndex);
+
+	if (ratio >= 1.0f) { uiVisibleFlag = true; }
 }
