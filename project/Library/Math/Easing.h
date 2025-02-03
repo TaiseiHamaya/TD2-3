@@ -21,46 +21,46 @@ namespace Easing {
 
 namespace In {
 
-static float Sine(float t);
-static float Quad(float t);
-static float Cubic(float t);
-static float Quart(float t);
-static float Quint(float t);
-static float Expo(float t);
-static float Circ(float t);
-static float Back(float t);
-static float Elastic(float t);
-static float Bounce(float t);
+float Sine(float t);
+float Quad(float t);
+float Cubic(float t);
+float Quart(float t);
+float Quint(float t);
+float Expo(float t);
+float Circ(float t);
+float Back(float t);
+float Elastic(float t);
+float Bounce(float t);
 
 };
 
 namespace Out {
 
-static float Sine(float t);
-static float Quad(float t);
-static float Cubic(float t);
-static float Quart(float t);
-static float Quint(float t);
-static float Expo(float t);
-static float Circ(float t);
-static float Back(float t);
-static float Elastic(float t);
-static float Bounce(float t);
+float Sine(float t);
+float Quad(float t);
+float Cubic(float t);
+float Quart(float t);
+float Quint(float t);
+float Expo(float t);
+float Circ(float t);
+float Back(float t);
+float Elastic(float t);
+float Bounce(float t);
 
 };
 
 namespace InOut {
 
-static float Sine(float t);
-static float Quad(float t);
-static float Cubic(float t);
-static float Quart(float t);
-static float Quint(float t);
-static float Expo(float t);
-static float Circ(float t);
-static float Back(float t);
-static float Elastic(float t);
-static float Bounce(float t);
+float Sine(float t);
+float Quad(float t);
+float Cubic(float t);
+float Quart(float t);
+float Quint(float t);
+float Expo(float t);
+float Circ(float t);
+float Back(float t);
+float Elastic(float t);
+float Bounce(float t);
 
 };
 
