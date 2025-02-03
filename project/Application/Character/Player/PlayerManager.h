@@ -6,7 +6,7 @@
 #include "Application/Character/Child/Child.h"
 #include "Application/Character/Player/Player.h"
 #include "Application/Mapchip/MapchipHandler.h"
-#include "Application/Scene/GameManagement.h"
+#include "Application/GameManagement/GameManagement.h"
 #include "Engine/Resources/Audio/AudioPlayer.h"
 
 class PlayerManager {
