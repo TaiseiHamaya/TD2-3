@@ -11,9 +11,9 @@ class LevelLoader;
 
 #include "Application/Character/Player/PlayerManager.h"
 #include "Application/Mapchip/MapchipField.h"
-#include "Application/Scene/GameManagement.h"
-#include "Application/Scene/GameSceneUI.h"
-#include "Application/Scene/BackGround.h"
+#include "Application/GameManagement/GameManagement.h"
+#include "Application/GameSprite/GameSceneUI.h"
+#include "Application/GameSprite/BackGround.h"
 
 #include "Engine/Module/Render/RenderNode/Posteffect/Outline/OutlineNode.h"
 
