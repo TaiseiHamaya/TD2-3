@@ -1,4 +1,4 @@
-#include "Application/Scene/GameManagement.h"
+#include "GameManagement.h"
 
 #include <algorithm>
 

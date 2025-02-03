@@ -127,11 +127,12 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClCompile Include="Application\Scene\DebugScene.cpp" />
     <ClCompile Include="Application\Scene\BackGround.cpp" />
     <ClCompile Include="Application\UI\ClearUI.cpp" />
+    <ClCompile Include="Application\GameSprite\BackGround.cpp" />
     <ClCompile Include="Engine\Module\Render\RenderNode\Deferred\Lighting\DirectionalLighingNode.cpp" />
     <ClCompile Include="Engine\Module\Render\RenderNode\Deferred\Mesh\MeshNodeDeferred.cpp" />
     <ClCompile Include="Engine\Module\DrawExecutor\PrimitiveLineDrawExecutor\PrimitiveLineDrawExecutor.cpp" />
     <ClCompile Include="Application\Character\Child\Child.cpp" />
-    <ClCompile Include="Application\Scene\GameManagement.cpp" />
+    <ClCompile Include="Application\GameManagement\GameManagement.cpp" />
     <ClCompile Include="Application\Character\CharacterBase.cpp" />
     <ClCompile Include="Engine\Module\World\Collision\Collider\AABBCollider.cpp" />
     <ClCompile Include="Application\Scene\GameScene.cpp" />
@@ -140,6 +141,7 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClCompile Include="Application\Utility\GameUtility.cpp" />
     <ClCompile Include="Application\Scene\GameSceneUI.cpp" />
     <ClCompile Include="Application\UI\FailedUI.cpp" />
+    <ClCompile Include="Application\GameSprite\GameSceneUI.cpp" />
     <ClCompile Include="Library\Math\Affine.cpp" />
     <ClCompile Include="Library\Math\Basis.cpp" />
     <ClCompile Include="Engine\Resources\Audio\AudioResourceBuilder.cpp" />
@@ -265,12 +267,13 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClInclude Include="Application\GameValue.h" />
     <ClInclude Include="Application\Scene\BackGround.h" />
     <ClInclude Include="Application\UI\ClearUI.h" />
+    <ClInclude Include="Application\GameSprite\BackGround.h" />
     <ClInclude Include="Engine\Module\Render\RenderNode\Deferred\DeferredAdaptor.h" />
     <ClInclude Include="Engine\Module\Render\RenderNode\Deferred\Lighting\DirectionalLighingNode.h" />
     <ClInclude Include="Engine\Module\Render\RenderNode\Deferred\Mesh\MeshNodeDeferred.h" />
     <ClInclude Include="Engine\Module\DrawExecutor\PrimitiveLineDrawExecutor\PrimitiveLineDrawExecutor.h" />
     <ClInclude Include="Application\Character\Child\Child.h" />
-    <ClInclude Include="Application\Scene\GameManagement.h" />
+    <ClInclude Include="Application\GameManagement\GameManagement.h" />
     <ClInclude Include="Application\Character\CharacterBase.h" />
     <ClInclude Include="Engine\Module\World\Collision\Collider\AABBCollider.h" />
     <ClInclude Include="Application\Scene\GameScene.h" />
@@ -279,6 +282,7 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClInclude Include="Application\Utility\GameUtility.h" />
     <ClInclude Include="Application\Scene\GameSceneUI.h" />
     <ClInclude Include="Application\UI\FailedUI.h" />
+    <ClInclude Include="Application\GameSprite\GameSceneUI.h" />
     <ClInclude Include="Library\Math\Affine.h" />
     <ClInclude Include="Library\Math\Basis.h" />
     <ClInclude Include="Engine\Resources\Audio\AudioResourceBuilder.h" />

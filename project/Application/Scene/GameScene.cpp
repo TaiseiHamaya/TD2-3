@@ -126,10 +126,18 @@ void GameScene::initialize() {
 	meshRT = std::make_shared<SingleRenderTarget>();
 	meshRT->initialize();
 
+	std::shared_ptr<SpriteNode> bgSpriteNode;
+	bgSpriteNode = std::make_unique<SpriteNode>();
+	bgSpriteNode->initialize();
+	bgSpriteNode->set_config(
+		RenderNodeConfig::ContinueDrawBefore
+	);
+	bgSpriteNode->set_render_target(meshRT);
+
 	std::shared_ptr<Object3DNode> object3dNode;
 	object3dNode = std::make_unique<Object3DNode>();
 	object3dNode->initialize();
-	object3dNode->set_config(RenderNodeConfig::ContinueDrawBefore | RenderNodeConfig::ContinueUseDpehtBefore);
+	object3dNode->set_config(RenderNodeConfig::ContinueDrawAfter | RenderNodeConfig::ContinueDrawBefore | RenderNodeConfig::ContinueUseDpehtBefore);
 	object3dNode->set_render_target(meshRT);
 
 	std::shared_ptr<SkinningMeshNode> skinningMeshNode;
@@ -162,9 +170,9 @@ void GameScene::initialize() {
 
 	renderPath = eps::CreateUnique<RenderPath>();
 #ifdef _DEBUG
-	renderPath->initialize({ object3dNode,skinningMeshNode,outlineNode,spriteNode,primitiveLineNode });
+	renderPath->initialize({ bgSpriteNode,object3dNode,skinningMeshNode,outlineNode,spriteNode,primitiveLineNode });
 #else
-	renderPath->initialize({object3dNode,skinningMeshNode,outlineNode,spriteNode });
+	renderPath->initialize({ bgSpriteNode,object3dNode,skinningMeshNode,outlineNode,spriteNode });
 #endif // _DEBUG
 
 	managementUI = std::make_unique<GameManagement>();
@@ -172,6 +180,7 @@ void GameScene::initialize() {
 	managementUI->SetMaxLevel(GameValue::MaxLevel);
 	managementUI->SetCurLevel(currentLevel);
 	gameUI = std::make_unique<GameSceneUI>();
+	gameUI->initialize(currentLevel);
 
 	bgm = std::make_unique<AudioPlayer>();
 	bgm->initialize("Game.wav");
@@ -251,35 +260,42 @@ void GameScene::late_update() {
 }
 
 void GameScene::draw() const {
+	// 背景スプライト
 	renderPath->begin();
+	background->darw();
+
+	// StaticMesh
+	renderPath->next();
 	camera3D->register_world_projection(1);
 	camera3D->register_world_lighting(4);
 	directionalLight->register_world(5);
 
-	
 	fieldObjs->draw();
 
 #ifdef _DEBUG
 	camera3D->debug_draw_axis();
 #endif // _DEBUG
 
+	// SkinningMesh
 	renderPath->next();
 	camera3D->register_world_projection(1);
 	camera3D->register_world_lighting(5);
 	directionalLight->register_world(6);
 	playerManager->draw();
 
+	// Outline
 	renderPath->next();
 	outlineNode->draw();
 
+	// 前景スプライト
 	renderPath->next();
-	gameUI->darw();
 	managementUI->darw();
+	gameUI->darw();
 
-	background->darw();
 	renderPath->next();
 
 #ifdef _DEBUG
+	// 線描画(Debug)
 	camera3D->register_world_projection(1);
 	camera3D->debug_draw_frustum();
 
