@@ -9,7 +9,7 @@ BackGround::~BackGround() {}
 
 void BackGround::init() {
 	curScroll = 0;
-	backGroundSprite = std::make_unique<SpriteInstance>("backGround.png");
+	backGroundSprite = std::make_unique<SpriteInstance>("backGround2.png");
 	backGroundSprite2 = std::make_unique<SpriteInstance>("backGround.png");
 }
 

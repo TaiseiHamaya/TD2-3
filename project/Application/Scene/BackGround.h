@@ -23,8 +23,8 @@ public:
 private:
 	std::unique_ptr<SpriteInstance>backGroundSprite;
 	std::unique_ptr<SpriteInstance>backGroundSprite2;
-	float scrollSpeed = 0.01f;
-	float scrollSpeed2 = 0.015f;
+	float scrollSpeed = 0.007f;
+	float scrollSpeed2 = 0.01f;
 	float curScroll;
 	float curScroll2;
 

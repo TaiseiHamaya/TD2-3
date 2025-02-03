@@ -73,6 +73,7 @@ void GameScene::load() {
 	TextureManager::RegisterLoadQue("./GameResources/Texture/UI/GoSelect.png");
 	TextureManager::RegisterLoadQue("./GameResources/Texture/UI/Undo.png");
 	TextureManager::RegisterLoadQue("./GameResources/Texture/backGround.png");
+	TextureManager::RegisterLoadQue("./GameResources/Texture/backGround2.png");
 
 
 	AudioManager::RegisterLoadQue("./GameResources/Audio/move.wav");
