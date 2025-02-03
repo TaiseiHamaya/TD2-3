@@ -4,6 +4,8 @@
 #include "Application/Scene/SelectScene.h"
 #include "Application/Scene/TitleScene.h"
 
+#include <Engine/Resources/Audio/AudioManager.h>
+
 #include "Engine/Runtime/Scene/SceneManager.h"
 #include "TestCode/SceneDemo.h"
 
@@ -19,6 +21,8 @@ int WINAPI WinMain(HINSTANCE,HINSTANCE,LPSTR,int) {
 #else
 	SceneManager::Initialize(std::make_unique<SelectScene>());
 #endif // _DEBUG
+
+	AudioManager::SetMasterVolume(1.0f);
 
 	WinApp::ShowAppWindow();
 

@@ -284,5 +284,7 @@ void GameScene::debug_update() {
 	//ImGui::Begin("OutlineNode");
 	//outlineNode->
 	//ImGui::End();
+
+	AudioManager::DebugGui();
 }
 #endif // _DEBUG
