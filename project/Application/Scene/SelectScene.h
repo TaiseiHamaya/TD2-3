@@ -4,8 +4,11 @@
 
 #include <memory>
 
+#include <Engine/Module/World/Camera/Camera3D.h>
+#include <Engine/Module/World/Light/DirectionalLight/DirectionalLightInstance.h>
+#include <Engine/Resources/Audio/AudioPlayer.h>
+#include <Application/Mapchip/MapchipField.h>
 #include <Engine/Module/Render/RenderPath/RenderPath.h>
-#include "Engine/Resources/Audio/AudioPlayer.h"
 
 class SpriteInstance;
 
@@ -28,6 +31,9 @@ public:
 
 	void draw() const override;
 
+public:
+	void crate_field_view();
+
 #ifdef _DEBUG
 public:
 	void debug_update() override;
@@ -36,10 +42,16 @@ public:
 private:
 	std::unique_ptr<RenderPath> renderPath;
 
+	std::unique_ptr<Camera3D> camera3D;
+	std::unique_ptr<DirectionalLightInstance> directionalLight;
+
 	int32_t selectIndex;
 	std::unique_ptr<SpriteInstance> selectUi;
 	std::unique_ptr<SpriteInstance> startUi;
 	std::unique_ptr<SpriteInstance> numberUi;
 
 	std::unique_ptr<AudioPlayer> bgm;
+
+	std::unique_ptr<WorldInstance> fieldRotation;
+	std::unique_ptr<MapchipField> field;
 };
