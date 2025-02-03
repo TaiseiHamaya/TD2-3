@@ -118,7 +118,7 @@ void SelectScene::update() {
 	}
 
 	Quaternion rotation = fieldRotation->get_transform().get_quaternion();
-	fieldRotation->get_transform().set_quaternion(Quaternion::AngleAxis(CVector3::BASIS_Y, 1.5f * ToRadian) * rotation);
+	fieldRotation->get_transform().set_quaternion(Quaternion::AngleAxis(CVector3::BASIS_Y, PI * WorldClock::DeltaSeconds()) * rotation);
 }
 
 void SelectScene::begin_rendering() {
@@ -180,6 +180,10 @@ void SelectScene::debug_update() {
 
 	ImGui::Begin("Camera");
 	camera3D->debug_gui();
+	ImGui::End();
+
+	ImGui::Begin("WorldClock");
+	WorldClock::DebugGui();
 	ImGui::End();
 }
 #endif // _DEBUG
