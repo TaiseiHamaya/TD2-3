@@ -6,14 +6,14 @@ FailedUI::FailedUI() { init(); }
 FailedUI::~FailedUI() {}
 
 void FailedUI::init() {
-	failedTex = std::make_unique<SpriteInstance>("Failed.png");
-	failedLetter[0] = std::make_unique<SpriteInstance>("F.png", Vector2(0.5f, 0.5f));
-	failedLetter[1] = std::make_unique<SpriteInstance>("a.png", Vector2(0.5f, 0.5f));
-	failedLetter[2] = std::make_unique<SpriteInstance>("i.png", Vector2(0.5f, 0.5f));
-	failedLetter[3] = std::make_unique<SpriteInstance>("l.png", Vector2(0.5f, 0.5f));
-	failedLetter[4] = std::make_unique<SpriteInstance>("e.png", Vector2(0.5f, 0.5f));
-	failedLetter[5] = std::make_unique<SpriteInstance>("d.png", Vector2(0.5f, 0.5f));
-	failedLetter[6] = std::make_unique<SpriteInstance>("ten.png", Vector2(0.5f, 0.5f));
+	alignmentTex = std::make_unique<SpriteInstance>("Failed.png");
+	letterTex[0] = std::make_unique<SpriteInstance>("F.png", Vector2(0.5f, 0.5f));
+	letterTex[1] = std::make_unique<SpriteInstance>("a.png", Vector2(0.5f, 0.5f));
+	letterTex[2] = std::make_unique<SpriteInstance>("i.png", Vector2(0.5f, 0.5f));
+	letterTex[3] = std::make_unique<SpriteInstance>("l.png", Vector2(0.5f, 0.5f));
+	letterTex[4] = std::make_unique<SpriteInstance>("e.png", Vector2(0.5f, 0.5f));
+	letterTex[5] = std::make_unique<SpriteInstance>("d.png", Vector2(0.5f, 0.5f));
+	letterTex[6] = std::make_unique<SpriteInstance>("ten.png", Vector2(0.5f, 0.5f));
 
 	endPos[0] = { 394.f,endPosHeight };
 	endPos[1] = { 496.f,endPosHeight };
@@ -25,8 +25,8 @@ void FailedUI::init() {
 	
 	for (int i = 0; i < 7; i++) {
 		curEaseT[i] = 0;
-		failedLetter[i]->get_transform().set_translate_x(endPos[i].x);
-		failedLetter[i]->get_color().alpha = 0.f;
+		letterTex[i]->get_transform().set_translate_x(endPos[i].x);
+		letterTex[i]->get_color().alpha = 0.f;
 		startPos[i] = { 640-(3-i)*30.0f,720};
 	}
 	curDelayTime = 0;
@@ -67,18 +67,18 @@ void FailedUI::update() {
 #include <imgui.h>
 void FailedUI::debugUpdate() {
 
-	for (int i = 0; i < 7; i++) {
+	/*for (int i = 0; i < 7; i++) {
 
 		ImGui::Begin(("endPos" + std::to_string(i)).c_str());
-		failedLetter[i]->debug_gui();
+		letterTex[i]->debug_gui();
 		ImGui::End();
-	}
+	}*/
 }
 #endif
 void FailedUI::begin_rendering() {
-	failedTex->begin_rendering();
+	alignmentTex->begin_rendering();
 	for (int i = 0; i < 7; i++) {
-		failedLetter[i]->begin_rendering();
+		letterTex[i]->begin_rendering();
 	}
 	failedReasonUI->begin_rendering();
 }
@@ -86,7 +86,7 @@ void FailedUI::begin_rendering() {
 void FailedUI::draw() {
 	//failedTex->draw();
 	for (int i = 0; i < 7; i++) {
-		failedLetter[i]->draw();
+		letterTex[i]->draw();
 	}
 	failedReasonUI->draw();
 
@@ -97,9 +97,9 @@ void FailedUI::EaseChange(int index, float easeT) {
 	float ratio = std::clamp(easeT / totalEaseT, 0.f, 1.f);
 	//色
 	//Easing::Out::Expo(ratio)
-	failedLetter[index]->get_color().alpha = Easing::Out::Expo(ratio);
+	letterTex[index]->get_color().alpha = Easing::Out::Expo(ratio);
 	//座標
-	failedLetter[index]->get_transform().set_translate(
+	letterTex[index]->get_transform().set_translate(
 		{ std::lerp(
 		startPos[index].x,
 		endPos[index].x,

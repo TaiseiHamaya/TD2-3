@@ -26,8 +26,8 @@ private:
 	void EaseChange(int index, float easeT);
 	void updateReason();
 private:
-	std::unique_ptr<SpriteInstance>failedTex;
-	std::unique_ptr<SpriteInstance>failedLetter[7];//1文字づつ表示用
+	std::unique_ptr<SpriteInstance>alignmentTex;
+	std::unique_ptr<SpriteInstance>letterTex[7];//1文字づつ表示用
 
 	Vector2 endPos[7];//最終的な位置
 	Vector2 startPos[7];//最終的な位置
@@ -35,7 +35,6 @@ private:
 	float curEaseT[7];
 	float totalEaseT = 0.8f;
 	float endPosHeight = 415.f;//最終的な位置の高さ
-	float moveLength = 50;//上下の移動量
 
 	int curIndex;
 	float delayTotalTime = 0.1f;

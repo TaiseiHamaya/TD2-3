@@ -153,6 +153,7 @@
     <ClCompile Include="Application\Scene\BackGround.cpp" />
     <ClCompile Include="Library\Math\Easing.cpp" />
     <ClCompile Include="Application\UI\FailedUI.cpp" />
+    <ClCompile Include="Application\UI\ClearUI.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Engine\Module\Render\RenderNode\Deferred\DeferredAdaptor.h" />
@@ -316,6 +317,7 @@
     <ClInclude Include="Application\Scene\BackGround.h" />
     <ClInclude Include="Library\Math\Easing.h" />
     <ClInclude Include="Application\UI\FailedUI.h" />
+    <ClInclude Include="Application\UI\ClearUI.h" />
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="EngineResources\HLSL\FullscreenShader.hlsl">

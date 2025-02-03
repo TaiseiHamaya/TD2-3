@@ -21,7 +21,7 @@ void GameManagement::init() {
 	isReset = false;
 	isNext = false;
 	selectIndex = 1;//リトライ時に最初に選んでる方　0リトライ　1ネクスト、1手前からリスタート
-	clearSprite = std::make_unique<SpriteInstance>("ClearTex.png");
+	//clearSprite = std::make_unique<SpriteInstance>("ClearTex.png");
 	//failedSprite = std::make_unique<SpriteInstance>("FailedTex.png");
 
 
@@ -47,6 +47,7 @@ void GameManagement::init() {
 	undoRetryUI->get_transform().set_translate({789,169});
 
 	failedUI = std::make_unique<FailedUI>();
+	clearUI = std::make_unique<ClearUI>();
 
 	decision = std::make_unique<AudioPlayer>();
 	decision->initialize("decision.wav");
@@ -108,6 +109,8 @@ void GameManagement::update() {
 
 	selectFunc();
 	if (failedFlag) { failedUI->update(); }
+	if (clearFlag) { clearUI->update(); }
+	
 }
 #ifdef _DEBUG
 
@@ -118,11 +121,13 @@ void GameManagement::debug_update() {
 	undoRetryUI->debug_gui();
 	ImGui::End();
 	failedUI->debugUpdate();
+	clearUI->debugUpdate();
 }
 #endif
 void GameManagement::begin_rendering() {
-	clearSprite->begin_rendering();
+	//clearSprite->begin_rendering();
 	failedUI->begin_rendering();
+	clearUI->begin_rendering();
 	nextUI->begin_rendering();
 	retryUI->begin_rendering();
 	selectFrame->begin_rendering();
@@ -133,7 +138,7 @@ void GameManagement::begin_rendering() {
 
 void GameManagement::darw() {
 	if(clearFlag) {
-		clearSprite->draw();
+		clearUI->draw();
 
 		if(curLevel>=maxLevel){
 			goSelect->draw();

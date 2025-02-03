@@ -77,6 +77,13 @@ void GameScene::load() {
 	TextureManager::RegisterLoadQue("./GameResources/Texture/Failed/e.png");
 	TextureManager::RegisterLoadQue("./GameResources/Texture/Failed/d.png");
 	TextureManager::RegisterLoadQue("./GameResources/Texture/Failed/ten.png");
+	TextureManager::RegisterLoadQue("./GameResources/Texture/Clear/Clear.png");
+	TextureManager::RegisterLoadQue("./GameResources/Texture/Clear/C.png");
+	TextureManager::RegisterLoadQue("./GameResources/Texture/Clear/L.png");
+	TextureManager::RegisterLoadQue("./GameResources/Texture/Clear/E.png");
+	TextureManager::RegisterLoadQue("./GameResources/Texture/Clear/A.png");
+	TextureManager::RegisterLoadQue("./GameResources/Texture/Clear/R.png");
+	TextureManager::RegisterLoadQue("./GameResources/Texture/Clear/!.png");
 
 
 	AudioManager::RegisterLoadQue("./GameResources/Audio/move.wav");
