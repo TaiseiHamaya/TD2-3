@@ -151,6 +151,7 @@
     <ClCompile Include="Application\Character\Player\MoveLogger\MoveLogger.cpp" />
     <ClCompile Include="Application\Scene\TitleScene.cpp" />
     <ClCompile Include="Application\Scene\BackGround.cpp" />
+    <ClCompile Include="Library\Math\Easing.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Engine\Module\Render\RenderNode\Deferred\DeferredAdaptor.h" />
@@ -312,6 +313,7 @@
     <ClInclude Include="Application\Character\Player\MoveLogger\MoveLogger.h" />
     <ClInclude Include="Application\Scene\TitleScene.h" />
     <ClInclude Include="Application\Scene\BackGround.h" />
+    <ClInclude Include="Library\Math\Easing.h" />
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="EngineResources\HLSL\FullscreenShader.hlsl">
