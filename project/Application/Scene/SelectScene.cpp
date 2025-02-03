@@ -57,9 +57,15 @@ void SelectScene::initialize() {
 	selectUi = eps::CreateUnique<SpriteInstance>("StageSelectUI.png", Vector2{ 0.5f, 0.5f });
 	selectUi->get_transform().set_translate({ 640.0f,550.0f });
 	numberUi = eps::CreateUnique<SpriteInstance>("number.png", Vector2{ 0.5f, 0.5f });
-	numberUi->get_transform().set_translate({ 640.0f,360.0f });
 	numberUi->get_transform().set_scale({ 0.1f,1.0f });
 	numberUi->get_uv_transform().set_scale({ 0.1f,1.0f });
+	numberUi10 = eps::CreateUnique<SpriteInstance>("number.png", Vector2{ 0.5f, 0.5f });
+	numberUi10->get_transform().set_translate({ 640.0f - 96 / 2,360.0f });
+	numberUi10->get_transform().set_scale({ 0.1f,1.0f });
+	numberUi10->get_uv_transform().set_scale({ 0.1f,1.0f });
+	if (selectIndex < 10) {
+		numberUi10->set_active(false);
+	}
 
 	LevelLoader loader{ selectIndex };
 
@@ -109,7 +115,19 @@ void SelectScene::update() {
 		crate_field_view();
 	}
 
+	// 2桁表示
+	if (selectIndex >= 10) {
+		numberUi->get_transform().set_translate({ 640.0f+ 96 / 2,360.0f });
+		numberUi10->set_active(true);
+	}
+	// 1桁表示
+	else {
+		numberUi->get_transform().set_translate({ 640.0f,360.0f });
+		numberUi10->set_active(false);
+	}
+
 	numberUi->get_uv_transform().set_translate_x(selectIndex * 0.1f);
+	numberUi10->get_uv_transform().set_translate_x((selectIndex / 10) * 0.1f);
 
 	if (Input::IsTriggerKey(KeyID::Space)) {
 		SceneManager::SetSceneChange(
@@ -127,6 +145,7 @@ void SelectScene::begin_rendering() {
 	field->begin_rendering();
 
 	numberUi->begin_rendering();
+	numberUi10->begin_rendering();
 	selectUi->begin_rendering();
 	startUi->begin_rendering();
 }
@@ -145,6 +164,7 @@ void SelectScene::draw() const {
 	renderPath->next();
 	// Sprite
 	numberUi->draw();
+	numberUi10->draw();
 	selectUi->draw();
 	startUi->draw();
 
@@ -169,9 +189,6 @@ void SelectScene::crate_field_view() {
 void SelectScene::debug_update() {
 	ImGui::Begin("SelectUi");
 	selectUi->debug_gui();
-	ImGui::End();
-	ImGui::Begin("numberUi");
-	numberUi->debug_gui();
 	ImGui::End();
 	ImGui::Begin("startUi");
 	startUi->debug_gui();

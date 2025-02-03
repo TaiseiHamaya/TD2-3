@@ -34,6 +34,18 @@ public:
 	Transform2D& get_uv_transform() noexcept;
 	Color4& get_color() const;
 
+	/// <summary>
+	/// アクティブフラグの設定
+	/// </summary>
+	/// <param name="isActive_"></param>
+	void set_active(bool isActive_) { isActive = isActive_; };
+
+	/// <summary>
+	/// アクティブフラグの取得
+	/// </summary>
+	/// <returns></returns>
+	bool is_active() const { return isActive; };
+
 	//void update();
 	void begin_rendering() noexcept;
 	void draw() const;
@@ -46,6 +58,8 @@ private:
 	void create_local_vertices(const Vector2& pivot);
 
 private:
+	bool isActive{ true };
+
 	std::unique_ptr<Object3DVertexBuffer> vertices;
 	std::unique_ptr<IndexBuffer> indexes;
 	std::shared_ptr<const Texture> texture;

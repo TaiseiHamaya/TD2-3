@@ -49,6 +49,7 @@ private:
 	std::unique_ptr<SpriteInstance> selectUi;
 	std::unique_ptr<SpriteInstance> startUi;
 	std::unique_ptr<SpriteInstance> numberUi;
+	std::unique_ptr<SpriteInstance> numberUi10;
 
 	std::unique_ptr<AudioPlayer> bgm;
 
