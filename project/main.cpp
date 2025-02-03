@@ -22,7 +22,7 @@ int WINAPI WinMain(HINSTANCE,HINSTANCE,LPSTR,int) {
 	SceneManager::Initialize(std::make_unique<SelectScene>());
 #endif // _DEBUG
 
-	AudioManager::SetMasterVolume(1.0f);
+	AudioManager::SetMasterVolume(0.3f);
 
 	WinApp::ShowAppWindow();
 
