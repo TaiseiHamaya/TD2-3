@@ -26,12 +26,25 @@ void FailedUI::init() {
 	for (int i = 0; i < 7; i++) {
 		curEaseT[i] = 0;
 		failedLetter[i]->get_transform().set_translate_x(endPos[i].x);
+		failedLetter[i]->get_color().alpha = 0.f;
+
 	}
+	curDelayTime = 0;
+	curIndex = 0;
 }
 
 void FailedUI::update() {
 
-	for (int i = 0; i < 7; i++) {
+	if (curIndex < 7) {
+		curDelayTime += WorldClock::DeltaSeconds();
+		if (curDelayTime >= delayTotalTime) {
+			curDelayTime = 0;
+			curIndex++;
+		}
+	}
+	
+
+	for (int i = 0; i < curIndex; i++) {
 		curEaseT[i] += WorldClock::DeltaSeconds();
 		EaseChange(i, curEaseT[i]);
 	}
@@ -58,7 +71,7 @@ void FailedUI::begin_rendering() {
 }
 
 void FailedUI::draw() {
-	failedTex->draw();
+	//failedTex->draw();
 	for (int i = 0; i < 7; i++) {
 		failedLetter[i]->draw();
 	}
@@ -69,7 +82,7 @@ void FailedUI::EaseChange(int index, float easeT) {
 	float ratio = std::clamp(easeT / totalEaseT, 0.f, 1.f);
 	//色
 	//Easing::Out::Expo(ratio)
-	failedLetter[index]->get_color().alpha = ratio;
+	failedLetter[index]->get_color().alpha = Easing::Out::Expo(ratio);
 	//座標
 	failedLetter[index]->get_transform().set_translate_y(
 	std::lerp(

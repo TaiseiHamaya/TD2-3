@@ -30,5 +30,9 @@ private:
 	float totalEaseT = 1.f;
 	float endPosHeight = 415.f;//最終的な位置の高さ
 	float moveLength = 50;//上下の移動量
+
+	int curIndex;
+	float delayTotalTime=0.1f;
+	float curDelayTime;
 };
 
