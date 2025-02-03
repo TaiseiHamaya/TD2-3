@@ -13,6 +13,7 @@ class LevelLoader;
 #include "Application/Mapchip/MapchipField.h"
 #include "Application/Scene/GameManagement.h"
 #include "Application/Scene/GameSceneUI.h"
+#include "Application/Scene/BackGround.h"
 
 #include "Engine/Module/Render/RenderNode/Posteffect/Outline/OutlineNode.h"
 
@@ -61,6 +62,8 @@ private:
 
 	//UI
 	std::unique_ptr< GameSceneUI> gameUI;
+
+	std::unique_ptr< BackGround>background;
 
 	//BGM
 	std::unique_ptr<AudioPlayer>bgm;

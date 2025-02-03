@@ -72,6 +72,7 @@ void GameScene::load() {
 	TextureManager::RegisterLoadQue("./GameResources/Texture/UI/undoRetry.png");
 	TextureManager::RegisterLoadQue("./GameResources/Texture/UI/GoSelect.png");
 	TextureManager::RegisterLoadQue("./GameResources/Texture/UI/Undo.png");
+	TextureManager::RegisterLoadQue("./GameResources/Texture/backGround.png");
 
 
 	AudioManager::RegisterLoadQue("./GameResources/Audio/move.wav");
@@ -165,6 +166,9 @@ void GameScene::initialize() {
 	bgm->set_loop(true);
 	bgm->set_volume(0.1f);
 	bgm->play();
+
+	background = std::make_unique<BackGround>();
+
 }
 
 void GameScene::popped() {
@@ -223,6 +227,7 @@ void GameScene::begin_rendering() {
 	directionalLight->begin_rendering();
 	managementUI->begin_rendering();
 	gameUI->begin_rendering();
+	background->begin_rendering();
 }
 
 void GameScene::late_update() {
@@ -234,6 +239,7 @@ void GameScene::draw() const {
 	camera3D->register_world_lighting(4);
 	directionalLight->register_world(5);
 
+	
 	fieldObjs->draw();
 
 #ifdef _DEBUG
@@ -252,6 +258,8 @@ void GameScene::draw() const {
 	renderPath->next();
 	managementUI->darw();
 	gameUI->darw();
+
+	background->darw();
 	renderPath->next();
 
 #ifdef _DEBUG
