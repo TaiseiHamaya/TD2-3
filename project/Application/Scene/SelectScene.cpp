@@ -12,7 +12,7 @@
 #include <Engine/Utility/Tools/SmartPointer.h>
 #include "Engine/Resources/Audio/AudioManager.h"
 
-
+#include "Application/LevelLoader/LevelLoader.h"
 #include "Application/GameValue.h"
 #include "Application/Scene/GameScene.h"
 
@@ -25,6 +25,12 @@ SelectScene::SelectScene(int32_t selectLevel) :
 SelectScene::~SelectScene() = default;
 
 void SelectScene::load() {
+
+	PolygonMeshManager::RegisterLoadQue("./GameResources/Models/RordObj/RordObj.obj");
+	PolygonMeshManager::RegisterLoadQue("./GameResources/Models/WallObj/WallObj.obj");
+	PolygonMeshManager::RegisterLoadQue("./GameResources/Models/GoalObj/GoalObj.obj");
+	PolygonMeshManager::RegisterLoadQue("./GameResources/Models/IceObj/IceObj.obj");
+
 	TextureManager::RegisterLoadQue("./GameResources/Texture/UI/StageSelectUI.png");
 	TextureManager::RegisterLoadQue("./GameResources/Texture/UI/start.png");
 	TextureManager::RegisterLoadQue("./GameResources/Texture/UI/number.png");
@@ -35,6 +41,15 @@ void SelectScene::load() {
 void SelectScene::initialize() {
 	// Instance
 	Camera2D::Initialize();
+	camera3D = std::make_unique<Camera3D>();
+	camera3D->initialize();
+	camera3D->set_transform({
+		CVector3::BASIS,
+		 Quaternion::EulerDegree(40,0,0),//Quaternion::AngleAxis(CVector3::BASIS_Y, -PI /4) *
+		{2,10,-8}//{10,10,-6.3f}
+		});
+	directionalLight = eps::CreateUnique<DirectionalLightInstance>();
+
 	startUi = eps::CreateUnique<SpriteInstance>("start.png", Vector2{ 0.5f, 0.5f });
 	startUi->get_transform().set_translate({ 640.0f,140 });
 	selectUi = eps::CreateUnique<SpriteInstance>("StageSelectUI.png", Vector2{ 0.5f, 0.5f });
@@ -43,6 +58,11 @@ void SelectScene::initialize() {
 	numberUi->get_transform().set_translate({ 640.0f,360.0f });
 	numberUi->get_transform().set_scale({ 0.1f,1.0f });
 	numberUi->get_uv_transform().set_scale({ 0.1f,1.0f });
+
+	LevelLoader loader{ selectIndex };
+
+	field = std::make_unique<MapchipField>();
+	field->initialize(loader);
 
 	// Node&Path
 	std::shared_ptr<Object3DNode> object3dNode;
@@ -78,9 +98,13 @@ void SelectScene::begin() {
 void SelectScene::update() {
 	if (Input::IsTriggerKey(KeyID::D) && selectIndex < GameValue::MaxLevel) {
 		++selectIndex;
+		LevelLoader loader{ selectIndex };
+		field->initialize(loader);
 	}
 	else if (Input::IsTriggerKey(KeyID::A) && selectIndex > 1) {
 		--selectIndex;
+		LevelLoader loader{ selectIndex };
+		field->initialize(loader);
 	}
 
 	numberUi->get_uv_transform().set_translate_x(selectIndex * 0.1f);
@@ -96,6 +120,8 @@ void SelectScene::begin_rendering() {
 	numberUi->begin_rendering();
 	selectUi->begin_rendering();
 	startUi->begin_rendering();
+	camera3D->update_matrix();
+	field->begin_rendering();
 }
 
 void SelectScene::late_update() {
@@ -104,6 +130,10 @@ void SelectScene::late_update() {
 void SelectScene::draw() const {
 	renderPath->begin();
 	// Mesh
+	camera3D->register_world_projection(1);
+	camera3D->register_world_lighting(4);
+	directionalLight->register_world(5);
+	field->draw();
 
 	renderPath->next();
 	// Sprite

@@ -2,7 +2,8 @@
 
 #include <cstdint>
 #include <vector>
-#include "Library/Math/Vector3.h"
+
+#include <Library/Math/Vector3.h>
 
 class LevelLoader {
 public:

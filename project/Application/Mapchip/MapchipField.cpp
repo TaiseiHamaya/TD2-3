@@ -21,24 +21,27 @@ void MapchipField::initialize(Reference<const LevelLoader> level) {
 	auto& fieldLevel = level->get_field();
 	auto& fieldZeroGravity = level->get_zerogravity();
 
-
 	constexpr float boxSize = 1.0f;
-	field.resize(fieldLevel.size());
-	for (uint32_t row = 0; row < fieldLevel.size(); ++row) {
-		field[row].resize(fieldLevel[row].size());
-		for (uint32_t column = 0; column < fieldLevel[row].size(); ++column) {
+
+	rowSize = (uint32_t)fieldLevel.size();
+	if (field.size() < rowSize) {
+		field.resize(rowSize);
+	}
+	for (uint32_t row = 0; row < rowSize; ++row) {
+
+		columnSize = (uint32_t)fieldLevel[row].size();
+		if (field[row].size() < columnSize) {
+			field[row].resize(columnSize);
+		}
+		for (uint32_t column = 0; column < columnSize; ++column) {
 			field[row][column].isZeroGravity = fieldZeroGravity[row][column];
 			field[row][column].type = fieldLevel[row][column];
 			if (field[row][column].type != 0) {
-				field[row][column].mesh = std::make_unique<MeshInstance>(fieldFileName[field[row][column].type]);
-				//field[row][column].mesh->get_materials()
-					auto& objMat = field[row][column].mesh->get_materials();
+				field[row][column].mesh->reset_mesh(fieldFileName[field[row][column].type]);
+				auto& objMat = field[row][column].mesh->get_materials();
 				for (auto& mat : objMat) {
 					mat.lightingType = LighingType::None;
 				}
-			}
-			else {
-				field[row][column].mesh = std::make_unique<MeshInstance>();
 			}
 
 			// 左下を (0, 0) とする座標変換
@@ -54,23 +57,24 @@ void MapchipField::update() {
 }
 
 void MapchipField::begin_rendering() {
-	for (auto& vec : field) {
-		for (auto& elem : vec) {
-			elem.mesh->begin_rendering();
+	for (uint32_t i = 0; i < rowSize; ++i) {
+		for (uint32_t j = 0; j < columnSize; ++j) {
+			field[i][j].mesh->begin_rendering();
 		}
 	}
 }
 
 void MapchipField::draw() {
-	for (auto& vec : field) {
-		for (auto& elem : vec) {
-			elem.mesh->draw();
+	for (uint32_t i = 0; i < rowSize; ++i) {
+		for (uint32_t j = 0; j < columnSize; ++j) {
+			if (field[i][j].type != 0) {
+				field[i][j].mesh->draw();
+			}
 		}
 	}
 }
 
-int MapchipField::getElement(float x, float y)
-{
+int MapchipField::getElement(float x, float y) {
 	// 座標を整数に変換
 	int ix = static_cast<int>(x);
 	int iy = static_cast<int>(y);
@@ -82,4 +86,8 @@ int MapchipField::getElement(float x, float y)
 
 	// 範囲内の場合はマップから値を取得
 	return field[iy][ix].type;
+}
+
+MapchipField::Field::Field() {
+	mesh = std::make_unique<MeshInstance>();
 }

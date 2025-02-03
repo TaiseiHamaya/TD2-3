@@ -34,11 +34,11 @@ public:
 
 	void draw() const override;
 
-	//void on_collision(const BaseCollider* const, Color4* object);
-	//void on_collision_enter(const BaseCollider* const, Color4* object);
-	//void on_collision_exit(const BaseCollider* const, Color4* object);
+public:
+	void swap_level(int32_t level);
 
 #ifdef _DEBUG
+public:
 	void debug_update() override;
 #endif // _DEBUG
 

@@ -50,11 +50,6 @@ void GameScene::load() {
 	TextureManager::RegisterLoadQue("./GameResources/Texture/ClearTex.png");
 	TextureManager::RegisterLoadQue("./GameResources/Texture/FailedTex.png");
 
-	PolygonMeshManager::RegisterLoadQue("./GameResources/Models/RordObj/RordObj.obj");
-	PolygonMeshManager::RegisterLoadQue("./GameResources/Models/WallObj/WallObj.obj");
-	PolygonMeshManager::RegisterLoadQue("./GameResources/Models/GoalObj/GoalObj.obj");
-	PolygonMeshManager::RegisterLoadQue("./GameResources/Models/IceObj/IceObj.obj");
-
 	TextureManager::RegisterLoadQue("./GameResources/Texture/UI/Wkey.png");
 	TextureManager::RegisterLoadQue("./GameResources/Texture/UI/Akey.png");
 	TextureManager::RegisterLoadQue("./GameResources/Texture/UI/Skey.png");
