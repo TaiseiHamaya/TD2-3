@@ -68,11 +68,8 @@ void FailedUI::EaseChange(int index, float easeT) {
 
 	float ratio = std::clamp(easeT / totalEaseT, 0.f, 1.f);
 	//色
-	failedLetter[index]->get_color().LerpElement(
-		{ 1.f,1.f,1.f,0.f },
-		{ 1.f,1.f,1.f,0.f }, 
-		{0.f,0.f,0.f,ratio });//Easing::Out::Expo(ratio)
-
+	//Easing::Out::Expo(ratio)
+	failedLetter[index]->get_color().alpha = ratio;
 	//座標
 	failedLetter[index]->get_transform().set_translate_y(
 	std::lerp(
