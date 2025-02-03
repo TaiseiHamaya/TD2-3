@@ -97,7 +97,7 @@ void PlayerManager::update() {
 
 	// この条件式でできない理由 is 何
 	if (stageSituation == 0 &&
-		!(player->is_rotating() || player->is_moving() || player->is_falling() || child->is_falling()) &&
+		!(player->get_state() != PlayerState::Idle || player->is_falling() || child->is_falling()) &&
 		moveLogger->can_undo() && Input::IsTriggerKey(KeyID::Z)) {
 		undo();
 	}
@@ -337,11 +337,12 @@ void PlayerManager::undo() {
 		// ペアレントを解消する
 		childMesh->reparent(nullptr, false);
 		childMesh->look_at(*playerMesh);
-		// 補正
-		child->set_translate({ std::round(childPos.x), std::round(childPos.y), std::round(childPos.z) });
 		// 親子付けフラグをオフにする
 		player->set_parent(false);
 	}
+	// 補正
+	Vector3 childWorld = child->get_object()->get_transform().get_translate();
+	child->set_translate({ std::round(childWorld.x), std::round(childWorld.y), std::round(childWorld.z) });
 
 	player->begin_rendering();
 	child->begin_rendering();
@@ -352,8 +353,8 @@ void PlayerManager::undo() {
 		// 足元情報
 		Vector3 playerWorld = player->get_object()->world_position();
 		Vector3 childWorld = child->get_object()->world_position();
-		bool isPlayerOnGround = mapchipField_->getElement(playerWorld.x, playerWorld.z) == 1;
-		bool isChildOnGround = mapchipField_->getElement(childWorld.x, childWorld.z) == 1;
+		bool isPlayerOnGround = mapchipField_->getElement(playerWorld.x, playerWorld.z) != 0;
+		bool isChildOnGround = mapchipField_->getElement(childWorld.x, childWorld.z) != 0;
 		// 親
 		// 足元が地面
 		if (isPlayerOnGround) {
