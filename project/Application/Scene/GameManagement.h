@@ -27,10 +27,12 @@ public:
 	void SetFailedFlag(bool value) { failedFlag = value; }
 	bool is_reset() const { return isReset; }
 	bool is_next() const { return isNext; }
+	bool is_undoRestart()const { return isUndoRestart; }
 	bool is_escape_game() const { return toSelectTimer >= 0.1f; }
 	void SetFailedSelect(int value) { failedUI->SetReasonIndex(value); }
 	void SetCurLevel(int value) { curLevel = value; }
 	void SetMaxLevel(int value) { maxLevel = value; }
+
 
 private:
 	//std::unique_ptr<SpriteInstance> clearSprite;
@@ -51,6 +53,7 @@ private:
 
 	bool isReset;
 	bool isNext;
+	bool isUndoRestart;
 
 	int selectIndex; //0がリトライ、1がネクスト
 	//int failedSelectIndex;//0:子どもを置いてゴール 1:子コアラがゴール　2:コアラを落とす　3:ターン経過(まだない)
