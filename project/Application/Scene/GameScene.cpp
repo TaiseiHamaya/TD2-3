@@ -156,6 +156,7 @@ void GameScene::initialize() {
 	managementUI->SetMaxLevel(GameValue::MaxLevel);
 	managementUI->SetCurLevel(currentLevel);
 	gameUI = std::make_unique<GameSceneUI>();
+	gameUI->initialize(currentLevel);
 
 	bgm = std::make_unique<AudioPlayer>();
 	bgm->initialize("Game.wav");

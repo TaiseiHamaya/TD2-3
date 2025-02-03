@@ -14,7 +14,7 @@ public:
 	GameSceneUI();
 	~GameSceneUI();
 
-	void init();
+	void initialize(int32_t level);
 	void update();
 	void debugUpdate();
 	void begin_rendering();
@@ -36,6 +36,10 @@ private:
 	std::array<std::unique_ptr<SpriteInstance>, uiIndex>wasdSprite;
 	//std::unique_ptr<SpriteInstance>wasdSprite[];
 	std::unique_ptr<SpriteInstance>tutorialUI;
+
+	Vector2 numCenter;
+	std::unique_ptr<SpriteInstance> numberUi;
+	std::unique_ptr<SpriteInstance> numberUi10;
 
 	bool isCanRelese;
 
