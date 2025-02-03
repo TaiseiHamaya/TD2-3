@@ -10,6 +10,8 @@ MapchipField::MapchipField() = default;
 MapchipField::~MapchipField() = default;
 
 void MapchipField::initialize(Reference<const LevelLoader> level) {
+	fieldRoot = std::make_unique<WorldInstance>();
+
 	const std::string fieldFileName[] = {
 		"", // 穴
 		"RordObj.obj", // 床
@@ -34,18 +36,20 @@ void MapchipField::initialize(Reference<const LevelLoader> level) {
 			field[row].resize(columnSize);
 		}
 		for (uint32_t column = 0; column < columnSize; ++column) {
-			field[row][column].isZeroGravity = fieldZeroGravity[row][column];
-			field[row][column].type = fieldLevel[row][column];
-			if (field[row][column].type != 0) {
-				field[row][column].mesh->reset_mesh(fieldFileName[field[row][column].type]);
-				auto& objMat = field[row][column].mesh->get_materials();
+			Field& write = field[row][column];
+			write.isZeroGravity = fieldZeroGravity[row][column];
+			write.type = fieldLevel[row][column];
+			if (write.type != 0) {
+				write.mesh->reset_mesh(fieldFileName[write.type]);
+				auto& objMat = write.mesh->get_materials();
 				for (auto& mat : objMat) {
 					mat.lightingType = LighingType::None;
 				}
 			}
 
+			write.mesh->reparent(fieldRoot, false);
 			// 左下を (0, 0) とする座標変換
-			field[row][column].mesh->get_transform().set_translate(
+			write.mesh->get_transform().set_translate(
 				Vector3{ column * boxSize, 0.0f, row * boxSize }
 			);
 		}
@@ -57,6 +61,7 @@ void MapchipField::update() {
 }
 
 void MapchipField::begin_rendering() {
+	fieldRoot->update_affine();
 	for (uint32_t i = 0; i < rowSize; ++i) {
 		for (uint32_t j = 0; j < columnSize; ++j) {
 			field[i][j].mesh->begin_rendering();
@@ -74,6 +79,10 @@ void MapchipField::draw() {
 	}
 }
 
+Reference<WorldInstance> MapchipField::field_root() const {
+	return fieldRoot;
+}
+
 int MapchipField::getElement(float x, float y) {
 	// 座標を整数に変換
 	int ix = static_cast<int>(x);
@@ -88,6 +97,8 @@ int MapchipField::getElement(float x, float y) {
 	return field[iy][ix].type;
 }
 
-MapchipField::Field::Field() {
-	mesh = std::make_unique<MeshInstance>();
+MapchipField::Field::Field() :
+	mesh(std::make_unique<MeshInstance>()),
+	type(0),
+	isZeroGravity(false) {
 }

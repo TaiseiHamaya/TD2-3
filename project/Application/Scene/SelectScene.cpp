@@ -1,6 +1,9 @@
 #include "SelectScene.h"
 
+#include <Library/Math/Definition.h>
+
 #include "Engine/Module/Render/RenderNode/2D/Sprite/SpriteNode.h"
+#include "Engine/Resources/Audio/AudioManager.h"
 #include <Engine/Module/Render/RenderNode/Forward/Object3DNode/Object3DNode.h>
 #include <Engine/Module/World/Camera/Camera2D.h>
 #include <Engine/Module/World/Sprite/SpriteInstance.h>
@@ -10,10 +13,9 @@
 #include <Engine/Runtime/Input/Input.h>
 #include <Engine/Runtime/Scene/SceneManager.h>
 #include <Engine/Utility/Tools/SmartPointer.h>
-#include "Engine/Resources/Audio/AudioManager.h"
 
-#include "Application/LevelLoader/LevelLoader.h"
 #include "Application/GameValue.h"
+#include "Application/LevelLoader/LevelLoader.h"
 #include "Application/Scene/GameScene.h"
 
 SelectScene::SelectScene() : SelectScene(1) {};
@@ -45,8 +47,8 @@ void SelectScene::initialize() {
 	camera3D->initialize();
 	camera3D->set_transform({
 		CVector3::BASIS,
-		 Quaternion::EulerDegree(40,0,0),//Quaternion::AngleAxis(CVector3::BASIS_Y, -PI /4) *
-		{2,10,-8}//{10,10,-6.3f}
+		 Quaternion::EulerDegree(40,0,0),
+		{0,10,-12}
 		});
 	directionalLight = eps::CreateUnique<DirectionalLightInstance>();
 
@@ -62,7 +64,9 @@ void SelectScene::initialize() {
 	LevelLoader loader{ selectIndex };
 
 	field = std::make_unique<MapchipField>();
-	field->initialize(loader);
+	fieldRotation = std::make_unique<WorldInstance>();
+
+	crate_field_view();
 
 	// Node&Path
 	std::shared_ptr<Object3DNode> object3dNode;
@@ -98,13 +102,11 @@ void SelectScene::begin() {
 void SelectScene::update() {
 	if (Input::IsTriggerKey(KeyID::D) && selectIndex < GameValue::MaxLevel) {
 		++selectIndex;
-		LevelLoader loader{ selectIndex };
-		field->initialize(loader);
+		crate_field_view();
 	}
 	else if (Input::IsTriggerKey(KeyID::A) && selectIndex > 1) {
 		--selectIndex;
-		LevelLoader loader{ selectIndex };
-		field->initialize(loader);
+		crate_field_view();
 	}
 
 	numberUi->get_uv_transform().set_translate_x(selectIndex * 0.1f);
@@ -114,14 +116,19 @@ void SelectScene::update() {
 			eps::CreateUnique<GameScene>(selectIndex), 1.0f
 		);
 	}
+
+	Quaternion rotation = fieldRotation->get_transform().get_quaternion();
+	fieldRotation->get_transform().set_quaternion(Quaternion::AngleAxis(CVector3::BASIS_Y, 1.5f * ToRadian) * rotation);
 }
 
 void SelectScene::begin_rendering() {
+	camera3D->update_matrix();
+	fieldRotation->update_affine();
+	field->begin_rendering();
+
 	numberUi->begin_rendering();
 	selectUi->begin_rendering();
 	startUi->begin_rendering();
-	camera3D->update_matrix();
-	field->begin_rendering();
 }
 
 void SelectScene::late_update() {
@@ -144,6 +151,20 @@ void SelectScene::draw() const {
 	renderPath->next();
 }
 
+void SelectScene::crate_field_view() {
+	fieldRotation->get_transform().set_quaternion(CQuaternion::IDENTITY);
+
+	LevelLoader loader{ selectIndex };
+	field->initialize(loader);
+	Reference<WorldInstance> fieldRoot = field->field_root();
+
+
+	fieldRoot->reparent(fieldRotation, false);
+	fieldRoot->get_transform().set_translate(
+		{ -static_cast<float>(field->row()) / 2,0,-static_cast<float>(field->column()) / 2 }
+	);
+}
+
 #ifdef _DEBUG
 void SelectScene::debug_update() {
 	ImGui::Begin("SelectUi");
@@ -156,5 +177,9 @@ void SelectScene::debug_update() {
 	startUi->debug_gui();
 	ImGui::End();
 
+
+	ImGui::Begin("Camera");
+	camera3D->debug_gui();
+	ImGui::End();
 }
 #endif // _DEBUG

@@ -34,9 +34,6 @@ public:
 
 	void draw() const override;
 
-public:
-	void swap_level(int32_t level);
-
 #ifdef _DEBUG
 public:
 	void debug_update() override;

@@ -31,6 +31,9 @@ public:
 
 	void draw() const override;
 
+public:
+	void crate_field_view();
+
 #ifdef _DEBUG
 public:
 	void debug_update() override;
@@ -49,5 +52,6 @@ private:
 
 	std::unique_ptr<AudioPlayer> bgm;
 
+	std::unique_ptr<WorldInstance> fieldRotation;
 	std::unique_ptr<MapchipField> field;
 };
