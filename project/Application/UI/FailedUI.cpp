@@ -27,7 +27,7 @@ void FailedUI::init() {
 		curEaseT[i] = 0;
 		failedLetter[i]->get_transform().set_translate_x(endPos[i].x);
 		failedLetter[i]->get_color().alpha = 0.f;
-
+		startPos[i] = { 640-(3-i)*30.0f,720};
 	}
 	curDelayTime = 0;
 	curIndex = 0;
@@ -84,10 +84,14 @@ void FailedUI::EaseChange(int index, float easeT) {
 	//Easing::Out::Expo(ratio)
 	failedLetter[index]->get_color().alpha = Easing::Out::Expo(ratio);
 	//座標
-	failedLetter[index]->get_transform().set_translate_y(
-	std::lerp(
-		endPosHeight+moveLength,
-		endPosHeight,
-		ratio)
+	failedLetter[index]->get_transform().set_translate(
+		{ std::lerp(
+		startPos[index].x,
+		endPos[index].x,
+		Easing::Out::Quad(ratio)) ,std::lerp(
+		startPos[index].y,
+		endPos[index].y,
+		Easing::Out::Quad(ratio)) }
+	
 	);
 }

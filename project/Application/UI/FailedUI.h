@@ -26,6 +26,8 @@ private:
 	std::unique_ptr<SpriteInstance>failedLetter[7];//1文字づつ表示用
 
 	Vector2 endPos[7];//最終的な位置
+	Vector2 startPos[7];//最終的な位置
+
 	float curEaseT[7];
 	float totalEaseT = 1.f;
 	float endPosHeight = 415.f;//最終的な位置の高さ
