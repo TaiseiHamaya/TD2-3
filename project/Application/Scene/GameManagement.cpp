@@ -140,15 +140,18 @@ void GameManagement::darw() {
 	if(clearFlag) {
 		clearUI->draw();
 
-		if(curLevel>=maxLevel){
-			goSelect->draw();
-		} else
-		{
-			nextUI->draw();
+		if (clearUI->GetUiVisible()) {
+			if (curLevel >= maxLevel) {
+				goSelect->draw();
+			}
+			else {
+				nextUI->draw();
 
+			}
+			retryUI->draw();
+			selectFrame->draw();
 		}
-		retryUI->draw();
-		selectFrame->draw();
+		
 	} else if(failedFlag) {
 		failedUI->draw();
 		if (failedUI->GetUiVisible()) {

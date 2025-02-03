@@ -25,6 +25,9 @@ void ClearUI::init() {
 		letterTex[i]->get_transform().set_translate_x(endPos[i].x);
 		letterTex[i]->get_color().alpha = 0.f;
 		startPos[i] = { 640 - (3 - i) * 200.0f,0 };
+		boundCurEaseT[i] = 0;
+		boundEaseDir[i] = 1;
+		//letterTex[i]->get_transform().set_scale({ 1.2f,0.8f });
 	}
 	curDelayTime = 0;
 	curIndex = 0;
@@ -43,17 +46,21 @@ void ClearUI::update() {
 		curEaseT[i] += WorldClock::DeltaSeconds();
 		EaseChange(i, curEaseT[i]);
 	}
+	for (int i = 0; i < 6; i++) {
+		BoundEase(i);
+	}
+	if (curEaseT[5] > totalEaseT) { uiVisibleFlag = true; }
 }
 #ifdef _DEBUG
 
 #include <imgui.h>
 void ClearUI::debugUpdate() {
-	for (int i = 0; i < 6; i++) {
+	/*for (int i = 0; i < 6; i++) {
 
 		ImGui::Begin(("endPos" + std::to_string(i)).c_str());
 		letterTex[i]->debug_gui();
 		ImGui::End();
-	}
+	}*/
 }
 #endif
 void ClearUI::begin_rendering() {
@@ -87,4 +94,32 @@ void ClearUI::EaseChange(int index, float easeT) {
 		Easing::Out::Back(ratio)) }
 
 	);
+}
+
+void ClearUI::BoundEase(int index) {
+	if (curEaseT[index] < totalEaseT) { return; }
+	boundCurEaseT[index] += WorldClock::DeltaSeconds() * boundEaseDir[index];
+
+	if (boundCurEaseT[index] > boundTotalEaseT) {
+		boundCurEaseT[index] = boundTotalEaseT;
+		boundEaseDir[index] *= -1;
+	}
+	else if (boundCurEaseT[index] < 0) {
+		boundCurEaseT[index] = 0;
+		boundEaseDir[index] *= -1;
+	}
+
+	float ratio = std::clamp(boundCurEaseT[index] / boundTotalEaseT, 0.f, 1.f);
+
+	letterTex[index]->get_transform().set_translate_y(
+		std::lerp(
+			endPosHeight,
+			endPosHeight+ boundLength,
+			Easing::Out::Sine(ratio))
+
+	);
+	Vector2 newScale = CVector2::ZERO;
+	newScale.x = std::lerp(1.1f, 0.8f, Easing::Out::Sine(ratio));
+	newScale.y = std::lerp(0.9f, 1.2f, Easing::Out::Sine(ratio));
+	letterTex[index]->get_transform().set_scale(newScale);
 }
