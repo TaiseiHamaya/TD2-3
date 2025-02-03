@@ -69,6 +69,14 @@ void GameScene::load() {
 	TextureManager::RegisterLoadQue("./GameResources/Texture/UI/Undo.png");
 	TextureManager::RegisterLoadQue("./GameResources/Texture/backGround.png");
 	TextureManager::RegisterLoadQue("./GameResources/Texture/backGround2.png");
+	TextureManager::RegisterLoadQue("./GameResources/Texture/Failed/Failed.png");
+	TextureManager::RegisterLoadQue("./GameResources/Texture/Failed/F.png");
+	TextureManager::RegisterLoadQue("./GameResources/Texture/Failed/a.png");
+	TextureManager::RegisterLoadQue("./GameResources/Texture/Failed/i.png");
+	TextureManager::RegisterLoadQue("./GameResources/Texture/Failed/l.png");
+	TextureManager::RegisterLoadQue("./GameResources/Texture/Failed/e.png");
+	TextureManager::RegisterLoadQue("./GameResources/Texture/Failed/d.png");
+	TextureManager::RegisterLoadQue("./GameResources/Texture/Failed/ten.png");
 
 
 	AudioManager::RegisterLoadQue("./GameResources/Audio/move.wav");

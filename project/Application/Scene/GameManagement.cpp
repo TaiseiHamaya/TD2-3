@@ -22,7 +22,7 @@ void GameManagement::init() {
 	isNext = false;
 	selectIndex = 1;//リトライ時に最初に選んでる方　0リトライ　1ネクスト、1手前からリスタート
 	clearSprite = std::make_unique<SpriteInstance>("ClearTex.png");
-	failedSprite = std::make_unique<SpriteInstance>("FailedTex.png");
+	//failedSprite = std::make_unique<SpriteInstance>("FailedTex.png");
 
 
 	goSelect = std::make_unique<SpriteInstance>("GoSelect.png",Vector2(0.5f,0.5f));
@@ -40,15 +40,17 @@ void GameManagement::init() {
 	retryUI->get_uv_transform().set_scale({0.5f,1.0f});
 
 	selectFrame = std::make_unique<SpriteInstance>("SelectFrame.png",Vector2(0.5f,0.5f));
-	failedUI = std::make_unique<SpriteInstance>("FailedUI_1.png");
-	failedUI->get_transform().set_scale({0.25f,1});
-	failedUI->get_uv_transform().set_scale({0.25f,1});
-	failedUI->get_transform().set_translate({257,220});
+	failedReasonUI = std::make_unique<SpriteInstance>("FailedUI_1.png");
+	failedReasonUI->get_transform().set_scale({0.25f,1});
+	failedReasonUI->get_uv_transform().set_scale({0.25f,1});
+	failedReasonUI->get_transform().set_translate({257,220});
 
 	undoRetryUI= std::make_unique<SpriteInstance>("undoRetry.png",Vector2(0.5f,0.5f));
 	undoRetryUI->get_transform().set_scale({0.5f,1.0f});
 	undoRetryUI->get_uv_transform().set_scale({0.5f,1.0f});
 	undoRetryUI->get_transform().set_translate({789,169});
+
+	failedUI = std::make_unique<FailedUI>();
 
 	decision = std::make_unique<AudioPlayer>();
 	decision->initialize("decision.wav");
@@ -119,15 +121,16 @@ void GameManagement::debug_update() {
 	ImGui::Begin("next");
 	undoRetryUI->debug_gui();
 	ImGui::End();
+	failedUI->debugUpdate();
 }
 #endif
 void GameManagement::begin_rendering() {
 	clearSprite->begin_rendering();
-	failedSprite->begin_rendering();
+	failedUI->begin_rendering();
 	nextUI->begin_rendering();
 	retryUI->begin_rendering();
 	selectFrame->begin_rendering();
-	failedUI->begin_rendering();
+	failedReasonUI->begin_rendering();
 	undoRetryUI->begin_rendering();
 	goSelect->begin_rendering();
 
@@ -147,10 +150,10 @@ void GameManagement::darw() {
 		retryUI->draw();
 		selectFrame->draw();
 	} else if(failedFlag) {
-		failedSprite->draw();
+		failedUI->draw();
 		retryUI->draw();
 		selectFrame->draw();
-		failedUI->draw();
+		failedReasonUI->draw();
 		undoRetryUI->draw();
 	}
 }
@@ -172,7 +175,7 @@ void GameManagement::selectFunc() {
 	if(failedFlag) {
 		//selectIndex = 0;
 		retryUI->get_transform().set_translate({458,169});
-		failedUI->get_uv_transform().set_translate_x(0.25f * failedSelectIndex);
+		failedReasonUI->get_uv_transform().set_translate_x(0.25f * failedSelectIndex);
 
 	} else if(clearFlag) {
 
