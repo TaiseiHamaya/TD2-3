@@ -9,6 +9,8 @@ void Player::initialize(const LevelLoader& level, MapchipHandler* mapchipHandler
 	object_->reset_animated_mesh("ParentKoala.gltf", "Standby", true);
 	object_->get_transform().set_translate(level.get_player_position());
 
+
+
 	auto& objMat = object_->get_materials();
 	for (auto& mat : objMat) {
 		mat.lightingType = LighingType::None;
@@ -137,6 +139,10 @@ void Player::move_update() {
 	// 移動中なら補間処理を実行
 	moveTimer += WorldClock::DeltaSeconds();
 
+	// 現在の位置を補間
+	Vector3 position = Vector3::Lerp(object_->get_transform().get_translate(), targetPosition, moveTimer / moveDuration);
+	object_->get_transform().set_translate(position);
+
 	if (moveTimer >= moveDuration) {
 		// 移動完了
 		playerState = PlayerState::Idle;
@@ -147,9 +153,6 @@ void Player::move_update() {
 		isStackMovement = true;
 	}
 
-	// 現在の位置を補間
-	Vector3 position = Vector3::Lerp(object_->get_transform().get_translate(), targetPosition, moveTimer / moveDuration);
-	object_->get_transform().set_translate(position);
 	return;
 }
 

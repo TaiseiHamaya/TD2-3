@@ -1,6 +1,7 @@
 #include "GameSceneUI.h"
 #include "Engine/Module/World/Sprite/SpriteInstance.h"
 #include <Engine/Runtime/Input/Input.h>
+#include <algorithm>
 
 GameSceneUI::GameSceneUI() { init(); }
 

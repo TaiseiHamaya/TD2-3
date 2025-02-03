@@ -6,9 +6,16 @@
 #include "Engine/Runtime/Input/Input.h"
 
 #include <Application/Utility/GameUtility.h>
+#include <Engine/Utility/Tools/SmartPointer.h>
 
 void PlayerManager::initialize(Reference<const LevelLoader> level, MapchipField* mapchipField) {
 	mapchipField_ = mapchipField;
+
+	catchEffect_ = std::make_unique<AnimatedMeshInstance>();
+	catchEffect_->reset_animated_mesh("CatchEffect.gltf", "", true);
+
+	dustEmitter = eps::CreateUnique<ParticleEmitterInstance>("dust.json", 128);
+	iceDustEmitter = eps::CreateUnique<ParticleEmitterInstance>("iceDust.json", 128);
 
 	mapchipHandler = std::make_unique<MapchipHandler>();
 	mapchipHandler->initialize(mapchipField_);
@@ -46,9 +53,13 @@ void PlayerManager::update() {
 	// クリアか失敗のフラグが立ってたら早期リターン
 	if (stageSituation != 0) return;
 
+	catchEffect_->begin();
+
 	// プレイヤーと子供の位置を計算
 	playerPos = player->get_translate();
 	childPos = child->get_object()->world_position();
+	Vector3 emitterPos = playerPos;
+	emitterPos.y -= 0.5f;
 
 	isParent = player->is_parent();//プレイヤーのくっつき状態のフラグを取得
 	// マップチップ関連の更新
@@ -59,6 +70,13 @@ void PlayerManager::update() {
 	// 状態の更新
 	player->update();
 	child->update();
+	catchEffect_->get_transform().set_translate({ 0.0f, 2.0f, 0.0f });
+
+	dustEmitter->get_transform().set_translate(emitterPos);
+	dustEmitter->update();
+
+	iceDustEmitter->get_transform().set_translate(emitterPos);
+	iceDustEmitter->update();
 
 	if (player->is_stack_movement()) {
 		emplace_log(player->move_start_position(), player->start_rotation());
@@ -66,8 +84,10 @@ void PlayerManager::update() {
 
 	// 親子関係の管理
 	manage_parent_child_relationship();
-
+	// 子供をプレイヤーの向かせる処理
 	set_child_rotate();
+	// パーティクルのオンオフの切り替え処理
+	particle_update();
 
 	// マップチップのクリア判定
 	stageSituation = mapchipHandler->is_goal_reached(player.get(), child.get());
@@ -106,11 +126,20 @@ void PlayerManager::update() {
 void PlayerManager::begin_rendering() {
 	player->begin_rendering();
 	child->begin_rendering();
+	catchEffect_->begin_rendering();
+	dustEmitter->begin_rendering();
+	iceDustEmitter->begin_rendering();
 }
 
 void PlayerManager::draw() const {
 	player->draw();
 	child->draw();
+	catchEffect_->draw();
+}
+
+void PlayerManager::draw_particle() {
+	dustEmitter->draw();
+	iceDustEmitter->draw();
 }
 
 void PlayerManager::handle_input() {
@@ -161,8 +190,39 @@ void PlayerManager::handle_input() {
 void PlayerManager::debug_update() {
 	player->debug_update();
 	child->debug_update();
+
+	ImGui::Begin("CatchEffect");
+	catchEffect_->debug_gui();
+	ImGui::End();
+
+	ImGui::Begin("dustEmitter");
+	dustEmitter->debug_gui();
+	ImGui::End();
+
+	ImGui::Begin("iceDustEmitter");
+	iceDustEmitter->debug_gui();
+	ImGui::End();
 }
 #endif
+
+void PlayerManager::particle_update() {
+	// パーティクルの制御
+// 待機と落下のどちらでもなければよろし
+	if (player->get_state() != PlayerState::Idle &&
+		player->get_state() != PlayerState::Falling) {
+		// その中でも氷の中だったら氷用
+		if (player->get_move_type() == MoveType::SlidingOnIce) {
+			iceDustEmitter->set_active(true);
+		}
+		else {
+			dustEmitter->set_active(true);
+		}
+	}
+	else {
+		dustEmitter->set_active(false);
+		iceDustEmitter->set_active(false);
+	}
+}
 
 void PlayerManager::manage_parent_child_relationship() {
 	// 1フレーム前の親子付け
@@ -209,8 +269,12 @@ void PlayerManager::set_child_rotate() {
 		return;
 	}
 
+	Vector3 childToPlayer;
+
 	// 子からプレイヤーへの方向ベクトルを計算
-	Vector3 childToPlayer = Vector3::Normalize(childPos, playerPos);
+	if (childPos != playerPos) {
+		childToPlayer = Vector3::Normalize(childPos, playerPos);
+	}
 
 	// 子からプレイヤーへの方向ベクトルの長さをチェック
 	if (childToPlayer.length() == 0.0f) return;
@@ -503,11 +567,11 @@ void PlayerManager::set_rotate_failed_parameters(const Vector3& direction) {
 	// 右方向
 	Vector3 rightDirection = GameUtility::rotate_direction_90_right(childDirection);
 	// 左斜め方向を計算
-	Vector3 leftDiagonalDirection = (childDirection + leftDirection).normalize();
+	Vector3 leftDiagonalDirection = (childDirection + leftDirection).normalize_safe();
 	// 右斜め方向を計算
-	Vector3 rightDiagonalDirection = (childDirection + rightDirection).normalize();
+	Vector3 rightDiagonalDirection = (childDirection + rightDirection).normalize_safe();
 	// プレイヤーと子が向かい合ってるときの斜め方向
-	Vector3 childDiagonalDirection = (childDirection + player->get_previous_direction()).normalize();
+	Vector3 childDiagonalDirection = (childDirection + player->get_previous_direction()).normalize_safe();
 
 	// 回転角の定義
 	const float ANGLE_15 = 15.0f * (3.14f / 180.0f);
@@ -678,6 +742,10 @@ void PlayerManager::set_rotate_failed_parameters(const Vector3& direction) {
 		else if (player->get_how_rotation() == RotationDirection::Right) {
 			player->set_mid_rotation(rotate175Right * player->get_rotation());
 		}
+		else {
+			player->set_how_rotation(RotationDirection::Reverce);
+			player->set_mid_rotation(rotate175Right * player->get_rotation());
+		}
 		break;
 	case RotateType::BackTileIsHole:
 		// 穴に落下する時の移動をセットしておく
@@ -698,4 +766,3 @@ void PlayerManager::set_rotate_failed_parameters(const Vector3& direction) {
 
 	return;
 }
-
