@@ -18,7 +18,9 @@
 #include <Engine/Runtime/WorldClock/WorldClock.h>
 #include "Engine/Resources/Audio/AudioManager.h"
 #include "Application/Scene/TitleScene.h"
-
+#include <Engine/Rendering/DirectX/DirectXResourceObject/DepthStencil/DepthStencil.h>
+#include <Engine/Module/Render/RenderTargetGroup/SingleRenderTarget.h>
+#include <Engine/Rendering/DirectX/DirectXResourceObject/OffscreenRender/OffscreenRender.h>
 
 #include "Application/GameValue.h"
 #include "Application/Scene/SelectScene.h"
@@ -107,17 +109,28 @@ void GameScene::initialize() {
 
 	directionalLight = eps::CreateUnique<DirectionalLightInstance>();
 
+	std::shared_ptr<SingleRenderTarget> meshRT;
+	meshRT = std::make_shared<SingleRenderTarget>();
+	meshRT->initialize();
+
 	std::shared_ptr<Object3DNode> object3dNode;
 	object3dNode = std::make_unique<Object3DNode>();
 	object3dNode->initialize();
-	object3dNode->set_config(RenderNodeConfig::ContinueUseDpehtBefore);
-	object3dNode->set_render_target_SC(DirectXSwapChain::GetRenderTarget());
+	object3dNode->set_config(RenderNodeConfig::ContinueDrawBefore | RenderNodeConfig::ContinueUseDpehtBefore);
+	object3dNode->set_render_target(meshRT);
 
 	std::shared_ptr<SkinningMeshNode> skinningMeshNode;
 	skinningMeshNode = std::make_unique<SkinningMeshNode>();
 	skinningMeshNode->initialize();
-	skinningMeshNode->set_config(RenderNodeConfig::ContinueDrawAfter | RenderNodeConfig::ContinueDrawBefore | RenderNodeConfig::ContinueUseDpehtAfter);
-	skinningMeshNode->set_render_target_SC(DirectXSwapChain::GetRenderTarget());
+	skinningMeshNode->set_config(RenderNodeConfig::ContinueDrawAfter | RenderNodeConfig::ContinueUseDpehtAfter);
+	skinningMeshNode->set_render_target(meshRT);
+
+	outlineNode = std::make_shared<OutlineNode>();
+	outlineNode->initialize();
+	outlineNode->set_render_target_SC(DirectXSwapChain::GetRenderTarget());
+	outlineNode->set_config(RenderNodeConfig::ContinueDrawBefore);
+	outlineNode->set_depth_resource(DepthStencilValue::depthStencil->texture_gpu_handle());
+	outlineNode->set_texture_resource(meshRT->offscreen_render().texture_gpu_handle());
 
 	std::shared_ptr<SpriteNode> spriteNode;
 	spriteNode = std::make_unique<SpriteNode>();
@@ -136,9 +149,9 @@ void GameScene::initialize() {
 
 	renderPath = eps::CreateUnique<RenderPath>();
 #ifdef _DEBUG
-	renderPath->initialize({ object3dNode,skinningMeshNode,spriteNode,primitiveLineNode });
+	renderPath->initialize({ object3dNode,skinningMeshNode,outlineNode,spriteNode,primitiveLineNode });
 #else
-	renderPath->initialize({object3dNode,skinningMeshNode,spriteNode });
+	renderPath->initialize({object3dNode,skinningMeshNode,outlineNode,spriteNode });
 #endif // _DEBUG
 
 	managementUI = std::make_unique<GameManagement>();
@@ -234,6 +247,9 @@ void GameScene::draw() const {
 	playerManager->draw();
 
 	renderPath->next();
+	outlineNode->draw();
+
+	renderPath->next();
 	managementUI->darw();
 	gameUI->darw();
 	renderPath->next();
@@ -256,9 +272,13 @@ void GameScene::debug_update() {
 	playerManager->debug_update();
 	gameUI->debugUpdate();
 	managementUI->debug_update();
+
 	ImGui::Begin("WorldClock");
 	WorldClock::DebugGui();
 	ImGui::End();
 
+	//ImGui::Begin("OutlineNode");
+	//outlineNode->
+	//ImGui::End();
 }
 #endif // _DEBUG
