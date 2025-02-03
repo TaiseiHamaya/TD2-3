@@ -17,6 +17,7 @@ public:
 	void handle_input();
 	void begin_rendering();
 	void draw() const;
+	void draw_particle();
 
 
 #ifdef _DEBUG
@@ -26,6 +27,8 @@ public:
 	void set_game_management(GameManagement* gameManagement) { gameManagement_ = gameManagement; }
 	bool get_isParent() { return isParent; }
 private:
+	void particle_update();
+
 	void manage_parent_child_relationship();
 	void set_child_rotate();
 
@@ -34,6 +37,7 @@ private:
 	bool is_game_cleared() const { return stageSituation; }
 	void emplace_log(const Vector3& playerPosition, const Quaternion& playerRotation);
 	void undo();
+
 
 	void set_move_parameters(const Vector3& direction);
 	void set_move_failed_parameters(const Vector3& direction);
@@ -46,6 +50,11 @@ private:
 	std::unique_ptr<Child> child;
 	std::unique_ptr<MapchipHandler> mapchipHandler;
 	std::unique_ptr<MoveLogger> moveLogger;
+	std::unique_ptr<AnimatedMeshInstance> catchEffect_;
+
+	// パーティクルの召還
+	std::unique_ptr<ParticleEmitterInstance> dustEmitter;
+	std::unique_ptr<ParticleEmitterInstance> iceDustEmitter;
 
 	GameManagement* gameManagement_;
 	MapchipField* mapchipField_;
