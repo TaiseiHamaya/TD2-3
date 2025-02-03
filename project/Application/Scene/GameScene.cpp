@@ -267,8 +267,8 @@ void GameScene::draw() const {
 	outlineNode->draw();
 
 	renderPath->next();
-	managementUI->darw();
 	gameUI->darw();
+	managementUI->darw();
 
 	background->darw();
 	renderPath->next();
