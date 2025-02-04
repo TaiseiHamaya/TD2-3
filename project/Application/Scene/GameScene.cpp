@@ -213,7 +213,7 @@ void GameScene::initialize() {
 	bgm->play();
 
 	background = std::make_unique<BackGround>();
-	rocketObj = std::make_unique<Rocket>();
+	rocketObj = std::make_unique<Rocket>(fieldObjs->GetGoalPos());
 }
 
 void GameScene::popped() {}
@@ -228,10 +228,12 @@ void GameScene::begin() {
 		fieldObjs->initialize(levelLoader);
 		playerManager->initialize(levelLoader, fieldObjs.get());
 		managementUI->init();
+		rocketObj->init();
 	}else if (managementUI->is_undoRestart()) {
 		//fieldObjs->initialize(levelLoader);
 		//playerManager->initialize(levelLoader, fieldObjs.get());
 		managementUI->init();
+		rocketObj->init();
 		//ここで一手戻す処理をする
 	}
 	else if (managementUI->is_next()) {
@@ -267,7 +269,7 @@ void GameScene::update() {
 	managementUI->update();
 	gameUI->update();
 	gameUI->setIsCanRelese(playerManager->get_isParent());
-	rocketObj->update();
+	rocketObj->update(playerManager->is_game_cleared());
 }
 
 void GameScene::begin_rendering() {
