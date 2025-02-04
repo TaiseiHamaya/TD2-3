@@ -18,13 +18,6 @@ enum class PlayerState {
     RotationFailed  // 回転失敗 (失敗理由は別に保持)
 };
 
-enum class ChildAnimation {
-    StandBy,
-    Hold,
-    Flustered,
-    Falling,
-};
-
 // 回転の失敗理由
 enum class RotateType {
     None,                  // 回転なし

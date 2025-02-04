@@ -1,6 +1,8 @@
 #include "FailedUI.h"
 #include <Engine/Module/World/Sprite/SpriteInstance.h>
 
+#include <algorithm>
+
 FailedUI::FailedUI() { init(); }
 
 FailedUI::~FailedUI() {}

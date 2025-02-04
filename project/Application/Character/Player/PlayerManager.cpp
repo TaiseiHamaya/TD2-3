@@ -12,7 +12,7 @@ void PlayerManager::initialize(Reference<const LevelLoader> level, MapchipField*
 	mapchipField_ = mapchipField;
 
 	catchEffect_ = std::make_unique<AnimatedMeshInstance>();
-	catchEffect_->reset_animated_mesh("CatchEffect.gltf", "", true);
+	catchEffect_->reset_animated_mesh("CatchEffect.gltf", "Standby", true);
 
 	dustEmitter = eps::CreateUnique<ParticleEmitterInstance>("dust.json", 128);
 	iceDustEmitter = eps::CreateUnique<ParticleEmitterInstance>("iceDust.json", 128);
@@ -141,7 +141,7 @@ void PlayerManager::begin_rendering() {
 void PlayerManager::draw() const {
 	player->draw();
 	child->draw();
-	catchEffect_->draw();
+	//catchEffect_->draw();
 }
 
 void PlayerManager::draw_particle() {

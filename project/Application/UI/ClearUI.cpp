@@ -1,6 +1,8 @@
 #include "ClearUI.h"
 #include <Engine/Module/World/Sprite/SpriteInstance.h>
 
+#include <algorithm>
+
 ClearUI::ClearUI() { init(); }
 
 ClearUI::~ClearUI() {}

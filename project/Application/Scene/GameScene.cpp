@@ -45,13 +45,16 @@ void GameScene::load() {
 	//PolygonMeshManager::RegisterLoadQue("./EngineResources/Models/Primitive/Sphere.obj");
 	PolygonMeshManager::RegisterLoadQue("./GameResources/Models/ParentKoala/ParentKoala.gltf");
 	PolygonMeshManager::RegisterLoadQue("./GameResources/Models/ChiledKoala/ChiledKoala.gltf");
-	PolygonMeshManager::RegisterLoadQue("./GameResources/Models/CatchEffect/CathEffect.gltf");
+	PolygonMeshManager::RegisterLoadQue("./GameResources/Models/CatchEffect/CatchEffect.gltf");
+	PolygonMeshManager::RegisterLoadQue("./GameResources/Models/exclamation/exclamation.gltf");
 	SkeletonManager::RegisterLoadQue("./GameResources/Models/ParentKoala/ParentKoala.gltf");
 	SkeletonManager::RegisterLoadQue("./GameResources/Models/ChiledKoala/ChiledKoala.gltf");
-	SkeletonManager::RegisterLoadQue("./GameResources/Models/CatchEffect/CathEffect.gltf");
+	SkeletonManager::RegisterLoadQue("./GameResources/Models/CatchEffect/CatchEffect.gltf");
+	SkeletonManager::RegisterLoadQue("./GameResources/Models/exclamation/exclamation.gltf");
 	NodeAnimationManager::RegisterLoadQue("./GameResources/Models/ParentKoala/ParentKoala.gltf");
 	NodeAnimationManager::RegisterLoadQue("./GameResources/Models/ChiledKoala/ChiledKoala.gltf");
-	NodeAnimationManager::RegisterLoadQue("./GameResources/Models/CatchEffect/CathEffect.gltf");
+	NodeAnimationManager::RegisterLoadQue("./GameResources/Models/CatchEffect/CatchEffect.gltf");
+	NodeAnimationManager::RegisterLoadQue("./GameResources/Models/exclamation/exclamation.gltf");
 	TextureManager::RegisterLoadQue("./GameResources/Texture/ClearTex.png");
 	TextureManager::RegisterLoadQue("./GameResources/Texture/FailedTex.png");
 

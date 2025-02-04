@@ -19,7 +19,7 @@ int WINAPI WinMain(HINSTANCE,HINSTANCE,LPSTR,int) {
 #ifdef _DEBUG
 	SceneManager::Initialize(std::make_unique<TitleScene>());
 #else
-	SceneManager::Initialize(std::make_unique<SelectScene>());
+	SceneManager::Initialize(std::make_unique<TitleScene>());
 #endif // _DEBUG
 
 	AudioManager::SetMasterVolume(0.3f);

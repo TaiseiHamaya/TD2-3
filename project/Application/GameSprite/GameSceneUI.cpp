@@ -6,6 +6,8 @@
 #include <Engine/Runtime/Input/Input.h>
 #include <Engine/Utility/Tools/SmartPointer.h>
 
+#include <algorithm>
+
 GameSceneUI::GameSceneUI() = default;
 
 GameSceneUI::~GameSceneUI() = default;
