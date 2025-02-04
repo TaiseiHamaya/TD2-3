@@ -6,7 +6,7 @@
 #include "Application/Character/Child/Child.h"
 #include "Application/Character/Player/Player.h"
 #include "Application/Mapchip/MapchipHandler.h"
-#include "Application/Scene/GameManagement.h"
+#include "Application/GameManagement/GameManagement.h"
 #include "Engine/Resources/Audio/AudioPlayer.h"
 
 class PlayerManager {
@@ -69,6 +69,7 @@ private:
     //音関連
     std::unique_ptr<AudioPlayer> holdAudio;//くっつき音
     std::unique_ptr<AudioPlayer> releaseAudio;//離れる音
+    std::unique_ptr<AudioPlayer> undoAudio;//undoの音
 	
 	bool isStackMovement;
 };

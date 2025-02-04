@@ -469,27 +469,25 @@ void MapchipHandler::check_fall_conditions(Player* player, Child* child) {
 
 	if (prePlayerChip != player->is_out_ground()) {
 		if (player->is_out_ground()) {
-			//player->get_object()->reset_animated_mesh("ChiledKoala.gltf", "Flustered", true);
 			player->get_object()->get_animation()->reset_animation("Flustered");
 			player->get_object()->get_animation()->set_loop(true);
 		}
 		else {
-			//player->get_object()->reset_animated_mesh("ChiledKoala.gltf", "Standby", true);
 			player->get_object()->get_animation()->reset_animation("Standby");
 			player->get_object()->get_animation()->set_loop(true);
 		}
 	}
-	// プレイヤーと同じで子供が穴の上にいるかどうかが前フレームと今フレームで違っていたらアニメーションの切り替え
-	if (preChildChip != child->is_out_ground()) {
-		if (child->is_out_ground()) {
-			//child->get_object()->reset_animated_mesh("ChiledKoala.gltf", "Flustered", true);
-			child->get_object()->get_animation()->reset_animation("Flustered");
-			child->get_object()->get_animation()->set_loop(true);
-		}
-		else {
-			//child->get_object()->reset_animated_mesh("ChiledKoala.gltf", "Hold", false);
-			child->get_object()->get_animation()->reset_animation("Hold");
-			child->get_object()->get_animation()->set_loop(false);
+	// 子供が穴の上にいるかどうかが前フレームと今フレームで違っていたらアニメーションの切り替え
+	if (player->is_parent()) {
+		if (preChildChip != child->is_out_ground()) {
+			if (child->is_out_ground()) {
+				child->get_object()->get_animation()->reset_animation("Flustered");
+				child->get_object()->get_animation()->set_loop(true);
+			}
+			else {
+				child->get_object()->get_animation()->reset_animation("Hold");
+				child->get_object()->get_animation()->set_loop(false);
+			}
 		}
 	}
 

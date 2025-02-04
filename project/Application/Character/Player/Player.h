@@ -13,6 +13,7 @@ public:
 	void initialize(const LevelLoader& level, MapchipHandler* mapchipHandler) override;
 	void finalize() override;
 	void update() override;
+	void fall_update();
 
 	void begin_rendering() override;
 	void draw() const override;
@@ -98,7 +99,7 @@ public: // アクセッサ
 #endif
 private:
 
-	void fall_update();
+
 	void move_update();
 	void rotate_update();
 	void wall_move();

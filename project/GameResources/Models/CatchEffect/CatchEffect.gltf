@@ -64,7 +64,7 @@
 					}
 				}
 			],
-			"name":"\u30a2\u30fc\u30de\u30c1\u30e5\u30a2\u30a2\u30af\u30b7\u30e7\u30f3",
+			"name":"Standby",
 			"samplers":[
 				{
 					"input":7,

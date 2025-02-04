@@ -1,13 +1,16 @@
 #include "GameSceneUI.h"
-#include "Engine/Module/World/Sprite/SpriteInstance.h"
-#include <Engine/Runtime/Input/Input.h>
+
 #include <algorithm>
 
-GameSceneUI::GameSceneUI() { init(); }
+#include <Engine/Module/World/Sprite/SpriteInstance.h>
+#include <Engine/Runtime/Input/Input.h>
+#include <Engine/Utility/Tools/SmartPointer.h>
 
-GameSceneUI::~GameSceneUI() {}
+GameSceneUI::GameSceneUI() = default;
 
-void GameSceneUI::init() {
+GameSceneUI::~GameSceneUI() = default;
+
+void GameSceneUI::initialize(int32_t level) {
 	wasdSprite[0] = std::make_unique<SpriteInstance>("Wkey.png");
 	wasdSprite[1] = std::make_unique<SpriteInstance>("Akey.png");
 	wasdSprite[2] = std::make_unique<SpriteInstance>("Skey.png");
@@ -39,6 +42,28 @@ void GameSceneUI::init() {
 	curEaseT = 0;
 	wasdSprite[7]->get_transform().set_scale(CVector2::ZERO);
 
+	numberUi = eps::CreateUnique<SpriteInstance>("number.png", Vector2{ 0.5f, 0.5f });
+	numberUi->get_transform().set_scale({ 0.1f,1.0f });
+	numberUi->get_uv_transform().set_scale({ 0.1f,1.0f });
+	numberUi10 = eps::CreateUnique<SpriteInstance>("number.png", Vector2{ 0.5f, 0.5f });
+	numberUi10->get_transform().set_scale({ 0.1f,1.0f });
+	numberUi10->get_uv_transform().set_scale({ 0.1f,1.0f });
+	if (level < 10) {
+		numberUi10->set_active(false);
+	}
+	numberUi->get_uv_transform().set_translate_x(level * 0.1f);
+	numberUi10->get_uv_transform().set_translate_x((level / 10) * 0.1f);
+
+	numCenter = {128,640- 64};
+	numberUi10->get_transform().set_translate({ numCenter.x - 96 / 2,numCenter.y });
+	// 2桁表示
+	if (level >= 10) {
+		numberUi->get_transform().set_translate({ numCenter.x + 96 / 2,numCenter.y });
+	}
+	// 1桁表示
+	else {
+		numberUi->get_transform().set_translate(numCenter);
+	}
 }
 
 void GameSceneUI::update() {
@@ -47,7 +72,6 @@ void GameSceneUI::update() {
 	}
 	ReleseUIUpdate();
 	wasdSprite[7]->get_uv_transform().set_translate_x(0.5f * !isCanRelese);
-
 }
 #ifdef _DEBUG
 
@@ -75,6 +99,9 @@ void GameSceneUI::begin_rendering() {
 		wasdSprite[i]->begin_rendering();
 	}
 
+
+	numberUi->begin_rendering();
+	numberUi10->begin_rendering();
 	tutorialUI->begin_rendering();
 
 }
@@ -84,6 +111,8 @@ void GameSceneUI::darw() {
 		wasdSprite[i]->draw();
 	}
 	tutorialUI->draw();
+	numberUi->draw();
+	numberUi10->draw();
 }
 
 void GameSceneUI::ReleseUIUpdate() {
@@ -94,8 +123,8 @@ void GameSceneUI::ReleseUIUpdate() {
 		curEaseT = std::clamp(curEaseT, 0.f, totalEaseT);
 
 		Vector2 newScale = CVector2::ZERO;
-		 ratio = curEaseT / totalEaseT;
-		 newScale.x = OutBack(ratio, 1, 0, 0.5f, 3);
+		ratio = curEaseT / totalEaseT;
+		newScale.x = OutBack(ratio, 1, 0, 0.5f, 3);
 		newScale.y = OutBack(ratio, 1, 0, 1.f, 3);
 		wasdSprite[7]->get_transform().set_scale(newScale);
 	}

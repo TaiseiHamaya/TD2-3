@@ -72,6 +72,21 @@ void GameScene::load() {
 	TextureManager::RegisterLoadQue("./GameResources/Texture/UI/Undo.png");
 	TextureManager::RegisterLoadQue("./GameResources/Texture/backGround.png");
 	TextureManager::RegisterLoadQue("./GameResources/Texture/backGround2.png");
+	TextureManager::RegisterLoadQue("./GameResources/Texture/Failed/Failed.png");
+	TextureManager::RegisterLoadQue("./GameResources/Texture/Failed/F.png");
+	TextureManager::RegisterLoadQue("./GameResources/Texture/Failed/a.png");
+	TextureManager::RegisterLoadQue("./GameResources/Texture/Failed/i.png");
+	TextureManager::RegisterLoadQue("./GameResources/Texture/Failed/l.png");
+	TextureManager::RegisterLoadQue("./GameResources/Texture/Failed/e.png");
+	TextureManager::RegisterLoadQue("./GameResources/Texture/Failed/d.png");
+	TextureManager::RegisterLoadQue("./GameResources/Texture/Failed/ten.png");
+	TextureManager::RegisterLoadQue("./GameResources/Texture/Clear/Clear.png");
+	TextureManager::RegisterLoadQue("./GameResources/Texture/Clear/C.png");
+	TextureManager::RegisterLoadQue("./GameResources/Texture/Clear/L.png");
+	TextureManager::RegisterLoadQue("./GameResources/Texture/Clear/E.png");
+	TextureManager::RegisterLoadQue("./GameResources/Texture/Clear/A.png");
+	TextureManager::RegisterLoadQue("./GameResources/Texture/Clear/R.png");
+	TextureManager::RegisterLoadQue("./GameResources/Texture/Clear/!.png");
 
 
 	AudioManager::RegisterLoadQue("./GameResources/Audio/move.wav");
@@ -85,6 +100,7 @@ void GameScene::load() {
 	AudioManager::RegisterLoadQue("./GameResources/Audio/clearSound.wav");
 	AudioManager::RegisterLoadQue("./GameResources/Audio/failedSound.wav");
 	AudioManager::RegisterLoadQue("./GameResources/Audio/rotate.wav");
+	AudioManager::RegisterLoadQue("./GameResources/Audio/undo.wav");
 	AudioManager::RegisterLoadQue("./GameResources/Audio/BGM/Game.wav");
 
 }
@@ -115,10 +131,18 @@ void GameScene::initialize() {
 
 	Particle::lookAtDefault = camera3D.get();
 
+	std::shared_ptr<SpriteNode> bgSpriteNode;
+	bgSpriteNode = std::make_unique<SpriteNode>();
+	bgSpriteNode->initialize();
+	bgSpriteNode->set_config(
+		RenderNodeConfig::ContinueDrawBefore
+	);
+	bgSpriteNode->set_render_target(meshRT);
+
 	std::shared_ptr<Object3DNode> object3dNode;
 	object3dNode = std::make_unique<Object3DNode>();
 	object3dNode->initialize();
-	object3dNode->set_config(RenderNodeConfig::ContinueDrawBefore | RenderNodeConfig::ContinueUseDpehtBefore);
+	object3dNode->set_config(RenderNodeConfig::ContinueDrawAfter | RenderNodeConfig::ContinueDrawBefore | RenderNodeConfig::ContinueUseDpehtBefore);
 	object3dNode->set_render_target(meshRT);
 
 	std::shared_ptr<SkinningMeshNode> skinningMeshNode;
@@ -129,18 +153,18 @@ void GameScene::initialize() {
 
 	outlineNode = std::make_shared<OutlineNode>();
 	outlineNode->initialize();
-	outlineNode->set_render_target_SC(DirectXSwapChain::GetRenderTarget());
 	outlineNode->set_config(RenderNodeConfig::ContinueDrawBefore);
 	outlineNode->set_depth_resource(DepthStencilValue::depthStencil->texture_gpu_handle());
 	outlineNode->set_texture_resource(meshRT->offscreen_render().texture_gpu_handle());
-	skinningMeshNode->set_config(RenderNodeConfig::ContinueDrawAfter | RenderNodeConfig::ContinueDrawBefore | RenderNodeConfig::ContinueUseDpehtAfter | RenderNodeConfig::ContinueUseDpehtBefore);
-	skinningMeshNode->set_render_target_SC(DirectXSwapChain::GetRenderTarget());
+	outlineNode->set_render_target_SC(DirectXSwapChain::GetRenderTarget());
 
 	std::shared_ptr<ParticleMeshNode> particleMeshNode;
 	particleMeshNode = std::make_unique<ParticleMeshNode>();
 	particleMeshNode->initialize();
 	//particleBillboardNode->set_config(RenderNodeConfig::ContinueDrawAfter | RenderNodeConfig::ContinueUseDpehtBefore);
-	particleMeshNode->set_config(RenderNodeConfig::ContinueDrawAfter | RenderNodeConfig::ContinueUseDpehtAfter | RenderNodeConfig::ContinueDrawBefore);
+	particleMeshNode->set_config(RenderNodeConfig::ContinueDrawAfter | RenderNodeConfig::NoClearDepth | RenderNodeConfig::ContinueDrawBefore);
+	//particleBillboardNode->set_render_target(renderTarget);s
+	particleMeshNode->set_render_target_SC(DirectXSwapChain::GetRenderTarget());
 
 	std::shared_ptr<SpriteNode> spriteNode;
 	spriteNode = std::make_unique<SpriteNode>();
@@ -149,9 +173,6 @@ void GameScene::initialize() {
 		RenderNodeConfig::ContinueDrawAfter | RenderNodeConfig::ContinueDrawBefore
 	);
 	spriteNode->set_render_target_SC(DirectXSwapChain::GetRenderTarget());
-
-	//particleBillboardNode->set_render_target(renderTarget);
-	particleMeshNode->set_render_target_SC(DirectXSwapChain::GetRenderTarget());
 
 #ifdef _DEBUG
 	std::shared_ptr<PrimitiveLineNode> primitiveLineNode;
@@ -164,9 +185,9 @@ void GameScene::initialize() {
 
 	renderPath = eps::CreateUnique<RenderPath>();
 #ifdef _DEBUG
-	renderPath->initialize({ object3dNode,skinningMeshNode,outlineNode,particleMeshNode,spriteNode,primitiveLineNode });
+	renderPath->initialize({ bgSpriteNode,object3dNode,skinningMeshNode,outlineNode,particleMeshNode,spriteNode,primitiveLineNode });
 #else
-	renderPath->initialize({object3dNode,skinningMeshNode,outlineNode, particleMeshNode,spriteNode });
+	renderPath->initialize({ bgSpriteNode,object3dNode,skinningMeshNode,outlineNode,particleMeshNode,spriteNode });
 #endif // _DEBUG
 
 	managementUI = std::make_unique<GameManagement>();
@@ -174,6 +195,7 @@ void GameScene::initialize() {
 	managementUI->SetMaxLevel(GameValue::MaxLevel);
 	managementUI->SetCurLevel(currentLevel);
 	gameUI = std::make_unique<GameSceneUI>();
+	gameUI->initialize(currentLevel);
 
 	bgm = std::make_unique<AudioPlayer>();
 	bgm->initialize("Game.wav");
@@ -197,6 +219,11 @@ void GameScene::begin() {
 		fieldObjs->initialize(levelLoader);
 		playerManager->initialize(levelLoader, fieldObjs.get());
 		managementUI->init();
+	}else if (managementUI->is_undoRestart()) {
+		//fieldObjs->initialize(levelLoader);
+		//playerManager->initialize(levelLoader, fieldObjs.get());
+		managementUI->init();
+		//ここで一手戻す処理をする
 	}
 	else if (managementUI->is_next()) {
 		managementUI->init();
@@ -249,27 +276,34 @@ void GameScene::begin_rendering() {
 void GameScene::late_update() {}
 
 void GameScene::draw() const {
+	// 背景スプライト
 	renderPath->begin();
+	background->darw();
+
+	// StaticMesh
+	renderPath->next();
 	camera3D->register_world_projection(1);
 	camera3D->register_world_lighting(4);
 	directionalLight->register_world(5);
 
-	
 	fieldObjs->draw();
 
 #ifdef _DEBUG
 	camera3D->debug_draw_axis();
 #endif // _DEBUG
 
+	// SkinningMesh
 	renderPath->next();
 	camera3D->register_world_projection(1);
 	camera3D->register_world_lighting(5);
 	directionalLight->register_world(6);
 	playerManager->draw();
 
+	// Outline
 	renderPath->next();
 	outlineNode->draw();
 
+	// 前景スプライト
 	renderPath->next();
 	camera3D->register_world_projection(1);
 	playerManager->draw_particle();
@@ -278,12 +312,12 @@ void GameScene::draw() const {
 	managementUI->darw();
 	gameUI->darw();
 
-	background->darw();
 	renderPath->next();
 
 
 
 #ifdef _DEBUG
+	// 線描画(Debug)
 	camera3D->register_world_projection(1);
 	camera3D->debug_draw_frustum();
 
@@ -311,5 +345,7 @@ void GameScene::debug_update() {
 	//ImGui::Begin("OutlineNode");
 	//outlineNode->
 	//ImGui::End();
+
+	AudioManager::DebugGui();
 }
 #endif // _DEBUG

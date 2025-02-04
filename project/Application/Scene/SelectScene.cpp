@@ -13,6 +13,9 @@
 #include <Engine/Runtime/Input/Input.h>
 #include <Engine/Runtime/Scene/SceneManager.h>
 #include <Engine/Utility/Tools/SmartPointer.h>
+#include <Engine/Rendering/DirectX/DirectXResourceObject/DepthStencil/DepthStencil.h>
+#include <Engine/Module/Render/RenderTargetGroup/SingleRenderTarget.h>
+#include <Engine/Rendering/DirectX/DirectXResourceObject/OffscreenRender/OffscreenRender.h>
 
 #include "Application/GameValue.h"
 #include "Application/LevelLoader/LevelLoader.h"
@@ -36,8 +39,11 @@ void SelectScene::load() {
 	TextureManager::RegisterLoadQue("./GameResources/Texture/UI/StageSelectUI.png");
 	TextureManager::RegisterLoadQue("./GameResources/Texture/UI/start.png");
 	TextureManager::RegisterLoadQue("./GameResources/Texture/UI/number.png");
-	AudioManager::RegisterLoadQue("./GameResources/Audio/BGM/Title.wav");
+	TextureManager::RegisterLoadQue("./GameResources/Texture/obi.png");
 
+	AudioManager::RegisterLoadQue("./GameResources/Audio/BGM/Title.wav");
+	TextureManager::RegisterLoadQue("./GameResources/Texture/backGround.png");
+	TextureManager::RegisterLoadQue("./GameResources/Texture/backGround2.png");
 }
 
 void SelectScene::initialize() {
@@ -53,13 +59,20 @@ void SelectScene::initialize() {
 	directionalLight = eps::CreateUnique<DirectionalLightInstance>();
 
 	startUi = eps::CreateUnique<SpriteInstance>("start.png", Vector2{ 0.5f, 0.5f });
-	startUi->get_transform().set_translate({ 640.0f,140 });
+	startUi->get_transform().set_translate({ 640.0f,90 });
 	selectUi = eps::CreateUnique<SpriteInstance>("StageSelectUI.png", Vector2{ 0.5f, 0.5f });
-	selectUi->get_transform().set_translate({ 640.0f,550.0f });
+	selectUi->get_transform().set_translate({ 640.0f,650.0f });
 	numberUi = eps::CreateUnique<SpriteInstance>("number.png", Vector2{ 0.5f, 0.5f });
-	numberUi->get_transform().set_translate({ 640.0f,360.0f });
 	numberUi->get_transform().set_scale({ 0.1f,1.0f });
 	numberUi->get_uv_transform().set_scale({ 0.1f,1.0f });
+	numberUi10 = eps::CreateUnique<SpriteInstance>("number.png", Vector2{ 0.5f, 0.5f });
+	numberUi10->get_transform().set_translate({ 640.0f - 96 / 2,360.0f });
+	numberUi10->get_transform().set_scale({ 0.1f,1.0f });
+	numberUi10->get_uv_transform().set_scale({ 0.1f,1.0f });
+	if (selectIndex < 10) {
+		numberUi10->set_active(false);
+	}
+	obSprite = std::make_unique<SpriteInstance>("obi.png");
 
 	LevelLoader loader{ selectIndex };
 
@@ -68,26 +81,50 @@ void SelectScene::initialize() {
 
 	crate_field_view();
 
-	// Node&Path
+	std::shared_ptr<SingleRenderTarget> meshRT;
+	meshRT = std::make_shared<SingleRenderTarget>();
+	meshRT->initialize();
+
+	std::shared_ptr<SpriteNode> bgSpriteNode;
+	bgSpriteNode = std::make_unique<SpriteNode>();
+	bgSpriteNode->initialize();
+	bgSpriteNode->set_config(
+		RenderNodeConfig::ContinueDrawBefore
+	);
+	bgSpriteNode->set_render_target(meshRT);
+
 	std::shared_ptr<Object3DNode> object3dNode;
 	object3dNode = std::make_unique<Object3DNode>();
 	object3dNode->initialize();
-	object3dNode->set_render_target_SC(DirectXSwapChain::GetRenderTarget());
+	object3dNode->set_config(RenderNodeConfig::ContinueDrawAfter);
+	object3dNode->set_render_target(meshRT);
+
+	outlineNode = std::make_shared<OutlineNode>();
+	outlineNode->initialize();
+	outlineNode->set_render_target_SC(DirectXSwapChain::GetRenderTarget());
+	outlineNode->set_config(RenderNodeConfig::ContinueDrawBefore);
+	outlineNode->set_depth_resource(DepthStencilValue::depthStencil->texture_gpu_handle());
+	outlineNode->set_texture_resource(meshRT->offscreen_render().texture_gpu_handle());
 
 	std::shared_ptr<SpriteNode> spriteNode;
 	spriteNode = std::make_unique<SpriteNode>();
 	spriteNode->initialize();
-	spriteNode->set_config(RenderNodeConfig::ContinueDrawAfter | RenderNodeConfig::ContinueDrawBefore);
+	spriteNode->set_config(
+		RenderNodeConfig::ContinueDrawAfter | RenderNodeConfig::ContinueDrawBefore
+	);
 	spriteNode->set_render_target_SC(DirectXSwapChain::GetRenderTarget());
 
 	renderPath = eps::CreateUnique<RenderPath>();
-	renderPath->initialize({ object3dNode,spriteNode });
+	renderPath->initialize({ bgSpriteNode,object3dNode,outlineNode,spriteNode });
+
 
 	bgm = std::make_unique<AudioPlayer>();
 	bgm->initialize("Game.wav");
 	bgm->set_loop(true);
 	bgm->set_volume(0.1f);
 	bgm->play();
+
+	background = std::make_unique<BackGround>();
 }
 
 void SelectScene::popped() {
@@ -109,7 +146,19 @@ void SelectScene::update() {
 		crate_field_view();
 	}
 
+	// 2桁表示
+	if (selectIndex >= 10) {
+		numberUi->get_transform().set_translate({ 640.0f+ 96 / 2,360.0f });
+		numberUi10->set_active(true);
+	}
+	// 1桁表示
+	else {
+		numberUi->get_transform().set_translate({ 640.0f,360.0f });
+		numberUi10->set_active(false);
+	}
+
 	numberUi->get_uv_transform().set_translate_x(selectIndex * 0.1f);
+	numberUi10->get_uv_transform().set_translate_x((selectIndex / 10) * 0.1f);
 
 	if (Input::IsTriggerKey(KeyID::Space)) {
 		SceneManager::SetSceneChange(
@@ -118,7 +167,9 @@ void SelectScene::update() {
 	}
 
 	Quaternion rotation = fieldRotation->get_transform().get_quaternion();
-	fieldRotation->get_transform().set_quaternion(Quaternion::AngleAxis(CVector3::BASIS_Y, 1.5f * ToRadian) * rotation);
+	fieldRotation->get_transform().set_quaternion(Quaternion::AngleAxis(CVector3::BASIS_Y, PI * WorldClock::DeltaSeconds()) * rotation);
+
+	background->update();
 }
 
 void SelectScene::begin_rendering() {
@@ -127,8 +178,11 @@ void SelectScene::begin_rendering() {
 	field->begin_rendering();
 
 	numberUi->begin_rendering();
+	numberUi10->begin_rendering();
 	selectUi->begin_rendering();
 	startUi->begin_rendering();
+	obSprite->begin_rendering();
+	background->begin_rendering();
 }
 
 void SelectScene::late_update() {
@@ -136,6 +190,9 @@ void SelectScene::late_update() {
 
 void SelectScene::draw() const {
 	renderPath->begin();
+	// 背景スプライト
+	background->darw();
+	renderPath->next();
 	// Mesh
 	camera3D->register_world_projection(1);
 	camera3D->register_world_lighting(4);
@@ -143,8 +200,13 @@ void SelectScene::draw() const {
 	field->draw();
 
 	renderPath->next();
-	// Sprite
+	outlineNode->draw();
+
+	renderPath->next();
+	// 前景スプライト
+	obSprite->draw();
 	numberUi->draw();
+	numberUi10->draw();
 	selectUi->draw();
 	startUi->draw();
 
@@ -170,9 +232,6 @@ void SelectScene::debug_update() {
 	ImGui::Begin("SelectUi");
 	selectUi->debug_gui();
 	ImGui::End();
-	ImGui::Begin("numberUi");
-	numberUi->debug_gui();
-	ImGui::End();
 	ImGui::Begin("startUi");
 	startUi->debug_gui();
 	ImGui::End();
@@ -180,6 +239,10 @@ void SelectScene::debug_update() {
 
 	ImGui::Begin("Camera");
 	camera3D->debug_gui();
+	ImGui::End();
+
+	ImGui::Begin("WorldClock");
+	WorldClock::DebugGui();
 	ImGui::End();
 }
 #endif // _DEBUG

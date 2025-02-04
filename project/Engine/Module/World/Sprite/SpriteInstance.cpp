@@ -58,11 +58,18 @@ Color4& SpriteInstance::get_color() const {
 }
 
 void SpriteInstance::begin_rendering() noexcept {
+	if (!isActive) {
+		return;
+	}
+
 	*transformMatrix->get_data() = transform->get_matrix4x4_transform() * Camera2D::GetVPMatrix();
 	material->get_data()->uvTransform = uvTransform->get_matrix4x4_transform();
 }
 
 void SpriteInstance::draw() const {
+	if (!isActive) {
+		return;
+	}
 	const Microsoft::WRL::ComPtr<ID3D12GraphicsCommandList>& commandList = DirectXCommand::GetCommandList();
 	// 設定したデータをコマンドに積む
 	commandList->IASetVertexBuffers(0, 1, &vertices->get_vbv()); // VBV

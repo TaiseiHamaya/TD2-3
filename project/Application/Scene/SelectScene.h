@@ -9,6 +9,9 @@
 #include <Engine/Resources/Audio/AudioPlayer.h>
 #include <Application/Mapchip/MapchipField.h>
 #include <Engine/Module/Render/RenderPath/RenderPath.h>
+#include "Application/GameSprite/BackGround.h"
+
+#include "Engine/Module/Render/RenderNode/Posteffect/Outline/OutlineNode.h"
 
 class SpriteInstance;
 
@@ -42,6 +45,8 @@ public:
 private:
 	std::unique_ptr<RenderPath> renderPath;
 
+	std::shared_ptr<OutlineNode> outlineNode;
+
 	std::unique_ptr<Camera3D> camera3D;
 	std::unique_ptr<DirectionalLightInstance> directionalLight;
 
@@ -49,9 +54,13 @@ private:
 	std::unique_ptr<SpriteInstance> selectUi;
 	std::unique_ptr<SpriteInstance> startUi;
 	std::unique_ptr<SpriteInstance> numberUi;
+	std::unique_ptr<SpriteInstance> numberUi10;
+	std::unique_ptr<SpriteInstance> obSprite;
 
 	std::unique_ptr<AudioPlayer> bgm;
 
 	std::unique_ptr<WorldInstance> fieldRotation;
 	std::unique_ptr<MapchipField> field;
+
+	std::unique_ptr< BackGround>background;
 };
