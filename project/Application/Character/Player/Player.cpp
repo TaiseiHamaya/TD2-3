@@ -11,7 +11,7 @@ void Player::initialize(const LevelLoader& level, MapchipHandler* mapchipHandler
 
 	// ビックリマークの生成
 	exclamation_ = std::make_unique<AnimatedMeshInstance>();
-	exclamation_->reset_animated_mesh("ParentKoala.gltf", "Standby", true);
+	exclamation_->reset_animated_mesh("exclamation.gltf", "Standby", true);
 
 	auto& objMat = object_->get_materials();
 	for (auto& mat : objMat) {
@@ -71,9 +71,7 @@ void Player::update() {
 
 	object_->update();
 	// 子供の座標の上にビックリマークを置いておく
-	Vector3 childPos = child_->get_object()->world_position();
-	childPos.y += 1.0f;
-	exclamation_->get_transform().set_translate(childPos);
+	exclamation_->get_transform().set_translate(child_->get_object()->world_position());
 	exclamation_->update();
 
 	// 一フレーム前の移動方向を保存しておく
@@ -299,6 +297,7 @@ void Player::rotate_failed_update() {
 			currentRotation = Quaternion::Slerp(startRotation, midRotation, t);
 			if (totalProgress >= 0.45f) {
 				exclamationData_.isActive = true;
+				exclamation_->get_animation()->reset_animation("Standby");
 			}
 		}
 		else if (!exclamationData_.isActive) { // 待機が終わっていたら再開

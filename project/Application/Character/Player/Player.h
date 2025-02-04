@@ -124,7 +124,7 @@ private:
 	struct ExclamationData {
 		bool isActive;
 		float timer;
-		float duration = 0.5f;
+		float duration = 1.0f;
 	};
 	ExclamationData exclamationData_;
 
