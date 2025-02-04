@@ -58,6 +58,11 @@ void GameScene::load() {
 	TextureManager::RegisterLoadQue("./GameResources/Texture/ClearTex.png");
 	TextureManager::RegisterLoadQue("./GameResources/Texture/FailedTex.png");
 
+	PolygonMeshManager::RegisterLoadQue("./GameResources/Models/GoalObj/GoalObj.gltf");
+	SkeletonManager::RegisterLoadQue("./GameResources/Models/GoalObj/GoalObj.gltf");
+	NodeAnimationManager::RegisterLoadQue("./GameResources/Models/GoalObj/GoalObj.gltf");
+
+
 	TextureManager::RegisterLoadQue("./GameResources/Texture/UI/Wkey.png");
 	TextureManager::RegisterLoadQue("./GameResources/Texture/UI/Akey.png");
 	TextureManager::RegisterLoadQue("./GameResources/Texture/UI/Skey.png");
@@ -208,7 +213,7 @@ void GameScene::initialize() {
 	bgm->play();
 
 	background = std::make_unique<BackGround>();
-
+	rocketObj = std::make_unique<Rocket>();
 }
 
 void GameScene::popped() {}
@@ -262,6 +267,7 @@ void GameScene::update() {
 	managementUI->update();
 	gameUI->update();
 	gameUI->setIsCanRelese(playerManager->get_isParent());
+	rocketObj->update();
 }
 
 void GameScene::begin_rendering() {
@@ -275,6 +281,7 @@ void GameScene::begin_rendering() {
 	managementUI->begin_rendering();
 	gameUI->begin_rendering();
 	background->begin_rendering();
+	rocketObj->begin_rendering();
 }
 
 void GameScene::late_update() {}
@@ -302,6 +309,7 @@ void GameScene::draw() const {
 	camera3D->register_world_lighting(5);
 	directionalLight->register_world(6);
 	playerManager->draw();
+	rocketObj->draw();
 
 	// Outline
 	renderPath->next();
@@ -345,7 +353,7 @@ void GameScene::debug_update() {
 	ImGui::Begin("WorldClock");
 	WorldClock::DebugGui();
 	ImGui::End();
-
+	rocketObj->debug_update();
 	//ImGui::Begin("OutlineNode");
 	//outlineNode->
 	//ImGui::End();
