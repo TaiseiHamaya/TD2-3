@@ -16,6 +16,7 @@
 #include <Engine/Rendering/DirectX/DirectXResourceObject/DepthStencil/DepthStencil.h>
 #include <Engine/Module/Render/RenderTargetGroup/SingleRenderTarget.h>
 #include <Engine/Rendering/DirectX/DirectXResourceObject/OffscreenRender/OffscreenRender.h>
+#include <Engine/Module/Render/RenderNode/Forward/SkinningMesh/SkinningMeshNode.h>
 
 #include "Application/GameValue.h"
 #include "Application/LevelLoader/LevelLoader.h"
@@ -98,8 +99,14 @@ void SelectScene::initialize() {
 	std::shared_ptr<Object3DNode> object3dNode;
 	object3dNode = std::make_unique<Object3DNode>();
 	object3dNode->initialize();
-	object3dNode->set_config(RenderNodeConfig::ContinueDrawAfter);
+	object3dNode->set_config(RenderNodeConfig::ContinueDrawAfter | RenderNodeConfig::ContinueDrawBefore | RenderNodeConfig::ContinueUseDpehtBefore);
 	object3dNode->set_render_target(meshRT);
+
+	std::shared_ptr<SkinningMeshNode> skinningMeshNode;
+	skinningMeshNode = std::make_unique<SkinningMeshNode>();
+	skinningMeshNode->initialize();
+	skinningMeshNode->set_config(RenderNodeConfig::ContinueDrawAfter | RenderNodeConfig::ContinueUseDpehtAfter);
+	skinningMeshNode->set_render_target(meshRT);
 
 	outlineNode = std::make_shared<OutlineNode>();
 	outlineNode->initialize();
@@ -117,7 +124,7 @@ void SelectScene::initialize() {
 	spriteNode->set_render_target_SC(DirectXSwapChain::GetRenderTarget());
 
 	renderPath = eps::CreateUnique<RenderPath>();
-	renderPath->initialize({ bgSpriteNode,object3dNode,outlineNode,spriteNode });
+	renderPath->initialize({ bgSpriteNode,object3dNode,skinningMeshNode,outlineNode,spriteNode });
 
 
 	bgm = std::make_unique<AudioPlayer>();
@@ -200,6 +207,9 @@ void SelectScene::draw() const {
 	camera3D->register_world_lighting(4);
 	directionalLight->register_world(5);
 	field->draw();
+
+	renderPath->next();
+	// SkinningMesh
 
 	renderPath->next();
 	outlineNode->draw();
