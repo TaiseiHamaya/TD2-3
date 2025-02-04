@@ -37,5 +37,9 @@ public:
 	std::unique_ptr<SpriteInstance> startUi;
 	std::unique_ptr<SpriteInstance> titleLogo;
 
+	//BGM
+	std::unique_ptr<AudioPlayer>bgm;
+
+
 };
 

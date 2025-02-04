@@ -44,6 +44,8 @@ void SelectScene::load() {
 	AudioManager::RegisterLoadQue("./GameResources/Audio/BGM/Title.wav");
 	TextureManager::RegisterLoadQue("./GameResources/Texture/backGround.png");
 	TextureManager::RegisterLoadQue("./GameResources/Texture/backGround2.png");
+	AudioManager::RegisterLoadQue("./GameResources/Audio/BGM/SelectBGM.wav");
+
 }
 
 void SelectScene::initialize() {
@@ -119,7 +121,7 @@ void SelectScene::initialize() {
 
 
 	bgm = std::make_unique<AudioPlayer>();
-	bgm->initialize("Game.wav");
+	bgm->initialize("SelectBGM.wav");
 	bgm->set_loop(true);
 	bgm->set_volume(0.1f);
 	bgm->play();
@@ -223,7 +225,7 @@ void SelectScene::crate_field_view() {
 
 	fieldRoot->reparent(fieldRotation, false);
 	fieldRoot->get_transform().set_translate(
-		{ -static_cast<float>(field->row()) / 2,0,-static_cast<float>(field->column()) / 2 }
+		{ -static_cast<float>(field->column() - 1) / 2,0,-static_cast<float>(field->row() - 1) / 2}
 	);
 }
 

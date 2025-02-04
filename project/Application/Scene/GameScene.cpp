@@ -109,16 +109,17 @@ void GameScene::initialize() {
 	Camera2D::Initialize();
 	camera3D = std::make_unique<Camera3D>();
 	camera3D->initialize();
-	camera3D->set_transform({
-		CVector3::BASIS,
-		 Quaternion::EulerDegree(40,0,0),//Quaternion::AngleAxis(CVector3::BASIS_Y, -PI /4) *
-		{2,10,-8}//{10,10,-6.3f}
-		});
 
 	levelLoader = eps::CreateUnique<LevelLoader>(currentLevel);
 
 	fieldObjs = std::make_unique<MapchipField>();
 	fieldObjs->initialize(levelLoader);
+
+	camera3D->set_transform({
+		CVector3::BASIS,
+		 Quaternion::EulerDegree(40,0,0),//Quaternion::AngleAxis(CVector3::BASIS_Y, -PI /4) *
+		{ static_cast<float>(fieldObjs->column() - 1) / 2,10,-12 + static_cast<float>(fieldObjs->row() - 1) / 2}//{10,10,-6.3f}
+		});
 
 	playerManager = std::make_unique<PlayerManager>();
 	playerManager->initialize(levelLoader, fieldObjs.get());

@@ -24,6 +24,7 @@ void TitleScene::load() {
 
 	TextureManager::RegisterLoadQue("./GameResources/Texture/UI/start.png");
 	TextureManager::RegisterLoadQue("./GameResources/Texture/TitleLogo.png");
+	AudioManager::RegisterLoadQue("./GameResources/Audio/BGM/TitleBGM.wav");
 
 }
 
@@ -49,7 +50,11 @@ void TitleScene::initialize() {
 	renderPath = eps::CreateUnique<RenderPath>();
 	renderPath->initialize({ object3dNode,spriteNode });
 
-
+	bgm = std::make_unique<AudioPlayer>();
+	bgm->initialize("TitleBGM.wav");
+	bgm->set_loop(true);
+	bgm->set_volume(0.2f);
+	bgm->play();
 }
 
 void TitleScene::popped() {}
