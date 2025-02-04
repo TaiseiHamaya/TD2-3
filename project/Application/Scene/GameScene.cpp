@@ -164,11 +164,9 @@ void GameScene::initialize() {
 
 	renderPath = eps::CreateUnique<RenderPath>();
 #ifdef _DEBUG
-	renderPath->initialize({ object3dNode,skinningMeshNode,particleMeshNode,spriteNode,primitiveLineNode });
-	renderPath->initialize({ object3dNode,skinningMeshNode,outlineNode,spriteNode,primitiveLineNode });
+	renderPath->initialize({ object3dNode,skinningMeshNode,outlineNode,particleMeshNode,spriteNode,primitiveLineNode });
 #else
-	renderPath->initialize({ object3dNode,skinningMeshNode,spriteNode, particleMeshNode });
-	renderPath->initialize({object3dNode,skinningMeshNode,outlineNode,spriteNode });
+	renderPath->initialize({object3dNode,skinningMeshNode,outlineNode, particleMeshNode,spriteNode });
 #endif // _DEBUG
 
 	managementUI = std::make_unique<GameManagement>();
@@ -270,11 +268,11 @@ void GameScene::draw() const {
 	playerManager->draw();
 
 	renderPath->next();
-	camera3D->register_world_projection(1);
-	playerManager->draw_particle();
+	outlineNode->draw();
 
 	renderPath->next();
-	outlineNode->draw();
+	camera3D->register_world_projection(1);
+	playerManager->draw_particle();
 
 	renderPath->next();
 	managementUI->darw();
