@@ -6,6 +6,7 @@
 #include "Engine/Resources/Audio/AudioPlayer.h"
 #include <Engine/Module/World/Particle/ParticleEmitterInstance.h>
 #include <memory>
+#include "Application/Character/Child/Child.h"
 
 
 class Player : public CharacterBase {
@@ -117,6 +118,15 @@ private:
 
 	MapchipHandler* mapchipHandler_;
 	Child* child_; // 子オブジェクトへの参照
+
+	std::unique_ptr<AnimatedMeshInstance> exclamation_;
+
+	struct ExclamationData {
+		bool isActive;
+		float timer;
+		float duration = 1.0f;
+	};
+	ExclamationData exclamationData_;
 
 	bool isMove = false; // 今フレームで移動をしたかどうか
 	bool isParent = false; // 子供を持つかどうか
