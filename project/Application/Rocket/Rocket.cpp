@@ -18,9 +18,15 @@ void Rocket::init() {
 	animatedMeshInstance->get_animation()->reset_animation("Standby");
 	animatedMeshInstance->get_animation()->restart();
 	isResult = false;
+
+	gushingEmitter = std::make_unique<ParticleEmitterInstance>("gushing.json", 128);
+
+	
 }
 
 void Rocket::update(int state) {
+
+	gushingEmitter->update();
 	animatedMeshInstance->begin();
 	//クリア時
 	if (state == 1|| state == 3) {
@@ -41,21 +47,25 @@ void Rocket::begin() {
 
 void Rocket::begin_rendering() {
 	animatedMeshInstance->begin_rendering();
+	gushingEmitter->begin_rendering();
 
 }
 #ifdef _DEBUG
 
 #include <imgui.h>
 void Rocket::debug_update() {
-	ImGui::Begin("Rocket");
-	animatedMeshInstance->debug_gui();
+	ImGui::Begin("gushing");
+	gushingEmitter->debug_gui();
 		ImGui::End();
 }
 #endif // _DEBUG
 
 void Rocket::draw() {
 	animatedMeshInstance->draw();
+	
 }
+
+void Rocket::draw_particle() { gushingEmitter->draw(); }
 
 void Rocket::isClear() {
 	if (isResult)return;

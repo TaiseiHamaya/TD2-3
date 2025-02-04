@@ -321,6 +321,7 @@ void GameScene::draw() const {
 	renderPath->next();
 	camera3D->register_world_projection(1);
 	playerManager->draw_particle();
+	rocketObj->draw_particle();
 
 	renderPath->next();
 	gameUI->darw();
