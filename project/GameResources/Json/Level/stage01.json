@@ -21,14 +21,14 @@
   },
   "player": {
 
-    "row": 1,
-    "column": 1,
+    "row": 0,
+    "column": 0,
     "direction": 1
 
   },
   "child": {
 
-    "row": 2,
-    "column": 4
+    "row": 1,
+    "column": 3
   }
 }

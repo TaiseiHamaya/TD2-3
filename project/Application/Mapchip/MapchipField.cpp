@@ -89,7 +89,7 @@ int MapchipField::getElement(float x, float y) {
 	uint32_t iy = static_cast<uint32_t>(y);
 
 	// 範囲チェック (0 <= ix, iy <= 6)
-	if (ix < 0 || ix > rowSize || iy < 0 || iy > columnSize) {
+	if (ix < 0 || ix >= columnSize  || iy < 0 || iy >= rowSize) {
 		return 0; // 範囲外の場合は 0 を返す
 	}
 
