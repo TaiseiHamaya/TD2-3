@@ -1,5 +1,7 @@
 #include "GameSceneUI.h"
 
+#include <algorithm>
+
 #include <Engine/Module/World/Sprite/SpriteInstance.h>
 #include <Engine/Runtime/Input/Input.h>
 #include <Engine/Utility/Tools/SmartPointer.h>

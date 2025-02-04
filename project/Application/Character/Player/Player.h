@@ -4,6 +4,8 @@
 #include <Application/Mapchip/MapchipHandler.h>
 #include "CharacterStates.h"
 #include "Engine/Resources/Audio/AudioPlayer.h"
+#include <Engine/Module/World/Particle/ParticleEmitterInstance.h>
+#include <memory>
 
 
 class Player : public CharacterBase {

@@ -30,9 +30,9 @@
 #ifdef _DEBUG
 #include "Engine/Module/Render/RenderNode/Debug/PrimitiveLine/PrimitiveLineNode.h"
 #endif // _DEBUG
+#include <Engine/Module/Render/RenderNode/Forward/Particle/ParticleMeshNode/ParticleMeshNode.h>
 
-GameScene::GameScene() : GameScene(1) {
-}
+GameScene::GameScene() : GameScene(1) {}
 
 GameScene::GameScene(int32_t level) {
 	currentLevel = level;
@@ -45,10 +45,13 @@ void GameScene::load() {
 	//PolygonMeshManager::RegisterLoadQue("./EngineResources/Models/Primitive/Sphere.obj");
 	PolygonMeshManager::RegisterLoadQue("./GameResources/Models/ParentKoala/ParentKoala.gltf");
 	PolygonMeshManager::RegisterLoadQue("./GameResources/Models/ChiledKoala/ChiledKoala.gltf");
+	PolygonMeshManager::RegisterLoadQue("./GameResources/Models/CatchEffect/CathEffect.gltf");
 	SkeletonManager::RegisterLoadQue("./GameResources/Models/ParentKoala/ParentKoala.gltf");
 	SkeletonManager::RegisterLoadQue("./GameResources/Models/ChiledKoala/ChiledKoala.gltf");
+	SkeletonManager::RegisterLoadQue("./GameResources/Models/CatchEffect/CathEffect.gltf");
 	NodeAnimationManager::RegisterLoadQue("./GameResources/Models/ParentKoala/ParentKoala.gltf");
 	NodeAnimationManager::RegisterLoadQue("./GameResources/Models/ChiledKoala/ChiledKoala.gltf");
+	NodeAnimationManager::RegisterLoadQue("./GameResources/Models/CatchEffect/CathEffect.gltf");
 	TextureManager::RegisterLoadQue("./GameResources/Texture/ClearTex.png");
 	TextureManager::RegisterLoadQue("./GameResources/Texture/FailedTex.png");
 
@@ -111,7 +114,7 @@ void GameScene::initialize() {
 		 Quaternion::EulerDegree(40,0,0),//Quaternion::AngleAxis(CVector3::BASIS_Y, -PI /4) *
 		{2,10,-8}//{10,10,-6.3f}
 		});
-	
+
 	levelLoader = eps::CreateUnique<LevelLoader>(currentLevel);
 
 	fieldObjs = std::make_unique<MapchipField>();
@@ -125,6 +128,8 @@ void GameScene::initialize() {
 	std::shared_ptr<SingleRenderTarget> meshRT;
 	meshRT = std::make_shared<SingleRenderTarget>();
 	meshRT->initialize();
+
+	Particle::lookAtDefault = camera3D.get();
 
 	std::shared_ptr<SpriteNode> bgSpriteNode;
 	bgSpriteNode = std::make_unique<SpriteNode>();
@@ -148,10 +153,18 @@ void GameScene::initialize() {
 
 	outlineNode = std::make_shared<OutlineNode>();
 	outlineNode->initialize();
-	outlineNode->set_render_target_SC(DirectXSwapChain::GetRenderTarget());
 	outlineNode->set_config(RenderNodeConfig::ContinueDrawBefore);
 	outlineNode->set_depth_resource(DepthStencilValue::depthStencil->texture_gpu_handle());
 	outlineNode->set_texture_resource(meshRT->offscreen_render().texture_gpu_handle());
+	outlineNode->set_render_target_SC(DirectXSwapChain::GetRenderTarget());
+
+	std::shared_ptr<ParticleMeshNode> particleMeshNode;
+	particleMeshNode = std::make_unique<ParticleMeshNode>();
+	particleMeshNode->initialize();
+	//particleBillboardNode->set_config(RenderNodeConfig::ContinueDrawAfter | RenderNodeConfig::ContinueUseDpehtBefore);
+	particleMeshNode->set_config(RenderNodeConfig::ContinueDrawAfter | RenderNodeConfig::NoClearDepth | RenderNodeConfig::ContinueDrawBefore);
+	//particleBillboardNode->set_render_target(renderTarget);s
+	particleMeshNode->set_render_target_SC(DirectXSwapChain::GetRenderTarget());
 
 	std::shared_ptr<SpriteNode> spriteNode;
 	spriteNode = std::make_unique<SpriteNode>();
@@ -167,12 +180,14 @@ void GameScene::initialize() {
 	primitiveLineNode->initialize();
 #endif // _DEBUG
 
+	// ---------------------- ParticleBillboard ----------------------
+
 
 	renderPath = eps::CreateUnique<RenderPath>();
 #ifdef _DEBUG
-	renderPath->initialize({ bgSpriteNode,object3dNode,skinningMeshNode,outlineNode,spriteNode,primitiveLineNode });
+	renderPath->initialize({ bgSpriteNode,object3dNode,skinningMeshNode,outlineNode,particleMeshNode,spriteNode,primitiveLineNode });
 #else
-	renderPath->initialize({ bgSpriteNode,object3dNode,skinningMeshNode,outlineNode,spriteNode });
+	renderPath->initialize({ bgSpriteNode,object3dNode,skinningMeshNode,outlineNode,particleMeshNode,spriteNode });
 #endif // _DEBUG
 
 	managementUI = std::make_unique<GameManagement>();
@@ -192,11 +207,9 @@ void GameScene::initialize() {
 
 }
 
-void GameScene::popped() {
-}
+void GameScene::popped() {}
 
-void GameScene::finalize() {
-}
+void GameScene::finalize() {}
 
 void GameScene::begin() {
 	managementUI->begin();
@@ -237,6 +250,8 @@ void GameScene::begin() {
 void GameScene::update() {
 	//WorldClock::Update();
 
+
+
 	playerManager->update();
 	fieldObjs->update();
 	directionalLight->update();
@@ -246,6 +261,8 @@ void GameScene::update() {
 }
 
 void GameScene::begin_rendering() {
+
+
 	playerManager->begin_rendering();
 	fieldObjs->begin_rendering();
 
@@ -256,8 +273,7 @@ void GameScene::begin_rendering() {
 	background->begin_rendering();
 }
 
-void GameScene::late_update() {
-}
+void GameScene::late_update() {}
 
 void GameScene::draw() const {
 	// 背景スプライト
@@ -289,10 +305,16 @@ void GameScene::draw() const {
 
 	// 前景スプライト
 	renderPath->next();
+	camera3D->register_world_projection(1);
+	playerManager->draw_particle();
+
+	renderPath->next();
 	managementUI->darw();
 	gameUI->darw();
 
 	renderPath->next();
+
+
 
 #ifdef _DEBUG
 	// 線描画(Debug)
@@ -301,6 +323,8 @@ void GameScene::draw() const {
 
 	renderPath->next();
 #endif // _DEBUG
+
+
 
 }
 
