@@ -313,8 +313,8 @@ void GameScene::draw() const {
 	playerManager->draw_particle();
 
 	renderPath->next();
-	managementUI->darw();
 	gameUI->darw();
+	managementUI->darw();
 
 	renderPath->next();
 
