@@ -41,6 +41,7 @@ void GameSceneUI::initialize(int32_t level) {
 	tutorialUI->get_transform().set_translate({ 924,524 });
 
 	isCanRelese = false;
+	popUpUI = false;
 	curEaseT = 0;
 	wasdSprite[7]->get_transform().set_scale(CVector2::ZERO);
 
@@ -120,7 +121,11 @@ void GameSceneUI::darw() {
 void GameSceneUI::ReleseUIUpdate() {
 	if (curLevel <= 2) { return; }//ステージ３以降からUIを表示するため
 	if (curEaseT > totalEaseT) { return; }
-	if (isCanRelese) {
+
+	if (!popUpUI) {
+		popUpUI = isCanRelese;
+	}
+	if (popUpUI) {
 		curEaseT += WorldClock::DeltaSeconds();
 		curEaseT = std::clamp(curEaseT, 0.f, totalEaseT);
 

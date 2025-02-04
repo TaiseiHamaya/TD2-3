@@ -42,6 +42,7 @@ private:
 	std::unique_ptr<SpriteInstance> numberUi10;
 
 	bool isCanRelese;
+	bool popUpUI;
 
 	float curEaseT;
 	float totalEaseT = 0.3f;
