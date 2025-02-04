@@ -27,6 +27,7 @@ private:
 	bool isResult;
 	// パーティクルの召還
 	std::unique_ptr<ParticleEmitterInstance> gushingEmitter;
+	std::unique_ptr<ParticleEmitterInstance> explosionEmitter;
 
 };
 
