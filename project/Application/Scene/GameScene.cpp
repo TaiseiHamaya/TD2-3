@@ -269,7 +269,7 @@ void GameScene::update() {
 	managementUI->update();
 	gameUI->update();
 	gameUI->setIsCanRelese(playerManager->get_isParent());
-	rocketObj->update(playerManager->is_game_cleared());
+	rocketObj->update(playerManager->getStageSituation());
 }
 
 void GameScene::begin_rendering() {
