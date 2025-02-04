@@ -41,6 +41,8 @@ void SelectScene::load() {
 }
 
 void SelectScene::initialize() {
+	sceneState = TransitionState::InSelect;
+
 	// Instance
 	Camera2D::Initialize();
 	camera3D = std::make_unique<Camera3D>();
@@ -106,37 +108,17 @@ void SelectScene::begin() {
 }
 
 void SelectScene::update() {
-	if (Input::IsTriggerKey(KeyID::D) && selectIndex < GameValue::MaxLevel) {
-		++selectIndex;
-		crate_field_view();
+	switch (sceneState) {
+	case SelectScene::TransitionState::InSelect:
+		in_update();
+		break;
+	case SelectScene::TransitionState::Default:
+		default_update();
+		break;
+	case SelectScene::TransitionState::OutSelect:
+		out_update();
+		break;
 	}
-	else if (Input::IsTriggerKey(KeyID::A) && selectIndex > 1) {
-		--selectIndex;
-		crate_field_view();
-	}
-
-	// 2桁表示
-	if (selectIndex >= 10) {
-		numberUi->get_transform().set_translate({ 640.0f+ 96 / 2,360.0f });
-		numberUi10->set_active(true);
-	}
-	// 1桁表示
-	else {
-		numberUi->get_transform().set_translate({ 640.0f,360.0f });
-		numberUi10->set_active(false);
-	}
-
-	numberUi->get_uv_transform().set_translate_x(selectIndex * 0.1f);
-	numberUi10->get_uv_transform().set_translate_x((selectIndex / 10) * 0.1f);
-
-	if (Input::IsTriggerKey(KeyID::Space)) {
-		SceneManager::SetSceneChange(
-			eps::CreateUnique<GameScene>(selectIndex), 1.0f
-		);
-	}
-
-	Quaternion rotation = fieldRotation->get_transform().get_quaternion();
-	fieldRotation->get_transform().set_quaternion(Quaternion::AngleAxis(CVector3::BASIS_Y, PI * WorldClock::DeltaSeconds()) * rotation);
 }
 
 void SelectScene::begin_rendering() {
@@ -183,6 +165,65 @@ void SelectScene::crate_field_view() {
 	fieldRoot->get_transform().set_translate(
 		{ -static_cast<float>(field->row()) / 2,0,-static_cast<float>(field->column()) / 2 }
 	);
+}
+
+void SelectScene::in_update() {
+	sceneState = TransitionState::Default;
+}
+
+void SelectScene::default_update() {
+	if (Input::IsTriggerKey(KeyID::D) && selectIndex < GameValue::MaxLevel) {
+		++selectIndex;
+		crate_field_view();
+	}
+	else if (Input::IsTriggerKey(KeyID::A) && selectIndex > 1) {
+		--selectIndex;
+		crate_field_view();
+	}
+
+	// 2桁表示
+	if (selectIndex >= 10) {
+		numberUi->get_transform().set_translate({ 640.0f + 96 / 2,360.0f });
+		numberUi10->set_active(true);
+	}
+	// 1桁表示
+	else {
+		numberUi->get_transform().set_translate({ 640.0f,360.0f });
+		numberUi10->set_active(false);
+	}
+
+	numberUi->get_uv_transform().set_translate_x(selectIndex * 0.1f);
+	numberUi10->get_uv_transform().set_translate_x((selectIndex / 10) * 0.1f);
+
+	if (Input::IsTriggerKey(KeyID::Space)) {
+		SceneManager::SetSceneChange(
+			eps::CreateUnique<GameScene>(selectIndex), 1.0f
+		);
+		sceneState = TransitionState::OutSelect;
+	}
+
+	Quaternion rotation = fieldRotation->get_transform().get_quaternion();
+	fieldRotation->get_transform().set_quaternion(Quaternion::AngleAxis(CVector3::BASIS_Y, PI * WorldClock::DeltaSeconds()) * rotation);
+}
+
+void SelectScene::out_update() {
+	outTransitionTimer += WorldClock::DeltaSeconds();
+	float parametric = outTransitionTimer / 1.0f;
+	Quaternion rotation = fieldRotation->get_transform().get_quaternion();
+	if (rotation.real() < 0) {
+		rotation *= -1;
+	}
+	if (parametric < 0.9f) {
+		fieldRotation->get_transform().set_quaternion(
+			Quaternion::AngleAxis(CVector3::BASIS_Y, PI * WorldClock::DeltaSeconds() + 0.1f * parametric) * rotation
+		);
+	}
+	else {
+		fieldRotation->get_transform().set_quaternion(
+			Quaternion::SlerpClockwise(rotation,
+				CQuaternion::IDENTITY, 0.3f)
+		);
+	}
 }
 
 #ifdef _DEBUG
