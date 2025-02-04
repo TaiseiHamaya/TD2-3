@@ -49,9 +49,6 @@ void Player::update() {
 		rotateType = RotateType::None;
 		moveType = MoveType::Normal;
 		break;
-	case PlayerState::Falling:
-		fall_update();
-		break;
 	case PlayerState::Moving:
 		move_update();
 		break;
@@ -99,7 +96,9 @@ void Player::debug_update() {
 
 
 void Player::fall_update() {
-	//if (isFalling) {
+	if (playerState != PlayerState::Falling) {
+		return;
+	}
 	Vector3 position = object_->get_transform().get_translate();
 	if (!fallSoundFlag) {
 		fall->play();
@@ -111,7 +110,6 @@ void Player::fall_update() {
 	if (position.y <= -3.0f) {
 		isFalled = true;
 	}
-	//}
 }
 
 void Player::move_update() {

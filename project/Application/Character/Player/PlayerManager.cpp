@@ -45,6 +45,10 @@ void PlayerManager::finalize() {
 
 void PlayerManager::update() {
 	isStackMovement = false;
+	// それぞれ落下処理はゲームオーバー時でも動くようにする
+	child->update();
+	player->fall_update();
+
 	// クリアか失敗のフラグが立ってたら早期リターン
 	if (stageSituation != 0) return;
 
@@ -60,7 +64,7 @@ void PlayerManager::update() {
 
 	// 状態の更新
 	player->update();
-	child->update();
+
 
 	if (player->is_stack_movement()) {
 		emplace_log(player->move_start_position(), player->start_rotation());
