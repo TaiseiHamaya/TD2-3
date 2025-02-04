@@ -297,7 +297,7 @@ void Player::rotate_failed_update() {
 			currentRotation = Quaternion::Slerp(startRotation, midRotation, t);
 			if (totalProgress >= 0.45f) {
 				exclamationData_.isActive = true;
-				exclamation_->get_animation()->reset_animation("Standby");
+				exclamation_->get_animation()->restart();
 			}
 		}
 		else if (!exclamationData_.isActive) { // 待機が終わっていたら再開
