@@ -9,6 +9,10 @@ void Player::initialize(const LevelLoader& level, MapchipHandler* mapchipHandler
 	object_->reset_animated_mesh("ParentKoala.gltf", "Standby", true);
 	object_->get_transform().set_translate(level.get_player_position());
 
+	// ビックリマークの生成
+	exclamation_ = std::make_unique<AnimatedMeshInstance>();
+	exclamation_->reset_animated_mesh("ParentKoala.gltf", "Standby", true);
+
 	auto& objMat = object_->get_materials();
 	for (auto& mat : objMat) {
 		mat.lightingType = LighingType::None;
@@ -37,6 +41,7 @@ void Player::finalize() {}
 void Player::update() {
 	isStackMovement = false;
 	object_->begin();
+	exclamation_->begin();
 	isMove = false;
 	moveNumOnIce = 1;
 
@@ -48,6 +53,7 @@ void Player::update() {
 		rotateDirection = RotationDirection::Default;
 		rotateType = RotateType::None;
 		moveType = MoveType::Normal;
+		exclamationData_.timer = 0.0f;
 		break;
 	case PlayerState::Moving:
 		move_update();
@@ -64,16 +70,26 @@ void Player::update() {
 	}
 
 	object_->update();
+	// 子供の座標の上にビックリマークを置いておく
+	Vector3 childPos = child_->get_object()->world_position();
+	childPos.y += 1.0f;
+	exclamation_->get_transform().set_translate(childPos);
+	exclamation_->update();
 
+	// 一フレーム前の移動方向を保存しておく
 	preMoveDirection = moveDirection;
 }
 
 void Player::begin_rendering() {
 	object_->begin_rendering();
+	exclamation_->begin_rendering();
 }
 
 void Player::draw() const {
 	object_->draw();
+	if (exclamationData_.isActive) {
+		exclamation_->draw();
+	}
 }
 
 void Player::on_undo(Vector3 position, Quaternion rotation, bool setParent) {
@@ -239,19 +255,39 @@ void Player::wall_move() {
 }
 
 void Player::rotate_failed_update() {
-	rotateTimer += WorldClock::DeltaSeconds();
+	// exclamation の進行度更新
+	float exclamationProgress = exclamationData_.timer / exclamationData_.duration;
+
+
+	// すでに待機中の場合は exclamationData_.timer だけ更新
+	if (exclamationData_.isActive) {
+		exclamationData_.timer += WorldClock::DeltaSeconds();
+
+		if (exclamationProgress >= 1.0f) {
+			exclamationData_.isActive = false; // 待機終了
+		}
+		else {
+			return; // ここで処理を止める
+		}
+	}
 
 	// 回転完了チェック
 	if (rotateTimer >= rotateDuration) {
 		unmovable->restart();
 		playerState = PlayerState::Idle;
 		rotateTimer = rotateDuration;
+		exclamationData_.timer = 0.0f;
 		isRotating = false;
+		// 最後に目標地点の座標を入れておく
+		object_->get_transform().set_quaternion(targetRotation);
+		return;
 	}
 
+	// 回転のタイマーを進める
+	rotateTimer += WorldClock::DeltaSeconds();
 	// 全体の進行度
 	float totalProgress = rotateTimer / rotateDuration;
-
+	// 現在の回転を計算
 	Quaternion currentRotation;
 
 	// 回転方向が逆の場合、進行度を反転し区間ごとに補間
@@ -260,17 +296,18 @@ void Player::rotate_failed_update() {
 			// 前半区間（start → mid）
 			float t = totalProgress / 0.5f; // 正規化した進行度
 			currentRotation = Quaternion::Slerp(startRotation, midRotation, t);
+			if (totalProgress >= 0.45f) {
+				exclamationData_.isActive = true;
+			}
 		}
-		else {
+		else if (!exclamationData_.isActive) { // 待機が終わっていたら再開
 			// 後半区間（mid → target）
-			float t = (totalProgress - 0.5f) / 0.5f; // 正規化した進行度
+			float t = (totalProgress - 0.5f) / 0.5f;
 			currentRotation = Quaternion::Slerp(midRotation, targetRotation, t);
 		}
-	}
-	else {
-		// 通常の回転（start → target）
-		float t = totalProgress;
-		currentRotation = Quaternion::Slerp(startRotation, targetRotation, t);
+		else {
+			currentRotation = midRotation;
+		}
 	}
 
 	if (startRotation == targetRotation) {
