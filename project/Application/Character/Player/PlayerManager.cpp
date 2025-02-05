@@ -102,6 +102,7 @@ void PlayerManager::update() {
 	// パーティクルのオンオフの切り替え処理
 	particle_update();
 
+	// キャッチエフェクトのアニメーションが終わってたらフラグをfalse
 	if (catchEffect_->get_animation()->is_end()) {
 		catchEffect_->set_active(false);
 	}
@@ -650,11 +651,78 @@ void PlayerManager::set_rotate_failed_parameters(const Vector3& direction) {
 		player->set_how_rotation(RotationDirection::Reverce);
 
 		if (std::round(child->get_translate().x) == 1.0f) {
-			player->set_mid_rotation(rotate15Right * player->get_rotation());
+			Vector3 playerForward = Vector3(0.0f, 0.0f, -1.0f) * player->get_rotation();
+
+			if (playerForward.x > 0) {
+				if (childDirection.z > 0) {
+					player->set_mid_rotation(rotate15Right * player->get_rotation());
+				}
+				else {
+					player->set_mid_rotation(rotate15Left * player->get_rotation()); // ok
+				}
+			}
+			else if (playerForward.x < 0) {
+				if (childDirection.z > 0) {
+					player->set_mid_rotation(rotate15Right * player->get_rotation());
+				}
+				else {
+					player->set_mid_rotation(rotate15Left * player->get_rotation()); // ok
+				}
+			}
+
+			if (playerForward.z > 0) {
+				if (childDirection.x > 0) {
+					player->set_mid_rotation(rotate15Left * player->get_rotation());
+				}
+				else {
+					player->set_mid_rotation(rotate15Right * player->get_rotation());
+				}
+			}
+			else if (playerForward.z < 0) {
+				if (childDirection.x > 0) {
+					player->set_mid_rotation(rotate15Right * player->get_rotation());
+				}
+				else {
+					player->set_mid_rotation(rotate15Left * player->get_rotation());
+				}
+			}
 		}
 		else if (std::round(child->get_translate().x) == -1.0f) {
-			//player->set_mid_rotation(Quaternion::FromToRotation({ 0.0f, 0.0f, -1.0f }, leftDiagonalDirection));
-			player->set_mid_rotation(rotate15Left * player->get_rotation());
+			Vector3 playerForward = Vector3(0.0f, 0.0f, -1.0f) * player->get_rotation();
+
+			if (playerForward.x > 0) {
+				if (childDirection.z > 0) {
+					player->set_mid_rotation(rotate15Right * player->get_rotation());
+				}
+				else {
+					player->set_mid_rotation(rotate15Left * player->get_rotation());
+				}
+			}
+			else if (playerForward.x < 0) {
+				if (childDirection.z > 0) {
+					player->set_mid_rotation(rotate15Left * player->get_rotation());
+				}
+				else {
+					player->set_mid_rotation(rotate15Right * player->get_rotation()); // ok
+				}
+			}
+
+			if (playerForward.z > 0) {
+				if (childDirection.x > 0) {
+					player->set_mid_rotation(rotate15Left * player->get_rotation());
+				}
+				else {
+					player->set_mid_rotation(rotate15Right * player->get_rotation()); // ok
+				}
+			}
+			else if (playerForward.z < 0) {
+				if (childDirection.x > 0) {
+					player->set_mid_rotation(rotate15Right * player->get_rotation());
+				}
+				else {
+					player->set_mid_rotation(rotate15Left * player->get_rotation());
+				}
+			}
 		}
 		else {
 			Vector3 playerForward = Vector3(0.0f, 0.0f, -1.0f) * player->get_rotation();
