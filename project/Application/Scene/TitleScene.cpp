@@ -22,16 +22,20 @@ TitleScene::TitleScene() {}
 TitleScene::~TitleScene() {}
 
 void TitleScene::load() {
-
 	TextureManager::RegisterLoadQue("./GameResources/Texture/UI/start.png");
 	TextureManager::RegisterLoadQue("./GameResources/Texture/black.png");
 	TextureManager::RegisterLoadQue("./GameResources/Texture/TitleLogo.png");
 	AudioManager::RegisterLoadQue("./GameResources/Audio/BGM/TitleBGM.wav");
-
 }
 
 void TitleScene::initialize() {
 	Camera2D::Initialize();
+
+	camera3D = std::make_unique<Camera3D>();
+	camera3D->initialize();
+
+	directionalLight = eps::CreateUnique<DirectionalLightInstance>();
+
 	startUi = eps::CreateUnique<SpriteInstance>("start.png", Vector2{ 0.5f, 0.5f });
 	startUi->get_transform().set_translate({ 640.0f,140 });
 	titleLogo = eps::CreateUnique<SpriteInstance>("TitleLogo.png", Vector2{ 0.5f, 0.5f });
@@ -92,6 +96,9 @@ void TitleScene::begin_rendering() {
 	startUi->begin_rendering();
 	titleLogo->begin_rendering();
 	transition->begin_rendering();
+
+	camera3D->update_matrix();
+	directionalLight->begin_rendering();
 }
 
 void TitleScene::late_update() {}
@@ -100,9 +107,15 @@ void TitleScene::draw() const {
 	renderPath->begin();
 	// Mesh
 	renderPath->next();
+	camera3D->register_world_projection(1);
+	camera3D->register_world_lighting(4);
+	directionalLight->register_world(5);
 
 	// SkinningMesh
 	renderPath->next();
+	camera3D->register_world_projection(1);
+	camera3D->register_world_lighting(5);
+	directionalLight->register_world(6);
 
 	// Sprite
 	startUi->draw();

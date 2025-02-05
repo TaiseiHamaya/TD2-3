@@ -7,6 +7,8 @@
 #include <Engine/Module/Render/RenderPath/RenderPath.h>
 #include "Engine/Resources/Audio/AudioPlayer.h"
 
+class Camera3D;
+class DirectionalLightInstance;
 class SpriteInstance;
 
 class TitleScene : public BaseScene {
@@ -48,6 +50,9 @@ private:
 	float transitionTimer{ 0 };
 
 	std::unique_ptr<RenderPath> renderPath;
+
+	std::unique_ptr<Camera3D> camera3D;
+	std::unique_ptr<DirectionalLightInstance> directionalLight;
 
 	std::unique_ptr<SpriteInstance> transition;
 	std::unique_ptr<SpriteInstance> startUi;
