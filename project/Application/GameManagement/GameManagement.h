@@ -24,6 +24,8 @@ private:
 public:
 	//アクセッサ
 	void SetClearFlag(bool value) { clearFlag = value; }
+	bool GetClearFlag() { return clearFlag; }
+	bool GetFailedFlag() { return failedFlag; }
 	void SetFailedFlag(bool value) { failedFlag = value; }
 	bool is_reset() const { return isReset; }
 	bool is_restart() const { return isRestart; }
