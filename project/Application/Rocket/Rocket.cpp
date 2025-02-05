@@ -1,6 +1,7 @@
 #include "Rocket.h"
 #include "Engine/Module/World/AnimatedMesh/AnimatedMeshInstance.h"
 #include<Engine/Resources/Animation/NodeAnimation/NodeAnimationPlayer.h>
+#include "Engine/Rendering/DirectX/DirectXResourceObject/ConstantBuffer/Material/Material.h"
 
 Rocket::Rocket(const Vector3& pos) {
 	
@@ -18,6 +19,10 @@ Rocket::Rocket(const Vector3& pos) {
 	animatedMeshInstance->get_transform().set_translate(newPos);
 	particlePos = newPos;
 	explosionEmitter->get_transform().set_translate(newPos);
+	auto& objMat = animatedMeshInstance->get_materials();
+	for (auto& mat : objMat) {
+		mat.lightingType = LighingType::None;
+	}
 }
 
 Rocket::~Rocket() {}
