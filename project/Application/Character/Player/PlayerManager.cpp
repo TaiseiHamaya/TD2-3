@@ -134,12 +134,15 @@ void PlayerManager::update() {
 	// 子を置いていく
 	else if (stageSituation == 3) {
 		gameManagement_->SetFailedFlag(true);
-		gameManagement_->SetFailedSelect(0);
+		gameManagement_->SetFailedSelect(1);
+		emplace_log(player->get_translate(), player->start_rotation());
 	}
-	// コアラを落とす
-	else if (stageSituation == 4) {
+	// 子を置いていく
+	else if (stageSituation == 3) {
 		gameManagement_->SetFailedFlag(true);
-		gameManagement_->SetFailedSelect(2);
+		gameManagement_->SetFailedSelect(0);
+		emplace_log(player->move_start_position(), player->start_rotation());
+
 	}
 
 	// この条件式でできない理由 is 何
