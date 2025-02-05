@@ -18,7 +18,7 @@ public:
 	void begin_rendering();
 	void draw() const;
 	void draw_particle();
-
+	void restart_undo();
 
 #ifdef _DEBUG
 	void debug_update();
@@ -37,7 +37,6 @@ private:
 	bool is_game_cleared() const { return stageSituation; }
 	void emplace_log(const Vector3& playerPosition, const Quaternion& playerRotation);
 	void undo();
-
 
 	void set_move_parameters(const Vector3& direction);
 	void set_move_failed_parameters(const Vector3& direction);

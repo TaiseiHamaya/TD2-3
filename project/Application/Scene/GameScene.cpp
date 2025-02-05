@@ -227,6 +227,7 @@ void GameScene::begin() {
 		//fieldObjs->initialize(levelLoader);
 		//playerManager->initialize(levelLoader, fieldObjs.get());
 		managementUI->init();
+		playerManager->restart_undo();
 		//ここで一手戻す処理をする
 	}
 	else if (managementUI->is_next()) {
