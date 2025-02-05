@@ -9,15 +9,15 @@
 #include <Application/Utility/GameUtility.h>
 #include <Engine/Utility/Tools/SmartPointer.h>
 
-void PlayerManager::initialize(Reference<const LevelLoader> level, MapchipField* mapchipField) {
+void PlayerManager::initialize(Reference<const LevelLoader> level, MapchipField* mapchipField, const Vector3& goalPosition) {
 	mapchipField_ = mapchipField;
 
 	catchEffect_ = std::make_unique<AnimatedMeshInstance>();
 	catchEffect_->reset_animated_mesh("CatchEffect.gltf", "Standby", false);
 	catchEffect_->set_active(false);
 	catchEffect_->get_transform().set_quaternion({ 0.0f, 0.5f, 0.0f, 0.5f });
-	
-		auto& objMat = catchEffect_->get_materials();
+
+	auto& objMat = catchEffect_->get_materials();
 	for (auto& mat : objMat) {
 		mat.lightingType = LighingType::None;
 	}
@@ -39,6 +39,9 @@ void PlayerManager::initialize(Reference<const LevelLoader> level, MapchipField*
 	}
 	stageSituation = 0;
 	isParent = false;
+
+	terminalPoint = goalPosition;
+	terminalPoint.y += 1.0f;
 
 	//音関連
 	holdAudio = std::make_unique<AudioPlayer>();
@@ -64,7 +67,17 @@ void PlayerManager::update() {
 	player->fall_update();
 
 	// クリアか失敗のフラグが立ってたら早期リターン
-	if (stageSituation != 0) return;
+	if (stageSituation != 0) {
+		// 子を連れて親が先にゴール
+		if (stageSituation == 1 || stageSituation == 3) {
+			on_clear_update();
+		}
+		// 子供が先にゴール
+		else if (stageSituation == 2) {
+			only_child_ride_update();
+		}
+		return;
+	}
 
 	catchEffect_->begin();
 
@@ -131,18 +144,34 @@ void PlayerManager::update() {
 	// 子を連れて親が先にゴール
 	if (stageSituation == 1) {
 		gameManagement_->SetClearFlag(true);
+		initialPoint = player->get_object()->world_position();
+		controlPoint = initialPoint;
+		controlPoint.y += 1.5f;
+		clearTimer = 0;
 	}
 	// 子供が先にゴール
 	else if (stageSituation == 2) {
 		gameManagement_->SetFailedFlag(true);
 		gameManagement_->SetFailedSelect(1);
 		emplace_log(player->move_start_position(), player->start_rotation());
+		child->get_object()->reparent(nullptr);
+		child->get_object()->get_animation()->reset_animation("Relese");
+		child->get_object()->get_animation()->restart();
+		child->get_object()->update_affine();
+		initialPoint = child->get_object()->world_position();
+		controlPoint = initialPoint;
+		controlPoint.y += 1.5f;
+		clearTimer = 0;
 	}
 	// 子を置いていく
 	else if (stageSituation == 3) {
 		gameManagement_->SetFailedFlag(true);
 		gameManagement_->SetFailedSelect(0);
 		emplace_log(player->move_start_position(), player->start_rotation());
+		initialPoint = player->get_object()->world_position();
+		controlPoint = initialPoint;
+		controlPoint.y += 1.5f;
+		clearTimer = 0;
 	}
 	// コアラを落とす
 	else if (stageSituation == 4) {
@@ -173,7 +202,7 @@ void PlayerManager::draw() const {
 	catchEffect_->draw();
 }
 
-void PlayerManager::draw_particle() {
+void PlayerManager::draw_particle() const {
 	dustEmitter->draw();
 	iceDustEmitter->draw();
 }
@@ -497,6 +526,37 @@ void PlayerManager::undo() {
 	}
 }
 
+void PlayerManager::only_child_ride_update() {
+	clearTimer += WorldClock::DeltaSeconds();
+	float parametric = std::min(clearTimer / 1.0f, 1.0f);
+	Transform3D& transform = child->get_object()->get_transform();
+	transform.set_translate(
+		Vector3::Bezier(initialPoint, controlPoint, terminalPoint, parametric)
+	);
+	float baseScale = 1 - Easing::Out::Bounce(parametric);
+	transform.set_scale({ baseScale ,baseScale ,baseScale });
+	if (parametric >= 1.0f) {
+		child->get_object()->set_active(false);
+	}
+}
+
+void PlayerManager::on_clear_update() {
+	clearTimer += WorldClock::DeltaSeconds();
+	float parametric = std::min(clearTimer / 1.0f, 1.0f);
+	Transform3D& transform = player->get_object()->get_transform();
+	transform.set_translate(
+		Vector3::Bezier(initialPoint, controlPoint, terminalPoint, parametric)
+	);
+	float baseScale = 1 - Easing::Out::Bounce(parametric);
+	transform.set_scale({ baseScale ,baseScale ,baseScale });
+	if (parametric >= 1.0f) {
+		player->get_object()->set_active(false);
+		if (stageSituation == 2) {
+			child->get_object()->set_active(false);
+		}
+	}
+}
+
 void PlayerManager::restart_undo() {
 	if (moveLogger->can_undo()) {
 		undo();
@@ -506,6 +566,10 @@ void PlayerManager::restart_undo() {
 		player->set_state(PlayerState::Idle);
 	}
 	child->set_falling(false);
+	child->get_object()->set_active(true);
+	player->get_object()->set_active(true);
+	child->get_object()->get_transform().set_scale(CVector3::BASIS);
+	player->get_object()->get_transform().set_scale(CVector3::BASIS);
 	stageSituation = 0;
 }
 
