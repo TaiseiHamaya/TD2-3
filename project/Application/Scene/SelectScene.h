@@ -14,6 +14,7 @@
 #include "Engine/Module/Render/RenderNode/Posteffect/Outline/OutlineNode.h"
 
 class MeshInstance;
+class AnimatedMeshInstance;
 class SpriteInstance;
 
 class SelectScene : public BaseScene {
@@ -68,8 +69,8 @@ private:
 	std::unique_ptr<Camera3D> camera3D;
 	std::unique_ptr<DirectionalLightInstance> directionalLight;
 
-	std::unique_ptr<MeshInstance> parentKoala;
-	std::unique_ptr<MeshInstance> childKoala;
+	std::unique_ptr<AnimatedMeshInstance> parentKoala;
+	std::unique_ptr<AnimatedMeshInstance> childKoala;
 	std::unique_ptr<MeshInstance> goalMesh;
 
 	int32_t selectIndex;
