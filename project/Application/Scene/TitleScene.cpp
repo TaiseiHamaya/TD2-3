@@ -132,7 +132,7 @@ void TitleScene::default_update() {
 
 void TitleScene::out_update() {
 	transitionTimer += WorldClock::DeltaSeconds();
-	float parametric = transitionTimer / 1.0f;
+	float parametric = transitionTimer / 0.5f;
 	transition->get_color().alpha = parametric;
 }
 

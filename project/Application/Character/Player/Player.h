@@ -148,8 +148,6 @@ private:
 	float wallMoveDuration = 0.15f; // 移動にかける時間（秒）
 	bool isWallMoveing = false; // 壁に向かって移動した時のフラグ
 
-
-
 	int moveNumOnIce = 1; // 氷の上を何マス
 	bool isOnIce = false; // 氷の上を移動するか否か
 	int isParentOnIce = 0; // 氷上での子供との接触フラグ(0:無し 1:正面 2:左 3:右)
@@ -161,7 +159,6 @@ private:
 	float rotateDuration = 0.3f; // 回転にかける時間（秒）
 	bool isRotating = false;     // 現在回転中かどうかのフラグ
 	bool canRotate = false; // 回転可能かどうかのフラグ
-
 
 	bool isStackMovement{ false };
 
