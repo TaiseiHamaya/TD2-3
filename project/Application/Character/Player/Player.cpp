@@ -74,7 +74,7 @@ void Player::update() {
 		break;
 	}
 
-	object_->update();
+
 	// 子供の座標の上にビックリマークを置いておく
 	exclamation_->get_transform().set_translate(object_->world_position());
 	exclamation_->update();
@@ -100,7 +100,7 @@ void Player::update() {
 		object_->get_animation()->reset_animation("Standby");
 		}
 	}
-
+	object_->update();
 	// 一フレーム前の移動方向を保存しておく
 	preMoveDirection = moveDirection;
 	preIsMoving = isMoving;
@@ -192,7 +192,12 @@ void Player::move_update() {
 		}
 	}
 	// 移動中なら補間処理を実行
-	moveTimer += WorldClock::DeltaSeconds();
+	if (moveType == MoveType::SlidingOnIce) {
+		moveTimer += WorldClock::DeltaSeconds() * 1.5f;
+	}
+	else {
+		moveTimer += WorldClock::DeltaSeconds();
+	}
 
 	// 現在の位置を補間
 	Vector3 position = Vector3::Lerp(object_->get_transform().get_translate(), targetPosition, moveTimer / moveDuration);
