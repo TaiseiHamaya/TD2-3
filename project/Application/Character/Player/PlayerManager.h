@@ -75,4 +75,8 @@ private:
 
 	// 子が放すアニメーションをしているか
 	bool isRerease = false;
+	// 親が焦るアニメーションかどうか
+	bool isPlayerFlustered = false;
+	// 子が焦るアニメーションをしているかどうか
+	bool isChildFlustered = false;
 };

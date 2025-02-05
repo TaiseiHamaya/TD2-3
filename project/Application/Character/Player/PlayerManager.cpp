@@ -486,6 +486,7 @@ void PlayerManager::undo() {
 			childAnimation->reset_animation("Flustered");
 			childAnimation->set_time_force(1000);
 			childAnimation->set_loop(true);
+			isChildFlustered = true;
 		}
 	}
 	// 非くっつき状態
