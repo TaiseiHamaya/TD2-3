@@ -328,7 +328,9 @@ void GameScene::late_update() {
 		transitionTimer += WorldClock::DeltaSeconds();
 		float parametric = std::min(1.0f, transitionTimer / sceneChangeTime);
 		transition->get_color().alpha = parametric;
-		bgm->set_volume((1 - parametric) * 0.1f);
+		if (!managementUI->is_restart()) {
+			bgm->set_volume((1 - parametric) * 0.1f);
+		}
 		if (parametric >= 1.0f) {
 			// リセット処理をここで呼び出す
 			if (managementUI->is_restart()) {
