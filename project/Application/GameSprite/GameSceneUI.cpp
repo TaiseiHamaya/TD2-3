@@ -45,10 +45,11 @@ void GameSceneUI::initialize(int32_t level) {
 	curEaseT = 0;
 	wasdSprite[7]->get_transform().set_scale(CVector2::ZERO);
 
-	numberUi = eps::CreateUnique<SpriteInstance>("number.png", Vector2{ 0.5f, 0.5f });
+	stageFrame = eps::CreateUnique<SpriteInstance>("stageFrame.png", Vector2{ 0.5f, 0.5f });
+	numberUi = eps::CreateUnique<SpriteInstance>("smallNumber.png", Vector2{ 0.5f, 0.5f });
 	numberUi->get_transform().set_scale({ 0.1f,1.0f });
 	numberUi->get_uv_transform().set_scale({ 0.1f,1.0f });
-	numberUi10 = eps::CreateUnique<SpriteInstance>("number.png", Vector2{ 0.5f, 0.5f });
+	numberUi10 = eps::CreateUnique<SpriteInstance>("smallNumber.png", Vector2{ 0.5f, 0.5f });
 	numberUi10->get_transform().set_scale({ 0.1f,1.0f });
 	numberUi10->get_uv_transform().set_scale({ 0.1f,1.0f });
 	if (level < 10) {
@@ -57,7 +58,7 @@ void GameSceneUI::initialize(int32_t level) {
 	numberUi->get_uv_transform().set_translate_x(level * 0.1f);
 	numberUi10->get_uv_transform().set_translate_x((level / 10) * 0.1f);
 
-	numCenter = {128,640- 64};
+	numCenter = { 128,640 - 40 };
 	numberUi10->get_transform().set_translate({ numCenter.x - 96 / 2,numCenter.y });
 	// 2桁表示
 	if (level >= 10) {
@@ -67,6 +68,7 @@ void GameSceneUI::initialize(int32_t level) {
 	else {
 		numberUi->get_transform().set_translate(numCenter);
 	}
+	stageFrame->get_transform().set_translate(numCenter + Vector2{ 0,20 });
 }
 
 void GameSceneUI::update() {
@@ -102,7 +104,7 @@ void GameSceneUI::begin_rendering() {
 		wasdSprite[i]->begin_rendering();
 	}
 
-
+	stageFrame->begin_rendering();
 	numberUi->begin_rendering();
 	numberUi10->begin_rendering();
 	tutorialUI->begin_rendering();
@@ -114,6 +116,7 @@ void GameSceneUI::darw() {
 		wasdSprite[i]->draw();
 	}
 	tutorialUI->draw();
+	stageFrame->draw();
 	numberUi->draw();
 	numberUi10->draw();
 }
