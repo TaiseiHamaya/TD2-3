@@ -136,7 +136,7 @@ void GameScene::initialize() {
 		});
 
 	playerManager = std::make_unique<PlayerManager>();
-	playerManager->initialize(levelLoader, fieldObjs.get());
+	playerManager->initialize(levelLoader, fieldObjs.get(), fieldObjs->GetGoalPos());
 
 
 	transition = eps::CreateUnique<SpriteInstance>("black.png");
@@ -264,7 +264,7 @@ void GameScene::begin_rendering() {
 void GameScene::late_update() {
 	if (managementUI->is_reset()) {
 		fieldObjs->initialize(levelLoader);
-		playerManager->initialize(levelLoader, fieldObjs.get());
+		playerManager->initialize(levelLoader, fieldObjs.get(), fieldObjs->GetGoalPos());
 		managementUI->init();
 		rocketObj->init();
 	}
@@ -330,7 +330,7 @@ void GameScene::late_update() {
 			if (managementUI->is_restart()) {
 				sceneState = TransitionState::In;
 				fieldObjs->initialize(levelLoader);
-				playerManager->initialize(levelLoader, fieldObjs.get());
+				playerManager->initialize(levelLoader, fieldObjs.get(), fieldObjs->GetGoalPos());
 				managementUI->init();
 				rocketObj->init();
 				transitionTimer = WorldClock::DeltaSeconds();

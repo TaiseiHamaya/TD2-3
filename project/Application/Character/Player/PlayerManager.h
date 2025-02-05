@@ -11,13 +11,15 @@
 
 class PlayerManager {
 public:
-	void initialize(Reference<const LevelLoader> level, MapchipField* mapchipField);
+	void initialize(Reference<const LevelLoader> level, MapchipField* mapchipField, const Vector3& goalPosition);
 	void finalize();
 	void update();
 	void handle_input();
 	void begin_rendering();
 	void draw() const;
-	void draw_particle();
+	void draw_particle() const;
+
+public:
 	void restart_undo();
 
 #ifdef _DEBUG
@@ -29,6 +31,8 @@ public:
 	int getStageSituation() { return stageSituation; }
 private:
 	void particle_update();
+	void only_child_ride_update();
+	void on_clear_update();
 
 	void manage_parent_child_relationship();
 	void set_child_rotate();
@@ -64,15 +68,20 @@ private:
 
 	int stageSituation = 0; // クリア状態を管理(0:通常 1:クリア 2:子が先 3:子を置いてく 4:コアラを落とす)
 
-    bool isParent;
+	bool isParent;
 
-    //音関連
-    std::unique_ptr<AudioPlayer> holdAudio;//くっつき音
-    std::unique_ptr<AudioPlayer> releaseAudio;//離れる音
-    std::unique_ptr<AudioPlayer> undoAudio;//undoの音
-	
+	//音関連
+	std::unique_ptr<AudioPlayer> holdAudio;//くっつき音
+	std::unique_ptr<AudioPlayer> releaseAudio;//離れる音
+	std::unique_ptr<AudioPlayer> undoAudio;//undoの音
+
 	bool isStackMovement;
 
 	// 子が放すアニメーションをしているか
 	bool isRerease = false;
+
+	float clearTimer{ 0 };
+	Vector3 initialPoint;
+	Vector3 controlPoint;
+	Vector3 terminalPoint;
 };
