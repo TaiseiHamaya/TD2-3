@@ -16,7 +16,7 @@ void MapchipField::initialize(Reference<const LevelLoader> level) {
 		"", // 穴
 		"RordObj.obj", // 床
 		"WallObj.obj", // 壁
-		"GoalObj.obj", // ゴール
+		"RordObj.obj", // 床
 		"IceObj.obj"   // 氷 
 	};
 
