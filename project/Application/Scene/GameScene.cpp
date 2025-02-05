@@ -77,6 +77,8 @@ void GameScene::load() {
 	TextureManager::RegisterLoadQue("./GameResources/Texture/UI/undoRetry.png");
 	TextureManager::RegisterLoadQue("./GameResources/Texture/UI/GoSelect.png");
 	TextureManager::RegisterLoadQue("./GameResources/Texture/UI/Undo.png");
+	TextureManager::RegisterLoadQue("./GameResources/Texture/UI/smallNumber.png");
+	TextureManager::RegisterLoadQue("./GameResources/Texture/UI/stageFrame.png");
 	TextureManager::RegisterLoadQue("./GameResources/Texture/backGround.png");
 	TextureManager::RegisterLoadQue("./GameResources/Texture/backGround2.png");
 	TextureManager::RegisterLoadQue("./GameResources/Texture/Failed/Failed.png");
