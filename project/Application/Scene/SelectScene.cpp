@@ -34,7 +34,8 @@ SelectScene::SelectScene(int32_t selectLevel) :
 SelectScene::~SelectScene() = default;
 
 void SelectScene::load() {
-
+	PolygonMeshManager::RegisterLoadQue("./GameResources/Models/ParentKoala/ParentKoala.gltf");
+	PolygonMeshManager::RegisterLoadQue("./GameResources/Models/ChiledKoala/ChiledKoala.gltf");
 	PolygonMeshManager::RegisterLoadQue("./GameResources/Models/RordObj/RordObj.obj");
 	PolygonMeshManager::RegisterLoadQue("./GameResources/Models/WallObj/WallObj.obj");
 	PolygonMeshManager::RegisterLoadQue("./GameResources/Models/GoalObj/GoalObj.obj");
@@ -64,6 +65,8 @@ void SelectScene::initialize() {
 	directionalLight = eps::CreateUnique<DirectionalLightInstance>();
 	
 	goalMesh = eps::CreateUnique<MeshInstance>("GoalObjStatic.obj");
+	parentKoala = eps::CreateUnique<MeshInstance>("ParentKoala.gltf");
+	childKoala = eps::CreateUnique<MeshInstance>("ChiledKoala.gltf");
 
 	startUi = eps::CreateUnique<SpriteInstance>("start.png", Vector2{ 0.5f, 0.5f });
 	startUi->get_transform().set_translate({ 640.0f,90 });
@@ -187,6 +190,8 @@ void SelectScene::begin_rendering() {
 	fieldRotation->update_affine();
 	field->begin_rendering();
 	goalMesh->begin_rendering();
+	parentKoala->begin_rendering();
+	childKoala->begin_rendering();
 
 	numberUi->begin_rendering();
 	numberUi10->begin_rendering();
@@ -211,6 +216,8 @@ void SelectScene::draw() const {
 	directionalLight->register_world(5);
 	field->draw();
 	goalMesh->draw();
+	parentKoala->draw();
+	childKoala->draw();
 
 	renderPath->next();
 	// SkinningMesh
@@ -249,8 +256,12 @@ void SelectScene::crate_field_view() {
 		{ static_cast<float>(field->column() - 1) / 2,10,-12 + static_cast<float>(field->row() - 1) / 2}
 		});
 
-	goalMesh->get_transform().set_translate(field->GetGoalPos());
 	goalMesh->reparent(fieldRoot, false);
+	goalMesh->get_transform().set_translate(field->GetGoalPos());
+	parentKoala->reparent(fieldRoot, false);
+	parentKoala->get_transform().set_translate(loader.get_player_position());
+	childKoala->reparent(fieldRoot, false);
+	childKoala->get_transform().set_translate(loader.get_child_position());
 }
 
 void SelectScene::default_update() {

@@ -68,6 +68,8 @@ private:
 	std::unique_ptr<Camera3D> camera3D;
 	std::unique_ptr<DirectionalLightInstance> directionalLight;
 
+	std::unique_ptr<MeshInstance> parentKoala;
+	std::unique_ptr<MeshInstance> childKoala;
 	std::unique_ptr<MeshInstance> goalMesh;
 
 	int32_t selectIndex;
