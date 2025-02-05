@@ -105,6 +105,10 @@ void ParticleEmitterInstance::emit() {
 	}
 }
 
+void ParticleEmitterInstance::end_force() {
+	timer = duration;
+}
+
 void ParticleEmitterInstance::emit_once() {
 	// 位置
 	Vector3 offset;
