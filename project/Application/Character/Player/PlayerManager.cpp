@@ -66,9 +66,6 @@ void PlayerManager::update() {
 	// クリアか失敗のフラグが立ってたら早期リターン
 	if (stageSituation != 0) return;
 
-	// 入力処理を受け付ける
-	handle_input();
-
 	catchEffect_->begin();
 
 	// プレイヤーと子供の位置を計算
@@ -81,6 +78,7 @@ void PlayerManager::update() {
 	// マップチップ関連の更新
 	mapchipHandler->update_player_on_mapchip(player.get(), child.get());
 
+	// 子が放すアニメーションが終わったタイミングでスタンバイをセットしなおす
 	if (isRerease && child->get_object()->get_animation()->is_end()) {
 		isRerease = false;
 		child->get_object()->get_animation()->reset_animation("Standby");
@@ -105,8 +103,11 @@ void PlayerManager::update() {
 		emplace_log(player->move_start_position(), player->start_rotation());
 	}
 
+
 	// 親子関係の管理
 	manage_parent_child_relationship();
+	// 入力処理を受け付ける
+	handle_input();
 	// 子供をプレイヤーの向かせる処理
 	set_child_rotate();
 	// パーティクルのオンオフの切り替え処理
@@ -193,7 +194,8 @@ void PlayerManager::handle_input() {
 	KeyID keys[] = { KeyID::W, KeyID::A, KeyID::S, KeyID::D };
 
 	for (size_t i = 0; i < 4; ++i) {
-		if (Input::GetInstance().IsTriggerKey(keys[i])) {
+		//if (Input::GetInstance().IsTriggerKey(keys[i])) {
+		if (Input::GetInstance().IsPressKey(keys[i])) {
 			//player->set = directions[i];
 			Vector3 nextPosition = player->get_translate() + directions[i];
 
@@ -302,6 +304,8 @@ void PlayerManager::manage_parent_child_relationship() {
 			releaseAudio->restart();
 		}
 	}
+	// 判定を取り終わったら元に戻しておく
+	player->set_moved(false);
 }
 
 void PlayerManager::set_child_rotate() {
@@ -355,7 +359,9 @@ void PlayerManager::set_child_rotate() {
 
 void PlayerManager::attach_child_to_player(Player* player, Child* child) {
 	// 今フレームで移動していなければ返す
-	if (!player->is_moved()) return;
+	if (!player->is_moved()) {
+		return;
+	};
 
 	child->get_object()->reparent(player->get_object());
 	child->get_object()->look_at(*player->get_object());
