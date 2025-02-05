@@ -38,6 +38,7 @@ void Player::initialize(const LevelLoader& level, MapchipHandler* mapchipHandler
 
 	fallSoundFlag = false;
 	unmovableFlag = false;
+	isMoved = false;
 }
 
 void Player::finalize() {}
@@ -204,6 +205,7 @@ void Player::move_update() {
 			// 移動完了
 			moveTimer = moveDuration;
 			isMoving = false;
+			isMoved = true;
 			isMove = true;
 			isOnIce = false;//この処理がupdate序盤にあると、床→氷に移動する時に音がならなかったので、ここに移動してる
 			isStackMovement = true;
@@ -218,6 +220,7 @@ void Player::move_update() {
 			moveTimer = moveDuration;
 			isMoving = false;
 			isMove = true;
+			isMoved = true;
 			isOnIce = false;//この処理がupdate序盤にあると、床→氷に移動する時に音がならなかったので、ここに移動してる
 			isStackMovement = true;
 			playerState = PlayerState::Idle;

@@ -11,7 +11,7 @@
 
 class PlayerManager {
 public:
-	void initialize(Reference<const LevelLoader> level, MapchipField* mapchipField, const Vector3& goalPosition);
+	void initialize(Reference<const LevelLoader> level, MapchipField* mapchipField, const Vector3& goalPosition, bool isResetLogger = true);
 	void finalize();
 	void update();
 	void handle_input();

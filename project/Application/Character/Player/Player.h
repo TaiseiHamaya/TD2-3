@@ -40,14 +40,16 @@ public: // アクセッサ
 	int is_parent_on_ice() const { return isParentOnIce; }
 	void set_parent_on_ice(int index) { isParentOnIce = index; }
 
-	bool is_moved() const { return isMove; }
-	void set_moved(bool flag) { isMove = flag; }
+	bool is_move() const { return isMove; }
+	void set_move(bool flag) { isMove = flag; }
 
 	bool is_on_child() const { return isOnChild; }
 	void set_on_child(bool flag) { isOnChild = flag; }
 
 	bool is_turn_success() const { return isTurnSuccess; }
 	void set_turn_success(bool flag) { isTurnSuccess = flag; }
+
+	bool is_moved() const { return isMoved; }
 
 	Vector3 get_previous_direction() const { return preMoveDirection; }
 
@@ -181,4 +183,5 @@ private:
 	std::unique_ptr<AudioPlayer> iceMove;//通常移動
 	std::unique_ptr<AudioPlayer> rotatAudio;//回転時間
 
+	bool isMoved{ false };
 };

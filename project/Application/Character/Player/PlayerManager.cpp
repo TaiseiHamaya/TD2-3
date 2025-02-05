@@ -11,7 +11,17 @@
 
 #include <Application/Utility/GameUtility.h>
 
-void PlayerManager::initialize(Reference<const LevelLoader> level, MapchipField* mapchipField, const Vector3& goalPosition) {
+void PlayerManager::initialize(Reference<const LevelLoader> level, MapchipField* mapchipField, const Vector3& goalPosition, bool isResetLogger) {
+	if (isResetLogger) {
+		moveLogger = std::make_unique<MoveLogger>();
+		moveLogger->initialize();
+	}
+	else {
+		if (player->is_moved()) {
+			emplace_log(player->get_translate(), player->get_rotation());
+		}
+	}
+
 	mapchipField_ = mapchipField;
 
 	catchEffect_ = std::make_unique<AnimatedMeshInstance>();
@@ -52,9 +62,6 @@ void PlayerManager::initialize(Reference<const LevelLoader> level, MapchipField*
 	releaseAudio->initialize("release.wav");
 	undoAudio = std::make_unique<AudioPlayer>();
 	undoAudio->initialize("undo.wav");
-
-	moveLogger = std::make_unique<MoveLogger>();
-	moveLogger->initialize();
 }
 
 void PlayerManager::finalize() {
@@ -114,7 +121,6 @@ void PlayerManager::update() {
 	iceDustEmitter->update();
 
 	//Vector3 playerFlusteredPos = 
-
 
 	if (player->is_stack_movement()) {
 		emplace_log(player->move_start_position(), player->start_rotation());
@@ -341,7 +347,7 @@ void PlayerManager::manage_parent_child_relationship() {
 		}
 	}
 	// 判定を取り終わったら元に戻しておく
-	player->set_moved(false);
+	player->set_move(false);
 }
 
 void PlayerManager::set_child_rotate() {
@@ -395,7 +401,7 @@ void PlayerManager::set_child_rotate() {
 
 void PlayerManager::attach_child_to_player(Player* player, Child* child) {
 	// 今フレームで移動していなければ返す
-	if (!player->is_moved()) {
+	if (!player->is_move()) {
 		return;
 	};
 
