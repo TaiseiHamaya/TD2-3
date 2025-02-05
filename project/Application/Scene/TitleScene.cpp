@@ -116,7 +116,7 @@ void TitleScene::in_update() {
 	transitionTimer += WorldClock::DeltaSeconds();
 	float parametric = transitionTimer / 0.5f;
 	transition->get_color().alpha = 1 - std::min(1.f, parametric);
-	if (parametric >= 0.5f) {
+	if (parametric >= 1.0f) {
 		sceneState = TransitionState::Main;
 	}
 }
