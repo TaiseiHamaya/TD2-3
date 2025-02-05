@@ -200,6 +200,7 @@ void SelectScene::default_update() {
 			eps::CreateUnique<GameScene>(selectIndex), 1.0f
 		);
 		sceneState = TransitionState::OutSelect;
+		startRotation = fieldRotation->get_transform().get_quaternion();;
 	}
 
 	Quaternion rotation = fieldRotation->get_transform().get_quaternion();
@@ -209,21 +210,10 @@ void SelectScene::default_update() {
 void SelectScene::out_update() {
 	outTransitionTimer += WorldClock::DeltaSeconds();
 	float parametric = outTransitionTimer / 1.0f;
-	Quaternion rotation = fieldRotation->get_transform().get_quaternion();
-	if (rotation.real() < 0) {
-		rotation *= -1;
-	}
-	if (parametric < 0.9f) {
-		fieldRotation->get_transform().set_quaternion(
-			Quaternion::AngleAxis(CVector3::BASIS_Y, PI * WorldClock::DeltaSeconds() + 0.1f * parametric) * rotation
-		);
-	}
-	else {
-		fieldRotation->get_transform().set_quaternion(
-			Quaternion::SlerpClockwise(rotation,
-				CQuaternion::IDENTITY, 0.3f)
-		);
-	}
+	fieldRotation->get_transform().set_quaternion(
+		Quaternion::SlerpClockwise(startRotation,
+			CQuaternion::IDENTITY, Easing::Out::Quad(std::min(1.0f, parametric)))
+	);
 }
 
 #ifdef _DEBUG
