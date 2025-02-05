@@ -278,7 +278,7 @@ bool MapchipHandler::can_player_rotate(Player* player, Child* child, const Vecto
 		return false; // 同じ方向なら回転不要
 	}
 	// 今フレームで移動していたら抜ける(くっつく処理をしていた場合回転不要)
-	if (player->is_moved()) {
+	if (player->is_move()) {
 		//player->set_rotate_type(RotateType::None);
 		return false;
 	};
