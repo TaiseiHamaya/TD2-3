@@ -65,6 +65,7 @@ void PlayerManager::update() {
 	// それぞれ落下処理はゲームオーバー時でも動くようにする
 	child->update();
 	player->fall_update();
+	catchEffect_->begin();
 
 	// クリアか失敗のフラグが立ってたら早期リターン
 	if (stageSituation != 0) {
@@ -78,8 +79,6 @@ void PlayerManager::update() {
 		}
 		return;
 	}
-
-	catchEffect_->begin();
 
 	// プレイヤーと子供の位置を計算
 	playerPos = player->get_translate();
@@ -151,6 +150,7 @@ void PlayerManager::update() {
 		controlPoint = initialPoint;
 		controlPoint.y += 1.5f;
 		clearTimer = 0;
+		catchEffect_->reparent(nullptr);
 	}
 	// 子供が先にゴール
 	else if (stageSituation == 2) {
@@ -175,6 +175,7 @@ void PlayerManager::update() {
 		controlPoint = initialPoint;
 		controlPoint.y += 1.5f;
 		clearTimer = 0;
+		catchEffect_->reparent(nullptr);
 	}
 	// コアラを落とす
 	else if (stageSituation == 4) {
