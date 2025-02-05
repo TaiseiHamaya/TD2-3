@@ -176,6 +176,7 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClCompile Include="Application\Scene\SelectScene.cpp" />
     <ClCompile Include="Application\Character\Player\MoveLogger\MoveLogger.cpp" />
     <ClCompile Include="Library\Math\Easing.cpp" />
+    <ClCompile Include="Application\Rocket\Rocket.cpp" />
     <ClCompile Include="TestCode\CallbackManagerDemo.cpp" />
     <ClCompile Include="Engine\Module\World\Collision\CollisionCallbackManager.cpp" />
     <ClCompile Include="Engine\Module\World\Light\DirectionalLight\DirectionalLightInstance.cpp" />
@@ -319,6 +320,7 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClInclude Include="Application\Scene\SelectScene.h" />
     <ClInclude Include="Application\Character\Player\MoveLogger\MoveLogger.h" />
     <ClInclude Include="Library\Math\Easing.h" />
+    <ClInclude Include="Application\Rocket\Rocket.h" />
     <ClInclude Include="TestCode\CallbackManagerDemo.h" />
     <ClInclude Include="Engine\Module\World\Collision\CollisionCallbackManager.h" />
     <ClInclude Include="Engine\Module\World\Light\DirectionalLight\DirectionalLightInstance.h" />

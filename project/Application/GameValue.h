@@ -7,6 +7,6 @@ namespace GameValue {
 /// <summary>
 /// ステージ数
 /// </summary>
-inline int32_t MaxLevel = 10;
+inline int32_t MaxLevel = 12;
 
 };

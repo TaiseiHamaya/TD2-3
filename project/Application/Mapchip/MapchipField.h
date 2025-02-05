@@ -6,6 +6,7 @@
 #include <Engine/Runtime/Input/Input.h>
 
 #include <Engine/Utility/Tools/ConstructorMacro.h>
+#include <Library/Math/Vector3.h>
 
 class MeshInstance;
 class WorldInstance;
@@ -45,14 +46,14 @@ public:
 public:
 	//アクセッサ
 	int getElement(float x, float y);
-
+	const Vector3 &GetGoalPos() { return goalPos; }
 private:
 
 	uint32_t rowSize;
 	uint32_t columnSize;
 
 	std::unique_ptr<WorldInstance> fieldRoot;
-
+	Vector3 goalPos;
 	//メモ
 	//ステージの左下が0,0右上が7,7
 	std::vector<std::vector<Field>> field;

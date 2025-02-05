@@ -17,8 +17,10 @@ class LevelLoader;
 
 #include "Engine/Module/Render/RenderNode/Posteffect/Outline/OutlineNode.h"
 
-class GameScene : public BaseScene
-{
+#include "Application/Rocket/Rocket.h"
+
+class GameScene : public BaseScene {
+
 public:
 	GameScene();
 	GameScene(int32_t level);
@@ -43,6 +45,7 @@ public:
 #endif // _DEBUG
 
 private:
+
 	std::unique_ptr<RenderPath> renderPath;
 
 	std::shared_ptr<OutlineNode> outlineNode;
@@ -56,11 +59,12 @@ private:
 
 	int32_t currentLevel;
 	std::unique_ptr<LevelLoader> levelLoader;
+	std::unique_ptr<Rocket> rocketObj;
 
 	//UI
-	std::unique_ptr< GameSceneUI> gameUI;
+	std::unique_ptr<GameSceneUI> gameUI;
 
-	std::unique_ptr< BackGround>background;
+	std::unique_ptr<BackGround>background;
 
 	//BGM
 	std::unique_ptr<AudioPlayer>bgm;

@@ -4,6 +4,9 @@
 #include <Application/Mapchip/MapchipHandler.h>
 #include "CharacterStates.h"
 #include "Engine/Resources/Audio/AudioPlayer.h"
+#include <Engine/Module/World/Particle/ParticleEmitterInstance.h>
+#include <memory>
+#include "Application/Character/Child/Child.h"
 
 
 class Player : public CharacterBase {
@@ -11,6 +14,7 @@ public:
 	void initialize(const LevelLoader& level, MapchipHandler* mapchipHandler) override;
 	void finalize() override;
 	void update() override;
+	void fall_update();
 
 	void begin_rendering() override;
 	void draw() const override;
@@ -96,7 +100,7 @@ public: // アクセッサ
 #endif
 private:
 
-	void fall_update();
+
 	void move_update();
 	void rotate_update();
 	void wall_move();
@@ -114,6 +118,15 @@ private:
 
 	MapchipHandler* mapchipHandler_;
 	Child* child_; // 子オブジェクトへの参照
+
+	std::unique_ptr<AnimatedMeshInstance> exclamation_;
+
+	struct ExclamationData {
+		bool isActive;
+		float timer;
+		float duration = 0.7f;
+	};
+	ExclamationData exclamationData_;
 
 	bool isMove = false; // 今フレームで移動をしたかどうか
 	bool isParent = false; // 子供を持つかどうか

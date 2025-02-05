@@ -52,6 +52,9 @@ void MapchipField::initialize(Reference<const LevelLoader> level) {
 			write.mesh->get_transform().set_translate(
 				Vector3{ column * boxSize, 0.0f, row * boxSize }
 			);
+			if (write.type == 3) {
+				goalPos = write.mesh->get_transform().get_translate();
+			}
 		}
 	}
 }
@@ -85,11 +88,11 @@ Reference<WorldInstance> MapchipField::field_root() const {
 
 int MapchipField::getElement(float x, float y) {
 	// 座標を整数に変換
-	int ix = static_cast<int>(x);
-	int iy = static_cast<int>(y);
+	uint32_t ix = static_cast<uint32_t>(x);
+	uint32_t iy = static_cast<uint32_t>(y);
 
 	// 範囲チェック (0 <= ix, iy <= 6)
-	if (ix < 0 || ix > 6 || iy < 0 || iy > 6) {
+	if (ix < 0 || ix >= columnSize  || iy < 0 || iy >= rowSize) {
 		return 0; // 範囲外の場合は 0 を返す
 	}
 
