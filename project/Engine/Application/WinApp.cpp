@@ -173,7 +173,7 @@ void WinApp::ShowAppWindow() {
 }
 
 bool WinApp::IsEndApp() {	// プロセスメッセージ取得用
-	if (instance->msg.message == WM_QUIT) { // ×ボタンが押されたら終わる
+	if (instance->isEndApp) { // ×ボタンが押されたら終わる
 		return true;
 	}
 	if (SceneManager::IsEndProgram()) {
@@ -191,6 +191,9 @@ void WinApp::ProcessMessage() {
 			DispatchMessage(&instance->msg);
 		}
 		else {
+			if (instance->msg.message == WM_QUIT) {
+				instance->isEndApp = true;
+			}
 			return;
 		}
 	}
