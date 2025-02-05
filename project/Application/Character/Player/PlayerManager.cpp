@@ -12,7 +12,9 @@ void PlayerManager::initialize(Reference<const LevelLoader> level, MapchipField*
 	mapchipField_ = mapchipField;
 
 	catchEffect_ = std::make_unique<AnimatedMeshInstance>();
-	catchEffect_->reset_animated_mesh("CatchEffect.gltf", "Standby", true);
+	catchEffect_->reset_animated_mesh("CatchEffect.gltf", "Standby", false);
+	catchEffect_->set_active(false);
+	catchEffect_->get_transform().set_quaternion({ 0.0f, 0.5f, 0.0f, 0.5f });
 
 	dustEmitter = eps::CreateUnique<ParticleEmitterInstance>("dust.json", 128);
 	iceDustEmitter = eps::CreateUnique<ParticleEmitterInstance>("iceDust.json", 128);
@@ -78,7 +80,10 @@ void PlayerManager::update() {
 	// 状態の更新
 	player->update();
 	child->update();
-	catchEffect_->get_transform().set_translate({ 0.0f, 2.0f, 0.0f });
+
+	Vector3 catchEffectPos = player->get_translate();
+	catchEffectPos.y += 1.0f;
+	catchEffect_->get_transform().set_translate(catchEffectPos);
 
 	dustEmitter->get_transform().set_translate(emitterPos);
 	dustEmitter->update();
@@ -96,6 +101,10 @@ void PlayerManager::update() {
 	set_child_rotate();
 	// パーティクルのオンオフの切り替え処理
 	particle_update();
+
+	if (catchEffect_->get_animation()->is_end()) {
+		catchEffect_->set_active(false);
+	}
 
 	// マップチップのクリア判定
 	stageSituation = mapchipHandler->is_goal_reached(player.get(), child.get());
@@ -147,7 +156,7 @@ void PlayerManager::begin_rendering() {
 void PlayerManager::draw() const {
 	player->draw();
 	child->draw();
-	//catchEffect_->draw();
+	catchEffect_->draw();
 }
 
 void PlayerManager::draw_particle() {
@@ -257,6 +266,9 @@ void PlayerManager::manage_parent_child_relationship() {
 			//前フレ子なし、今フレ子ありならholdを鳴らす
 			if (!preParent && player->is_parent()) {
 				holdAudio->restart();
+
+				catchEffect_->set_active(true);
+				catchEffect_->get_animation()->restart();
 			}
 		}
 	}
