@@ -1,7 +1,5 @@
 #include "Output.h"
 
-#define NOMINMAX
-
 #include <Windows.h>
 
 #include <fstream>

@@ -9,8 +9,14 @@
 
 class SpriteInstance;
 
-class TitleScene : public BaseScene
-{
+class TitleScene : public BaseScene {
+private:
+	enum class TransitionState {
+		In,
+		Main,
+		Out
+	};
+
 public:
 	TitleScene();
 	~TitleScene();
@@ -27,19 +33,27 @@ public:
 
 	void draw() const override;
 
+private:
+	void in_update();
+	void default_update();
+	void out_update();
+
 #ifdef _DEBUG
 public:
 	void debug_update() override;
 #endif // _DEBUG
 
+private:
+	TransitionState sceneState;
+	float transitionTimer{ 0 };
+
 	std::unique_ptr<RenderPath> renderPath;
 
+	std::unique_ptr<SpriteInstance> transition;
 	std::unique_ptr<SpriteInstance> startUi;
 	std::unique_ptr<SpriteInstance> titleLogo;
 
 	//BGM
 	std::unique_ptr<AudioPlayer>bgm;
-
-
 };
 

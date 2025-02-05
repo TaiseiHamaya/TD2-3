@@ -19,6 +19,8 @@ void GameManagement::init() {
 	clearFlag = false;
 	failedFlag = false;
 	isReset = false;
+	isRestart = false;
+	isTransition = false;
 	isNext = false;
 	isUndoRestart = false;
 	selectIndex = 1;//リトライ時に最初に選んでる方　0リトライ　1ネクスト、1手前からリスタート
@@ -90,9 +92,10 @@ void GameManagement::begin() {
 		if (Input::IsTriggerKey(KeyID::Space)) {
 
 			decision->restart();//確定の音
+			isTransition = true;
 			// カーソルがリトライを選んでる時
 			if (selectIndex == 0) {
-				isReset = true;
+				isRestart = true;
 				clearFlag = false;
 				failedFlag = false;
 			}
