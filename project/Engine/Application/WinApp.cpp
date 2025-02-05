@@ -174,6 +174,7 @@ void WinApp::ShowAppWindow() {
 
 volatile bool WinApp::IsEndApp() {	// プロセスメッセージ取得用
 	if (instance->isEndApp) { // ×ボタンが押されたら終わる
+		Console("test");
 		return true;
 	}
 	if (SceneManager::IsEndProgram()) {
@@ -189,12 +190,14 @@ volatile void WinApp::ProcessMessage() {
 		if (PeekMessage(&instance->msg, NULL, 0, 0, PM_REMOVE)) {
 			TranslateMessage(&instance->msg);
 			DispatchMessage(&instance->msg);
+			Console("test");
 		}
 		else {
-			if (instance->msg.message == WM_QUIT) {
-				instance->isEndApp = true;
-			}
 			return;
+		}
+		if (instance->msg.message == WM_QUIT) {
+			Console("test");
+			instance->isEndApp = true;
 		}
 	}
 }
