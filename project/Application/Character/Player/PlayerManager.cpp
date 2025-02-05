@@ -81,6 +81,11 @@ void PlayerManager::update() {
 	// マップチップ関連の更新
 	mapchipHandler->update_player_on_mapchip(player.get(), child.get());
 
+	if (isRerease && child->get_object()->get_animation()->is_end()) {
+		isRerease = false;
+		child->get_object()->get_animation()->reset_animation("Standby");
+		child->get_object()->get_animation()->set_loop(true);
+	}
 
 	// 状態の更新
 	player->update();
@@ -270,6 +275,7 @@ void PlayerManager::manage_parent_child_relationship() {
 				//child->get_object()->reset_animated_mesh("ChiledKoala.gltf", "Standby", false);
 				child->get_object()->get_animation()->reset_animation("Standby");
 				child->get_object()->get_animation()->set_loop(false);
+				child->get_object()->get_animation()->restart();
 			}
 
 			//前フレ子なし、今フレ子ありならholdを鳴らす
@@ -380,6 +386,7 @@ void PlayerManager::detach_child_from_player(Player* player, Child* child) {
 		anim->reset_animation("Relese");
 		anim->set_loop(false);
 		anim->restart();
+		isRerease = true;
 	}
 	else {
 		anim->reset_animation("Falling");
