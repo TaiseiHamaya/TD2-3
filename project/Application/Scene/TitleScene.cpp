@@ -104,9 +104,8 @@ void TitleScene::begin_rendering() {
 void TitleScene::late_update() {}
 
 void TitleScene::draw() const {
-	renderPath->begin();
 	// Mesh
-	renderPath->next();
+	renderPath->begin();
 	camera3D->register_world_projection(1);
 	camera3D->register_world_lighting(4);
 	directionalLight->register_world(5);
@@ -118,6 +117,7 @@ void TitleScene::draw() const {
 	directionalLight->register_world(6);
 
 	// Sprite
+	renderPath->next();
 	startUi->draw();
 	titleLogo->draw();
 	transition->draw();
