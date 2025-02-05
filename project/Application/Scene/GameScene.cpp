@@ -267,7 +267,7 @@ void GameScene::begin_rendering() {
 void GameScene::late_update() {
 	if (managementUI->is_reset()) {
 		fieldObjs->initialize(levelLoader);
-		playerManager->initialize(levelLoader, fieldObjs.get(), fieldObjs->GetGoalPos());
+		playerManager->initialize(levelLoader, fieldObjs.get(), fieldObjs->GetGoalPos(), false);
 		managementUI->init();
 		rocketObj->init();
 	}
