@@ -190,7 +190,6 @@ volatile void WinApp::ProcessMessage() {
 		if (PeekMessage(&instance->msg, NULL, 0, 0, PM_REMOVE)) {
 			TranslateMessage(&instance->msg);
 			DispatchMessage(&instance->msg);
-			Console("test");
 		}
 		else {
 			return;
