@@ -190,6 +190,7 @@ void Player::rotate_update() {
 	// 回転完了チェック
 	if (rotateTimer >= rotateDuration) {
 		playerState = PlayerState::Moving;
+		rotateType = RotateType::None;
 		rotateTimer = rotateDuration;
 		isRotating = false;
 	}
@@ -253,6 +254,8 @@ void Player::wall_move() {
 		isWallMoveing = false;
 		newPos = wallStartPosition;
 		playerState = PlayerState::Idle;
+
+		moveType = MoveType::Normal;
 		unmovableFlag = false;
 	}
 	object_->get_transform().set_translate(newPos);
@@ -278,6 +281,8 @@ void Player::rotate_failed_update() {
 	// 回転完了チェック
 	if (rotateTimer >= rotateDuration) {
 		playerState = PlayerState::Idle;
+		rotateType = RotateType::None;
+		moveType = MoveType::Normal;
 		rotateTimer = rotateDuration;
 		exclamationData_.timer = 0.0f;
 		isRotating = false;
