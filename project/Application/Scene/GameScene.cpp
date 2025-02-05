@@ -34,8 +34,7 @@
 GameScene::GameScene() : GameScene(1) {}
 
 GameScene::GameScene(int32_t level) :
-	currentLevel(level) {
-}
+	currentLevel(level) {}
 ;
 
 GameScene::~GameScene() = default;
@@ -233,7 +232,10 @@ void GameScene::popped() {}
 void GameScene::finalize() {}
 
 void GameScene::begin() {
-	managementUI->begin();
+	if (playerManager->get_player_state() == PlayerState::Idle) {
+		managementUI->begin();
+	}
+
 	managementUI->SetCurLevel(currentLevel);
 	gameUI->SetCurLevel(currentLevel);
 
@@ -279,7 +281,7 @@ void GameScene::late_update() {
 		//ここで一手戻す処理をする
 		playerManager->restart_undo();
 	}
-	else if (managementUI->is_next()&& sceneState!= TransitionState::Out) {
+	else if (managementUI->is_next() && sceneState != TransitionState::Out) {
 		//managementUI->init();
 		// 最大レベルではない場合
 		if (currentLevel < GameValue::MaxLevel) {
@@ -401,8 +403,7 @@ void GameScene::draw() const {
 #endif // _DEBUG
 }
 
-void GameScene::reset_level() {
-}
+void GameScene::reset_level() {}
 
 #ifdef _DEBUG
 void GameScene::debug_update() {

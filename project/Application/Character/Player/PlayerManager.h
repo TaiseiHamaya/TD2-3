@@ -19,6 +19,8 @@ public:
 	void draw() const;
 	void draw_particle() const;
 
+	PlayerState get_player_state() { return player->get_state(); }
+
 public:
 	void restart_undo();
 
@@ -39,6 +41,7 @@ private:
 
 	void attach_child_to_player(Player* player, Child* child);
 	void detach_child_from_player(Player* player, Child* child);
+
 	void emplace_log(const Vector3& playerPosition, const Quaternion& playerRotation);
 	void undo();
 	bool is_game_cleared() const { return stageSituation; }
