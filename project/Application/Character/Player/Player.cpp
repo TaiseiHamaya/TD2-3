@@ -139,8 +139,10 @@ void Player::fall_update() {
 	if (!isFalling) {
 		isFalled = false;
 		playerState = PlayerState::Idle;
+		return;
 	}
 
+	object_->begin();
 	Vector3 position = object_->get_transform().get_translate();
 	if (!fallSoundFlag) {
 		fall->play();
@@ -151,6 +153,7 @@ void Player::fall_update() {
 	object_->get_transform().set_translate(position);
 	if (position.y <= -3.0f) {
 		isFalled = true;
+		object_->update();
 	}
 }
 
