@@ -62,6 +62,7 @@ void SelectScene::load() {
 	AudioManager::RegisterLoadQue("./GameResources/Audio/change.wav");
 	AudioManager::RegisterLoadQue("./GameResources/Audio/stageStart.wav");
 	AudioManager::RegisterLoadQue("./GameResources/Audio/backAudio.wav");
+	TextureManager::RegisterLoadQue("./GameResources/Texture/UI/ESCkey.png");
 
 }
 
@@ -164,6 +165,11 @@ void SelectScene::initialize() {
 	backTitle = std::make_unique<AudioPlayer>();
 	backTitle->initialize("backAudio.wav");
 	backTitle->set_volume(0.5f);
+
+	backTitleSprite= std::make_unique<SpriteInstance>("ESCkey.png");
+	backTitleSprite->get_transform().set_scale({ 0.5f, 1.0f });
+	backTitleSprite->get_uv_transform().set_scale({ 0.5f, 1.0f });
+	backTitleSprite->get_transform().set_translate({ 1141,30 });
 }
 
 void SelectScene::popped() {
@@ -222,6 +228,7 @@ void SelectScene::begin_rendering() {
 	obSprite->begin_rendering();
 	background->begin_rendering();
 	transition->begin_rendering();
+	backTitleSprite->begin_rendering();
 }
 
 void SelectScene::late_update() {
@@ -257,6 +264,7 @@ void SelectScene::draw() const {
 	numberUi10->draw();
 	selectUi->draw();
 	startUi->draw();
+	backTitleSprite->draw();
 	transition->draw();
 
 	renderPath->next();
@@ -318,6 +326,8 @@ void SelectScene::default_update() {
 		SceneManager::SetSceneChange(
 			eps::CreateUnique<TitleScene>(), 0.5f);
 		backTitle->play();
+
+		backTitleSprite->get_uv_transform().set_translate_x(0.5f);
 	}
 	// 2桁表示
 	if (selectIndex >= 10) {
