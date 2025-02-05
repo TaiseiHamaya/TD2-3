@@ -465,12 +465,12 @@ void PlayerManager::undo() {
 }
 
 void PlayerManager::restart_undo() {
-	player->set_falling(false);
-	child->set_falling(false);
-	stageSituation = 0;
 	if (moveLogger->can_undo()) {
 		undo();
 	}
+	player->set_falling(false);
+	child->set_falling(false);
+	stageSituation = 0;
 }
 
 void PlayerManager::set_move_parameters(const Vector3& direction) {

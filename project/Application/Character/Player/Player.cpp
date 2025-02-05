@@ -110,13 +110,15 @@ void Player::debug_update() {
 
 
 void Player::fall_update() {
-	if (!isFalling) {
-		isFalled = false;
-	}
-
 	if (playerState != PlayerState::Falling) {
 		return;
 	}
+
+	if (!isFalling) {
+		isFalled = false;
+		playerState = PlayerState::Idle;
+	}
+
 	Vector3 position = object_->get_transform().get_translate();
 	if (!fallSoundFlag) {
 		fall->play();

@@ -219,37 +219,7 @@ void GameScene::begin() {
 	managementUI->begin();
 	managementUI->SetCurLevel(currentLevel);
 	gameUI->SetCurLevel(currentLevel);
-	if (managementUI->is_reset()) {
-		fieldObjs->initialize(levelLoader);
-		playerManager->initialize(levelLoader, fieldObjs.get());
-		managementUI->init();
-	}else if (managementUI->is_undoRestart()) {
-		//fieldObjs->initialize(levelLoader);
-		//playerManager->initialize(levelLoader, fieldObjs.get());
-		managementUI->init();
-		playerManager->restart_undo();
-		//ここで一手戻す処理をする
-	}
-	else if (managementUI->is_next()) {
-		managementUI->init();
-		// 最大レベルではない場合
-		if (currentLevel < GameValue::MaxLevel) {
-			SceneManager::SetSceneChange(
-				eps::CreateUnique<GameScene>(currentLevel + 1), 1.0
-			);
-		}
-		// 最大レベルの場合
-		else {
-			// TODO : ここに最大レベル時の遷移を実装する
-			SceneManager::SetSceneChange(
-			eps::CreateUnique<TitleScene>(), 1.0f);
-		}
-	}
-	else if (managementUI->is_escape_game()) {
-		SceneManager::SetSceneChange(
-			eps::CreateUnique<SelectScene>(currentLevel), 1.0
-		);
-	}
+
 }
 
 void GameScene::update() {
@@ -278,7 +248,40 @@ void GameScene::begin_rendering() {
 	background->begin_rendering();
 }
 
-void GameScene::late_update() {}
+void GameScene::late_update() {
+	if (managementUI->is_reset()) {
+		fieldObjs->initialize(levelLoader);
+		playerManager->initialize(levelLoader, fieldObjs.get());
+		managementUI->init();
+	}
+	else if (managementUI->is_undoRestart()) {
+		//fieldObjs->initialize(levelLoader);
+		//playerManager->initialize(levelLoader, fieldObjs.get());
+		managementUI->init();
+		playerManager->restart_undo();
+		//ここで一手戻す処理をする
+	}
+	else if (managementUI->is_next()) {
+		managementUI->init();
+		// 最大レベルではない場合
+		if (currentLevel < GameValue::MaxLevel) {
+			SceneManager::SetSceneChange(
+				eps::CreateUnique<GameScene>(currentLevel + 1), 1.0
+			);
+		}
+		// 最大レベルの場合
+		else {
+			// TODO : ここに最大レベル時の遷移を実装する
+			SceneManager::SetSceneChange(
+			eps::CreateUnique<TitleScene>(), 1.0f);
+		}
+	}
+	else if (managementUI->is_escape_game()) {
+		SceneManager::SetSceneChange(
+			eps::CreateUnique<SelectScene>(currentLevel), 1.0
+		);
+	}
+}
 
 void GameScene::draw() const {
 	// 背景スプライト
