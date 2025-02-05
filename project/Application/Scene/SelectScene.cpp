@@ -52,7 +52,7 @@ void SelectScene::load() {
 }
 
 void SelectScene::initialize() {
-	sceneState = TransitionState::In;
+	sceneState = TransitionState::Main;
 
 	// Instance
 	Camera2D::Initialize();
@@ -136,6 +136,7 @@ void SelectScene::initialize() {
 	bgm->play();
 
 	background = std::make_unique<BackGround>();
+	fadeEase = 1;
 }
 
 void SelectScene::popped() {
@@ -247,15 +248,19 @@ void SelectScene::crate_field_view() {
 }
 
 void SelectScene::in_update() {
-	transitionTimer += WorldClock::DeltaSeconds();
-	float parametric = transitionTimer / 1.0f;
-	transition->get_color().alpha = 1 - std::min(1.0f, parametric);
-	if (parametric >= 1.0f) {
+	
+	/*if (fadeRatio >= 1.0f) {
 		sceneState = TransitionState::Main;
-	}
+	}*/
 }
 
 void SelectScene::default_update() {
+	//フェード処理
+	transitionTimer += WorldClock::DeltaSeconds();
+	fadeEase -= WorldClock::DeltaSeconds();
+	float fadeRatio = std::max(0.f, fadeEase / 1.0f);
+	transition->get_color().alpha = fadeEase;
+
 	if (Input::IsTriggerKey(KeyID::D) && selectIndex < GameValue::MaxLevel) {
 		++selectIndex;
 		crate_field_view();
@@ -264,7 +269,10 @@ void SelectScene::default_update() {
 		--selectIndex;
 		crate_field_view();
 	}
-
+	if (Input::IsTriggerKey(KeyID::Escape)) {
+		SceneManager::SetSceneChange(
+			eps::CreateUnique<TitleScene>(), 0.5f);
+	}
 	// 2桁表示
 	if (selectIndex >= 10) {
 		numberUi->get_transform().set_translate({ 640.0f + 96 / 2,360.0f });
@@ -278,7 +286,7 @@ void SelectScene::default_update() {
 
 	if (Input::IsTriggerKey(KeyID::Space)) {
 		SceneManager::SetSceneChange(
-			eps::CreateUnique<GameScene>(selectIndex), 1.0f
+			eps::CreateUnique<GameScene>(selectIndex), 1.f
 		);
 		sceneState = TransitionState::Out;
 		startRotation = fieldRotation->get_transform().get_quaternion();
@@ -288,13 +296,15 @@ void SelectScene::default_update() {
 
 void SelectScene::out_update() {
 	transitionTimer += WorldClock::DeltaSeconds();
+	fadeEase += WorldClock::DeltaSeconds();
 	float parametric = std::min(1.0f, transitionTimer / 1.0f);
+	float fadeRatio = std::min(1.f, fadeEase / 1.0f);
 	fieldRotation->get_transform().set_quaternion(
 		Quaternion::SlerpFar(startRotation,
 			Quaternion::AngleAxis(CVector3::BASIS_Y, -0.01f) * startRotation,
 			Easing::Out::Quad(parametric))
 	);
-	transition->get_color().alpha = parametric;
+	transition->get_color().alpha = fadeRatio;
 }
 
 #ifdef _DEBUG

@@ -80,6 +80,8 @@ private:
 	std::unique_ptr<MapchipField> field;
 
 	Quaternion startRotation;
+	
+	float fadeEase;//フェードインアウトのイージング
 
 	float test{0};
 

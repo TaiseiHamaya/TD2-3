@@ -55,5 +55,7 @@ private:
 
 	//BGM
 	std::unique_ptr<AudioPlayer>bgm;
+
+	
 };
 
