@@ -6,12 +6,15 @@
 #include <Engine/Module/Render/RenderNode/Forward/Object3DNode/Object3DNode.h>
 #include <Engine/Module/Render/RenderNode/Forward/SkinningMesh/SkinningMeshNode.h>
 #include <Engine/Module/Render/RenderTargetGroup/SingleRenderTarget.h>
+#include <Engine/Module/World/AnimatedMesh/AnimatedMeshInstance.h>
 #include <Engine/Module/World/Camera/Camera2D.h>
 #include <Engine/Module/World/Mesh/MeshInstance.h> 
 #include <Engine/Module/World/Sprite/SpriteInstance.h>
 #include <Engine/Rendering/DirectX/DirectXResourceObject/DepthStencil/DepthStencil.h>
 #include <Engine/Rendering/DirectX/DirectXResourceObject/OffscreenRender/OffscreenRender.h>
 #include <Engine/Rendering/DirectX/DirectXSwapChain/DirectXSwapChain.h>
+#include <Engine/Resources/Animation/NodeAnimation/NodeAnimationManager.h>
+#include <Engine/Resources/Animation/Skeleton/SkeletonManager.h>
 #include <Engine/Resources/Audio/AudioManager.h>
 #include <Engine/Resources/PolygonMesh/PolygonMeshManager.h>
 #include <Engine/Resources/Texture/TextureManager.h>
@@ -34,7 +37,12 @@ SelectScene::SelectScene(int32_t selectLevel) :
 SelectScene::~SelectScene() = default;
 
 void SelectScene::load() {
-
+	PolygonMeshManager::RegisterLoadQue("./GameResources/Models/ParentKoala/ParentKoala.gltf");
+	PolygonMeshManager::RegisterLoadQue("./GameResources/Models/ChiledKoala/ChiledKoala.gltf");
+	SkeletonManager::RegisterLoadQue("./GameResources/Models/ParentKoala/ParentKoala.gltf");
+	SkeletonManager::RegisterLoadQue("./GameResources/Models/ChiledKoala/ChiledKoala.gltf");
+	NodeAnimationManager::RegisterLoadQue("./GameResources/Models/ParentKoala/ParentKoala.gltf");
+	NodeAnimationManager::RegisterLoadQue("./GameResources/Models/ChiledKoala/ChiledKoala.gltf");
 	PolygonMeshManager::RegisterLoadQue("./GameResources/Models/RordObj/RordObj.obj");
 	PolygonMeshManager::RegisterLoadQue("./GameResources/Models/WallObj/WallObj.obj");
 	PolygonMeshManager::RegisterLoadQue("./GameResources/Models/GoalObj/GoalObj.obj");
@@ -62,8 +70,10 @@ void SelectScene::initialize() {
 	camera3D->initialize();
 
 	directionalLight = eps::CreateUnique<DirectionalLightInstance>();
-	
+
 	goalMesh = eps::CreateUnique<MeshInstance>("GoalObjStatic.obj");
+	parentKoala = eps::CreateUnique<AnimatedMeshInstance>("ParentKoala.gltf", "Standby", true);
+	childKoala = eps::CreateUnique<AnimatedMeshInstance>("ChiledKoala.gltf", "Standby", true);
 
 	startUi = eps::CreateUnique<SpriteInstance>("start.png", Vector2{ 0.5f, 0.5f });
 	startUi->get_transform().set_translate({ 640.0f,90 });
@@ -150,6 +160,8 @@ void SelectScene::finalize() {
 }
 
 void SelectScene::begin() {
+	parentKoala->begin();
+	childKoala->begin();
 }
 
 void SelectScene::update() {
@@ -187,6 +199,8 @@ void SelectScene::begin_rendering() {
 	fieldRotation->update_affine();
 	field->begin_rendering();
 	goalMesh->begin_rendering();
+	parentKoala->begin_rendering();
+	childKoala->begin_rendering();
 
 	numberUi->begin_rendering();
 	numberUi10->begin_rendering();
@@ -214,6 +228,11 @@ void SelectScene::draw() const {
 
 	renderPath->next();
 	// SkinningMesh
+	camera3D->register_world_projection(1);
+	camera3D->register_world_lighting(5);
+	directionalLight->register_world(6);
+	parentKoala->draw();
+	childKoala->draw();
 
 	renderPath->next();
 	outlineNode->draw();
@@ -249,8 +268,18 @@ void SelectScene::crate_field_view() {
 		{ static_cast<float>(field->column() - 1) / 2,10,-12 + static_cast<float>(field->row() - 1) / 2}
 		});
 
-	goalMesh->get_transform().set_translate(field->GetGoalPos());
 	goalMesh->reparent(fieldRoot, false);
+	goalMesh->get_transform().set_translate(field->GetGoalPos());
+	parentKoala->reparent(fieldRoot, false);
+	parentKoala->get_transform().set_translate(loader.get_player_position());
+	parentKoala->update_affine();
+	childKoala->reparent(fieldRoot, false);
+	childKoala->get_transform().set_translate(loader.get_child_position());
+	childKoala->look_at(*parentKoala);
+	auto& rotation = childKoala->get_transform().get_quaternion();
+	childKoala->get_transform().set_quaternion(
+		Quaternion::AngleAxis(CVector3::BASIS_Y, PI) * rotation
+	);
 }
 
 void SelectScene::default_update() {
