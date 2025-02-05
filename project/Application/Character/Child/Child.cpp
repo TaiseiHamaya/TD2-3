@@ -69,7 +69,7 @@ void Child::begin_rendering()
 void Child::draw() const
 {
 	object_->draw();
-	flusteredEffect_->draw();
+	//flusteredEffect_->draw();
 }
 
 void Child::on_undo(Vector3 position, Vector3 lookat) {

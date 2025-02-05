@@ -105,7 +105,7 @@ void Player::draw() const {
 	if (exclamationData_.isActive) {
 		exclamation_->draw();
 	}
-	flusteredEffect_->draw();
+	//flusteredEffect_->draw();
 }
 
 void Player::on_undo(Vector3 position, Quaternion rotation, bool setParent) {
