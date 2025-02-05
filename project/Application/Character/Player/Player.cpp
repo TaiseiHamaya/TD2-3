@@ -90,8 +90,20 @@ void Player::update() {
 	}
 	flusteredEffect_->update();
 
+	if (isMoving && !preIsMoving) {
+		object_->get_animation()->reset_animation("Walk");
+	}else if(!isMoving && preIsMoving){
+		if (is_out_ground()) {
+			object_->get_animation()->reset_animation("Flustered");
+		}
+		else {
+		object_->get_animation()->reset_animation("Standby");
+		}
+	}
+
 	// 一フレーム前の移動方向を保存しておく
 	preMoveDirection = moveDirection;
+	preIsMoving = isMoving;
 }
 
 void Player::begin_rendering() {
@@ -166,6 +178,8 @@ void Player::move_update() {
 		playerState = PlayerState::MoveFailed;
 		return;
 	}
+
+	isMoving = true;
 
 	//移動時の音。moveTimerが加算される前に処理して一回だけ鳴らす
 	if (moveTimer <= 0) {
