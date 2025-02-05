@@ -22,8 +22,8 @@
 		},
 		"Time": 4.699999809265137
 	},
-	"isLoop": true,
-	"isParentThis": true,
+	"isLoop": false,
+	"isParentThis": false,
 	"particleFinal": {
 		"Color": {
 			"Max": {

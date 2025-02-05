@@ -1,6 +1,6 @@
 {
 	"DrawType": 0,
-	"duration": 0.10000000149011612,
+	"duration": 0.4000000059604645,
 	"emission": {
 		"Count": 1,
 		"Cycles": 0,
@@ -11,10 +11,10 @@
 			},
 			"Type": 1
 		},
-		"Time": 4.5
+		"Time": 1.899999976158142
 	},
-	"isLoop": true,
-	"isParentThis": true,
+	"isLoop": false,
+	"isParentThis": false,
 	"particleFinal": {
 		"Color": {
 			"Max": {
