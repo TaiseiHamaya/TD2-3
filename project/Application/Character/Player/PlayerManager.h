@@ -26,6 +26,7 @@ public:
 
 	void set_game_management(GameManagement* gameManagement) { gameManagement_ = gameManagement; }
 	bool get_isParent() { return isParent; }
+	int getStageSituation() { return stageSituation; }
 private:
 	void particle_update();
 
@@ -34,9 +35,9 @@ private:
 
 	void attach_child_to_player(Player* player, Child* child);
 	void detach_child_from_player(Player* player, Child* child);
-	bool is_game_cleared() const { return stageSituation; }
 	void emplace_log(const Vector3& playerPosition, const Quaternion& playerRotation);
 	void undo();
+	bool is_game_cleared() const { return stageSituation; }
 
 	void set_move_parameters(const Vector3& direction);
 	void set_move_failed_parameters(const Vector3& direction);

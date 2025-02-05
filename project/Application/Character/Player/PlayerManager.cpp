@@ -204,17 +204,17 @@ void PlayerManager::debug_update() {
 	player->debug_update();
 	child->debug_update();
 
-	ImGui::Begin("CatchEffect");
-	catchEffect_->debug_gui();
-	ImGui::End();
+	//ImGui::Begin("CatchEffect");
+	//catchEffect_->debug_gui();
+	//ImGui::End();
 
-	ImGui::Begin("dustEmitter");
-	dustEmitter->debug_gui();
-	ImGui::End();
+	//ImGui::Begin("dustEmitter");
+	//dustEmitter->debug_gui();
+	//ImGui::End();
 
-	ImGui::Begin("iceDustEmitter");
-	iceDustEmitter->debug_gui();
-	ImGui::End();
+	//ImGui::Begin("iceDustEmitter");
+	//iceDustEmitter->debug_gui();
+	//ImGui::End();
 }
 #endif
 

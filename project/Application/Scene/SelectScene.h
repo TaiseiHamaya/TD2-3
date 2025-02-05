@@ -16,6 +16,13 @@
 class SpriteInstance;
 
 class SelectScene : public BaseScene {
+private:
+	enum class TransitionState {
+		InSelect,
+		Default,
+		OutSelect
+	};
+
 public:
 	SelectScene();
 	SelectScene(int32_t selectLevel);
@@ -37,12 +44,19 @@ public:
 public:
 	void crate_field_view();
 
+private:
+	void in_update();
+	void default_update();
+	void out_update();
+
 #ifdef _DEBUG
 public:
 	void debug_update() override;
 #endif // _DEBUG
 
 private:
+	TransitionState sceneState;
+
 	std::unique_ptr<RenderPath> renderPath;
 
 	std::shared_ptr<OutlineNode> outlineNode;
@@ -61,6 +75,11 @@ private:
 
 	std::unique_ptr<WorldInstance> fieldRotation;
 	std::unique_ptr<MapchipField> field;
+
+	Quaternion startRotation;
+	float outTransitionTimer{ 0 };
+
+	float test{0};
 
 	std::unique_ptr< BackGround>background;
 };

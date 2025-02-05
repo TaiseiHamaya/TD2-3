@@ -52,6 +52,9 @@ void MapchipField::initialize(Reference<const LevelLoader> level) {
 			write.mesh->get_transform().set_translate(
 				Vector3{ column * boxSize, 0.0f, row * boxSize }
 			);
+			if (write.type == 3) {
+				goalPos = write.mesh->get_transform().get_translate();
+			}
 		}
 	}
 }

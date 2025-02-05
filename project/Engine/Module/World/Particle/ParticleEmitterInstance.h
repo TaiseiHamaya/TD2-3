@@ -132,6 +132,7 @@ public:
 protected: // Member variable
 	float timer;
 	bool isLoop;
+	bool isParentThis;
 	float duration;
 
 	ParticleDrawType drawType;

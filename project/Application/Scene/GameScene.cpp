@@ -58,6 +58,11 @@ void GameScene::load() {
 	TextureManager::RegisterLoadQue("./GameResources/Texture/ClearTex.png");
 	TextureManager::RegisterLoadQue("./GameResources/Texture/FailedTex.png");
 
+	PolygonMeshManager::RegisterLoadQue("./GameResources/Models/GoalObj/GoalObj.gltf");
+	SkeletonManager::RegisterLoadQue("./GameResources/Models/GoalObj/GoalObj.gltf");
+	NodeAnimationManager::RegisterLoadQue("./GameResources/Models/GoalObj/GoalObj.gltf");
+
+
 	TextureManager::RegisterLoadQue("./GameResources/Texture/UI/Wkey.png");
 	TextureManager::RegisterLoadQue("./GameResources/Texture/UI/Akey.png");
 	TextureManager::RegisterLoadQue("./GameResources/Texture/UI/Skey.png");
@@ -208,7 +213,7 @@ void GameScene::initialize() {
 	bgm->play();
 
 	background = std::make_unique<BackGround>();
-
+	rocketObj = std::make_unique<Rocket>(fieldObjs->GetGoalPos());
 }
 
 void GameScene::popped() {}
@@ -253,12 +258,12 @@ void GameScene::late_update() {
 		fieldObjs->initialize(levelLoader);
 		playerManager->initialize(levelLoader, fieldObjs.get());
 		managementUI->init();
-	}
-	else if (managementUI->is_undoRestart()) {
+		rocketObj->init();
+	}else if (managementUI->is_undoRestart()) {
 		//fieldObjs->initialize(levelLoader);
 		//playerManager->initialize(levelLoader, fieldObjs.get());
 		managementUI->init();
-		playerManager->restart_undo();
+		rocketObj->init();
 		//ここで一手戻す処理をする
 	}
 	else if (managementUI->is_next()) {
@@ -306,6 +311,7 @@ void GameScene::draw() const {
 	camera3D->register_world_lighting(5);
 	directionalLight->register_world(6);
 	playerManager->draw();
+	rocketObj->draw();
 
 	// Outline
 	renderPath->next();
@@ -315,10 +321,11 @@ void GameScene::draw() const {
 	renderPath->next();
 	camera3D->register_world_projection(1);
 	playerManager->draw_particle();
+	rocketObj->draw_particle();
 
 	renderPath->next();
-	managementUI->darw();
 	gameUI->darw();
+	managementUI->darw();
 
 	renderPath->next();
 
@@ -349,7 +356,7 @@ void GameScene::debug_update() {
 	ImGui::Begin("WorldClock");
 	WorldClock::DebugGui();
 	ImGui::End();
-
+	rocketObj->debug_update();
 	//ImGui::Begin("OutlineNode");
 	//outlineNode->
 	//ImGui::End();
