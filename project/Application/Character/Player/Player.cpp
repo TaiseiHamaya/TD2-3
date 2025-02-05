@@ -74,7 +74,7 @@ void Player::update() {
 		break;
 	}
 
-	object_->update();
+
 	// 子供の座標の上にビックリマークを置いておく
 	exclamation_->get_transform().set_translate(object_->world_position());
 	exclamation_->update();
@@ -100,7 +100,7 @@ void Player::update() {
 		object_->get_animation()->reset_animation("Standby");
 		}
 	}
-
+	object_->update();
 	// 一フレーム前の移動方向を保存しておく
 	preMoveDirection = moveDirection;
 	preIsMoving = isMoving;
@@ -192,20 +192,38 @@ void Player::move_update() {
 		}
 	}
 	// 移動中なら補間処理を実行
-	moveTimer += WorldClock::DeltaSeconds();
+		moveTimer += WorldClock::DeltaSeconds();
 
 	// 現在の位置を補間
 	Vector3 position = Vector3::Lerp(object_->get_transform().get_translate(), targetPosition, moveTimer / moveDuration);
 	object_->get_transform().set_translate(position);
 
-	if (moveTimer >= moveDuration) {
-		// 移動完了
-		moveTimer = moveDuration;
-		isMoving = false;
-		isMove = true;
-		isOnIce = false;//この処理がupdate序盤にあると、床→氷に移動する時に音がならなかったので、ここに移動してる
-		isStackMovement = true;
-		playerState = PlayerState::Idle;
+	// 移動中なら補間処理を実行
+	if (moveType == MoveType::SlidingOnIce) {
+		if (moveTimer >= moveDuration - (moveDuration * 0.30f)) {
+			// 移動完了
+			moveTimer = moveDuration;
+			isMoving = false;
+			isMove = true;
+			isOnIce = false;//この処理がupdate序盤にあると、床→氷に移動する時に音がならなかったので、ここに移動してる
+			isStackMovement = true;
+			playerState = PlayerState::Idle;
+			object_->get_transform().set_translate(targetPosition);
+			return;
+		}
+	}
+	else {
+		if (moveTimer >= moveDuration) {
+			// 移動完了
+			moveTimer = moveDuration;
+			isMoving = false;
+			isMove = true;
+			isOnIce = false;//この処理がupdate序盤にあると、床→氷に移動する時に音がならなかったので、ここに移動してる
+			isStackMovement = true;
+			playerState = PlayerState::Idle;
+			object_->get_transform().set_translate(targetPosition);
+			return;
+		}
 	}
 
 	return;
