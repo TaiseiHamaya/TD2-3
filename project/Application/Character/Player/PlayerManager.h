@@ -72,4 +72,7 @@ private:
     std::unique_ptr<AudioPlayer> undoAudio;//undoの音
 	
 	bool isStackMovement;
+
+	// 子が放すアニメーションをしているか
+	bool isRerease = false;
 };
