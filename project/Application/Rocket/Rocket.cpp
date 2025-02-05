@@ -41,10 +41,10 @@ void Rocket::init() {
 }
 
 void Rocket::update(int state) {
-
+	animatedMeshInstance->begin();
 	gushingEmitter->update();
 	explosionEmitter->update();
-	animatedMeshInstance->begin();
+	
 	//クリア時
 	if (state == 1 || state == 3) {
 		isClear();
@@ -53,10 +53,10 @@ void Rocket::update(int state) {
 		isFailed();
 	}
 
-	animatedMeshInstance->update();
+	
 
 	particleUpdate();
-
+	animatedMeshInstance->update();
 }
 
 void Rocket::begin() {
@@ -74,7 +74,7 @@ void Rocket::begin_rendering() {
 
 #include <imgui.h>
 void Rocket::debug_update() {
-	/*ImGui::Begin("gushing");
+	ImGui::Begin("gushing");
 	gushingEmitter->debug_gui();
 	ImGui::End();
 	ImGui::Begin("Rocket");
@@ -82,7 +82,7 @@ void Rocket::debug_update() {
 	ImGui::End();
 	ImGui::Begin("explosion");
 	explosionEmitter->debug_gui();
-	ImGui::End();*/
+	ImGui::End();
 }
 #endif // _DEBUG
 

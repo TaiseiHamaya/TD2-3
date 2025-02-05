@@ -240,6 +240,8 @@ void GameScene::update() {
 	managementUI->update();
 	gameUI->update();
 	gameUI->setIsCanRelese(playerManager->get_isParent());
+	rocketObj->update(playerManager->getStageSituation());
+
 }
 
 void GameScene::begin_rendering() {
@@ -253,6 +255,8 @@ void GameScene::begin_rendering() {
 	managementUI->begin_rendering();
 	gameUI->begin_rendering();
 	background->begin_rendering();
+	rocketObj->begin_rendering();
+
 }
 
 void GameScene::late_update() {
