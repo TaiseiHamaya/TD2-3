@@ -17,6 +17,7 @@
 #include <Engine/Module/Render/RenderTargetGroup/SingleRenderTarget.h>
 #include <Engine/Rendering/DirectX/DirectXResourceObject/OffscreenRender/OffscreenRender.h>
 #include <Engine/Module/Render/RenderNode/Forward/SkinningMesh/SkinningMeshNode.h>
+#include "Application/Scene/TitleScene.h"
 
 #include "Application/GameValue.h"
 #include "Application/LevelLoader/LevelLoader.h"
@@ -231,6 +232,10 @@ void SelectScene::default_update() {
 	else if (Input::IsTriggerKey(KeyID::A) && selectIndex > 1) {
 		--selectIndex;
 		crate_field_view();
+	}
+	if (Input::IsPressKey(KeyID::Escape)) {
+		SceneManager::SetSceneChange(
+			eps::CreateUnique<TitleScene>(), 0.0f);
 	}
 
 	// 2桁表示

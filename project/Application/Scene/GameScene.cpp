@@ -243,19 +243,19 @@ void GameScene::begin() {
 		// 最大レベルではない場合
 		if (currentLevel < GameValue::MaxLevel) {
 			SceneManager::SetSceneChange(
-				eps::CreateUnique<GameScene>(currentLevel + 1), 1.0
+				eps::CreateUnique<GameScene>(currentLevel + 1), sceneChangeTime
 			);
 		}
 		// 最大レベルの場合
 		else {
 			// TODO : ここに最大レベル時の遷移を実装する
 			SceneManager::SetSceneChange(
-			eps::CreateUnique<TitleScene>(), 1.0f);
+			eps::CreateUnique<TitleScene>(), sceneChangeTime);
 		}
 	}
 	else if (managementUI->is_escape_game()) {
 		SceneManager::SetSceneChange(
-			eps::CreateUnique<SelectScene>(currentLevel), 1.0
+			eps::CreateUnique<SelectScene>(currentLevel), sceneChangeTime
 		);
 	}
 }
