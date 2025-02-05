@@ -21,8 +21,10 @@ BackGround::BackGround() {
 	gushingEmitter = std::make_unique<ParticleEmitterInstance>("gushing2.json", 128);
 	coolTime = 0;
 	easeT = totalEaseT;
-
+	
 	gushingEmitter->get_transform().set_translate_x(-100.f);
+	gushingEmitter->update_affine();
+	//gushingEmitter->set_active(false);
 }
 
 BackGround::~BackGround() {}
@@ -77,7 +79,6 @@ void BackGround::drawParticle() {
 }
 
 void BackGround::rocketUpdate() {
-
 	easeT += WorldClock::DeltaSeconds();
 
 	float ratio = std::clamp(easeT/totalEaseT,0.f,1.f);

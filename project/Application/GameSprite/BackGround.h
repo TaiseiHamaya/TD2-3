@@ -40,5 +40,6 @@ private:
 	std::unique_ptr<ParticleEmitterInstance> gushingEmitter;
 
 	float coolTime;
+	
 };
 
