@@ -489,6 +489,7 @@ void MapchipHandler::check_fall_conditions(Player* player, Child* child) {
 			}
 			else {
 				child->get_object()->get_animation()->reset_animation("Hold");
+				child->get_object()->get_animation()->set_time_force(1000);
 				child->get_object()->get_animation()->set_loop(false);
 				child->set_animation_info(ChildAnimation::Normal);
 			}

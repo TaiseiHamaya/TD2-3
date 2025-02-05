@@ -2,12 +2,14 @@
 
 #include <cmath>
 
+#include <Library/Math/Definition.h>
+
 #include "Engine/Resources/Animation/NodeAnimation/NodeAnimationPlayer.h"
 #include "Engine/Runtime/Input/Input.h"
 #include "Engine/Rendering/DirectX/DirectXResourceObject/ConstantBuffer/Material/Material.h"
+#include <Engine/Utility/Tools/SmartPointer.h>
 
 #include <Application/Utility/GameUtility.h>
-#include <Engine/Utility/Tools/SmartPointer.h>
 
 void PlayerManager::initialize(Reference<const LevelLoader> level, MapchipField* mapchipField, const Vector3& goalPosition) {
 	mapchipField_ = mapchipField;
@@ -487,6 +489,9 @@ void PlayerManager::undo() {
 		// ペアレントを解消する
 		childMesh->reparent(nullptr, false);
 		childMesh->look_at(*playerMesh);
+		childMesh->get_transform().set_quaternion(
+			Quaternion::AngleAxis(CVector3::BASIS_Y, PI) * childMesh->get_transform().get_quaternion()
+		);
 		// 親子付けフラグをオフにする
 		player->set_parent(false);
 	}

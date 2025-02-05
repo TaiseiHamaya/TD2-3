@@ -88,8 +88,8 @@ Reference<WorldInstance> MapchipField::field_root() const {
 
 int MapchipField::getElement(float x, float y) {
 	// 座標を整数に変換
-	uint32_t ix = static_cast<uint32_t>(x);
-	uint32_t iy = static_cast<uint32_t>(y);
+	uint32_t ix = static_cast<uint32_t>(std::round(x));
+	uint32_t iy = static_cast<uint32_t>(std::round(y));
 
 	// 範囲チェック (0 <= ix, iy <= 6)
 	if (ix < 0 || ix >= columnSize  || iy < 0 || iy >= rowSize) {
