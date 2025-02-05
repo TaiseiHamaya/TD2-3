@@ -63,6 +63,9 @@ public: // アクセッサ
 	RotateType get_rotate_type() const { return rotateType; }
 	void set_rotate_type(RotateType type) { rotateType = type; }
 
+	PlayerAnimation get_animation_info() const { return playerAnimation; }
+	void set_animation_info(PlayerAnimation type) { playerAnimation = type; }
+
 	void set_mid_rotation(Quaternion Rotation) { midRotation = Rotation; }
 
 	Quaternion get_start_rotation() const { return startRotation; }
@@ -115,11 +118,15 @@ private:
 	RotateType rotateType;
 	// 橋渡しみたいに移動するか
 	MoveType moveType;
+	// 特殊な操作が必要なアニメーションかどうか
+	PlayerAnimation playerAnimation = PlayerAnimation::Normal;
 
 	MapchipHandler* mapchipHandler_;
 	Child* child_; // 子オブジェクトへの参照
-
+	// 回転失敗時エフェクト
 	std::unique_ptr<AnimatedMeshInstance> exclamation_;
+	// 焦るときエフェクト
+	std::unique_ptr<AnimatedMeshInstance> flusteredEffect_;
 
 	struct ExclamationData {
 		bool isActive;

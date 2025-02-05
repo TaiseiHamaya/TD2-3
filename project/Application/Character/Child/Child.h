@@ -3,6 +3,7 @@
 #include "Engine/Runtime/WorldClock/WorldClock.h"
 #include <Application/Mapchip/MapchipHandler.h>
 #include "Engine/Resources/Audio/AudioPlayer.h"
+#include <Application/Character/Player/CharacterStates.h>
 
 
 class Child : public CharacterBase {
@@ -17,6 +18,8 @@ public:
     void unset_parent() { object_->reparent(nullptr); }
 
 
+    ChildAnimation get_animation_info() const { return childAnimation; }
+    void set_animation_info(ChildAnimation type) { childAnimation = type; }
 
     bool is_falled()const { return isFalled; }
 
@@ -32,6 +35,9 @@ private:
     // 
     bool isOutGround = false; 
 
+    ChildAnimation childAnimation = ChildAnimation::Normal;
+    // 焦るときエフェクト
+    std::unique_ptr<AnimatedMeshInstance> flusteredEffect_;
     //音関連
 
 

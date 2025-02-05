@@ -19,6 +19,10 @@ void Player::initialize(const LevelLoader& level, MapchipHandler* mapchipHandler
 	}
 	mapchipHandler_ = mapchipHandler;
 
+	flusteredEffect_ = std::make_unique<AnimatedMeshInstance>();
+	flusteredEffect_->reset_animated_mesh("FlusteredEffect.gltf", "Standby", true);
+	flusteredEffect_->set_active(false);
+
 	//音関連
 
 	moveAudio = std::make_unique<AudioPlayer>();
@@ -42,6 +46,7 @@ void Player::update() {
 	isStackMovement = false;
 	object_->begin();
 	exclamation_->begin();
+	flusteredEffect_->begin();
 	isMove = false;
 	moveNumOnIce = 1;
 
@@ -73,6 +78,17 @@ void Player::update() {
 	// 子供の座標の上にビックリマークを置いておく
 	exclamation_->get_transform().set_translate(object_->world_position());
 	exclamation_->update();
+	// 焦る時のエフェクトをプレイヤーの上に置いておく
+	Vector3 flusteredPos = object_->world_position();
+	flusteredPos.y += 1.0f;
+	flusteredEffect_->get_transform().set_translate(flusteredPos);
+	if (playerAnimation == PlayerAnimation::Flustered) {
+		flusteredEffect_->set_active(true);
+	}
+	else {
+		flusteredEffect_->set_active(false);
+	}
+	flusteredEffect_->update();
 
 	// 一フレーム前の移動方向を保存しておく
 	preMoveDirection = moveDirection;
@@ -81,6 +97,7 @@ void Player::update() {
 void Player::begin_rendering() {
 	object_->begin_rendering();
 	exclamation_->begin_rendering();
+	flusteredEffect_->begin_rendering();
 }
 
 void Player::draw() const {
@@ -88,6 +105,7 @@ void Player::draw() const {
 	if (exclamationData_.isActive) {
 		exclamation_->draw();
 	}
+	flusteredEffect_->draw();
 }
 
 void Player::on_undo(Vector3 position, Quaternion rotation, bool setParent) {
@@ -105,6 +123,10 @@ void Player::debug_update() {
 	ImGui::Text("%d", isParent);
 	object_->debug_gui();
 	ImGui::End();
+
+	//ImGui::Begin("flust");
+	//flusteredEffect_->debug_gui();
+	//ImGui::End();
 }
 #endif // _DEBUG
 
