@@ -147,7 +147,7 @@ void PlayerManager::begin_rendering() {
 void PlayerManager::draw() const {
 	player->draw();
 	child->draw();
-	catchEffect_->draw();
+	//catchEffect_->draw();
 }
 
 void PlayerManager::draw_particle() {
@@ -469,6 +469,9 @@ void PlayerManager::restart_undo() {
 		undo();
 	}
 	player->set_falling(false);
+	if (player->get_state() != PlayerState::Falling) {
+		player->set_state(PlayerState::Idle);
+	}
 	child->set_falling(false);
 	stageSituation = 0;
 }
