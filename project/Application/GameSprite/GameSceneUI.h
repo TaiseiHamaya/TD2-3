@@ -38,6 +38,7 @@ private:
 	std::unique_ptr<SpriteInstance>tutorialUI;
 
 	Vector2 numCenter;
+	std::unique_ptr<SpriteInstance> stageFrame;
 	std::unique_ptr<SpriteInstance> numberUi;
 	std::unique_ptr<SpriteInstance> numberUi10;
 
