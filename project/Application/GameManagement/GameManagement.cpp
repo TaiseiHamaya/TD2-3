@@ -62,6 +62,8 @@ void GameManagement::init() {
 	failedAudio = std::make_unique<AudioPlayer>();
 	failedAudio->initialize("failedSound.wav");
 	resultSoundFlag = false;
+	clearFlag = false;
+	failedFlag = false;
 }
 
 void GameManagement::begin() {
@@ -97,8 +99,8 @@ void GameManagement::begin() {
 			// カーソルがリトライを選んでる時
 			if (selectIndex == 0) {
 				isRestart = true;
-				clearFlag = false;
-				failedFlag = false;
+				//clearFlag = false;
+				//failedFlag = false;
 			}
 			// カーソルがネクストを選んでる時
 			else {
@@ -108,12 +110,8 @@ void GameManagement::begin() {
 				}
 				else if (failedFlag) {
 					isUndoRestart = true;
-				}
-
-				clearFlag = false;
-				failedFlag = false;
+				}				
 			}
-
 		}
 	}
 }

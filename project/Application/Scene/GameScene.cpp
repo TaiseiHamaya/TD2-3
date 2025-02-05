@@ -273,8 +273,8 @@ void GameScene::late_update() {
 		//ここで一手戻す処理をする
 		playerManager->restart_undo();
 	}
-	else if (managementUI->is_next()) {
-		managementUI->init();
+	else if (managementUI->is_next()&& sceneState!= TransitionState::Out) {
+		//managementUI->init();
 		// 最大レベルではない場合
 		if (currentLevel < GameValue::MaxLevel) {
 			SceneManager::SetSceneChange(
@@ -332,6 +332,7 @@ void GameScene::late_update() {
 				rocketObj->init();
 				transitionTimer = WorldClock::DeltaSeconds();
 			}
+			//managementUI->init();
 		}
 		break;
 	}
