@@ -1,41 +1,40 @@
 #include "GameScene.h"
 
-#include <Library/Math/Definition.h>
-
-#include "Engine/Module/Render/RenderNode/2D/Sprite/SpriteNode.h"
-#include "Engine/Module/Render/RenderNode/Forward/Object3DNode/Object3DNode.h"
-#include "Engine/Module/Render/RenderNode/Forward/SkinningMesh/SkinningMeshNode.h"
-#include "Engine/Module/Render/RenderPath/RenderPath.h"
-#include "Engine/Module/World/Camera/Camera2D.h"
-#include "Engine/Module/World/Camera/Camera3D.h"
-#include "Engine/Rendering/DirectX/DirectXSwapChain/DirectXSwapChain.h"
-#include "Engine/Resources/Animation/NodeAnimation/NodeAnimationManager.h"
-#include "Engine/Resources/Animation/Skeleton/SkeletonManager.h"
-#include "Engine/Resources/PolygonMesh/PolygonMeshManager.h"
-#include "Engine/Resources/Texture/TextureManager.h"
-#include "Engine/Utility/Tools/SmartPointer.h"
+#include <Engine/Module/Render/RenderNode/2D/Sprite/SpriteNode.h>
+#include <Engine/Module/Render/RenderNode/Forward/Object3DNode/Object3DNode.h>
+#include <Engine/Module/Render/RenderNode/Forward/Particle/ParticleMeshNode/ParticleMeshNode.h>
+#include <Engine/Module/Render/RenderNode/Forward/SkinningMesh/SkinningMeshNode.h>
+#include <Engine/Module/Render/RenderPath/RenderPath.h>
+#include <Engine/Module/Render/RenderTargetGroup/SingleRenderTarget.h>
+#include <Engine/Module/World/Camera/Camera2D.h>
+#include <Engine/Module/World/Camera/Camera3D.h>
+#include <Engine/Module/World/Sprite/SpriteInstance.h>
+#include <Engine/Rendering/DirectX/DirectXResourceObject/DepthStencil/DepthStencil.h>
+#include <Engine/Rendering/DirectX/DirectXResourceObject/OffscreenRender/OffscreenRender.h>
+#include <Engine/Rendering/DirectX/DirectXSwapChain/DirectXSwapChain.h>
+#include <Engine/Resources/Animation/NodeAnimation/NodeAnimationManager.h>
+#include <Engine/Resources/Animation/Skeleton/SkeletonManager.h>
+#include <Engine/Resources/Audio/AudioManager.h>
+#include <Engine/Resources/PolygonMesh/PolygonMeshManager.h>
+#include <Engine/Resources/Texture/TextureManager.h>
 #include <Engine/Runtime/Scene/SceneManager.h>
 #include <Engine/Runtime/WorldClock/WorldClock.h>
-#include "Engine/Resources/Audio/AudioManager.h"
-#include "Application/Scene/TitleScene.h"
-#include <Engine/Rendering/DirectX/DirectXResourceObject/DepthStencil/DepthStencil.h>
-#include <Engine/Module/Render/RenderTargetGroup/SingleRenderTarget.h>
-#include <Engine/Rendering/DirectX/DirectXResourceObject/OffscreenRender/OffscreenRender.h>
+#include <Engine/Utility/Tools/SmartPointer.h>
 
 #include "Application/GameValue.h"
 #include "Application/Scene/SelectScene.h"
+#include "Application/Scene/TitleScene.h"
 
 #include "Application/LevelLoader/LevelLoader.h"
 
 #ifdef _DEBUG
 #include "Engine/Module/Render/RenderNode/Debug/PrimitiveLine/PrimitiveLineNode.h"
 #endif // _DEBUG
-#include <Engine/Module/Render/RenderNode/Forward/Particle/ParticleMeshNode/ParticleMeshNode.h>
 
 GameScene::GameScene() : GameScene(1) {}
 
-GameScene::GameScene(int32_t level) {
-	currentLevel = level;
+GameScene::GameScene(int32_t level) :
+	currentLevel(level) {
 }
 ;
 
@@ -132,6 +131,9 @@ void GameScene::initialize() {
 	playerManager = std::make_unique<PlayerManager>();
 	playerManager->initialize(levelLoader, fieldObjs.get());
 
+
+	transition = eps::CreateUnique<SpriteInstance>("black.png");
+
 	directionalLight = eps::CreateUnique<DirectionalLightInstance>();
 
 	std::shared_ptr<SingleRenderTarget> meshRT;
@@ -222,14 +224,13 @@ void GameScene::finalize() {}
 
 void GameScene::begin() {
 	managementUI->begin();
-	managementUI->SetCurLevel(currentLevel);
-	gameUI->SetCurLevel(currentLevel);
 	if (managementUI->is_reset()) {
 		fieldObjs->initialize(levelLoader);
 		playerManager->initialize(levelLoader, fieldObjs.get());
 		managementUI->init();
 		rocketObj->init();
-	}else if (managementUI->is_undoRestart()) {
+	}
+	else if (managementUI->is_undoRestart()) {
 		//fieldObjs->initialize(levelLoader);
 		//playerManager->initialize(levelLoader, fieldObjs.get());
 		managementUI->init();
@@ -259,17 +260,44 @@ void GameScene::begin() {
 }
 
 void GameScene::update() {
-	//WorldClock::Update();
-
-
-
 	playerManager->update();
 	fieldObjs->update();
 	directionalLight->update();
 	managementUI->update();
 	gameUI->update();
+	background->update();
 	gameUI->setIsCanRelese(playerManager->get_isParent());
 	rocketObj->update(playerManager->getStageSituation());
+
+	switch (sceneState) {
+	case TransitionState::In:
+	{
+		transitionTimer += WorldClock::DeltaSeconds();
+		float parametric = std::min(1.0f, transitionTimer / 1.0f);
+		transition->get_color().alpha = 1 - parametric;
+		if (parametric >= 1.0f) {
+			sceneState = TransitionState::Main;
+		}
+		break;
+	}
+	case TransitionState::Main:
+		if (managementUI->is_transition()) {
+			transitionTimer = WorldClock::DeltaSeconds();
+			sceneState = TransitionState::Out;
+		}
+		break;
+	case TransitionState::Out:
+	{
+		transitionTimer += WorldClock::DeltaSeconds();
+		float parametric = transitionTimer / 1.0f;
+		transition->get_color().alpha = parametric;
+		if (parametric >= 1.0f) {
+			// リセット処理をここで呼び出す
+			sceneState = TransitionState::In;
+		}
+		break;
+	}
+	}
 }
 
 void GameScene::begin_rendering() {
@@ -284,6 +312,8 @@ void GameScene::begin_rendering() {
 	gameUI->begin_rendering();
 	background->begin_rendering();
 	rocketObj->begin_rendering();
+
+	transition->begin_rendering();
 }
 
 void GameScene::late_update() {}
@@ -291,7 +321,7 @@ void GameScene::late_update() {}
 void GameScene::draw() const {
 	// 背景スプライト
 	renderPath->begin();
-	background->darw();
+	background->draw();
 
 	// StaticMesh
 	renderPath->next();
@@ -327,9 +357,9 @@ void GameScene::draw() const {
 	gameUI->darw();
 	managementUI->darw();
 
+	transition->draw();
+
 	renderPath->next();
-
-
 
 #ifdef _DEBUG
 	// 線描画(Debug)
@@ -338,9 +368,6 @@ void GameScene::draw() const {
 
 	renderPath->next();
 #endif // _DEBUG
-
-
-
 }
 
 #ifdef _DEBUG

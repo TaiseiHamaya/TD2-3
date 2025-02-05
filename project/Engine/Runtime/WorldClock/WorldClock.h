@@ -16,10 +16,10 @@ public:
 	static float DeltaSeconds();
 	static float AverageFPS();
 	static const std::chrono::high_resolution_clock::time_point& BeginTime();
+	static void IsFixDeltaTime(bool boolean);
 
 #ifdef _DEBUG
 public:
-	static void IsFixDeltaTime(bool boolean);
 	static void DebugGui();
 	static bool IsUnlimitedFPS() { return GetInstance().isUnlimitedRefreshRate; };
 #endif // _DEBUG
@@ -32,9 +32,9 @@ private:
 	float timeSummation;
 	float fpsSummation;
 	float averageFPS;
+	bool isFixDeltaTime;
 
 #ifdef _DEBUG
-	bool isFixDeltaTime;
 	bool isUnlimitedRefreshRate;
 #endif // _DEBUG
 };

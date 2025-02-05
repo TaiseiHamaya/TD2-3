@@ -12,9 +12,7 @@
 int WINAPI WinMain(HINSTANCE,HINSTANCE,LPSTR,int) {
 	WinApp::Initialize();
 
-#ifdef _DEBUG
 	WorldClock::IsFixDeltaTime(true);
-#endif // _DEBUG
 
 #ifdef _DEBUG
 	SceneManager::Initialize(std::make_unique<TitleScene>());

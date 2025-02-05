@@ -76,13 +76,13 @@ void TitleScene::begin() {}
 
 void TitleScene::update() {
 	switch (sceneState) {
-	case TitleScene::TransitionState::InSelect:
+	case TransitionState::In:
 		in_update();
 		break;
-	case TitleScene::TransitionState::Default:
+	case TransitionState::Main:
 		default_update();
 		break;
-	case TitleScene::TransitionState::OutSelect:
+	case TransitionState::Out:
 		out_update();
 		break;
 	}
@@ -117,7 +117,7 @@ void TitleScene::in_update() {
 	float parametric = transitionTimer / 1.0f;
 	transition->get_color().alpha = 1 - std::min(1.0f, parametric);
 	if (parametric >= 1.0f) {
-		sceneState = TransitionState::Default;
+		sceneState = TransitionState::Main;
 	}
 }
 
@@ -126,7 +126,7 @@ void TitleScene::default_update() {
 		SceneManager::SetSceneChange(
 			eps::CreateUnique<SelectScene>(), 1.0f);
 		transitionTimer = WorldClock::DeltaSeconds();
-		sceneState = TransitionState::OutSelect;
+		sceneState = TransitionState::Out;
 	}
 }
 

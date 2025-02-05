@@ -12,9 +12,9 @@ class SpriteInstance;
 class TitleScene : public BaseScene {
 private:
 	enum class TransitionState {
-		InSelect,
-		Default,
-		OutSelect
+		In,
+		Main,
+		Out
 	};
 
 public:

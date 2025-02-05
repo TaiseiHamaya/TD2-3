@@ -2,8 +2,7 @@
 
 #include <Library/Math/Definition.h>
 
-#include "Engine/Module/Render/RenderNode/2D/Sprite/SpriteNode.h"
-#include "Engine/Resources/Audio/AudioManager.h"
+#include <Engine/Module/Render/RenderNode/2D/Sprite/SpriteNode.h>
 #include <Engine/Module/Render/RenderNode/Forward/Object3DNode/Object3DNode.h>
 #include <Engine/Module/Render/RenderNode/Forward/SkinningMesh/SkinningMeshNode.h>
 #include <Engine/Module/Render/RenderTargetGroup/SingleRenderTarget.h>
@@ -12,6 +11,7 @@
 #include <Engine/Rendering/DirectX/DirectXResourceObject/DepthStencil/DepthStencil.h>
 #include <Engine/Rendering/DirectX/DirectXResourceObject/OffscreenRender/OffscreenRender.h>
 #include <Engine/Rendering/DirectX/DirectXSwapChain/DirectXSwapChain.h>
+#include <Engine/Resources/Audio/AudioManager.h>
 #include <Engine/Resources/PolygonMesh/PolygonMeshManager.h>
 #include <Engine/Resources/Texture/TextureManager.h>
 #include <Engine/Runtime/Input/Input.h>
@@ -50,7 +50,7 @@ void SelectScene::load() {
 }
 
 void SelectScene::initialize() {
-	sceneState = TransitionState::InSelect;
+	sceneState = TransitionState::In;
 
 	// Instance
 	Camera2D::Initialize();
@@ -147,13 +147,13 @@ void SelectScene::begin() {
 
 void SelectScene::update() {
 	switch (sceneState) {
-	case SelectScene::TransitionState::InSelect:
+	case SelectScene::TransitionState::In:
 		in_update();
 		break;
-	case SelectScene::TransitionState::Default:
+	case SelectScene::TransitionState::Main:
 		default_update();
 		break;
-	case SelectScene::TransitionState::OutSelect:
+	case SelectScene::TransitionState::Out:
 		out_update();
 		break;
 	}
@@ -189,6 +189,7 @@ void SelectScene::begin_rendering() {
 	startUi->begin_rendering();
 	obSprite->begin_rendering();
 	background->begin_rendering();
+	transition->begin_rendering();
 }
 
 void SelectScene::late_update() {
@@ -197,7 +198,7 @@ void SelectScene::late_update() {
 void SelectScene::draw() const {
 	renderPath->begin();
 	// 背景スプライト
-	background->darw();
+	background->draw();
 	renderPath->next();
 	// Mesh
 	camera3D->register_world_projection(1);
@@ -218,6 +219,7 @@ void SelectScene::draw() const {
 	numberUi10->draw();
 	selectUi->draw();
 	startUi->draw();
+	transition->draw();
 
 	renderPath->next();
 }
@@ -247,7 +249,7 @@ void SelectScene::in_update() {
 	float parametric = transitionTimer / 1.0f;
 	transition->get_color().alpha = 1 - std::min(1.0f, parametric);
 	if (parametric >= 1.0f) {
-		sceneState = TransitionState::Default;
+		sceneState = TransitionState::Main;
 	}
 }
 
@@ -265,18 +267,21 @@ void SelectScene::default_update() {
 		SceneManager::SetSceneChange(
 			eps::CreateUnique<GameScene>(selectIndex), 1.0f
 		);
-		sceneState = TransitionState::OutSelect;
-		startRotation = fieldRotation->get_transform().get_quaternion();;
+		sceneState = TransitionState::Out;
+		startRotation = fieldRotation->get_transform().get_quaternion();
+		transitionTimer = WorldClock::DeltaSeconds();
 	}
 }
 
 void SelectScene::out_update() {
-	outTransitionTimer += WorldClock::DeltaSeconds();
-	float parametric = outTransitionTimer / 1.0f;
+	transitionTimer += WorldClock::DeltaSeconds();
+	float parametric = std::min(1.0f, transitionTimer / 1.0f);
 	fieldRotation->get_transform().set_quaternion(
-		Quaternion::SlerpClockwise(startRotation,
-			CQuaternion::IDENTITY, Easing::Out::Quad(std::min(1.0f, parametric)))
+		Quaternion::SlerpFar(startRotation, 
+			Quaternion::AngleAxis(CVector3::BASIS_Y, -0.01f) * startRotation ,
+			Easing::Out::Quad(parametric))
 	);
+	transition->get_color().alpha = parametric;
 }
 
 #ifdef _DEBUG

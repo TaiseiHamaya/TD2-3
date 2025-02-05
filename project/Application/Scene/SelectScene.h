@@ -18,9 +18,9 @@ class SpriteInstance;
 class SelectScene : public BaseScene {
 private:
 	enum class TransitionState {
-		InSelect,
-		Default,
-		OutSelect
+		In,
+		Main,
+		Out
 	};
 
 public:
@@ -80,7 +80,6 @@ private:
 	std::unique_ptr<MapchipField> field;
 
 	Quaternion startRotation;
-	float outTransitionTimer{ 0 };
 
 	float test{0};
 

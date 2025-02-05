@@ -20,6 +20,12 @@ class LevelLoader;
 #include "Application/Rocket/Rocket.h"
 
 class GameScene : public BaseScene {
+private:
+	enum class TransitionState {
+		In,
+		Main,
+		Out
+	};
 
 public:
 	GameScene();
@@ -43,9 +49,7 @@ public:
 public:
 	void debug_update() override;
 #endif // _DEBUG
-
 private:
-
 	std::unique_ptr<RenderPath> renderPath;
 
 	std::shared_ptr<OutlineNode> outlineNode;
@@ -57,8 +61,13 @@ private:
 	std::unique_ptr<Camera3D> camera3D;
 	std::unique_ptr<DirectionalLightInstance> directionalLight;
 
-	int32_t currentLevel;
+	const int32_t currentLevel;
 	std::unique_ptr<LevelLoader> levelLoader;
+
+	// Transition関連
+	TransitionState sceneState;
+	float transitionTimer{ 0 };
+	std::unique_ptr<SpriteInstance> transition;
 	std::unique_ptr<Rocket> rocketObj;
 
 	//UI

@@ -90,6 +90,7 @@ void GameManagement::begin() {
 		if (Input::IsTriggerKey(KeyID::Space)) {
 
 			decision->restart();//確定の音
+			isTransition = true;
 			// カーソルがリトライを選んでる時
 			if (selectIndex == 0) {
 				isReset = true;

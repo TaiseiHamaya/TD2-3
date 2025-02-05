@@ -32,7 +32,7 @@ public:
 	void SetFailedSelect(int value) { failedUI->SetReasonIndex(value); }
 	void SetCurLevel(int value) { curLevel = value; }
 	void SetMaxLevel(int value) { maxLevel = value; }
-
+	bool is_transition() const { return isTransition; }
 
 private:
 	//std::unique_ptr<SpriteInstance> clearSprite;
@@ -47,6 +47,8 @@ private:
 
 	std::unique_ptr< FailedUI>failedUI;
 	std::unique_ptr< ClearUI>clearUI;
+
+	bool isTransition{ false };
 
 	bool clearFlag;
 	bool failedFlag;
