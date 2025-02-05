@@ -50,3 +50,18 @@ enum class MoveType {
     FallIntoHole,        // 穴に落ちる
     MoveOnChild,        // 子供の上に移動
 };
+
+enum class ChildAnimation {
+    // 個別でフラグがほしい奴ら
+    Rerease, // 放す
+    Flustered, // 焦る
+    // それ以外
+    Normal,
+};
+
+enum class PlayerAnimation {
+    // 個別でフラグがほしい奴ら
+    Flustered, // 焦る
+    // それ以外
+    Normal,
+};

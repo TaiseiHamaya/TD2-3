@@ -52,6 +52,8 @@ private:
 	std::unique_ptr<MoveLogger> moveLogger;
 	std::unique_ptr<AnimatedMeshInstance> catchEffect_;
 
+	std::unique_ptr<AnimatedMeshInstance> childFlusteredEffect_;
+
 	// パーティクルの召還
 	std::unique_ptr<ParticleEmitterInstance> dustEmitter;
 	std::unique_ptr<ParticleEmitterInstance> iceDustEmitter;
@@ -75,8 +77,4 @@ private:
 
 	// 子が放すアニメーションをしているか
 	bool isRerease = false;
-	// 親が焦るアニメーションかどうか
-	bool isPlayerFlustered = false;
-	// 子が焦るアニメーションをしているかどうか
-	bool isChildFlustered = false;
 };

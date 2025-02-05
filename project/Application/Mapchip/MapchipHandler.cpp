@@ -471,10 +471,12 @@ void MapchipHandler::check_fall_conditions(Player* player, Child* child) {
 		if (player->is_out_ground()) {
 			player->get_object()->get_animation()->reset_animation("Flustered");
 			player->get_object()->get_animation()->set_loop(true);
+			player->set_animation_info(PlayerAnimation::Flustered);
 		}
 		else {
 			player->get_object()->get_animation()->reset_animation("Standby");
 			player->get_object()->get_animation()->set_loop(true);
+			player->set_animation_info(PlayerAnimation::Normal);
 		}
 	}
 	// 子供が穴の上にいるかどうかが前フレームと今フレームで違っていたらアニメーションの切り替え
@@ -483,10 +485,12 @@ void MapchipHandler::check_fall_conditions(Player* player, Child* child) {
 			if (child->is_out_ground()) {
 				child->get_object()->get_animation()->reset_animation("Flustered");
 				child->get_object()->get_animation()->set_loop(true);
+				child->set_animation_info(ChildAnimation::Flustered);
 			}
 			else {
 				child->get_object()->get_animation()->reset_animation("Hold");
 				child->get_object()->get_animation()->set_loop(false);
+				child->set_animation_info(ChildAnimation::Normal);
 			}
 		}
 	}

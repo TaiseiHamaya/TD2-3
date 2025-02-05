@@ -16,6 +16,12 @@ void PlayerManager::initialize(Reference<const LevelLoader> level, MapchipField*
 	catchEffect_->reset_animated_mesh("CatchEffect.gltf", "Standby", false);
 	catchEffect_->set_active(false);
 	catchEffect_->get_transform().set_quaternion({ 0.0f, 0.5f, 0.0f, 0.5f });
+
+
+
+	childFlusteredEffect_ = std::make_unique<AnimatedMeshInstance>();
+	childFlusteredEffect_->reset_animated_mesh("FlusteredEffect.gltf", "Standby", true);
+	childFlusteredEffect_->set_active(false);
 	
 		auto& objMat = catchEffect_->get_materials();
 	for (auto& mat : objMat) {
@@ -93,11 +99,18 @@ void PlayerManager::update() {
 	catchEffectPos.y += 1.0f;
 	catchEffect_->get_transform().set_translate(catchEffectPos);
 
+
+	childFlusteredEffect_->get_transform().set_translate(child->get_translate());
+
+
 	dustEmitter->get_transform().set_translate(emitterPos);
 	dustEmitter->update();
 
 	iceDustEmitter->get_transform().set_translate(emitterPos);
 	iceDustEmitter->update();
+
+	//Vector3 playerFlusteredPos = 
+
 
 	if (player->is_stack_movement()) {
 		emplace_log(player->move_start_position(), player->start_rotation());
@@ -165,12 +178,16 @@ void PlayerManager::begin_rendering() {
 	catchEffect_->begin_rendering();
 	dustEmitter->begin_rendering();
 	iceDustEmitter->begin_rendering();
+
+	childFlusteredEffect_->begin_rendering();
 }
 
 void PlayerManager::draw() const {
 	player->draw();
 	child->draw();
 	catchEffect_->draw();
+
+	childFlusteredEffect_->draw();
 }
 
 void PlayerManager::draw_particle() {
@@ -277,6 +294,7 @@ void PlayerManager::manage_parent_child_relationship() {
 				child->get_object()->get_animation()->reset_animation("Standby");
 				child->get_object()->get_animation()->set_loop(false);
 				child->get_object()->get_animation()->restart();
+				childFlusteredEffect_->set_active(false);
 			}
 
 			//前フレ子なし、今フレ子ありならholdを鳴らす
@@ -369,6 +387,7 @@ void PlayerManager::attach_child_to_player(Player* player, Child* child) {
 	anim->reset_animation("Hold");
 	anim->set_loop(false);
 	anim->restart();
+	childFlusteredEffect_->set_active(false);
 }
 
 void PlayerManager::detach_child_from_player(Player* player, Child* child) {
@@ -392,11 +411,13 @@ void PlayerManager::detach_child_from_player(Player* player, Child* child) {
 		anim->set_loop(false);
 		anim->restart();
 		isRerease = true;
+		childFlusteredEffect_->set_active(false);
 	}
 	else {
 		anim->reset_animation("Falling");
 		anim->set_loop(true);
 		anim->restart();
+		childFlusteredEffect_->set_active(false);
 	}
 }
 
@@ -474,6 +495,7 @@ void PlayerManager::undo() {
 		else {
 			playerAnimation->reset_animation("Flustered");
 			playerAnimation->set_loop(true);
+
 		}
 		// 子
 		// 足元が地面
@@ -481,12 +503,13 @@ void PlayerManager::undo() {
 			childAnimation->reset_animation("Hold");
 			childAnimation->set_time_force(1000);
 			childAnimation->set_loop(false);
+			childFlusteredEffect_->set_active(false);
 		}
 		else {
 			childAnimation->reset_animation("Flustered");
 			childAnimation->set_time_force(1000);
 			childAnimation->set_loop(true);
-			isChildFlustered = true;
+			childFlusteredEffect_->set_active(true);
 		}
 	}
 	// 非くっつき状態
@@ -495,6 +518,7 @@ void PlayerManager::undo() {
 		playerAnimation->set_loop(true);
 		childAnimation->reset_animation("Standby");
 		childAnimation->set_loop(true);
+		childFlusteredEffect_->set_active(false);
 	}
 }
 
