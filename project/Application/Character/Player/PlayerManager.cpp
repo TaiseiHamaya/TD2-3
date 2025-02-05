@@ -4,6 +4,7 @@
 
 #include "Engine/Resources/Animation/NodeAnimation/NodeAnimationPlayer.h"
 #include "Engine/Runtime/Input/Input.h"
+#include "Engine/Rendering/DirectX/DirectXResourceObject/ConstantBuffer/Material/Material.h"
 
 #include <Application/Utility/GameUtility.h>
 #include <Engine/Utility/Tools/SmartPointer.h>
@@ -15,7 +16,11 @@ void PlayerManager::initialize(Reference<const LevelLoader> level, MapchipField*
 	catchEffect_->reset_animated_mesh("CatchEffect.gltf", "Standby", false);
 	catchEffect_->set_active(false);
 	catchEffect_->get_transform().set_quaternion({ 0.0f, 0.5f, 0.0f, 0.5f });
-
+	
+		auto& objMat = catchEffect_->get_materials();
+	for (auto& mat : objMat) {
+		mat.lightingType = LighingType::None;
+	}
 	dustEmitter = eps::CreateUnique<ParticleEmitterInstance>("dust.json", 128);
 	iceDustEmitter = eps::CreateUnique<ParticleEmitterInstance>("iceDust.json", 128);
 
