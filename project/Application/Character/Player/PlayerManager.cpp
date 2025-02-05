@@ -135,19 +135,18 @@ void PlayerManager::update() {
 	else if (stageSituation == 2) {
 		gameManagement_->SetFailedFlag(true);
 		gameManagement_->SetFailedSelect(1);
-	}
-	// 子を置いていく
-	else if (stageSituation == 3) {
-		gameManagement_->SetFailedFlag(true);
-		gameManagement_->SetFailedSelect(1);
-		emplace_log(player->get_translate(), player->start_rotation());
+		emplace_log(player->move_start_position(), player->start_rotation());
 	}
 	// 子を置いていく
 	else if (stageSituation == 3) {
 		gameManagement_->SetFailedFlag(true);
 		gameManagement_->SetFailedSelect(0);
 		emplace_log(player->move_start_position(), player->start_rotation());
-
+	}
+	// コアラを落とす
+	else if (stageSituation == 4) {
+		gameManagement_->SetFailedFlag(true);
+		gameManagement_->SetFailedSelect(2);
 	}
 
 	// この条件式でできない理由 is 何
@@ -565,6 +564,7 @@ void PlayerManager::set_rotate_parameters(const Vector3& direction) {
 		player->set_rotate_timer(0.0f);
 		player->set_rotate_duration(0.3f);
 		player->set_rotating(true);
+		player->set_start_position(player->get_translate());
 		break;
 	case RotateType::None:
 		player->set_start_rotation(player->get_rotation());
@@ -572,6 +572,7 @@ void PlayerManager::set_rotate_parameters(const Vector3& direction) {
 		player->set_rotate_timer(0.0f);
 		player->set_rotate_duration(0.01f);
 		player->set_rotating(true);
+		player->set_start_position(player->get_translate());
 		break;
 	case RotateType::Normal:
 		player->set_start_rotation(player->get_rotation());
@@ -579,6 +580,7 @@ void PlayerManager::set_rotate_parameters(const Vector3& direction) {
 		player->set_rotate_timer(0.0f);
 		player->set_rotate_duration(0.3f);
 		player->set_rotating(true);
+		player->set_start_position(player->get_translate());
 
 		if (player->get_how_rotation() == RotationDirection::Left) {
 			midDir = GameUtility::rotate_direction_90_left(direction);
