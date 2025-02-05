@@ -75,9 +75,15 @@ void PlayerManager::update() {
 	child->update();
 	player->fall_update();
 	catchEffect_->begin();
+	iceDustEmitter->update();
+	dustEmitter->update();
 
 	// クリアか失敗のフラグが立ってたら早期リターン
 	if (stageSituation != 0) {
+		iceDustEmitter->end_force();
+		iceDustEmitter->set_loop(false);
+		dustEmitter->end_force();
+		dustEmitter->set_loop(false);
 		// 子を連れて親が先にゴール
 		if (stageSituation == 1 || stageSituation == 3) {
 			on_clear_update();
@@ -115,10 +121,8 @@ void PlayerManager::update() {
 	catchEffect_->get_transform().set_translate(catchEffectPos);
 
 	dustEmitter->get_transform().set_translate(emitterPos);
-	dustEmitter->update();
 
 	iceDustEmitter->get_transform().set_translate(emitterPos);
-	iceDustEmitter->update();
 
 	//Vector3 playerFlusteredPos = 
 
