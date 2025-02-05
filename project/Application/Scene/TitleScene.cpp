@@ -16,6 +16,9 @@
 #include "Application/Scene/SelectScene.h"
 
 #include <utility>
+#include <Engine/Module/World/AnimatedMesh/AnimatedMeshInstance.h>
+#include <Engine/Resources/Animation/Skeleton/SkeletonManager.h>
+#include <Engine/Resources/Animation/NodeAnimation/NodeAnimationManager.h>
 
 TitleScene::TitleScene() {}
 
@@ -26,6 +29,14 @@ void TitleScene::load() {
 	TextureManager::RegisterLoadQue("./GameResources/Texture/black.png");
 	TextureManager::RegisterLoadQue("./GameResources/Texture/TitleLogo.png");
 	AudioManager::RegisterLoadQue("./GameResources/Audio/BGM/TitleBGM.wav");
+
+	PolygonMeshManager::RegisterLoadQue("./GameResources/Models/ParentKoala/ParentKoala.gltf");
+	PolygonMeshManager::RegisterLoadQue("./GameResources/Models/ChiledKoala/ChiledKoala.gltf");
+	SkeletonManager::RegisterLoadQue("./GameResources/Models/ParentKoala/ParentKoala.gltf");
+	SkeletonManager::RegisterLoadQue("./GameResources/Models/ChiledKoala/ChiledKoala.gltf");
+	NodeAnimationManager::RegisterLoadQue("./GameResources/Models/ParentKoala/ParentKoala.gltf");
+	NodeAnimationManager::RegisterLoadQue("./GameResources/Models/ChiledKoala/ChiledKoala.gltf");
+
 }
 
 void TitleScene::initialize() {
@@ -37,9 +48,9 @@ void TitleScene::initialize() {
 	directionalLight = eps::CreateUnique<DirectionalLightInstance>();
 
 	startUi = eps::CreateUnique<SpriteInstance>("start.png", Vector2{ 0.5f, 0.5f });
-	startUi->get_transform().set_translate({ 640.0f,140 });
+	startUi->get_transform().set_translate({ 440.0f,140 });
 	titleLogo = eps::CreateUnique<SpriteInstance>("TitleLogo.png", Vector2{ 0.5f, 0.5f });
-	titleLogo->get_transform().set_translate({ 640.0f,440 });
+	titleLogo->get_transform().set_translate({ 440.0f,540 });
 
 	transition = eps::CreateUnique<SpriteInstance>("black.png", Vector2{ 0.f, 0.f });
 
@@ -70,6 +81,14 @@ void TitleScene::initialize() {
 	bgm->set_loop(true);
 	bgm->set_volume(0.2f);
 	bgm->play();
+
+	parentObj = std::make_unique<AnimatedMeshInstance>("ParentKoala.gltf", "Hello", true);
+	parentObj->get_transform().set_translate({ 0.6f,-0.8f,3.7f });
+	parentObj->get_transform().set_quaternion(Quaternion::EulerDegree(0.f, 0.f, 10.f));
+
+	chiledObj = std::make_unique<AnimatedMeshInstance>("ChiledKoala.gltf", "Hello", true);
+	easeT = 0;
+	movePos = { -7.f,-0.5f,14.4f };
 }
 
 void TitleScene::popped() {}
@@ -90,6 +109,17 @@ void TitleScene::update() {
 		out_update();
 		break;
 	}
+
+	parentObj->begin();
+	parentObj->update();
+	chiledObj->begin();
+
+	easeT += WorldClock::DeltaSeconds();
+
+	movePos.x = std::lerp(-7.f, 7.f, easeT / totalEaseT);
+	if (easeT > totalEaseT) { easeT = 0.f; }
+	chiledObj->get_transform().set_translate(movePos);
+	chiledObj->update();
 }
 
 void TitleScene::begin_rendering() {
@@ -99,6 +129,8 @@ void TitleScene::begin_rendering() {
 
 	camera3D->update_matrix();
 	directionalLight->begin_rendering();
+	parentObj->begin_rendering();
+	chiledObj->begin_rendering();
 }
 
 void TitleScene::late_update() {}
@@ -115,7 +147,8 @@ void TitleScene::draw() const {
 	camera3D->register_world_projection(1);
 	camera3D->register_world_lighting(5);
 	directionalLight->register_world(6);
-
+	parentObj->draw();
+	chiledObj->draw();
 	// Sprite
 	renderPath->next();
 	startUi->draw();
@@ -150,6 +183,10 @@ void TitleScene::out_update() {
 }
 
 #ifdef _DEBUG
-void TitleScene::debug_update() {}
+void TitleScene::debug_update() {
+	ImGui::Begin("parent");
+	chiledObj->debug_gui();
+	ImGui::End();
+}
 #endif // _DEBUG
 
