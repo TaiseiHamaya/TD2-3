@@ -10,6 +10,7 @@
 
 
 GameManagement::GameManagement() {
+	decision = std::make_unique<AudioPlayer>();
 	init();
 }
 
@@ -53,7 +54,6 @@ void GameManagement::init() {
 	failedUI = std::make_unique<FailedUI>();
 	clearUI = std::make_unique<ClearUI>();
 
-	decision = std::make_unique<AudioPlayer>();
 	decision->initialize("decision.wav");
 	operation = std::make_unique<AudioPlayer>();
 	operation->initialize("operation.wav");
@@ -120,7 +120,7 @@ void GameManagement::begin() {
 				}
 				else if (failedFlag) {
 					isUndoRestart = true;
-				}				
+				}
 			}
 		}
 	}
