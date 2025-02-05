@@ -130,11 +130,10 @@ void PlayerManager::update() {
 		emplace_log(player->move_start_position(), player->start_rotation());
 	}
 
-
-	// 親子関係の管理
-	manage_parent_child_relationship();
 	// 入力処理を受け付ける
 	handle_input();
+	// 親子関係の管理
+	manage_parent_child_relationship();
 	// 子供をプレイヤーの向かせる処理
 	set_child_rotate();
 	// パーティクルのオンオフの切り替え処理
@@ -199,7 +198,9 @@ void PlayerManager::update() {
 	if (stageSituation == 0 &&
 		!(player->get_state() != PlayerState::Idle || player->is_falling() || child->is_falling()) &&
 		moveLogger->can_undo() && Input::IsTriggerKey(KeyID::Z)) {
-		undo();
+		if (player->get_state() == PlayerState::Idle) {
+			undo();
+		}
 		undoAudio->restart();
 	}
 }
@@ -227,6 +228,13 @@ void PlayerManager::draw_particle() const {
 
 void PlayerManager::handle_input() {
 	if (player->get_state() != PlayerState::Idle) {
+		return;
+	}
+
+	if (child->is_falling()) {
+		return;
+	}
+	if (player->is_move()) {
 		return;
 	}
 
@@ -423,6 +431,9 @@ void PlayerManager::detach_child_from_player(Player* player, Child* child) {
 		return;
 	}
 	if (player->is_rotating()) {
+		return;
+	}
+	if (player->get_state() != PlayerState::Idle) {
 		return;
 	}
 	// ペアレントを解消する

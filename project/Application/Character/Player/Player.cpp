@@ -180,7 +180,7 @@ void Player::move_update() {
 		return;
 	}
 
-	isMoving = true;
+	//isMoving = true;
 
 	//移動時の音。moveTimerが加算される前に処理して一回だけ鳴らす
 	if (moveTimer <= 0) {
@@ -221,6 +221,7 @@ void Player::move_update() {
 			isMoving = false;
 			isMove = true;
 			isMoved = true;
+			isMoving = false;
 			isOnIce = false;//この処理がupdate序盤にあると、床→氷に移動する時に音がならなかったので、ここに移動してる
 			isStackMovement = true;
 			playerState = PlayerState::Idle;
