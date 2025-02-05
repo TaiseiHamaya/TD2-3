@@ -18,6 +18,8 @@
 #include <Engine/Runtime/Scene/SceneManager.h>
 #include <Engine/Utility/Tools/SmartPointer.h>
 
+#include "Application/Scene/TitleScene.h"
+
 #include "Application/GameValue.h"
 #include "Application/LevelLoader/LevelLoader.h"
 #include "Application/Scene/GameScene.h"
@@ -263,6 +265,17 @@ void SelectScene::default_update() {
 		crate_field_view();
 	}
 
+	// 2桁表示
+	if (selectIndex >= 10) {
+		numberUi->get_transform().set_translate({ 640.0f + 96 / 2,360.0f });
+		numberUi10->set_active(true);
+	}
+	// 1桁表示
+	else {
+		numberUi->get_transform().set_translate({ 640.0f,360.0f });
+		numberUi10->set_active(false);
+	}
+
 	if (Input::IsTriggerKey(KeyID::Space)) {
 		SceneManager::SetSceneChange(
 			eps::CreateUnique<GameScene>(selectIndex), 1.0f
@@ -277,8 +290,8 @@ void SelectScene::out_update() {
 	transitionTimer += WorldClock::DeltaSeconds();
 	float parametric = std::min(1.0f, transitionTimer / 1.0f);
 	fieldRotation->get_transform().set_quaternion(
-		Quaternion::SlerpFar(startRotation, 
-			Quaternion::AngleAxis(CVector3::BASIS_Y, -0.01f) * startRotation ,
+		Quaternion::SlerpFar(startRotation,
+			Quaternion::AngleAxis(CVector3::BASIS_Y, -0.01f) * startRotation,
 			Easing::Out::Quad(parametric))
 	);
 	transition->get_color().alpha = parametric;

@@ -113,6 +113,12 @@ void Player::fall_update() {
 	if (playerState != PlayerState::Falling) {
 		return;
 	}
+
+	if (!isFalling) {
+		isFalled = false;
+		playerState = PlayerState::Idle;
+	}
+
 	Vector3 position = object_->get_transform().get_translate();
 	if (!fallSoundFlag) {
 		fall->play();
@@ -155,12 +161,12 @@ void Player::move_update() {
 
 	if (moveTimer >= moveDuration) {
 		// 移動完了
-		playerState = PlayerState::Idle;
 		moveTimer = moveDuration;
 		isMoving = false;
 		isMove = true;
 		isOnIce = false;//この処理がupdate序盤にあると、床→氷に移動する時に音がならなかったので、ここに移動してる
 		isStackMovement = true;
+		playerState = PlayerState::Idle;
 	}
 
 	return;
@@ -240,7 +246,6 @@ void Player::wall_move() {
 			unmovable->restart();
 			unmovableFlag = true;
 		}
-
 	}
 
 	if (wallMoveTimer >= wallMoveDuration) {
@@ -272,7 +277,6 @@ void Player::rotate_failed_update() {
 
 	// 回転完了チェック
 	if (rotateTimer >= rotateDuration) {
-		unmovable->restart();
 		playerState = PlayerState::Idle;
 		rotateTimer = rotateDuration;
 		exclamationData_.timer = 0.0f;
@@ -295,8 +299,9 @@ void Player::rotate_failed_update() {
 			// 前半区間（start → mid）
 			float t = totalProgress / 0.5f; // 正規化した進行度
 			currentRotation = Quaternion::Slerp(startRotation, midRotation, t);
-			if (totalProgress >= 0.45f) {
+			if (totalProgress >= 0.45f && exclamationProgress <= 0.3f) {
 				exclamationData_.isActive = true;
+				unmovable->restart();
 				exclamation_->get_animation()->restart();
 			}
 		}
