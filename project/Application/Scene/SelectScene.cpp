@@ -369,6 +369,7 @@ void SelectScene::out_update() {
 			Easing::Out::Quad(parametric))
 	);
 	transition->get_color().alpha = fadeRatio;
+	bgm->set_volume((1 - fadeEase) * 0.1f);
 }
 
 #ifdef _DEBUG
