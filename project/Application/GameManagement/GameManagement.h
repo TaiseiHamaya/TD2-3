@@ -34,7 +34,7 @@ public:
 	void SetCurLevel(int value) { curLevel = value; }
 	void SetMaxLevel(int value) { maxLevel = value; }
 	bool is_transition() const { return isTransition; }
-
+	bool GetCanOperation() { return canOperation; }
 private:
 	//std::unique_ptr<SpriteInstance> clearSprite;
 	//std::unique_ptr<SpriteInstance> failedSprite;
@@ -72,5 +72,7 @@ private:
 	std::unique_ptr<AudioPlayer> clearAudio;//切り替え音
 	std::unique_ptr<AudioPlayer> failedAudio;//切り替え音
 	bool resultSoundFlag;
+
+	bool canOperation;
 
 };

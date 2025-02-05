@@ -5,6 +5,8 @@
 #include "Library/Math/Transform2D.h"
 #include "Engine/Runtime/WorldClock/WorldClock.h"
 #include "Library/Math/Easing.h"
+#include <Engine/Runtime/Input/Input.h>
+
 class SpriteInstance;
 
 class FailedUI
@@ -22,6 +24,8 @@ public:
 public:
 	void SetReasonIndex(int value) { reasonIndex = value; }
 	bool GetUiVisible() { return uiVisibleFlag; }
+	bool GetCanOperation() { return canOperation; }
+
 private:
 	void EaseChange(int index, float easeT);
 	void updateReason();
@@ -49,5 +53,6 @@ private:
 	bool reaUpdateFlag;
 
 	bool uiVisibleFlag;//リザルトの操作UIを表示するか
+	bool canOperation;
 };
 

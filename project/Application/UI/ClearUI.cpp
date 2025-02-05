@@ -33,10 +33,19 @@ void ClearUI::init() {
 	}
 	curDelayTime = 0;
 	curIndex = 0;
-
+	canOperation = false;
 }
 
 void ClearUI::update() {
+
+	if (!canOperation && Input::IsTriggerKey(KeyID::Space)) {
+		curIndex = 6;
+		for (int i = 0; i < curIndex; i++) {
+			curEaseT[i] = totalEaseT;
+			boundCurEaseT[i] = delayTotalTime * 6 - delayTotalTime * i;
+		}
+		canOperation = true;
+	}
 	if (curIndex < 6) {
 		curDelayTime += WorldClock::DeltaSeconds();
 		if (curDelayTime >= delayTotalTime) {
@@ -100,6 +109,7 @@ void ClearUI::EaseChange(int index, float easeT) {
 
 void ClearUI::BoundEase(int index) {
 	if (curEaseT[index] < totalEaseT) { return; }
+	if (curEaseT[5] >= totalEaseT) { canOperation = true; }
 	boundCurEaseT[index] += WorldClock::DeltaSeconds() * boundEaseDir[index];
 
 	if (boundCurEaseT[index] > boundTotalEaseT) {
@@ -116,7 +126,7 @@ void ClearUI::BoundEase(int index) {
 	letterTex[index]->get_transform().set_translate_y(
 		std::lerp(
 			endPosHeight,
-			endPosHeight+ boundLength,
+			endPosHeight + boundLength,
 			Easing::Out::Sine(ratio))
 
 	);

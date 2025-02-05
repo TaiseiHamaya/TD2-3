@@ -23,6 +23,7 @@ void GameManagement::init() {
 	isTransition = false;
 	isNext = false;
 	isUndoRestart = false;
+	canOperation = false;
 	selectIndex = 1;//リトライ時に最初に選んでる方　0リトライ　1ネクスト、1手前からリスタート
 	//clearSprite = std::make_unique<SpriteInstance>("ClearTex.png");
 	//failedSprite = std::make_unique<SpriteInstance>("FailedTex.png");
@@ -89,7 +90,7 @@ void GameManagement::begin() {
 			resultSoundFlag = true;
 		}
 		toSelectTimer = 0;
-		if (Input::IsTriggerKey(KeyID::Space)) {
+		if (Input::IsTriggerKey(KeyID::Space)&& canOperation) {
 
 			decision->restart();//確定の音
 			isTransition = true;
@@ -120,8 +121,14 @@ void GameManagement::begin() {
 void GameManagement::update() {
 
 	selectFunc();
-	if (failedFlag) { failedUI->update(); }
-	if (clearFlag) { clearUI->update(); }
+	if (failedFlag) { 
+		failedUI->update();
+		canOperation = failedUI->GetCanOperation();
+	}
+	if (clearFlag) {
+		clearUI->update();
+		canOperation = clearUI->GetCanOperation();
+	}
 
 }
 #ifdef _DEBUG

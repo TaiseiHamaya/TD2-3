@@ -5,6 +5,8 @@
 #include "Library/Math/Transform2D.h"
 #include "Engine/Runtime/WorldClock/WorldClock.h"
 #include "Library/Math/Easing.h"
+#include <Engine/Runtime/Input/Input.h>
+
 class SpriteInstance;
 
 class ClearUI
@@ -21,6 +23,7 @@ public:
 public:
 	//アクセッサ
 	bool GetUiVisible() { return uiVisibleFlag; }
+	bool GetCanOperation() { return canOperation; }
 
 private:
 	void EaseChange(int index, float easeT);
@@ -45,6 +48,6 @@ private:
 	float curDelayTime;
 
 	bool uiVisibleFlag;//リザルトの操作UIを表示するか
-
+	bool canOperation;//操作出来るか
 };
 

@@ -44,10 +44,20 @@ void FailedUI::init() {
 	failedReasonUI->get_transform().set_scale(CVector2::ZERO);
 
 	uiVisibleFlag = false;
+	canOperation = false;
+
 }
 
 void FailedUI::update() {
-
+	if (!canOperation && Input::IsTriggerKey(KeyID::Space)) {
+		curIndex = 7;
+		for (int i = 0; i < curIndex; i++) {
+			curEaseT[i] = totalEaseT;
+			//boundCurEaseT[i] = delayTotalTime * 6 - delayTotalTime * i;
+		}
+		reaCurEaseT=reaTotalEaseT;
+		canOperation = true;
+	}
 	if (curIndex < 7) {
 		curDelayTime += WorldClock::DeltaSeconds();
 		if (curDelayTime >= delayTotalTime) {
