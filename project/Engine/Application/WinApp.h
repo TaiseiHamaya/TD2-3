@@ -22,8 +22,8 @@ public:
 	static void Finalize();
 
 	static void ShowAppWindow();
-	static bool IsEndApp();
-	static void ProcessMessage();
+	static volatile void IsEndApp();
+	static volatile void ProcessMessage();
 
 public:
 	static HWND& GetWndHandle() noexcept { return instance->hWnd; };
@@ -38,7 +38,7 @@ private:
 	static inline std::unique_ptr<WinApp> instance = nullptr;
 
 private:
-	volatile bool isEndApp;
+	 bool isEndApp{ false };
 	HWND hWnd;
 	HINSTANCE hInstance;
 

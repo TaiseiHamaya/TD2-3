@@ -166,7 +166,7 @@ void WinApp::Finalize() {
 	std::chrono::get_tzdb_list().~tzdb_list();
 }
 
-void WinApp::ShowAppWindow() {
+volatile void WinApp::ShowAppWindow() {
 	// ウィンドウ表示
 	ShowWindow(instance->hWnd, SW_SHOW);
 	Console("Show application window.\n");
@@ -182,7 +182,7 @@ bool WinApp::IsEndApp() {	// プロセスメッセージ取得用
 	return false;
 }
 
-void WinApp::ProcessMessage() {
+volatile void WinApp::ProcessMessage() {
 	// windowの×ボタンが押されるまでループ
 	while (true) {
 		// windowにメッセージが来たら最優先で処理
