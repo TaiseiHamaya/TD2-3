@@ -226,6 +226,10 @@ void PlayerManager::handle_input() {
 		return;
 	}
 
+	if (child->is_falling()) {
+		return;
+	}
+
 	Vector3 directions[] = {
 		{0.0f, 0.0f, 1.0f},  // 前
 		{-1.0f, 0.0f, 0.0f}, // 左
@@ -419,6 +423,9 @@ void PlayerManager::detach_child_from_player(Player* player, Child* child) {
 		return;
 	}
 	if (player->is_rotating()) {
+		return;
+	}
+	if (player->get_state() != PlayerState::Idle) {
 		return;
 	}
 	// ペアレントを解消する

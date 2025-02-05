@@ -180,7 +180,7 @@ void Player::move_update() {
 		return;
 	}
 
-	isMoving = true;
+	//isMoving = true;
 
 	//移動時の音。moveTimerが加算される前に処理して一回だけ鳴らす
 	if (moveTimer <= 0) {
