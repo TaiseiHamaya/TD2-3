@@ -145,6 +145,7 @@ private:
 	float moveTimer = 0.0f;  // 移動の進行状況を管理するタイマー
 	float moveDuration = 0.15f;  // 移動にかける時間（秒）
 	bool isMoving = false;   // 現在移動中かどうかのフラグ
+	bool preIsMoving = false;   // 前フレームで移動中かどうかのフラグ
 	bool isOnChild = false; // 移動先が子供かどうか
 
 	bool isTurnSuccess; // 回転が成功したかどうか
