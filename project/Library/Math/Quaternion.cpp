@@ -253,7 +253,7 @@ const Quaternion Quaternion::SlerpClockwise(const Quaternion& internal, const Qu
 	Vector3 cross = Vector3::CrossProduct(internalV, terminalV);
 
 	Quaternion internal_;
-	if (Vector3::DotProduct(cross, axis) < 0) {
+	if (std::signbit(Vector3::DotProduct(cross, axis)) != std::signbit(internal.w)) {
 		internal_ = internal * -1;
 	}
 	else {

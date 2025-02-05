@@ -1,10 +1,6 @@
 #pragma once
 
 #include <memory>
-#include "Engine/Debug/ImGui/ImGuiLoadManager/ImGuiLoadManager.h"
-#include "Library/Math/Transform2D.h"
-#include "Engine/Runtime/WorldClock/WorldClock.h"
-
 
 class SpriteInstance;
 
@@ -14,19 +10,22 @@ public:
 	BackGround();
 	~BackGround();
 
-	void init();
 	void update();
 	void debugUpdate();
 	void begin_rendering();
-	void darw();
+	void draw();
+
+public:
+	float get_duration() const { return timer; }
 
 private:
-	std::unique_ptr<SpriteInstance>backGroundSprite;
-	std::unique_ptr<SpriteInstance>backGroundSprite2;
+	float timer{ 0 };
+	std::unique_ptr<SpriteInstance> backGroundSprite;
+	std::unique_ptr<SpriteInstance> backGroundSprite2;
 	float scrollSpeed = 0.007f;
 	float scrollSpeed2 = 0.01f;
-	float curScroll;
-	float curScroll2;
+	float curScroll{ 0 };
+	float curScroll2{ 0 };
 
 };
 

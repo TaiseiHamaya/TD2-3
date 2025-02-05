@@ -161,6 +161,7 @@ void AnimatedMeshInstance::create_skeleton() {
 		++i;
 	}
 
+#ifdef _DEBUG
 	// ボーン描画用(削除予定)
 	const Skeleton skeleton = skeletonResrouce->skeleton();
 	boneMeshTest.resize(jointSize);
@@ -176,6 +177,7 @@ void AnimatedMeshInstance::create_skeleton() {
 			boneMesh.reparent(*this);
 		}
 	}
+#endif // _DEBUG
 }
 
 #ifdef _DEBUG

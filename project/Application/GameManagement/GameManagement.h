@@ -26,13 +26,14 @@ public:
 	void SetClearFlag(bool value) { clearFlag = value; }
 	void SetFailedFlag(bool value) { failedFlag = value; }
 	bool is_reset() const { return isReset; }
+	bool is_restart() const { return isRestart; }
 	bool is_next() const { return isNext; }
 	bool is_undoRestart()const { return isUndoRestart; }
 	bool is_escape_game() const { return toSelectTimer >= 0.1f; }
 	void SetFailedSelect(int value) { failedUI->SetReasonIndex(value); }
 	void SetCurLevel(int value) { curLevel = value; }
 	void SetMaxLevel(int value) { maxLevel = value; }
-
+	bool is_transition() const { return isTransition; }
 
 private:
 	//std::unique_ptr<SpriteInstance> clearSprite;
@@ -48,8 +49,11 @@ private:
 	std::unique_ptr< FailedUI>failedUI;
 	std::unique_ptr< ClearUI>clearUI;
 
+	bool isTransition{ false };
+
 	bool clearFlag;
 	bool failedFlag;
+	bool isRestart;
 
 	bool isReset;
 	bool isNext;
