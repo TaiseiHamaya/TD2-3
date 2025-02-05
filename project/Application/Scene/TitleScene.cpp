@@ -15,6 +15,7 @@
 #include "Application/GameValue.h"
 #include "Application/Scene/SelectScene.h"
 
+#include <utility>
 
 TitleScene::TitleScene() {}
 
@@ -23,6 +24,7 @@ TitleScene::~TitleScene() {}
 void TitleScene::load() {
 
 	TextureManager::RegisterLoadQue("./GameResources/Texture/UI/start.png");
+	TextureManager::RegisterLoadQue("./GameResources/Texture/black.png");
 	TextureManager::RegisterLoadQue("./GameResources/Texture/TitleLogo.png");
 	AudioManager::RegisterLoadQue("./GameResources/Audio/BGM/TitleBGM.wav");
 
@@ -34,6 +36,8 @@ void TitleScene::initialize() {
 	startUi->get_transform().set_translate({ 640.0f,140 });
 	titleLogo = eps::CreateUnique<SpriteInstance>("TitleLogo.png", Vector2{ 0.5f, 0.5f });
 	titleLogo->get_transform().set_translate({ 640.0f,440 });
+
+	transition = eps::CreateUnique<SpriteInstance>("black.png", Vector2{ 0.f, 0.f });
 
 	// Node&Path
 	std::shared_ptr<Object3DNode> object3dNode;
@@ -71,16 +75,23 @@ void TitleScene::finalize() {}
 void TitleScene::begin() {}
 
 void TitleScene::update() {
-
-	if (Input::IsTriggerKey(KeyID::Space)) {
-		SceneManager::SetSceneChange(
-			eps::CreateUnique<SelectScene>(), 1.0f);
+	switch (sceneState) {
+	case TitleScene::TransitionState::InSelect:
+		in_update();
+		break;
+	case TitleScene::TransitionState::Default:
+		default_update();
+		break;
+	case TitleScene::TransitionState::OutSelect:
+		out_update();
+		break;
 	}
 }
 
 void TitleScene::begin_rendering() {
 	startUi->begin_rendering();
 	titleLogo->begin_rendering();
+	transition->begin_rendering();
 }
 
 void TitleScene::late_update() {}
@@ -96,8 +107,33 @@ void TitleScene::draw() const {
 	// Sprite
 	startUi->draw();
 	titleLogo->draw();
+	transition->draw();
 
 	renderPath->next();
+}
+
+void TitleScene::in_update() {
+	transitionTimer += WorldClock::DeltaSeconds();
+	float parametric = transitionTimer / 1.0f;
+	transition->get_color().alpha = 1 - std::min(1.0f, parametric);
+	if (parametric >= 1.0f) {
+		sceneState = TransitionState::Default;
+	}
+}
+
+void TitleScene::default_update() {
+	if (Input::IsTriggerKey(KeyID::Space)) {
+		SceneManager::SetSceneChange(
+			eps::CreateUnique<SelectScene>(), 1.0f);
+		transitionTimer = WorldClock::DeltaSeconds();
+		sceneState = TransitionState::OutSelect;
+	}
+}
+
+void TitleScene::out_update() {
+	transitionTimer += WorldClock::DeltaSeconds();
+	float parametric = transitionTimer / 1.0f;
+	transition->get_color().alpha = parametric;
 }
 
 #ifdef _DEBUG

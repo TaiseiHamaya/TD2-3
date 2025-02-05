@@ -1,7 +1,5 @@
 #pragma once
 
-#define NOMINMAX
-
 #include <wrl/client.h>
 #include <d3d12.h>
 

@@ -5,18 +5,18 @@
 #include "Engine/Module/Render/RenderNode/2D/Sprite/SpriteNode.h"
 #include "Engine/Resources/Audio/AudioManager.h"
 #include <Engine/Module/Render/RenderNode/Forward/Object3DNode/Object3DNode.h>
+#include <Engine/Module/Render/RenderNode/Forward/SkinningMesh/SkinningMeshNode.h>
+#include <Engine/Module/Render/RenderTargetGroup/SingleRenderTarget.h>
 #include <Engine/Module/World/Camera/Camera2D.h>
 #include <Engine/Module/World/Sprite/SpriteInstance.h>
+#include <Engine/Rendering/DirectX/DirectXResourceObject/DepthStencil/DepthStencil.h>
+#include <Engine/Rendering/DirectX/DirectXResourceObject/OffscreenRender/OffscreenRender.h>
 #include <Engine/Rendering/DirectX/DirectXSwapChain/DirectXSwapChain.h>
 #include <Engine/Resources/PolygonMesh/PolygonMeshManager.h>
 #include <Engine/Resources/Texture/TextureManager.h>
 #include <Engine/Runtime/Input/Input.h>
 #include <Engine/Runtime/Scene/SceneManager.h>
 #include <Engine/Utility/Tools/SmartPointer.h>
-#include <Engine/Rendering/DirectX/DirectXResourceObject/DepthStencil/DepthStencil.h>
-#include <Engine/Module/Render/RenderTargetGroup/SingleRenderTarget.h>
-#include <Engine/Rendering/DirectX/DirectXResourceObject/OffscreenRender/OffscreenRender.h>
-#include <Engine/Module/Render/RenderNode/Forward/SkinningMesh/SkinningMeshNode.h>
 
 #include "Application/GameValue.h"
 #include "Application/LevelLoader/LevelLoader.h"
@@ -56,11 +56,7 @@ void SelectScene::initialize() {
 	Camera2D::Initialize();
 	camera3D = std::make_unique<Camera3D>();
 	camera3D->initialize();
-	camera3D->set_transform({
-		CVector3::BASIS,
-		 Quaternion::EulerDegree(40,0,0),
-		{0,10,-12}
-		});
+
 	directionalLight = eps::CreateUnique<DirectionalLightInstance>();
 
 	startUi = eps::CreateUnique<SpriteInstance>("start.png", Vector2{ 0.5f, 0.5f });
@@ -78,10 +74,12 @@ void SelectScene::initialize() {
 		numberUi10->set_active(false);
 	}
 	obSprite = std::make_unique<SpriteInstance>("obi.png");
+	transition = eps::CreateUnique<SpriteInstance>("black.png");
 
 	LevelLoader loader{ selectIndex };
 
 	field = std::make_unique<MapchipField>();
+
 	fieldRotation = std::make_unique<WorldInstance>();
 
 	crate_field_view();
@@ -159,6 +157,25 @@ void SelectScene::update() {
 		out_update();
 		break;
 	}
+
+	// 2桁表示
+	if (selectIndex >= 10) {
+		numberUi->get_transform().set_translate({ 640.0f + 96 / 2,360.0f });
+		numberUi10->set_active(true);
+	}
+	// 1桁表示
+	else {
+		numberUi->get_transform().set_translate({ 640.0f,360.0f });
+		numberUi10->set_active(false);
+	}
+
+	numberUi->get_uv_transform().set_translate_x(selectIndex * 0.1f);
+	numberUi10->get_uv_transform().set_translate_x((selectIndex / 10) * 0.1f);
+
+	Quaternion rotation = fieldRotation->get_transform().get_quaternion();
+	fieldRotation->get_transform().set_quaternion(Quaternion::AngleAxis(CVector3::BASIS_Y, PI2 / 3 * WorldClock::DeltaSeconds()) * rotation);
+
+	background->update();
 }
 
 void SelectScene::begin_rendering() {
@@ -212,15 +229,26 @@ void SelectScene::crate_field_view() {
 	field->initialize(loader);
 	Reference<WorldInstance> fieldRoot = field->field_root();
 
-
-	fieldRoot->reparent(fieldRotation, false);
-	fieldRoot->get_transform().set_translate(
-		{ -static_cast<float>(field->column() - 1) / 2,0,-static_cast<float>(field->row() - 1) / 2}
+	fieldRotation->get_transform().set_translate(
+		{ static_cast<float>(field->column() - 1) / 2,0,static_cast<float>(field->row() - 1) / 2 }
 	);
+	fieldRotation->update_affine();
+	fieldRoot->reparent(fieldRotation, true);
+
+	camera3D->set_transform({
+		CVector3::BASIS,
+		 Quaternion::EulerDegree(40,0,0),
+		{ static_cast<float>(field->column() - 1) / 2,10,-12 + static_cast<float>(field->row() - 1) / 2}
+		});
 }
 
 void SelectScene::in_update() {
-	sceneState = TransitionState::Default;
+	transitionTimer += WorldClock::DeltaSeconds();
+	float parametric = transitionTimer / 1.0f;
+	transition->get_color().alpha = 1 - std::min(1.0f, parametric);
+	if (parametric >= 1.0f) {
+		sceneState = TransitionState::Default;
+	}
 }
 
 void SelectScene::default_update() {
@@ -233,20 +261,6 @@ void SelectScene::default_update() {
 		crate_field_view();
 	}
 
-	// 2桁表示
-	if (selectIndex >= 10) {
-		numberUi->get_transform().set_translate({ 640.0f + 96 / 2,360.0f });
-		numberUi10->set_active(true);
-	}
-	// 1桁表示
-	else {
-		numberUi->get_transform().set_translate({ 640.0f,360.0f });
-		numberUi10->set_active(false);
-	}
-
-	numberUi->get_uv_transform().set_translate_x(selectIndex * 0.1f);
-	numberUi10->get_uv_transform().set_translate_x((selectIndex / 10) * 0.1f);
-
 	if (Input::IsTriggerKey(KeyID::Space)) {
 		SceneManager::SetSceneChange(
 			eps::CreateUnique<GameScene>(selectIndex), 1.0f
@@ -254,11 +268,6 @@ void SelectScene::default_update() {
 		sceneState = TransitionState::OutSelect;
 		startRotation = fieldRotation->get_transform().get_quaternion();;
 	}
-
-	Quaternion rotation = fieldRotation->get_transform().get_quaternion();
-	fieldRotation->get_transform().set_quaternion(Quaternion::AngleAxis(CVector3::BASIS_Y, PI * WorldClock::DeltaSeconds()) * rotation);
-
-	background->update();
 }
 
 void SelectScene::out_update() {

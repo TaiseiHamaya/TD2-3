@@ -57,6 +57,9 @@ public:
 private:
 	TransitionState sceneState;
 
+	float transitionTimer{ 0 };
+	std::unique_ptr<SpriteInstance> transition;
+
 	std::unique_ptr<RenderPath> renderPath;
 
 	std::shared_ptr<OutlineNode> outlineNode;
