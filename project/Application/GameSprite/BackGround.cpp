@@ -21,6 +21,8 @@ BackGround::BackGround() {
 	gushingEmitter = std::make_unique<ParticleEmitterInstance>("gushing2.json", 128);
 	coolTime = 0;
 	easeT = totalEaseT;
+
+	gushingEmitter->get_transform().set_translate_x(-100.f);
 }
 
 BackGround::~BackGround() {}
