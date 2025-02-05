@@ -22,7 +22,7 @@ public:
 	static void Finalize();
 
 	static void ShowAppWindow();
-	static volatile void IsEndApp();
+	static volatile bool IsEndApp();
 	static volatile void ProcessMessage();
 
 public:

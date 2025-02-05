@@ -166,13 +166,13 @@ void WinApp::Finalize() {
 	std::chrono::get_tzdb_list().~tzdb_list();
 }
 
-volatile void WinApp::ShowAppWindow() {
+void WinApp::ShowAppWindow() {
 	// ウィンドウ表示
 	ShowWindow(instance->hWnd, SW_SHOW);
 	Console("Show application window.\n");
 }
 
-bool WinApp::IsEndApp() {	// プロセスメッセージ取得用
+volatile bool WinApp::IsEndApp() {	// プロセスメッセージ取得用
 	if (instance->isEndApp) { // ×ボタンが押されたら終わる
 		return true;
 	}
