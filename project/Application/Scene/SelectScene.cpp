@@ -248,7 +248,7 @@ void SelectScene::crate_field_view() {
 
 void SelectScene::in_update() {
 	transitionTimer += WorldClock::DeltaSeconds();
-	float parametric = transitionTimer / 1.0f;
+	float parametric = transitionTimer / 0.5f;
 	transition->get_color().alpha = 1 - std::min(1.0f, parametric);
 	if (parametric >= 1.0f) {
 		sceneState = TransitionState::Main;
@@ -288,7 +288,7 @@ void SelectScene::default_update() {
 
 void SelectScene::out_update() {
 	transitionTimer += WorldClock::DeltaSeconds();
-	float parametric = std::min(1.0f, transitionTimer / 1.0f);
+	float parametric = std::min(1.0f, transitionTimer / 0.5f);
 	fieldRotation->get_transform().set_quaternion(
 		Quaternion::SlerpFar(startRotation,
 			Quaternion::AngleAxis(CVector3::BASIS_Y, -0.01f) * startRotation,

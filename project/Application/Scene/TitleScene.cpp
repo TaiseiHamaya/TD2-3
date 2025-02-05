@@ -114,7 +114,7 @@ void TitleScene::draw() const {
 
 void TitleScene::in_update() {
 	transitionTimer += WorldClock::DeltaSeconds();
-	float parametric = transitionTimer / 1.0f;
+	float parametric = transitionTimer / 0.5f;
 	transition->get_color().alpha = 1 - std::min(1.0f, parametric);
 	if (parametric >= 1.0f) {
 		sceneState = TransitionState::Main;
@@ -132,7 +132,7 @@ void TitleScene::default_update() {
 
 void TitleScene::out_update() {
 	transitionTimer += WorldClock::DeltaSeconds();
-	float parametric = transitionTimer / 1.0f;
+	float parametric = transitionTimer / 0.5f;
 	transition->get_color().alpha = parametric;
 }
 
