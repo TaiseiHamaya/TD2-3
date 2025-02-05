@@ -320,13 +320,12 @@ void GameScene::late_update() {
 	case TransitionState::Out:
 	{
 		transitionTimer += WorldClock::DeltaSeconds();
-		float parametric = transitionTimer / sceneChangeTime;
+		float parametric = std::min(1.0f, transitionTimer / sceneChangeTime);
 		transition->get_color().alpha = parametric;
 		if (parametric >= 1.0f) {
 			// リセット処理をここで呼び出す
-			sceneState = TransitionState::In;
-
 			if (managementUI->is_restart()) {
+				sceneState = TransitionState::In;
 				fieldObjs->initialize(levelLoader);
 				playerManager->initialize(levelLoader, fieldObjs.get());
 				managementUI->init();

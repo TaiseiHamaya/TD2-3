@@ -150,9 +150,6 @@ void SelectScene::begin() {
 
 void SelectScene::update() {
 	switch (sceneState) {
-	case SelectScene::TransitionState::In:
-		in_update();
-		break;
 	case SelectScene::TransitionState::Main:
 		default_update();
 		break;
@@ -247,19 +244,14 @@ void SelectScene::crate_field_view() {
 		});
 }
 
-void SelectScene::in_update() {
-	
-	/*if (fadeRatio >= 1.0f) {
-		sceneState = TransitionState::Main;
-	}*/
-}
-
 void SelectScene::default_update() {
 	//フェード処理
 	transitionTimer += WorldClock::DeltaSeconds();
-	fadeEase -= WorldClock::DeltaSeconds();
-	float fadeRatio = std::max(0.f, fadeEase / 1.0f);
-	transition->get_color().alpha = fadeEase;
+	if (fadeEase >= 0) {
+		fadeEase -= WorldClock::DeltaSeconds();
+		float fadeRatio = std::max(0.f, fadeEase / 1.0f);
+		transition->get_color().alpha = fadeEase;
+	}
 
 	if (Input::IsTriggerKey(KeyID::D) && selectIndex < GameValue::MaxLevel) {
 		++selectIndex;
@@ -298,7 +290,10 @@ void SelectScene::out_update() {
 	transitionTimer += WorldClock::DeltaSeconds();
 	fadeEase += WorldClock::DeltaSeconds();
 	float parametric = std::min(1.0f, transitionTimer / 1.0f);
-	float fadeRatio = std::min(1.f, fadeEase / 1.0f);
+	if (parametric >= 1.0f) {
+		fadeEase = 1.0f;
+	}
+	float fadeRatio = std::min(1.f, fadeEase);
 	fieldRotation->get_transform().set_quaternion(
 		Quaternion::SlerpFar(startRotation,
 			Quaternion::AngleAxis(CVector3::BASIS_Y, -0.01f) * startRotation,
