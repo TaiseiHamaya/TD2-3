@@ -369,7 +369,7 @@ void GameScene::draw() const {
 	directionalLight->register_world(6);
 	playerManager->draw();
 	rocketObj->draw();
-
+	background->animeDraw();
 	// Outline
 	renderPath->next();
 	outlineNode->draw();

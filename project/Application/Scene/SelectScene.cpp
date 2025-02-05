@@ -64,6 +64,10 @@ void SelectScene::load() {
 	AudioManager::RegisterLoadQue("./GameResources/Audio/backAudio.wav");
 	TextureManager::RegisterLoadQue("./GameResources/Texture/UI/ESCkey.png");
 
+	PolygonMeshManager::RegisterLoadQue("./GameResources/Models/GoalObj/GoalObj.gltf");
+	SkeletonManager::RegisterLoadQue("./GameResources/Models/GoalObj/GoalObj.gltf");
+	NodeAnimationManager::RegisterLoadQue("./GameResources/Models/GoalObj/GoalObj.gltf");
+
 }
 
 void SelectScene::initialize() {
@@ -253,7 +257,7 @@ void SelectScene::draw() const {
 	directionalLight->register_world(6);
 	parentKoala->draw();
 	childKoala->draw();
-
+	background->animeDraw();
 	renderPath->next();
 	outlineNode->draw();
 
@@ -384,5 +388,6 @@ void SelectScene::debug_update() {
 	ImGui::Begin("WorldClock");
 	WorldClock::DebugGui();
 	ImGui::End();
+	background->debugUpdate();
 }
 #endif // _DEBUG
