@@ -265,6 +265,7 @@ void GameScene::late_update() {
 		managementUI->init();
 		rocketObj->init();
 		//ここで一手戻す処理をする
+		playerManager->restart_undo();
 	}
 	else if (managementUI->is_next()) {
 		managementUI->init();
