@@ -226,6 +226,36 @@ void GameScene::begin() {
 	managementUI->begin();
 	managementUI->SetCurLevel(currentLevel);
 	gameUI->SetCurLevel(currentLevel);
+
+}
+
+void GameScene::update() {
+	//WorldClock::Update();
+
+
+
+	playerManager->update();
+	fieldObjs->update();
+	directionalLight->update();
+	managementUI->update();
+	gameUI->update();
+	gameUI->setIsCanRelese(playerManager->get_isParent());
+}
+
+void GameScene::begin_rendering() {
+
+
+	playerManager->begin_rendering();
+	fieldObjs->begin_rendering();
+
+	camera3D->update_matrix();
+	directionalLight->begin_rendering();
+	managementUI->begin_rendering();
+	gameUI->begin_rendering();
+	background->begin_rendering();
+}
+
+void GameScene::late_update() {
 	if (managementUI->is_reset()) {
 		fieldObjs->initialize(levelLoader);
 		playerManager->initialize(levelLoader, fieldObjs.get());
@@ -237,6 +267,7 @@ void GameScene::begin() {
 		managementUI->init();
 		rocketObj->init();
 		//ここで一手戻す処理をする
+		playerManager->restart_undo();
 	}
 	else if (managementUI->is_next()) {
 		managementUI->init();
@@ -259,36 +290,6 @@ void GameScene::begin() {
 		);
 	}
 }
-
-void GameScene::update() {
-	//WorldClock::Update();
-
-
-
-	playerManager->update();
-	fieldObjs->update();
-	directionalLight->update();
-	managementUI->update();
-	gameUI->update();
-	gameUI->setIsCanRelese(playerManager->get_isParent());
-	rocketObj->update(playerManager->getStageSituation());
-}
-
-void GameScene::begin_rendering() {
-
-
-	playerManager->begin_rendering();
-	fieldObjs->begin_rendering();
-
-	camera3D->update_matrix();
-	directionalLight->begin_rendering();
-	managementUI->begin_rendering();
-	gameUI->begin_rendering();
-	background->begin_rendering();
-	rocketObj->begin_rendering();
-}
-
-void GameScene::late_update() {}
 
 void GameScene::draw() const {
 	// 背景スプライト

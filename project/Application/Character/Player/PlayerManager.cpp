@@ -59,6 +59,9 @@ void PlayerManager::update() {
 	// クリアか失敗のフラグが立ってたら早期リターン
 	if (stageSituation != 0) return;
 
+	// 入力処理を受け付ける
+	handle_input();
+
 	catchEffect_->begin();
 
 	// プレイヤーと子供の位置を計算
@@ -70,8 +73,7 @@ void PlayerManager::update() {
 	isParent = player->is_parent();//プレイヤーのくっつき状態のフラグを取得
 	// マップチップ関連の更新
 	mapchipHandler->update_player_on_mapchip(player.get(), child.get());
-	// 入力処理を受け付ける
-	handle_input();
+
 
 	// 状態の更新
 	player->update();
@@ -97,6 +99,10 @@ void PlayerManager::update() {
 
 	// マップチップのクリア判定
 	stageSituation = mapchipHandler->is_goal_reached(player.get(), child.get());
+	// 普通の時
+	if (stageSituation == 0) {
+		gameManagement_->SetFailedFlag(false);
+	}
 	// 子コアラを落とした
 	if (child->is_falled() || player->is_falled()) {
 		stageSituation = 4;
@@ -456,6 +462,18 @@ void PlayerManager::undo() {
 		childAnimation->reset_animation("Standby");
 		childAnimation->set_loop(true);
 	}
+}
+
+void PlayerManager::restart_undo() {
+	if (moveLogger->can_undo()) {
+		undo();
+	}
+	player->set_falling(false);
+	if (player->get_state() != PlayerState::Falling) {
+		player->set_state(PlayerState::Idle);
+	}
+	child->set_falling(false);
+	stageSituation = 0;
 }
 
 void PlayerManager::set_move_parameters(const Vector3& direction) {

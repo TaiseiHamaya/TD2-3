@@ -26,6 +26,10 @@ void Child::update()
 {
 	object_->begin();
 
+	if (!isFalling) {
+		isFalled = false;
+	}
+
 	if (isFalling) {
 		Vector3 position = object_->get_transform().get_translate();
 		position.y -= fallSpeed * WorldClock::DeltaSeconds();
