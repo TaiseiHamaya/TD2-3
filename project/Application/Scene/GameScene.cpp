@@ -278,6 +278,8 @@ void GameScene::late_update() {
 			SceneManager::SetSceneChange(
 				eps::CreateUnique<GameScene>(currentLevel + 1), sceneChangeTime
 			);
+			transitionTimer = WorldClock::DeltaSeconds();
+			sceneState = TransitionState::Out;
 		}
 		// 最大レベルの場合
 		else {
@@ -285,18 +287,22 @@ void GameScene::late_update() {
 			SceneManager::SetSceneChange(
 			eps::CreateUnique<TitleScene>(), sceneChangeTime);
 		}
+		transitionTimer = WorldClock::DeltaSeconds();
+		sceneState = TransitionState::Out;
 	}
 	else if (managementUI->is_escape_game()) {
 		SceneManager::SetSceneChange(
 			eps::CreateUnique<SelectScene>(currentLevel), sceneChangeTime
 		);
+		transitionTimer = WorldClock::DeltaSeconds();
+		sceneState = TransitionState::Out;
 	}
 
 	switch (sceneState) {
 	case TransitionState::In:
 	{
 		transitionTimer += WorldClock::DeltaSeconds();
-		float parametric = std::min(1.0f, transitionTimer / 1.0f);
+		float parametric = std::min(1.0f, transitionTimer / sceneChangeTime);
 		transition->get_color().alpha = 1 - parametric;
 		if (parametric >= 1.0f) {
 			sceneState = TransitionState::Main;
@@ -312,29 +318,23 @@ void GameScene::late_update() {
 	case TransitionState::Out:
 	{
 		transitionTimer += WorldClock::DeltaSeconds();
-		float parametric = transitionTimer / 1.0f;
+		float parametric = transitionTimer / sceneChangeTime;
 		transition->get_color().alpha = parametric;
 		if (parametric >= 1.0f) {
 			// リセット処理をここで呼び出す
 			sceneState = TransitionState::In;
+
+			if (managementUI->is_restart()) {
+				fieldObjs->initialize(levelLoader);
+				playerManager->initialize(levelLoader, fieldObjs.get());
+				managementUI->init();
+				rocketObj->init();
+				transitionTimer = WorldClock::DeltaSeconds();
+			}
 		}
 		break;
 	}
 	}
-}
-
-void GameScene::begin_rendering() {
-
-
-	playerManager->begin_rendering();
-	fieldObjs->begin_rendering();
-
-	camera3D->update_matrix();
-	directionalLight->begin_rendering();
-	managementUI->begin_rendering();
-	gameUI->begin_rendering();
-	background->begin_rendering();
-	rocketObj->begin_rendering();
 }
 
 void GameScene::draw() const {
@@ -387,6 +387,9 @@ void GameScene::draw() const {
 
 	renderPath->next();
 #endif // _DEBUG
+}
+
+void GameScene::reset_level() {
 }
 
 #ifdef _DEBUG

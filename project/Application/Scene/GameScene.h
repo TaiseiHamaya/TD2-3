@@ -45,6 +45,9 @@ public:
 
 	void draw() const override;
 
+private:
+	void reset_level();
+
 #ifdef _DEBUG
 public:
 	void debug_update() override;
