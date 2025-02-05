@@ -7,6 +7,7 @@
 #include <Engine/Module/Render/RenderNode/Forward/SkinningMesh/SkinningMeshNode.h>
 #include <Engine/Module/Render/RenderTargetGroup/SingleRenderTarget.h>
 #include <Engine/Module/World/Camera/Camera2D.h>
+#include <Engine/Module/World/Mesh/MeshInstance.h> 
 #include <Engine/Module/World/Sprite/SpriteInstance.h>
 #include <Engine/Rendering/DirectX/DirectXResourceObject/DepthStencil/DepthStencil.h>
 #include <Engine/Rendering/DirectX/DirectXResourceObject/OffscreenRender/OffscreenRender.h>
@@ -38,6 +39,7 @@ void SelectScene::load() {
 	PolygonMeshManager::RegisterLoadQue("./GameResources/Models/WallObj/WallObj.obj");
 	PolygonMeshManager::RegisterLoadQue("./GameResources/Models/GoalObj/GoalObj.obj");
 	PolygonMeshManager::RegisterLoadQue("./GameResources/Models/IceObj/IceObj.obj");
+	PolygonMeshManager::RegisterLoadQue("./GameResources/Models/GoalObj/GoalObjStatic.obj");
 
 	TextureManager::RegisterLoadQue("./GameResources/Texture/UI/StageSelectUI.png");
 	TextureManager::RegisterLoadQue("./GameResources/Texture/UI/start.png");
@@ -60,6 +62,8 @@ void SelectScene::initialize() {
 	camera3D->initialize();
 
 	directionalLight = eps::CreateUnique<DirectionalLightInstance>();
+	
+	goalMesh = eps::CreateUnique<MeshInstance>("GoalObjStatic.obj");
 
 	startUi = eps::CreateUnique<SpriteInstance>("start.png", Vector2{ 0.5f, 0.5f });
 	startUi->get_transform().set_translate({ 640.0f,90 });
@@ -182,6 +186,7 @@ void SelectScene::begin_rendering() {
 	camera3D->update_matrix();
 	fieldRotation->update_affine();
 	field->begin_rendering();
+	goalMesh->begin_rendering();
 
 	numberUi->begin_rendering();
 	numberUi10->begin_rendering();
@@ -205,6 +210,7 @@ void SelectScene::draw() const {
 	camera3D->register_world_lighting(4);
 	directionalLight->register_world(5);
 	field->draw();
+	goalMesh->draw();
 
 	renderPath->next();
 	// SkinningMesh
@@ -242,6 +248,9 @@ void SelectScene::crate_field_view() {
 		 Quaternion::EulerDegree(40,0,0),
 		{ static_cast<float>(field->column() - 1) / 2,10,-12 + static_cast<float>(field->row() - 1) / 2}
 		});
+
+	goalMesh->get_transform().set_translate(field->GetGoalPos());
+	goalMesh->reparent(fieldRoot, false);
 }
 
 void SelectScene::default_update() {
