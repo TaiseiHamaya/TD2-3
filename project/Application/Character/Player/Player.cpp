@@ -307,6 +307,7 @@ void Player::rotate_failed_update() {
 	if (rotateTimer >= rotateDuration) {
 		playerState = PlayerState::Idle;
 		rotateType = RotateType::None;
+		rotateDirection = RotationDirection::Default;
 		moveType = MoveType::Normal;
 		rotateTimer = rotateDuration;
 		exclamationData_.timer = 0.0f;
