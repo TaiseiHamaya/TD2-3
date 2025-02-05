@@ -38,5 +38,8 @@ private:
 	bool spwanParticle;
 	bool spwanParticle2;
 	Vector3 particlePos;
+
+	std::unique_ptr<AudioPlayer>explosion;
+	std::unique_ptr<AudioPlayer>gushing;
 };
 

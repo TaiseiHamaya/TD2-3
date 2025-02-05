@@ -6,6 +6,12 @@ Rocket::Rocket(const Vector3& pos) {
 	
 
 	animatedMeshInstance = std::make_unique<AnimatedMeshInstance>("GoalObj.gltf", "Standby", false);
+	gushingEmitter = std::make_unique<ParticleEmitterInstance>("gushing.json", 128);
+	explosionEmitter = std::make_unique<ParticleEmitterInstance>("explosion.json", 128);
+	explosion = std::make_unique <AudioPlayer>();
+	explosion->initialize("explosion.wav");
+	gushing = std::make_unique <AudioPlayer>();
+	gushing->initialize("gushing.wav");
 	init();
 	Vector3 newPos = pos;
 	newPos.y = 0.5f;
@@ -22,14 +28,14 @@ void Rocket::init() {
 	isResult = false;
 	isFailedFlag = false;
 
-	gushingEmitter = std::make_unique<ParticleEmitterInstance>("gushing.json", 128);
-	explosionEmitter = std::make_unique<ParticleEmitterInstance>("explosion.json", 128);
 	gushingEmitter->set_active(false);
 	explosionEmitter->set_active(false);
 	spwanParticle = false;
 	spwanParticle2 = false;
 	particleSpawnTime = 0;
 	explosionSpawnTime = 0;
+
+	
 
 
 }
@@ -112,12 +118,13 @@ void Rocket::particleUpdate() {
 
 	particleSpawnTime += WorldClock::DeltaSeconds();
 
-	if (particleSpawnTime >= 0.5f) {
+	if (particleSpawnTime >= 0.7f) {
 		//発射のパーティクルを再生
 		if (!spwanParticle) {
 			spwanParticle = true;
 			gushingEmitter->set_active(true);
 			gushingEmitter->restart();
+			gushing->restart();
 		}
 		
 
@@ -134,6 +141,7 @@ void Rocket::particleUpdate() {
 				spwanParticle2 = true;
 				particlePos.y = 0.5f;
 				explosionEmitter->get_transform().set_translate(particlePos);
+				explosion->restart();
 			}
 		}
 	}
