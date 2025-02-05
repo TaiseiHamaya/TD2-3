@@ -115,6 +115,8 @@ void GameScene::load() {
 	AudioManager::RegisterLoadQue("./GameResources/Audio/undo.wav");
 	AudioManager::RegisterLoadQue("./GameResources/Audio/explosion.wav");
 	AudioManager::RegisterLoadQue("./GameResources/Audio/gushing.wav");
+	AudioManager::RegisterLoadQue("./GameResources/Audio/reset.wav");
+	AudioManager::RegisterLoadQue("./GameResources/Audio/backAudio.wav");
 	AudioManager::RegisterLoadQue("./GameResources/Audio/BGM/Game.wav");
 
 }
@@ -223,6 +225,7 @@ void GameScene::initialize() {
 
 	background = std::make_unique<BackGround>();
 	rocketObj = std::make_unique<Rocket>(fieldObjs->GetGoalPos());
+
 }
 
 void GameScene::popped() {}

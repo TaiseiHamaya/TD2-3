@@ -89,4 +89,9 @@ private:
 	float test{0};
 
 	std::unique_ptr< BackGround>background;
+
+	std::unique_ptr< AudioPlayer>startAudio;
+	std::unique_ptr< AudioPlayer>selectAudio;
+	std::unique_ptr< AudioPlayer>backTitle;
+
 };

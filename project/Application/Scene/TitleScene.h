@@ -69,5 +69,7 @@ private:
 	float easeT;
 	float totalEaseT = 6.0f;
 	Vector3 movePos;
+
+	std::unique_ptr< AudioPlayer>startAudio;
 };
 

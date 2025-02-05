@@ -64,15 +64,25 @@ void GameManagement::init() {
 	resultSoundFlag = false;
 	clearFlag = false;
 	failedFlag = false;
+
+	resetAudio = std::make_unique<AudioPlayer>();
+	resetAudio->initialize("reset.wav");
+	backTitle = std::make_unique<AudioPlayer>();
+	backTitle->initialize("backAudio.wav");
+
 }
 
 void GameManagement::begin() {
 	// クリア、失敗状態ではない
 	if (!(clearFlag || failedFlag)) {
-		isReset = Input::IsTriggerKey(KeyID::R);
+		if (Input::IsTriggerKey(KeyID::R)) {
+			isReset = true;
+			resetAudio->restart();
+		}
 		// 長押し対応
-		if (Input::IsPressKey(KeyID::Escape)) {
-			toSelectTimer += WorldClock::DeltaSeconds();
+		if (Input::IsTriggerKey(KeyID::Escape)) {
+			toSelectTimer = 10;
+			backTitle->play();
 		}
 		else {
 			toSelectTimer = 0;

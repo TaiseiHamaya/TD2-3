@@ -82,5 +82,6 @@ private:
 	std::unique_ptr<AudioPlayer>bgm;
 
 	float sceneChangeTime = 0.5f;
+
 };
 

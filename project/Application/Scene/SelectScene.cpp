@@ -51,6 +51,10 @@ void SelectScene::load() {
 	TextureManager::RegisterLoadQue("./GameResources/Texture/backGround2.png");
 	AudioManager::RegisterLoadQue("./GameResources/Audio/BGM/SelectBGM.wav");
 
+	AudioManager::RegisterLoadQue("./GameResources/Audio/change.wav");
+	AudioManager::RegisterLoadQue("./GameResources/Audio/stageStart.wav");
+	AudioManager::RegisterLoadQue("./GameResources/Audio/backAudio.wav");
+
 }
 
 void SelectScene::initialize() {
@@ -141,6 +145,15 @@ void SelectScene::initialize() {
 
 	background = std::make_unique<BackGround>();
 	fadeEase = 1;
+
+	startAudio = std::make_unique<AudioPlayer>();
+	startAudio->initialize("stageStart.wav");
+	selectAudio = std::make_unique<AudioPlayer>();
+	selectAudio->initialize("change.wav");
+	selectAudio->set_volume(0.5f);
+	backTitle = std::make_unique<AudioPlayer>();
+	backTitle->initialize("backAudio.wav");
+	backTitle->set_volume(0.5f);
 }
 
 void SelectScene::popped() {
@@ -265,14 +278,17 @@ void SelectScene::default_update() {
 	if (Input::IsTriggerKey(KeyID::D) && selectIndex < GameValue::MaxLevel) {
 		++selectIndex;
 		crate_field_view();
+		selectAudio->restart();
 	}
 	else if (Input::IsTriggerKey(KeyID::A) && selectIndex > 1) {
 		--selectIndex;
 		crate_field_view();
+		selectAudio->restart();
 	}
 	if (Input::IsTriggerKey(KeyID::Escape)) {
 		SceneManager::SetSceneChange(
 			eps::CreateUnique<TitleScene>(), 0.5f);
+		backTitle->play();
 	}
 	// 2桁表示
 	if (selectIndex >= 10) {
@@ -292,6 +308,7 @@ void SelectScene::default_update() {
 		sceneState = TransitionState::Out;
 		startRotation = fieldRotation->get_transform().get_quaternion();
 		transitionTimer = WorldClock::DeltaSeconds();
+		startAudio->play();
 	}
 }
 

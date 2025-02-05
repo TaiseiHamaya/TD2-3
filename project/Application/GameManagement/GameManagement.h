@@ -75,4 +75,8 @@ private:
 
 	bool canOperation;
 
+	std::unique_ptr< AudioPlayer>resetAudio;
+	std::unique_ptr< AudioPlayer>backTitle;
+
+
 };

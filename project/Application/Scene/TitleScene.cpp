@@ -37,6 +37,7 @@ void TitleScene::load() {
 	NodeAnimationManager::RegisterLoadQue("./GameResources/Models/ParentKoala/ParentKoala.gltf");
 	NodeAnimationManager::RegisterLoadQue("./GameResources/Models/ChiledKoala/ChiledKoala.gltf");
 
+	AudioManager::RegisterLoadQue("./GameResources/Audio/gameStart.wav");
 }
 
 void TitleScene::initialize() {
@@ -89,6 +90,9 @@ void TitleScene::initialize() {
 	chiledObj = std::make_unique<AnimatedMeshInstance>("ChiledKoala.gltf", "Hello", true);
 	easeT = 0;
 	movePos = { -7.f,-0.5f,14.4f };
+
+	startAudio = std::make_unique<AudioPlayer>();
+	startAudio->initialize("gameStart.wav");
 }
 
 void TitleScene::popped() {}
@@ -173,6 +177,7 @@ void TitleScene::default_update() {
 			eps::CreateUnique<SelectScene>(), 1.0f);
 		transitionTimer = WorldClock::DeltaSeconds();
 		sceneState = TransitionState::Out;
+		startAudio->play();
 	}
 }
 
