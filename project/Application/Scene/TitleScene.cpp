@@ -1,4 +1,5 @@
 #include "TitleScene.h"
+
 #include "Engine/Module/Render/RenderNode/2D/Sprite/SpriteNode.h"
 #include <Engine/Module/Render/RenderNode/Forward/Object3DNode/Object3DNode.h>
 #include <Engine/Module/World/Camera/Camera2D.h>
@@ -185,6 +186,7 @@ void TitleScene::out_update() {
 	transitionTimer += WorldClock::DeltaSeconds();
 	float parametric = transitionTimer / 0.5f;
 	transition->get_color().alpha = parametric;
+	bgm->set_volume((1 - parametric) * 0.2f);
 }
 
 #ifdef _DEBUG
