@@ -606,6 +606,7 @@ void PlayerManager::restart_undo() {
 	child->set_falling(false);
 	child->get_object()->set_active(true);
 	player->get_object()->set_active(true);
+	player->set_moving(false);
 	child->get_object()->get_transform().set_scale(CVector3::BASIS);
 	player->get_object()->get_transform().set_scale(CVector3::BASIS);
 	stageSituation = 0;
