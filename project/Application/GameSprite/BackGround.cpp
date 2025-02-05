@@ -15,6 +15,12 @@ BackGround::BackGround() {
 	for (auto& mat : objMat) {
 		mat.lightingType = LighingType::None;
 	}
+	animatedMeshInstance->get_transform().set_quaternion(
+	Quaternion::EulerDegree(30.f, 0.f, -40.f));
+
+	gushingEmitter = std::make_unique<ParticleEmitterInstance>("gushing2.json", 128);
+	coolTime = 0;
+	easeT = totalEaseT;
 }
 
 BackGround::~BackGround() {}
@@ -27,15 +33,23 @@ void BackGround::update() {
 	backGroundSprite2->get_uv_transform().set_translate_x(curScroll2);
 
 	animatedMeshInstance->begin();
+	rocketUpdate();
 	animatedMeshInstance->update();
+	gushingEmitter->update();
+
+	coolTime += WorldClock::DeltaSeconds();
+	if (coolTime >= 60) {
+		coolTime = 0;
+		easeT = 0;
+	}
 }
 
 #ifdef _DEBUG
 
 #include <imgui.h>
 void BackGround::debugUpdate() {
-	ImGui::Begin("Rocket");
-	animatedMeshInstance->debug_gui();
+	ImGui::Begin("BackGroundParticle");
+	gushingEmitter->debug_gui();
 		ImGui::End();
 }
 #endif
@@ -44,6 +58,7 @@ void BackGround::begin_rendering() {
 	backGroundSprite->begin_rendering();
 	backGroundSprite2->begin_rendering();
 	animatedMeshInstance->begin_rendering();
+	gushingEmitter->begin_rendering();
 }
 
 void BackGround::draw() {
@@ -53,4 +68,20 @@ void BackGround::draw() {
 
 void BackGround::animeDraw() {
 	animatedMeshInstance->draw();
+}
+
+void BackGround::drawParticle() {
+	gushingEmitter->draw();
+}
+
+void BackGround::rocketUpdate() {
+
+	easeT += WorldClock::DeltaSeconds();
+
+	float ratio = std::clamp(easeT/totalEaseT,0.f,1.f);
+
+	Vector3 newPos = Vector3::Lerp(rocektStartPos, rocketEndPos, ratio);
+	animatedMeshInstance->get_transform().set_translate(newPos);
+	gushingEmitter->get_transform().set_translate(newPos);
+
 }

@@ -379,6 +379,7 @@ void GameScene::draw() const {
 	camera3D->register_world_projection(1);
 	playerManager->draw_particle();
 	rocketObj->draw_particle();
+	background->drawParticle();
 
 	renderPath->next();
 	gameUI->darw();
@@ -414,6 +415,7 @@ void GameScene::debug_update() {
 	WorldClock::DebugGui();
 	ImGui::End();
 	rocketObj->debug_update();
+	background->debugUpdate();
 	//ImGui::Begin("OutlineNode");
 	//outlineNode->
 	//ImGui::End();

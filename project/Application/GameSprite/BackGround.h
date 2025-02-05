@@ -18,7 +18,8 @@ public:
 	void begin_rendering();
 	void draw();
 	void animeDraw();
-
+	void drawParticle();
+	void rocketUpdate();
 public:
 	float get_duration() const { return timer; }
 
@@ -32,5 +33,12 @@ private:
 	float curScroll2{ 0 };
 	std::unique_ptr<AnimatedMeshInstance> animatedMeshInstance;
 
+	Vector3 rocektStartPos = {-11.4f,-22.f,11.8f};
+	Vector3 rocketEndPos = {11.4f,7.6f,11.8f};
+	float easeT;
+	float totalEaseT = 10.f;
+	std::unique_ptr<ParticleEmitterInstance> gushingEmitter;
+
+	float coolTime;
 };
 

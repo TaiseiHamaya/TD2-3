@@ -38,4 +38,6 @@ protected:
 
     // 地面の上にいるかの判定するフラグ
     bool isOutGround = false;
+
+
 };

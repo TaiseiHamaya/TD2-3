@@ -257,7 +257,7 @@ void SelectScene::draw() const {
 	directionalLight->register_world(6);
 	parentKoala->draw();
 	childKoala->draw();
-	background->animeDraw();
+	//background->animeDraw();
 	renderPath->next();
 	outlineNode->draw();
 
