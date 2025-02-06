@@ -237,6 +237,9 @@ void PlayerManager::handle_input() {
 	if (player->is_move()) {
 		return;
 	}
+	if (isRerease) {
+		return;
+	}
 
 	Vector3 directions[] = {
 		{0.0f, 0.0f, 1.0f},  // 前
@@ -348,7 +351,7 @@ void PlayerManager::manage_parent_child_relationship() {
 			return;
 		}
 		// 子をプレイヤーから切り離す処理
-		if (Input::GetInstance().IsTriggerKey(KeyID::Space)) {
+		if (Input::IsTriggerKey(KeyID::Space)) {
 			emplace_log(player->get_translate(), player->get_rotation());
 			detach_child_from_player(player.get(), child.get());
 		}
