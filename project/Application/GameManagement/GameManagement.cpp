@@ -10,7 +10,12 @@
 
 
 GameManagement::GameManagement() {
+	operation = std::make_unique<AudioPlayer>();
+	clearAudio = std::make_unique<AudioPlayer>();
+	failedAudio = std::make_unique<AudioPlayer>();
 	decision = std::make_unique<AudioPlayer>();
+	resetAudio = std::make_unique<AudioPlayer>();
+	backTitle = std::make_unique<AudioPlayer>();
 	init();
 }
 
@@ -55,19 +60,14 @@ void GameManagement::init() {
 	clearUI = std::make_unique<ClearUI>();
 
 	decision->initialize("decision.wav");
-	operation = std::make_unique<AudioPlayer>();
 	operation->initialize("operation.wav");
-	clearAudio = std::make_unique<AudioPlayer>();
 	clearAudio->initialize("clearSound.wav");
-	failedAudio = std::make_unique<AudioPlayer>();
 	failedAudio->initialize("failedSound.wav");
 	resultSoundFlag = false;
 	clearFlag = false;
 	failedFlag = false;
 
-	resetAudio = std::make_unique<AudioPlayer>();
 	resetAudio->initialize("reset.wav");
-	backTitle = std::make_unique<AudioPlayer>();
 	backTitle->initialize("backAudio.wav");
 
 }
