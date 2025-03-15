@@ -80,6 +80,7 @@ private:
 
 	std::unique_ptr< AudioPlayer>resetAudio;
 	std::unique_ptr< AudioPlayer>backTitle;
+	std::unique_ptr<AudioPlayer> undoAudio;//undoの音
 
 
 };

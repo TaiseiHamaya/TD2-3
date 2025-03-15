@@ -16,6 +16,8 @@ GameManagement::GameManagement() {
 	decision = std::make_unique<AudioPlayer>();
 	resetAudio = std::make_unique<AudioPlayer>();
 	backTitle = std::make_unique<AudioPlayer>();
+	undoAudio = std::make_unique<AudioPlayer>();
+
 	init();
 }
 
@@ -70,6 +72,7 @@ void GameManagement::init() {
 	resetAudio->initialize("reset.wav");
 	backTitle->initialize("backAudio.wav");
 
+	undoAudio->initialize("undo.wav");
 }
 
 void GameManagement::begin() {
@@ -200,8 +203,8 @@ void GameManagement::resultKeyInput() {
 		resetAudio->restart();
 	}
 	if (Input::IsTriggerKey(KeyID::Z)) {
-		isReset = true;
-		resetAudio->restart();
+		isUndoRestart = true;
+		undoAudio->restart();
 	}
 }
 
