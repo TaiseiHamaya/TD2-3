@@ -49,15 +49,19 @@ void FailedUI::init() {
 }
 
 void FailedUI::update() {
-	if (!canOperation && Input::IsTriggerKey(KeyID::Space)) {
-		curIndex = 7;
-		for (int i = 0; i < curIndex; i++) {
-			curEaseT[i] = totalEaseT;
-			//boundCurEaseT[i] = delayTotalTime * 6 - delayTotalTime * i;
+	KeyID keys[] = { KeyID::Space, KeyID::R, KeyID::Z };
+	for (int i = 0; i < 3; i++) {
+		if (!canOperation && Input::IsTriggerKey(keys[i])) {
+			curIndex = 7;
+			for (int i = 0; i < curIndex; i++) {
+				curEaseT[i] = totalEaseT;
+				//boundCurEaseT[i] = delayTotalTime * 6 - delayTotalTime * i;
+			}
+			reaCurEaseT = reaTotalEaseT;
+			canOperation = true;
 		}
-		reaCurEaseT=reaTotalEaseT;
-		canOperation = true;
 	}
+	
 	if (curIndex < 7) {
 		curDelayTime += WorldClock::DeltaSeconds();
 		if (curDelayTime >= delayTotalTime) {

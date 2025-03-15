@@ -38,14 +38,18 @@ void ClearUI::init() {
 
 void ClearUI::update() {
 
-	if (!canOperation && Input::IsTriggerKey(KeyID::Space)) {
-		curIndex = 6;
-		for (int i = 0; i < curIndex; i++) {
-			curEaseT[i] = totalEaseT;
-			boundCurEaseT[i] = delayTotalTime * 6 - delayTotalTime * i;
+	KeyID keys[] = { KeyID::Space, KeyID::R, KeyID::Z};
+	for (int i = 0; i < 3; i++) {
+		if (!canOperation && Input::IsTriggerKey(keys[i])) {
+			curIndex = 6;
+			for (int i = 0; i < curIndex; i++) {
+				curEaseT[i] = totalEaseT;
+				boundCurEaseT[i] = delayTotalTime * 6 - delayTotalTime * i;
+			}
+			canOperation = true;
 		}
-		canOperation = true;
 	}
+	
 	if (curIndex < 6) {
 		curDelayTime += WorldClock::DeltaSeconds();
 		if (curDelayTime >= delayTotalTime) {
