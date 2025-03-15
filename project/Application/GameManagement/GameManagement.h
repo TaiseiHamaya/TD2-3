@@ -18,6 +18,7 @@ public:
 	void debug_update();
 	void begin_rendering();
 	void darw();
+	void resultKeyInput();
 
 private:
 	void selectFunc();

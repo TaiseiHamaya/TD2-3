@@ -128,6 +128,7 @@ void GameManagement::begin() {
 
 void GameManagement::update() {
 
+	resultKeyInput();
 	selectFunc();
 	if (failedFlag) { 
 		failedUI->update();
@@ -188,6 +189,19 @@ void GameManagement::darw() {
 			undoRetryUI->draw();
 		}
 
+	}
+}
+
+void GameManagement::resultKeyInput() {
+	if (!canOperation) { return; }
+	if (!clearFlag && !failedFlag) { return; }
+	if (Input::IsTriggerKey(KeyID::R)) {
+		isReset = true;
+		resetAudio->restart();
+	}
+	if (Input::IsTriggerKey(KeyID::Z)) {
+		isReset = true;
+		resetAudio->restart();
 	}
 }
 
