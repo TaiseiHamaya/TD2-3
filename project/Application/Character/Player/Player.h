@@ -133,7 +133,7 @@ private:
 	struct ExclamationData {
 		bool isActive;
 		float timer;
-		float duration = 0.7f;
+		float duration = 0.4f;
 	};
 	ExclamationData exclamationData_;
 
@@ -145,7 +145,7 @@ private:
 	Vector3 moveStartPosition;   // 移動の開始位置
 	Vector3 targetPosition;  // 次の目標位置
 	float moveTimer = 0.0f;  // 移動の進行状況を管理するタイマー
-	float moveDuration = 0.15f;  // 移動にかける時間（秒）
+	float moveDuration = 1;  // 移動にかける時間（秒）
 	bool isMoving = false;   // 現在移動中かどうかのフラグ
 	bool preIsMoving = false;   // 前フレームで移動中かどうかのフラグ
 	bool isOnChild = false; // 移動先が子供かどうか
@@ -166,7 +166,7 @@ private:
 	Quaternion startRotation;   // 補間の開始回転
 	Quaternion midRotation;     // 180度回転するときの中間点
 	float rotateTimer = 0.0f;    // 回転の進行状況を管理するタイマー
-	float rotateDuration = 0.3f; // 回転にかける時間（秒）
+	float rotateDuration = 30.f; // 回転にかける時間（秒）
 	bool isRotating = false;     // 現在回転中かどうかのフラグ
 	bool canRotate = false; // 回転可能かどうかのフラグ
 
