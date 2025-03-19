@@ -37,16 +37,39 @@ SpriteInstance::SpriteInstance(SpriteInstance&&) noexcept = default;
 
 SpriteInstance& SpriteInstance::operator=(SpriteInstance&&) noexcept = default;
 
-const Transform2D& SpriteInstance::get_transform() noexcept {
+const Transform2D& SpriteInstance::get_transform() const noexcept {
 	return *transform;
 }
 
+Transform2D& SpriteInstance::get_transform() noexcept {
+	return *transform;
+}
+
+const Transform2D& SpriteInstance::get_uv_transform() const noexcept {
+	return *uvTransform;
+}
+
+Transform2D& SpriteInstance::get_uv_transform() noexcept {
+	return *uvTransform;
+}
+
+Color4& SpriteInstance::get_color() const {
+	return color;
+}
+
 void SpriteInstance::begin_rendering() noexcept {
+	if (!isActive) {
+		return;
+	}
+
 	*transformMatrix->get_data() = transform->get_matrix4x4_transform() * Camera2D::GetVPMatrix();
 	material->get_data()->uvTransform = uvTransform->get_matrix4x4_transform();
 }
 
 void SpriteInstance::draw() const {
+	if (!isActive) {
+		return;
+	}
 	const Microsoft::WRL::ComPtr<ID3D12GraphicsCommandList>& commandList = DirectXCommand::GetCommandList();
 	// 設定したデータをコマンドに積む
 	commandList->IASetVertexBuffers(0, 1, &vertices->get_vbv()); // VBV

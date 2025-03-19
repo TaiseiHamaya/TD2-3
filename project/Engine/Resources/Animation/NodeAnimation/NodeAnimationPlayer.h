@@ -34,6 +34,7 @@ public:
 	float parametric() const;
 
 	void set_loop(bool isLoop);
+	void set_time_force(float timer);
 	void animation_speed(float speed = 1.0f);
 
 #ifdef _DEBUG

@@ -31,11 +31,7 @@ void WorldClock::Update() {
 	// duration算出
 	auto secDuration = chrono::duration_cast<second_f>(now - instance.startFrameTimePoint);
 	// deltaTimeとして記録
-#ifdef _DEBUG
 	instance.deltaSeconds = instance.isFixDeltaTime ? std::min(EngineSettings::FixDeltaSeconds, secDuration.count()) : secDuration.count();
-#else
-	instance.deltaSeconds = secDuration.count();
-#endif // _DEBUG
 
 	// 平均フレーム秒を算出
 	// リストに追加
@@ -79,10 +75,11 @@ const chrono::high_resolution_clock::time_point& WorldClock::BeginTime() {
 	return GetInstance().startFrameTimePoint;
 }
 
-#ifdef _DEBUG
 void WorldClock::IsFixDeltaTime(bool boolean) {
 	GetInstance().isFixDeltaTime = boolean;
 }
+
+#ifdef _DEBUG
 
 #include <imgui.h>
 void WorldClock::DebugGui() {

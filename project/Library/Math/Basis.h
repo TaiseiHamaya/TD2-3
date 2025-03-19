@@ -6,6 +6,8 @@
 #include <array>
 
 class Quaternion;
+class Matrix3x3;
+class Matrix4x4;
 
 class Basis final {
 private:
@@ -36,9 +38,16 @@ public:
 	Basis inverse() const;
 	Basis transposed() const;
 
+	Matrix3x3 to_matrix() const;
+	Matrix4x4 to_matrix4x4() const;
+
 	constexpr Vector3 column(uint32_t index) const noexcept;
 
 	void scale_rotate(const Vector3& scale, const Quaternion& rotate);
+
+public:
+	Vector3 to_scale() const;
+	Quaternion to_quaternion() const;
 };
 
 inline constexpr Basis::Basis(const Vector3& rowX, const Vector3& rowY, const Vector3& rowZ) :

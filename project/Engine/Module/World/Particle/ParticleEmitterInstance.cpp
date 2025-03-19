@@ -33,6 +33,7 @@ ParticleEmitterInstance::ParticleEmitterInstance(std::filesystem::path jsonFile,
 		break;
 	}
 	jsonResource.register_value(__JSON_RESOURCE_REGISTER(isLoop));
+	jsonResource.register_value(__JSON_RESOURCE_REGISTER(isParentThis));
 	jsonResource.register_value(__JSON_RESOURCE_REGISTER(duration));
 	jsonResource.register_value(__JSON_RESOURCE_REGISTER(emission));
 	jsonResource.register_value(__JSON_RESOURCE_REGISTER(particleInit));
@@ -102,6 +103,10 @@ void ParticleEmitterInstance::emit() {
 			emit_once();
 		}
 	}
+}
+
+void ParticleEmitterInstance::end_force() {
+	timer = duration;
 }
 
 void ParticleEmitterInstance::emit_once() {
@@ -224,6 +229,9 @@ void ParticleEmitterInstance::emit_once() {
 			particleInit.rotation.mode, rotation
 		)
 	);
+	if (isParentThis) {
+		newParticle->reparent(this, false);
+	}
 }
 
 bool ParticleEmitterInstance::is_end_all() const {

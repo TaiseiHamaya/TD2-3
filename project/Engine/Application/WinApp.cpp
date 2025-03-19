@@ -7,8 +7,8 @@
 #include "Engine/Resources/Audio/AudioManager.h"
 #include "Engine/Resources/BackgroundLoader/BackgroundLoader.h"
 #include "Engine/Resources/PolygonMesh/PolygonMeshManager.h"
-#include "Engine/Resources/Debug/LineGroup/LineGroupManager.h"
-#include "Engine/Resources/Debug/LineGroup/LineGroupResource.h"
+#include "Engine/Resources/PrimitiveGeometry/PrimitiveGeometryManager.h"
+#include "Engine/Resources/PrimitiveGeometry/PrimitiveGeometryResource.h"
 #include "Engine/Resources/Texture/TextureManager.h"
 #include "Engine/Runtime/Input/Input.h"
 #include "Engine/Runtime/Scene/SceneManager.h"
@@ -93,12 +93,17 @@ void WinApp::Initialize(DWORD windowConfig) {
 	PolygonMeshManager::RegisterLoadQue("./EngineResources/Models/Camera/CameraAxis.obj");
 
 #ifdef _DEBUG
-	LineGroupManager::Transfer(
+	PrimitiveGeometryManager::Transfer(
 		"SphereCollider",
-		std::make_shared<LineGroupResource>("./EngineResources/Json/LineGroup/Collider/Sphere.json")
+		std::make_shared<PrimitiveGeometryResource>("./EngineResources/Json/PrimitiveGeometry/Collider/Sphere.json")
 	);
-	LineGroupManager::Transfer("AABBCollider",
-		std::make_shared<LineGroupResource>("./EngineResources/Json/LineGroup/Collider/AABB.json")
+	PrimitiveGeometryManager::Transfer(
+		"AABBCollider",
+		std::make_shared<PrimitiveGeometryResource>("./EngineResources/Json/PrimitiveGeometry/Collider/AABB.json")
+	);
+	PrimitiveGeometryManager::Transfer(
+		"Frustum",
+		std::make_shared<PrimitiveGeometryResource>("./EngineResources/Json/PrimitiveGeometry/Frustum.json")
 	);
 #endif // _DEBUG
 
@@ -168,7 +173,7 @@ void WinApp::ShowAppWindow() {
 }
 
 bool WinApp::IsEndApp() {	// プロセスメッセージ取得用
-	if (instance->msg.message == WM_QUIT) { // ×ボタンが押されたら終わる
+	if (instance->isEndApp) { // ×ボタンが押されたら終わる
 		return true;
 	}
 	if (SceneManager::IsEndProgram()) {
@@ -187,6 +192,9 @@ void WinApp::ProcessMessage() {
 		}
 		else {
 			return;
+		}
+		if (instance->msg.message == WM_QUIT) {
+			instance->isEndApp = true;
 		}
 	}
 }

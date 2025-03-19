@@ -8,7 +8,7 @@
 namespace EngineSettings {
 	// Windowタイトル
 	// Framework作ったらそっちに移行する？
-	static constexpr std::wstring_view WINDOW_TITLE_W{ L"DirectXGame\0" };
+	static constexpr std::wstring_view WINDOW_TITLE_W{ L"2306_コスモアラ" };
 
 	// DefaultWindowSetting
 	//static constexpr DWORD WindowConfig

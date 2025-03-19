@@ -1,28 +1,37 @@
 #include "Engine/Application/WinApp.h"
 
+#include "Application/Scene/DebugScene.h"
+#include "Application/Scene/SelectScene.h"
+#include "Application/Scene/TitleScene.h"
+
+#include <Engine/Resources/Audio/AudioManager.h>
+
 #include "Engine/Runtime/Scene/SceneManager.h"
 #include "TestCode/SceneDemo.h"
-#include "Application/Scene/GameScene.h"
 
-int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
+int WINAPI WinMain(HINSTANCE,HINSTANCE,LPSTR,int) {
 	WinApp::Initialize();
 
+	WorldClock::IsFixDeltaTime(true);
+
 #ifdef _DEBUG
-	WorldClock::IsFixDeltaTime(false);
+	SceneManager::Initialize(std::make_unique<TitleScene>());
+#else
+	SceneManager::Initialize(std::make_unique<TitleScene>());
 #endif // _DEBUG
 
-	SceneManager::Initialize(std::make_unique<GameScene>());
+	AudioManager::SetMasterVolume(0.3f);
 
 	WinApp::ShowAppWindow();
 
-	while (true) {
+	while(true) {
 		WinApp::BeginFrame();
 
 		SceneManager::Begin();
 
 		WinApp::ProcessMessage();
 
-		if (WinApp::IsEndApp()) {
+		if(WinApp::IsEndApp()) {
 			break;
 		}
 
