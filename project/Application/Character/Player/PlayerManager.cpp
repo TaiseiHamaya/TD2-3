@@ -624,7 +624,7 @@ void PlayerManager::set_move_parameters(const Vector3& direction) {
 		nextPosition = player->get_translate() + direction;
 		player->get_target_pos(nextPosition);
 		player->set_move_timer(0.0f);
-		player->set_move_duration(0.15f);
+		player->set_move_duration(moveDuration_);
 		player->set_start_position(player->get_translate());
 		break;
 	case MoveType::SlidingOnIce:
@@ -632,7 +632,7 @@ void PlayerManager::set_move_parameters(const Vector3& direction) {
 		nextPosition = player->get_translate() + direction * static_cast<float>(moveNumOnIce);
 		player->get_target_pos(nextPosition);
 		player->set_move_timer(0.0f);
-		player->set_move_duration(0.15f * static_cast<float>(moveNumOnIce));
+		player->set_move_duration(moveDuration_ * static_cast<float>(moveNumOnIce));
 		player->set_start_position(player->get_translate());
 		break;
 	}
@@ -652,14 +652,14 @@ void PlayerManager::set_move_failed_parameters(const Vector3& direction) {
 		//条件を「入力方向に回転する時引っかからない」かつ「進行方向が壁か穴」だと上手く行く
 		player->set_wall_target_pos(player->get_translate() + direction * 0.5f);
 		player->set_wall_timer(0.0f);
-		player->set_wall_duration(0.15f);
+		player->set_wall_duration(moveDuration_);
 		player->set_wall_moving(true);
 		player->set_wall_start_pos(player->get_translate());
 		break;
 	case MoveType::FallIntoHole:
 		player->set_wall_target_pos(player->get_translate() + direction * 0.5f);
 		player->set_wall_timer(0.0f);
-		player->set_wall_duration(0.15f);
+		player->set_wall_duration(moveDuration_);
 		player->set_wall_moving(true);
 		player->set_wall_start_pos(player->get_translate());
 		break;
@@ -674,7 +674,7 @@ void PlayerManager::set_rotate_parameters(const Vector3& direction) {
 		player->set_start_rotation(player->get_rotation());
 		player->set_target_rotation(Quaternion::FromToRotation({ 0.0f, 0.0f, -1.0f }, direction));
 		player->set_rotate_timer(0.0f);
-		player->set_rotate_duration(0.3f);
+		player->set_rotate_duration(rotateDuration_);
 		player->set_rotating(true);
 		player->set_start_position(player->get_translate());
 		break;
@@ -690,7 +690,7 @@ void PlayerManager::set_rotate_parameters(const Vector3& direction) {
 		player->set_start_rotation(player->get_rotation());
 		player->set_target_rotation(Quaternion::FromToRotation({ 0.0f, 0.0f, -1.0f }, direction));
 		player->set_rotate_timer(0.0f);
-		player->set_rotate_duration(0.3f);
+		player->set_rotate_duration(rotateDuration_);
 		player->set_rotating(true);
 		player->set_start_position(player->get_translate());
 
@@ -764,7 +764,7 @@ void PlayerManager::set_rotate_failed_parameters(const Vector3& direction) {
 	player->set_start_rotation(player->get_rotation());
 	player->set_target_rotation(player->get_rotation());
 	player->set_rotate_timer(0.0f);
-	player->set_rotate_duration(0.3f);
+	player->set_rotate_duration(rotateDuration_);
 	player->set_rotating(true);
 	player->set_moving(false);
 
