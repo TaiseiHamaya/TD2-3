@@ -83,6 +83,9 @@ private:
 	// 子が放すアニメーションをしているか
 	bool isRerease = false;
 
+	float rotateDuration_ = 0.3f;
+	float moveDuration_ = 0.15f;
+
 	float clearTimer{ 0 };
 	Vector3 initialPoint;
 	Vector3 controlPoint;
