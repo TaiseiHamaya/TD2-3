@@ -174,8 +174,8 @@ void Player::move_update() {
 	if (moveType != MoveType::Normal &&
 		moveType != MoveType::ParentCarriesChild &&
 		moveType != MoveType::ChildCarriesParent &&
-		moveType != MoveType::SlidingOnIce &&
-		moveType != MoveType::MoveOnChild) {
+		moveType != MoveType::SlidingOnIce/* &&
+		moveType != MoveType::MoveOnChild*/) {
 		playerState = PlayerState::MoveFailed;
 		return;
 	}

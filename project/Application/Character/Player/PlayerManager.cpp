@@ -644,7 +644,7 @@ void PlayerManager::set_move_parameters(const Vector3& direction) {
 	switch (player->get_move_type()) {
 	case MoveType::Normal:
 		nextPosition = player->get_translate() + direction;
-		player->get_target_pos(nextPosition);
+		player->set_target_pos(nextPosition);
 		player->set_move_timer(0.0f);
 		player->set_move_duration(moveDuration_);
 		player->set_start_position(player->get_translate());
@@ -652,7 +652,7 @@ void PlayerManager::set_move_parameters(const Vector3& direction) {
 	case MoveType::SlidingOnIce:
 		moveNumOnIce = mapchipHandler->can_player_move_on_ice(player.get(), child.get(), direction);
 		nextPosition = player->get_translate() + direction * static_cast<float>(moveNumOnIce);
-		player->get_target_pos(nextPosition);
+		player->set_target_pos(nextPosition);
 		player->set_move_timer(0.0f);
 		player->set_move_duration(moveDuration_ * static_cast<float>(moveNumOnIce));
 		player->set_start_position(player->get_translate());
@@ -664,11 +664,16 @@ void PlayerManager::set_move_failed_parameters(const Vector3& direction) {
 	Vector3 nextPosition;
 	switch (player->get_move_type()) {
 	case MoveType::MoveOnChild:
-		nextPosition = player->get_translate();
-		player->get_target_pos(nextPosition);
-		player->set_move_timer(0.0f);
-		player->set_move_duration(0.01f);
-		player->set_start_position(player->get_translate());
+		//nextPosition = player->get_translate();
+		//player->set_target_pos(nextPosition);
+		//player->set_move_timer(0.0f);
+		//player->set_move_duration(0.01f);
+		//player->set_start_position(nextPosition);
+		player->set_wall_target_pos(player->get_translate());
+		player->set_wall_timer(0.0f);
+		player->set_wall_duration(moveDuration_);
+		player->set_move(true);
+		player->set_wall_start_pos(player->get_translate());
 		break;
 	case MoveType::HitRock:
 		//条件を「入力方向に回転する時引っかからない」かつ「進行方向が壁か穴」だと上手く行く
@@ -811,7 +816,7 @@ void PlayerManager::set_rotate_failed_parameters(const Vector3& direction) {
 				if (childDirection.z > 0) {
 					player->set_mid_rotation(rotate15Right * player->get_rotation());
 				} else {
-					player->set_mid_rotation(rotate15Left * player->get_rotation()); // ok
+					player->set_mid_rotation(rotate15Right * player->get_rotation()); // ok
 				}
 			}
 
