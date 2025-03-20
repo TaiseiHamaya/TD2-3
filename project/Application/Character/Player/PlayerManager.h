@@ -85,7 +85,7 @@ private:
 	bool isRerease = false;
 
 	float rotateDuration_ = 0.2f;
-	float moveDuration_ = 0.15f;
+	float moveDuration_ = 0.10f;
 
 	float clearTimer{ 0 };
 	Vector3 initialPoint;

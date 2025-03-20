@@ -271,7 +271,7 @@ void PlayerManager::handle_input() {
 
 	for (size_t i = 0; i < 4; ++i) {
 		//if (Input::GetInstance().IsTriggerKey(keys[i])) {
-		if (Input::GetInstance().IsPressKey(keys[i])) {
+		if (Input::GetInstance().IsTriggerKey(keys[i])) {
 			//player->set = directions[i];
 			Vector3 nextPosition = player->get_translate() + directions[i];
 
@@ -349,12 +349,13 @@ void PlayerManager::manage_parent_child_relationship() {
 		if (distance <= 1.01f) {
 			// 子をプレイヤーにくっつける処理
 			attach_child_to_player(player.get(), child.get());
-			if (child->get_object()->get_animation()->is_end()) {
-				//child->get_object()->reset_animated_mesh("ChiledKoala.gltf", "Standby", false);
-				child->get_object()->get_animation()->reset_animation("Standby");
-				child->get_object()->get_animation()->set_loop(false);
-				child->get_object()->get_animation()->restart();
-			}
+
+			//if (child->get_object()->get_animation()->is_end()) {
+			//	//child->get_object()->reset_animated_mesh("ChiledKoala.gltf", "Standby", false);
+			//	child->get_object()->get_animation()->reset_animation("Standby");
+			//	child->get_object()->get_animation()->set_loop(false);
+			//	child->get_object()->get_animation()->restart();
+			//}
 
 			//前フレ子なし、今フレ子ありならholdを鳴らす
 			if (!preParent && player->is_parent()) {
