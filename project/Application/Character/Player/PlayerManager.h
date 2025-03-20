@@ -29,8 +29,8 @@ public:
 #endif
 
 	void set_game_management(GameManagement* gameManagement) { gameManagement_ = gameManagement; }
-	bool get_isParent() { return isParent; }
-	int getStageSituation() { return stageSituation; }
+	bool get_isParent() const { return isParent; }
+	int getStageSituation() const { return stageSituation; }
 private:
 	void particle_update();
 	void only_child_ride_update();
@@ -58,6 +58,7 @@ private:
 	std::unique_ptr<MapchipHandler> mapchipHandler;
 	std::unique_ptr<MoveLogger> moveLogger;
 	std::unique_ptr<AnimatedMeshInstance> catchEffect_;
+	std::unique_ptr<AnimatedMeshInstance> releaseEffect_;
 
 	// パーティクルの召還
 	std::unique_ptr<ParticleEmitterInstance> dustEmitter;
