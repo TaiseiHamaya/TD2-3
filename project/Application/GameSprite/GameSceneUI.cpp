@@ -59,10 +59,10 @@ void GameSceneUI::initialize(int32_t level) {
 	numberUi10->get_uv_transform().set_translate_x((level / 10) * 0.1f);
 
 	numCenter = { 128,640 - 40 };
-	numberUi10->get_transform().set_translate({ numCenter.x - 96 / 2,numCenter.y });
+	numberUi10->get_transform().set_translate({ numCenter.x - 59 / 2,numCenter.y });
 	// 2桁表示
 	if (level >= 10) {
-		numberUi->get_transform().set_translate({ numCenter.x + 96 / 2,numCenter.y });
+		numberUi->get_transform().set_translate({ numCenter.x + 59 / 2,numCenter.y });
 	}
 	// 1桁表示
 	else {
