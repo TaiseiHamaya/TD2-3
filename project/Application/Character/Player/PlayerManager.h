@@ -84,7 +84,7 @@ private:
 	// 子が放すアニメーションをしているか
 	bool isRerease = false;
 
-	float rotateDuration_ = 0.3f;
+	float rotateDuration_ = 0.2f;
 	float moveDuration_ = 0.15f;
 
 	float clearTimer{ 0 };
