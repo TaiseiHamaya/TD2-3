@@ -87,7 +87,7 @@ public: // アクセッサ
 	void set_start_position(const Vector3& pos) { moveStartPosition = pos; }
 
 	//Vector3 get_target_pos() const { return targetPosition; }
-	void get_target_pos(const Vector3& pos) { targetPosition = pos; }
+	void set_target_pos(const Vector3& pos) { targetPosition = pos; }
 
 	Quaternion start_rotation() const { return startRotation; }
 
