@@ -816,7 +816,7 @@ void PlayerManager::set_rotate_failed_parameters(const Vector3& direction) {
 				if (childDirection.z > 0) {
 					player->set_mid_rotation(rotate15Right * player->get_rotation());
 				} else {
-					player->set_mid_rotation(rotate15Right * player->get_rotation()); // ok
+					player->set_mid_rotation(rotate15Left * player->get_rotation()); // ok
 				}
 			}
 
