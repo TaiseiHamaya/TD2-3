@@ -213,11 +213,11 @@ void GameManagement::selectFunc() {
 	if (!clearFlag && !failedFlag) {
 		return;
 	}
-	if (Input::IsTriggerKey(KeyID::A)) {
+	if (Input::IsTriggerKey(KeyID::A)||Input::IsTriggerKey(KeyID::Left)) {
 		selectIndex--;
 		operation->restart();//選択時の音
 	}
-	if (Input::IsTriggerKey(KeyID::D)) {
+	if (Input::IsTriggerKey(KeyID::D) || Input::IsTriggerKey(KeyID::Right)) {
 		selectIndex++;
 		operation->restart();//選択時の音
 	}
