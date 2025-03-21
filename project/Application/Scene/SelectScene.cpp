@@ -316,12 +316,13 @@ void SelectScene::default_update() {
 		transition->get_color().alpha = fadeEase;
 	}
 
-	if (Input::IsTriggerKey(KeyID::D) && selectIndex < GameValue::MaxLevel) {
+	if ((Input::IsTriggerKey(KeyID::D) || Input::IsTriggerKey(KeyID::Right)) &&
+		selectIndex < GameValue::MaxLevel) {
 		++selectIndex;
 		crate_field_view();
 		selectAudio->restart();
 	}
-	else if (Input::IsTriggerKey(KeyID::A) && selectIndex > 1) {
+	else if ((Input::IsTriggerKey(KeyID::A) || Input::IsTriggerKey(KeyID::Left)) && selectIndex > 1) {
 		--selectIndex;
 		crate_field_view();
 		selectAudio->restart();

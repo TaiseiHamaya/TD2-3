@@ -267,11 +267,12 @@ void PlayerManager::handle_input() {
 		{1.0f, 0.0f, 0.0f}   // 右
 	};
 
-	KeyID keys[] = { KeyID::W, KeyID::A, KeyID::S, KeyID::D };
+	KeyID keysWASD[] = { KeyID::W, KeyID::A, KeyID::S, KeyID::D };
+	KeyID keysArrow[] = { KeyID::Up, KeyID::Left, KeyID::Down, KeyID::Right };
 
 	for (size_t i = 0; i < 4; ++i) {
 		//if (Input::GetInstance().IsTriggerKey(keys[i])) {
-		if (Input::GetInstance().IsTriggerKey(keys[i])) {
+		if (Input::IsTriggerKey(keysWASD[i]) || Input::IsTriggerKey(keysArrow[i])) {
 			//player->set = directions[i];
 			Vector3 nextPosition = player->get_translate() + directions[i];
 
