@@ -74,6 +74,10 @@ void DirectXCore::Finalize() {
 	DirectXSwapChain::Finalize();
 }
 
+void DirectXCore::SetFullscreen(bool flag) {
+	DirectXSwapChain::SetFullscreen(flag);
+}
+
 DirectXCore::Debug::~Debug() {
 	// 全てが終了したあと、ReportLiveObjectsの実行
 	Microsoft::WRL::ComPtr<IDXGIDebug1> debug;

@@ -17,6 +17,8 @@ public:
 	static void EndFrame();
 	static void Finalize();
 
+	static void SetFullscreen(bool flag);
+
 private:
 	class Debug final {
 	private:
