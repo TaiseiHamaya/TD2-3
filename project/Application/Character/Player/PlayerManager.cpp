@@ -673,7 +673,6 @@ void PlayerManager::set_move_failed_parameters(const Vector3& direction) {
 		player->set_wall_target_pos(player->get_translate());
 		player->set_wall_timer(0.0f);
 		player->set_wall_duration(moveDuration_);
-		player->set_move(true);
 		player->set_wall_start_pos(player->get_translate());
 		break;
 	case MoveType::HitRock:

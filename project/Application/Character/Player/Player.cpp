@@ -93,12 +93,13 @@ void Player::update() {
 
 	if (isMoving && !preIsMoving) {
 		object_->get_animation()->reset_animation("Walk");
-	}else if(!isMoving && preIsMoving){
+	}
+	else if (!isMoving && preIsMoving) {
 		if (is_out_ground()) {
 			object_->get_animation()->reset_animation("Flustered");
 		}
 		else {
-		object_->get_animation()->reset_animation("Standby");
+			object_->get_animation()->reset_animation("Standby");
 		}
 	}
 	object_->update();
@@ -193,7 +194,7 @@ void Player::move_update() {
 		}
 	}
 	// 移動中なら補間処理を実行
-		moveTimer += WorldClock::DeltaSeconds();
+	moveTimer += WorldClock::DeltaSeconds();
 
 	// 現在の位置を補間
 	Vector3 position = Vector3::Lerp(object_->get_transform().get_translate(), targetPosition, moveTimer / moveDuration);
@@ -315,6 +316,9 @@ void Player::wall_move() {
 		isWallMoveing = false;
 		newPos = wallStartPosition;
 		playerState = PlayerState::Idle;
+		if (moveType == MoveType::MoveOnChild) {
+			isMove = true;
+		}
 
 		moveType = MoveType::Normal;
 		unmovableFlag = false;
