@@ -4,14 +4,16 @@
 #include <format>
 #include <memory>
 
-#include "Engine/Rendering/DirectX/DirectXCommand/DirectXCommand.h"
-#include "Engine/Rendering/DirectX/DirectXDevice/DirectXDevice.h"
+#include "Engine/Application/EngineSettings.h"
+#include "Engine/Application/WinApp.h"
 #include "Engine/Module/Render/RenderNode/BaseRenderNode.h"
 #include "Engine/Module/Render/RenderTargetGroup/SwapChainRenderTargetGroup.h"
-#include "Engine/Application/WinApp.h"
-#include "Engine/Application/EngineSettings.h"
-#include "Engine/Rendering/RenderingSystemValues.h"
+#include "Engine/Rendering/DirectX/DirectXCommand/DirectXCommand.h"
+#include "Engine/Rendering/DirectX/DirectXDevice/DirectXDevice.h"
 #include "Engine/Rendering/DirectX/DirectXSystemValues.h"
+#include "Engine/Rendering/RenderingSystemValues.h"
+
+#include <dxgi.h>
 
 void DirectXSwapChain::Initialize() {
 	auto& instance = GetInstance();
@@ -28,6 +30,10 @@ void DirectXSwapChain::Finalize() {
 
 void DirectXSwapChain::SwapScreen() {
 	GetInstance().swap_screen();
+}
+
+void DirectXSwapChain::SetFullscreen(bool flag) {
+	GetInstance().swapChain->SetFullscreenState(flag, nullptr);
 }
 
 const std::shared_ptr<SwapChainRenderTargetGroup>& DirectXSwapChain::GetRenderTarget() {

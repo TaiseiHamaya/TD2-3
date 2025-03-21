@@ -26,6 +26,7 @@ public:
 
 public:
 	static void SwapScreen();
+	static void SetFullscreen(bool flag);
 
 public:
 	//static const Microsoft::WRL::ComPtr<IDXGISwapChain4>& GetSwapChain() noexcept { return GetInstance().swapChain; }

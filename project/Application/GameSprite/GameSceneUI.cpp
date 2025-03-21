@@ -142,7 +142,7 @@ void GameSceneUI::ReleseUIUpdate() {
 
 void GameSceneUI::keyControl(int index) {
 	KeyID keys[] = { KeyID::W, KeyID::A, KeyID::S, KeyID::D,KeyID::R,KeyID::Escape,KeyID::Z };
-	KeyID keys2[] = { KeyID::Up,KeyID::Left,KeyID::Down,KeyID::Right };
+	KeyID keys2[] = { KeyID::Up,KeyID::Left,KeyID::Down,KeyID::Right,KeyID::R,KeyID::Escape,KeyID::Z };
 	if (Input::IsPressKey(keys[index]) || Input::IsPressKey(keys2[index])) {
 		wasdSprite[index]->get_uv_transform().set_translate_x(0.5f);
 	}

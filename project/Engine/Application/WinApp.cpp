@@ -117,6 +117,23 @@ void WinApp::BeginFrame() {
 	WorldClock::Update();
 	Input::Update();
 	DirectXCore::BeginFrame();
+
+	if (Input::IsTriggerKey(KeyID::F11)) {
+		instance->isFullscreen ^= 1;
+
+		if (instance->isFullscreen) {
+			SetWindowLong(instance->hWnd, GWL_STYLE, WS_POPUP);
+			int x = GetSystemMetrics(SM_CXSCREEN);
+			int y = GetSystemMetrics(SM_CYSCREEN);
+
+			SetWindowPos(instance->hWnd, 0, 0, 0, x, y, SWP_SHOWWINDOW);
+		}
+		else {
+			SetWindowLong(instance->hWnd, GWL_STYLE, WindowStyle::Window);
+			SetWindowPos(instance->hWnd, 0, 100, 100, 1280, 720, SWP_SHOWWINDOW);
+		}
+	}
+
 #ifdef _DEBUG
 	ImGuiManager::BeginFrame();
 #endif // _DEBUG

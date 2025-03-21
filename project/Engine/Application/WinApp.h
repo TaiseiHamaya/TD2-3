@@ -4,6 +4,12 @@
 
 #include <windows.h>
 
+enum WindowStyle {
+	Window = WS_OVERLAPPEDWINDOW & ~WS_MAXIMIZEBOX & ~WS_THICKFRAME,
+	Fullscreen,//= WS_ & ~WS_MAXIMIZEBOX & ~WS_THICKFRAME,
+	Borderless,
+};
+
 class WinApp final {
 private:
 	WinApp() noexcept;
@@ -16,7 +22,7 @@ public:
 	WinApp& operator=(const WinApp&) = delete;
 
 public:
-	static void Initialize(DWORD windowConfig = WS_OVERLAPPEDWINDOW & ~WS_MAXIMIZEBOX & ~WS_THICKFRAME);
+	static void Initialize(DWORD windowConfig = WindowStyle::Window);
 	static void BeginFrame();
 	static void EndFrame();
 	static void Finalize();
@@ -41,6 +47,10 @@ private:
 	bool isEndApp{ false };
 	HWND hWnd;
 	HINSTANCE hInstance;
+
+	DWORD style;
+
+	bool isFullscreen{false};
 
 	MSG msg;
 };
