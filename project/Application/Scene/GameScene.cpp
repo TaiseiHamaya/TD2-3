@@ -286,6 +286,13 @@ void GameScene::late_update() {
 		//ここで一手戻す処理をする
 		playerManager->restart_undo();
 	}
+	else if (managementUI->is_escape_game()) {
+		SceneManager::SetSceneChange(
+			eps::CreateUnique<SelectScene>(currentLevel), sceneChangeTime
+		);
+		transitionTimer = WorldClock::DeltaSeconds();
+		sceneState = TransitionState::Out;
+	}
 	else if (managementUI->is_next() && sceneState != TransitionState::Out) {
 		//managementUI->init();
 		// 最大レベルではない場合
@@ -302,13 +309,6 @@ void GameScene::late_update() {
 			SceneManager::SetSceneChange(
 			eps::CreateUnique<TitleScene>(), sceneChangeTime);
 		}
-		transitionTimer = WorldClock::DeltaSeconds();
-		sceneState = TransitionState::Out;
-	}
-	else if (managementUI->is_escape_game()) {
-		SceneManager::SetSceneChange(
-			eps::CreateUnique<SelectScene>(currentLevel), sceneChangeTime
-		);
 		transitionTimer = WorldClock::DeltaSeconds();
 		sceneState = TransitionState::Out;
 	}

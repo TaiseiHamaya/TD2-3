@@ -105,7 +105,7 @@ void GameManagement::begin() {
 			}
 			resultSoundFlag = true;
 		}
-		toSelectTimer = 0;
+		//toSelectTimer = 0;
 		if (Input::IsTriggerKey(KeyID::Space)&& canOperation) {
 
 			decision->restart();//確定の音
