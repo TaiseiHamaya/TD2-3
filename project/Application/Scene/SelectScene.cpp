@@ -170,7 +170,7 @@ void SelectScene::initialize() {
 	backTitle->initialize("backAudio.wav");
 	backTitle->set_volume(0.5f);
 
-	backTitleSprite= std::make_unique<SpriteInstance>("ESCkey.png");
+	backTitleSprite = std::make_unique<SpriteInstance>("ESCkey.png");
 	backTitleSprite->get_transform().set_scale({ 0.5f, 1.0f });
 	backTitleSprite->get_uv_transform().set_scale({ 0.5f, 1.0f });
 	backTitleSprite->get_transform().set_translate({ 1141,30 });
@@ -316,14 +316,18 @@ void SelectScene::default_update() {
 		transition->get_color().alpha = fadeEase;
 	}
 
-	if ((Input::IsTriggerKey(KeyID::D) || Input::IsTriggerKey(KeyID::Right)) &&
-		selectIndex < GameValue::MaxLevel) {
+	if (Input::IsTriggerKey(KeyID::D) || Input::IsTriggerKey(KeyID::Right)) {
 		++selectIndex;
+		selectIndex = (selectIndex - 1) % GameValue::MaxLevel + 1;
 		crate_field_view();
 		selectAudio->restart();
 	}
-	else if ((Input::IsTriggerKey(KeyID::A) || Input::IsTriggerKey(KeyID::Left)) && selectIndex > 1) {
+	else if (Input::IsTriggerKey(KeyID::A) || Input::IsTriggerKey(KeyID::Left)) {
 		--selectIndex;
+		selectIndex = (selectIndex - 1) % GameValue::MaxLevel + 1;
+		if (selectIndex <= 0) {
+			selectIndex += GameValue::MaxLevel;
+		}
 		crate_field_view();
 		selectAudio->restart();
 	}
