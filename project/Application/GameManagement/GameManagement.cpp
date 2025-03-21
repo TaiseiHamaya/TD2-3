@@ -76,20 +76,21 @@ void GameManagement::init() {
 }
 
 void GameManagement::begin() {
+	// 長押し対応
+	if (Input::IsTriggerKey(KeyID::Escape)) {
+		toSelectTimer = 10;
+		backTitle->play();
+	}
+	else {
+		toSelectTimer = 0;
+	}
 	// クリア、失敗状態ではない
 	if (!(clearFlag || failedFlag)) {
 		if (Input::IsTriggerKey(KeyID::R)) {
 			isReset = true;
 			resetAudio->restart();
 		}
-		// 長押し対応
-		if (Input::IsTriggerKey(KeyID::Escape)) {
-			toSelectTimer = 10;
-			backTitle->play();
-		}
-		else {
-			toSelectTimer = 0;
-		}
+		
 
 	}
 	else {
