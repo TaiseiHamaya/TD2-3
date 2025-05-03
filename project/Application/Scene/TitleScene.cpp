@@ -49,8 +49,10 @@ void TitleScene::initialize() {
 
 	directionalLight = eps::CreateUnique<DirectionalLightInstance>();
 
-	startUi = eps::CreateUnique<SpriteInstance>("start.png", Vector2{ 0.5f, 0.5f });
-	startUi->get_transform().set_translate({ 440.0f,140 });
+	startUi[0] = eps::CreateUnique<SpriteInstance>(".png", Vector2{0.5f, 0.5f});
+	startUi[1] = eps::CreateUnique<SpriteInstance>("start.png", Vector2{0.5f, 0.5f});
+	startUi[0]->get_transform().set_translate({ 440.0f,140 });
+	startUi[1]->get_transform().set_translate({ 440.0f,140 });
 	titleLogo = eps::CreateUnique<SpriteInstance>("TitleLogo.png", Vector2{ 0.5f, 0.5f });
 	titleLogo->get_transform().set_translate({ 440.0f,540 });
 
@@ -100,7 +102,9 @@ void TitleScene::popped() {}
 
 void TitleScene::finalize() {}
 
-void TitleScene::begin() {}
+void TitleScene::begin() {
+	GameValue::UiType.update();
+}
 
 void TitleScene::update() {
 	switch (sceneState) {
@@ -128,7 +132,8 @@ void TitleScene::update() {
 }
 
 void TitleScene::begin_rendering() {
-	startUi->begin_rendering();
+	startUi[0]->begin_rendering();
+	startUi[1]->begin_rendering();
 	titleLogo->begin_rendering();
 	transition->begin_rendering();
 
@@ -156,7 +161,7 @@ void TitleScene::draw() const {
 	chiledObj->draw();
 	// Sprite
 	renderPath->next();
-	startUi->draw();
+	startUi[(int)GameValue::UiType.get_type()]->draw();
 	titleLogo->draw();
 	transition->draw();
 
@@ -173,7 +178,7 @@ void TitleScene::in_update() {
 }
 
 void TitleScene::default_update() {
-	if (Input::IsTriggerKey(KeyID::Space)) {
+	if (Input::IsTriggerKey(KeyID::Space) || Input::IsTriggerPad(PadID::A)) {
 		SceneManager::SetSceneChange(
 			eps::CreateUnique<SelectScene>(), 1.0f);
 		transitionTimer = WorldClock::DeltaSeconds();

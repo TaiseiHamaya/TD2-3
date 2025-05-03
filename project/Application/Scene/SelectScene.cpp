@@ -84,8 +84,10 @@ void SelectScene::initialize() {
 	parentKoala = eps::CreateUnique<AnimatedMeshInstance>("ParentKoala.gltf", "Standby", true);
 	childKoala = eps::CreateUnique<AnimatedMeshInstance>("ChiledKoala.gltf", "Standby", true);
 
-	startUi = eps::CreateUnique<SpriteInstance>("start.png", Vector2{ 0.5f, 0.5f });
-	startUi->get_transform().set_translate({ 640.0f,90 });
+	startUi[0] = eps::CreateUnique<SpriteInstance>(".png", Vector2{0.5f, 0.5f});
+	startUi[0]->get_transform().set_translate({ 640.0f,90 });
+	startUi[1] = eps::CreateUnique<SpriteInstance>("start.png", Vector2{ 0.5f, 0.5f });
+	startUi[1]->get_transform().set_translate({ 640.0f,90 });
 	selectUi = eps::CreateUnique<SpriteInstance>("StageSelectUI.png", Vector2{ 0.5f, 0.5f });
 	selectUi->get_transform().set_translate({ 640.0f,650.0f });
 	numberUi = eps::CreateUnique<SpriteInstance>("number.png", Vector2{ 0.5f, 0.5f });
@@ -174,6 +176,9 @@ void SelectScene::initialize() {
 	backTitleSprite->get_transform().set_scale({ 0.5f, 1.0f });
 	backTitleSprite->get_uv_transform().set_scale({ 0.5f, 1.0f });
 	backTitleSprite->get_transform().set_translate({ 1141,30 });
+
+	// 入力遅延時間
+	InputDowntime = 0.3f;
 }
 
 void SelectScene::popped() {
@@ -183,8 +188,11 @@ void SelectScene::finalize() {
 }
 
 void SelectScene::begin() {
+	GameValue::UiType.update();
 	parentKoala->begin();
 	childKoala->begin();
+
+	inputTimer -= WorldClock::DeltaSeconds();
 }
 
 void SelectScene::update() {
@@ -228,7 +236,8 @@ void SelectScene::begin_rendering() {
 	numberUi->begin_rendering();
 	numberUi10->begin_rendering();
 	selectUi->begin_rendering();
-	startUi->begin_rendering();
+	startUi[0]->begin_rendering();
+	startUi[1]->begin_rendering();
 	obSprite->begin_rendering();
 	background->begin_rendering();
 	transition->begin_rendering();
@@ -267,7 +276,7 @@ void SelectScene::draw() const {
 	numberUi->draw();
 	numberUi10->draw();
 	selectUi->draw();
-	startUi->draw();
+	startUi[(int)GameValue::UiType.get_type()]->draw();
 	backTitleSprite->draw();
 	transition->draw();
 
@@ -316,22 +325,39 @@ void SelectScene::default_update() {
 		transition->get_color().alpha = fadeEase;
 	}
 
-	if (Input::IsTriggerKey(KeyID::D) || Input::IsTriggerKey(KeyID::Right)) {
-		++selectIndex;
-		selectIndex = (selectIndex - 1) % GameValue::MaxLevel + 1;
-		crate_field_view();
-		selectAudio->restart();
-	}
-	else if (Input::IsTriggerKey(KeyID::A) || Input::IsTriggerKey(KeyID::Left)) {
-		--selectIndex;
-		selectIndex = (selectIndex - 1) % GameValue::MaxLevel + 1;
-		if (selectIndex <= 0) {
-			selectIndex += GameValue::MaxLevel;
+	Vector2 stickL = Input::StickL().normalize_safe(1e-4f, CVector2::ZERO);
+	if (inputTimer <= 0.0f) {
+		if (Input::IsPressKey(KeyID::D) || Input::IsPressKey(KeyID::Right) ||
+			Input::IsPressPad(PadID::Right) || stickL.x > 0) {
+			++selectIndex;
+			selectIndex = (selectIndex - 1) % GameValue::MaxLevel + 1;
+			crate_field_view();
+			selectAudio->restart();
+			inputTimer = InputDowntime;
 		}
-		crate_field_view();
-		selectAudio->restart();
+		else if (Input::IsPressKey(KeyID::A) || Input::IsPressKey(KeyID::Left) ||
+			Input::IsPressPad(PadID::Left) || stickL.x < 0) {
+			--selectIndex;
+			selectIndex = (selectIndex - 1) % GameValue::MaxLevel + 1;
+			if (selectIndex <= 0) {
+				selectIndex += GameValue::MaxLevel;
+			}
+			crate_field_view();
+			selectAudio->restart();
+			inputTimer = InputDowntime;
+		}
 	}
-	if (Input::IsTriggerKey(KeyID::Escape)) {
+	else {
+		// キーを離したら強制的にInputDownTimerを0にする
+		if (!(Input::IsPressKey(KeyID::D) || Input::IsPressKey(KeyID::Right) ||
+			Input::IsPressPad(PadID::Right) ||
+			Input::IsPressKey(KeyID::A) || Input::IsPressKey(KeyID::Left) ||
+			Input::IsPressPad(PadID::Left) || stickL.x != 0)
+			) {
+			inputTimer = 0;
+		}
+	}
+	if (Input::IsTriggerKey(KeyID::Escape) || Input::IsTriggerPad(PadID::Start)) {
 		SceneManager::SetSceneChange(
 			eps::CreateUnique<TitleScene>(), 0.5f);
 		backTitle->play();
@@ -349,7 +375,7 @@ void SelectScene::default_update() {
 		numberUi10->set_active(false);
 	}
 
-	if (Input::IsTriggerKey(KeyID::Space)) {
+	if (Input::IsTriggerKey(KeyID::Space) || Input::IsTriggerPad(PadID::A)) {
 		SceneManager::SetSceneChange(
 			eps::CreateUnique<GameScene>(selectIndex), 1.f
 		);
@@ -383,7 +409,7 @@ void SelectScene::debug_update() {
 	selectUi->debug_gui();
 	ImGui::End();
 	ImGui::Begin("startUi");
-	startUi->debug_gui();
+	startUi[1]->debug_gui();
 	ImGui::End();
 
 

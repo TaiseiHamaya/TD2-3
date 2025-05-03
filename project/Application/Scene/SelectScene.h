@@ -60,6 +60,8 @@ private:
 	TransitionState sceneState;
 
 	float transitionTimer{ 0 };
+	float inputTimer{ 0 };
+	float InputDowntime{ 0 };
 	std::unique_ptr<SpriteInstance> transition;
 
 	std::unique_ptr<RenderPath> renderPath;
@@ -75,7 +77,7 @@ private:
 
 	int32_t selectIndex;
 	std::unique_ptr<SpriteInstance> selectUi;
-	std::unique_ptr<SpriteInstance> startUi;
+	std::array<std::unique_ptr<SpriteInstance>, 2> startUi;
 	std::unique_ptr<SpriteInstance> numberUi;
 	std::unique_ptr<SpriteInstance> numberUi10;
 	std::unique_ptr<SpriteInstance> obSprite;
@@ -87,10 +89,10 @@ private:
 	std::unique_ptr<MapchipField> field;
 
 	Quaternion startRotation;
-	
+
 	float fadeEase;//フェードインアウトのイージング
 
-	float test{0};
+	float test{ 0 };
 
 	std::unique_ptr< BackGround>background;
 

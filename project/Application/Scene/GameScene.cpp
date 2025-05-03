@@ -241,6 +241,7 @@ void GameScene::popped() {}
 void GameScene::finalize() {}
 
 void GameScene::begin() {
+	GameValue::UiType.update();
 	if (playerManager->get_player_state() == PlayerState::Idle||
 		managementUI->GetClearFlag()|| managementUI->GetFailedFlag()
 		) {

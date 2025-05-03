@@ -68,6 +68,9 @@ void PlayerManager::initialize(Reference<const LevelLoader> level, MapchipField*
 	terminalPoint = goalPosition;
 	terminalPoint.y += 1.0f;
 
+	inputTimer = 0;
+	InputDowntime = 0.4f;
+
 	//音関連
 	holdAudio = std::make_unique<AudioPlayer>();
 	holdAudio->initialize("hold.wav");
@@ -83,8 +86,7 @@ void PlayerManager::finalize() {
 }
 
 void PlayerManager::update() {
-
-
+	inputTimer -= WorldClock::DeltaSeconds();
 
 	isStackMovement = false;
 	// それぞれ落下処理はゲームオーバー時でも動くようにする
@@ -227,7 +229,7 @@ void PlayerManager::update() {
 	// この条件式でできない理由 is 何
 	if (stageSituation == 0 &&
 		!(player->get_state() != PlayerState::Idle || player->is_falling() || child->is_falling()) &&
-		moveLogger->can_undo() && Input::IsTriggerKey(KeyID::Z)) {
+		moveLogger->can_undo() && (Input::IsTriggerKey(KeyID::Z) || Input::IsTriggerPad(PadID::B))) {
 		if (player->get_state() == PlayerState::Idle) {
 			undo();
 		}
@@ -317,19 +319,46 @@ void PlayerManager::handle_input() {
 		return;
 	}
 
-	Vector3 directions[] = {
+	constexpr Vector3 directions[] = {
 		{0.0f, 0.0f, 1.0f},  // 前
 		{-1.0f, 0.0f, 0.0f}, // 左
 		{0.0f, 0.0f, -1.0f}, // 後ろ
 		{1.0f, 0.0f, 0.0f}   // 右
 	};
 
-	KeyID keysWASD[] = { KeyID::W, KeyID::A, KeyID::S, KeyID::D };
-	KeyID keysArrow[] = { KeyID::Up, KeyID::Left, KeyID::Down, KeyID::Right };
+	constexpr KeyID keysWASD[] = { KeyID::W, KeyID::A, KeyID::S, KeyID::D };
+	constexpr KeyID keysArrow[] = { KeyID::Up, KeyID::Left, KeyID::Down, KeyID::Right };
+	constexpr std::array<PadID, 4> padTrigger = { PadID::Up, PadID::Left, PadID::Down, PadID::Right };
+	constexpr std::array<Vector2, 4> stickDirection{
+		CVector2::BACK,
+		CVector2::FORWARD,
+		CVector2::UP,
+		CVector2::BACKWARD,
+	};
 
+
+	if (inputTimer > 0) {
+		bool isReleased = true;
+		for (size_t i = 0; i < 4; ++i) {
+			if (Input::IsPressKey(keysWASD[i]) || Input::IsPressKey(keysArrow[i]) ||
+				Input::IsPressPad(padTrigger[i])) {
+				isReleased = false;
+			}
+		}
+		float stickLength = Input::StickL().length();
+		isReleased &= stickLength < 0.5f;
+		// キーを離したら強制的にInputDownTimerを0にする
+		if (isReleased) {
+			inputTimer = 0;
+		}
+		return;
+	}
+	Vector2 stickL = Input::StickL().normalize_safe(1e-4f, CVector2::ZERO);
 	for (size_t i = 0; i < 4; ++i) {
 		//if (Input::GetInstance().IsTriggerKey(keys[i])) {
-		if (Input::IsTriggerKey(keysWASD[i]) || Input::IsTriggerKey(keysArrow[i])) {
+		if (Input::IsPressKey(keysWASD[i]) || Input::IsPressKey(keysArrow[i]) ||
+			Input::IsPressPad(padTrigger[i]) || (Vector2::DotProduct(stickL, stickDirection[i]) < std::cos(PI_H) && stickL.length() != 0.0f)) {
+			inputTimer = InputDowntime;
 			//player->set = directions[i];
 			Vector3 nextPosition = player->get_translate() + directions[i];
 
@@ -450,7 +479,7 @@ void PlayerManager::manage_parent_child_relationship() {
 			return;
 		}
 		// 子をプレイヤーから切り離す処理
-		if (Input::IsTriggerKey(KeyID::Space)) {
+		if (Input::IsTriggerKey(KeyID::Space) || Input::IsTriggerPad(PadID::A)) {
 			emplace_log(player->get_translate(), player->get_rotation());
 			detach_child_from_player(player.get(), child.get());
 		}

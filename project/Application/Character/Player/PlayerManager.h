@@ -81,6 +81,9 @@ private:
 
 	bool isParent;
 
+	float inputTimer;
+	float InputDowntime;
+
 	//音関連
 	std::unique_ptr<AudioPlayer> holdAudio;//くっつき音
 	std::unique_ptr<AudioPlayer> releaseAudio;//離れる音
