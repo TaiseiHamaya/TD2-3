@@ -45,6 +45,15 @@ void GameManagement::init() {
 		resetKoara->get_transform().set_translate({640.0f, -360.0f });
 	}
 
+	if (!toSelectBack) {
+		toSelectBack = std::make_unique<SpriteInstance>("ResetBack.png", Vector2(0.5f, 0.5f));
+		toSelectBack->get_transform().set_translate({ 640.0f, -360.0f });
+	}
+	if (!toSelectKoara) {
+		toSelectKoara = std::make_unique<SpriteInstance>("KoaraFace.png", Vector2(0.5f, 0.5f));
+		toSelectKoara->get_transform().set_translate({ 640.0f, -360.0f });
+	}
+
 	goSelect = std::make_unique<SpriteInstance>("GoSelect.png", Vector2(0.5f, 0.5f));
 	goSelect->get_transform().set_scale({ 0.5f,1.0f });
 	goSelect->get_uv_transform().set_scale({ 0.5f,1.0f });
@@ -85,15 +94,15 @@ void GameManagement::init() {
 
 void GameManagement::begin() {
 	// 長押し対応
-	if (Input::IsPressKey(KeyID::Escape) || Input::IsPressPad(PadID::Start)) {
-		if (toSelectTimer == 0) {
-			backTitle->restart();
-		}
-		toSelectTimer += WorldClock::DeltaSeconds();
-	}
-	else {
-		toSelectTimer = 0;
-	}
+	//if (Input::IsTriggerKey(KeyID::Escape) || Input::IsTriggerPad(PadID::Start)) {
+	//	toSelectTimer = 10;
+	//	
+	//}
+	//else {
+	//	toSelectTimer = 0;
+	//}
+	to_select_update();
+
 	// クリア、失敗状態ではない
 	if (!(clearFlag || failedFlag || isTutorial)) {
 		//if (Input::IsTriggerKey(KeyID::R) || Input::IsTriggerPad(PadID::Y)) {
@@ -182,6 +191,8 @@ void GameManagement::begin_rendering() {
 	goSelect->begin_rendering();
 	resetBack->begin_rendering();
 	resetKoara->begin_rendering();
+	toSelectBack->begin_rendering();
+	toSelectKoara->begin_rendering();
 }
 
 void GameManagement::darw() {
@@ -212,6 +223,8 @@ void GameManagement::darw() {
 	}
 	resetBack->draw();
 	resetKoara->draw();
+	toSelectBack->draw();
+	toSelectKoara->draw();
 }
 
 void GameManagement::resultKeyInput() {
@@ -356,6 +369,82 @@ void GameManagement::reset_update() {
 
 		break;
 	}
+}
 
+void GameManagement::to_select_update() {
+	float t = 0.0f;
+	float newPos = 0.0f;
+	float koaraAngle = 0.0f;
+	switch (toSelectState) {
+	case ResetState::Idle:
+		// 今の時間を0にしておく
+		if (toSelectCurrentTime < 0.0f) {
+			toSelectCurrentTime = 0.0f;
+		}
+		else {
+			toSelectCurrentTime -= WorldClock::DeltaSeconds();
+		}
+
+		t = std::clamp(toSelectCurrentTime / toSelectMaxTime, 0.0f, 1.0f);
+
+		newPos = -360.0f + (360.0f + 360.0f) * t;
+		toSelectBack->get_transform().set_translate_y(newPos);
+		toSelectKoara->get_transform().set_translate_y(newPos);
+
+		if (Input::IsTriggerKey(KeyID::Escape) || Input::IsTriggerPad(PadID::Start)) {
+			toSelectState = ResetState::Pressing;
+		}
+		break;
+	case ResetState::Pressing:
+		toSelectCurrentTime += WorldClock::DeltaSeconds();
+
+		t = std::clamp(toSelectCurrentTime / toSelectMaxTime, 0.0f, 1.0f);
+
+		newPos = -360.0f + (360.0f + 360.0f) * t;
+		toSelectBack->get_transform().set_translate_y(newPos);
+		toSelectKoara->get_transform().set_translate_y(newPos);
+
+		if (toSelectCurrentTime >= toSelectMaxTime) {
+			toSelectState = ResetState::Resetting;
+			resetAudio->restart();
+			toSelectCurrentTime = 0.0f;
+			toSelectTimer = 10;
+			backTitle->play();
+		}
+
+		if (!Input::IsPressKey(KeyID::Escape) && !Input::IsPressPad(PadID::Start)) {
+			toSelectState = ResetState::Idle;
+		}
+		break;
+	case ResetState::Resetting:
+		toSelectCurrentTime += WorldClock::DeltaSeconds();
+		t = std::clamp(toSelectCurrentTime / toSelectMaxTime, 0.0f, 1.0f);
+
+		koaraAngle = 0.8f * std::exp(-0.6f * t) * std::sin(2 * 3.14159f * 1.5f * t);
+		toSelectKoara->get_transform().set_rotate(koaraAngle);
+
+		if (toSelectCurrentTime >= toSelectMaxTime) {
+			toSelectState = ResetState::Completed;
+			toSelectCurrentTime = 0.0f;
+			toSelectTimer = 1;
+			backTitle->play();
+		}
+		break;
+	case ResetState::Completed:
+		toSelectCurrentTime += WorldClock::DeltaSeconds();
+
+		t = std::clamp(toSelectCurrentTime / toSelectMaxTime, 0.0f, 1.0f);
+		newPos = 360.0f + (1080.0f + -360.0f) * t;
+		toSelectBack->get_transform().set_translate_y(newPos);
+		toSelectKoara->get_transform().set_translate_y(newPos);
+
+
+		if (toSelectCurrentTime >= toSelectMaxTime) {
+			toSelectState = ResetState::Idle;
+			toSelectCurrentTime = 0.0f;
+		}
+
+		break;
+	}
 
 }

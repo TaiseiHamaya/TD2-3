@@ -112,8 +112,7 @@ void GameScene::load() {
 	TextureManager::RegisterLoadQue("./GameResources/Texture/Tutorial/Frame.png");
 	TextureManager::RegisterLoadQue("./GameResources/Texture/Tutorial/TutorialText.png");
 	TextureManager::RegisterLoadQue("./GameResources/Texture/Tutorial/TutorialImage.png");
-	TextureManager::RegisterLoadQue("./GameResources/Texture/UI/KoaraFace.png");
-	TextureManager::RegisterLoadQue("./GameResources/Texture/UI/ResetBack.png");
+
 	TextureManager::RegisterLoadQue("./GameResources/Texture/UI/Abutton.png");
 
 	AudioManager::RegisterLoadQue("./GameResources/Audio/move.wav");
@@ -325,7 +324,7 @@ void GameScene::late_update() {
 	}
 	else if (managementUI->is_escape_game() && sceneState != TransitionState::Out) {
 		SceneManager::SetSceneChange(
-			eps::CreateUnique<SelectScene>(currentLevel), sceneChangeTime
+			eps::CreateUnique<SelectScene>(currentLevel, true), sceneChangeTime
 		);
 		transitionTimer = WorldClock::DeltaSeconds();
 		sceneState = TransitionState::Out;

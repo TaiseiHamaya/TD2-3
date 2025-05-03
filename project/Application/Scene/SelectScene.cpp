@@ -28,10 +28,11 @@
 #include "Application/LevelLoader/LevelLoader.h"
 #include "Application/Scene/GameScene.h"
 
-SelectScene::SelectScene() : SelectScene(1) {};
+SelectScene::SelectScene() : SelectScene(1, false) {};
 
-SelectScene::SelectScene(int32_t selectLevel) :
+SelectScene::SelectScene(int32_t selectLevel, bool isFromGame) :
 	selectIndex(selectLevel) {
+	isFromGameScene = isFromGame;
 }
 
 SelectScene::~SelectScene() = default;
@@ -54,6 +55,8 @@ void SelectScene::load() {
 	TextureManager::RegisterLoadQue("./GameResources/Texture/UI/ESCkeyController.png");
 	TextureManager::RegisterLoadQue("./GameResources/Texture/UI/start.png");
 	TextureManager::RegisterLoadQue("./GameResources/Texture/UI/number.png");
+	TextureManager::RegisterLoadQue("./GameResources/Texture/UI/KoaraFace.png");
+	TextureManager::RegisterLoadQue("./GameResources/Texture/UI/ResetBack.png");
 	TextureManager::RegisterLoadQue("./GameResources/Texture/obi.png");
 
 	AudioManager::RegisterLoadQue("./GameResources/Audio/BGM/Title.wav");
@@ -183,6 +186,15 @@ void SelectScene::initialize() {
 	backTitleSprite[1]->get_uv_transform().set_scale({ 0.5f, 1.0f });
 	backTitleSprite[1]->get_transform().set_translate({ 1141,30 });
 
+	//if (!toSelectBack) {
+		fromGameBack = std::make_unique<SpriteInstance>("ResetBack.png", Vector2(0.5f, 0.5f));
+		fromGameBack->get_transform().set_translate({ 640.0f, -360.0f });
+	//}
+	//if (!fromGameKoara) {
+		fromGameKoara = std::make_unique<SpriteInstance>("KoaraFace.png", Vector2(0.5f, 0.5f));
+		fromGameKoara->get_transform().set_translate({ 640.0f, -360.0f });
+	//}
+
 	// 入力遅延時間
 	InputDowntime = 0.3f;
 }
@@ -245,6 +257,8 @@ void SelectScene::update() {
 	fieldRotation->get_transform().set_quaternion(Quaternion::AngleAxis(CVector3::BASIS_Y, PI2 / 3 * WorldClock::DeltaSeconds()) * rotation);
 
 	background->update();
+
+	from_game_update();
 }
 
 void SelectScene::begin_rendering() {
@@ -265,6 +279,8 @@ void SelectScene::begin_rendering() {
 	transition->begin_rendering();
 	backTitleSprite[0]->begin_rendering();
 	backTitleSprite[1]->begin_rendering();
+	fromGameBack->begin_rendering();
+	fromGameKoara->begin_rendering();
 }
 
 void SelectScene::late_update() {
@@ -301,6 +317,10 @@ void SelectScene::draw() const {
 	selectUi->draw();
 	startUi[(int)GameValue::UiType.get_type()]->draw();
 	backTitleSprite[(int)GameValue::UiType.get_type()]->draw();
+
+	fromGameBack->draw();
+	fromGameKoara->draw();
+
 	transition->draw();
 
 	renderPath->next();
@@ -425,6 +445,30 @@ void SelectScene::out_update() {
 	);
 	transition->get_color().alpha = fadeRatio;
 	bgm->set_volume((1 - fadeEase) * 0.1f);
+}
+
+void SelectScene::from_game_update() {
+	if (isFromGameScene) {
+		fromGameBack->set_active(true);
+		fromGameKoara->set_active(true);
+	}
+	else {
+		fromGameBack->set_active(false);
+		fromGameKoara->set_active(false);
+	}
+
+	if (fromGameCurrentTime >= fromGameMaxTime) {
+		//toSelectState = ResetState::Idle;
+		fromGameCurrentTime = 1.0f;
+	}
+	else {
+		fromGameCurrentTime += WorldClock::DeltaSeconds();
+
+		float t = std::clamp(fromGameCurrentTime / fromGameMaxTime, 0.0f, 1.0f);
+		float newPos = 360.0f + (1080.0f + -360.0f) * t;
+		fromGameBack->get_transform().set_translate_y(newPos);
+		fromGameKoara->get_transform().set_translate_y(newPos);
+	}
 }
 
 #ifdef _DEBUG
