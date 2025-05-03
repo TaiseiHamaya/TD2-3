@@ -35,6 +35,7 @@ private:
 	static const  int uiIndex = 8;
 
 	std::array<std::array<std::unique_ptr<SpriteInstance>, uiIndex>, 2> controlSprite;
+	std::unique_ptr<SpriteInstance> noneButtonSprite;
 	//std::unique_ptr<SpriteInstance>wasdSprite[];
 	std::unique_ptr<SpriteInstance>tutorialUI;
 

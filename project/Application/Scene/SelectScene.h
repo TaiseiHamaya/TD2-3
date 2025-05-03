@@ -81,7 +81,7 @@ private:
 	std::unique_ptr<SpriteInstance> numberUi;
 	std::unique_ptr<SpriteInstance> numberUi10;
 	std::unique_ptr<SpriteInstance> obSprite;
-	std::unique_ptr<SpriteInstance> backTitleSprite;
+	std::array<std::unique_ptr<SpriteInstance>, 2> backTitleSprite;
 
 	std::unique_ptr<AudioPlayer> bgm;
 

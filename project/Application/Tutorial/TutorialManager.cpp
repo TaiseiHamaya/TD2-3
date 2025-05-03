@@ -72,7 +72,7 @@ void TutorialManager::update() {
 		case TutorialState::Staying:
 
 			// もしキー入力されたら
-			if (Input::IsTriggerKey(KeyID::Space)) {
+			if (Input::IsTriggerKey(KeyID::Space) || Input::IsTriggerPad(PadID::A)) {
 				state_ = TutorialState::Disappearing;
 			}
 			break;

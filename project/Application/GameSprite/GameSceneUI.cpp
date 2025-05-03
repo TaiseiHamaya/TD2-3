@@ -16,14 +16,14 @@ GameSceneUI::GameSceneUI() = default;
 GameSceneUI::~GameSceneUI() = default;
 
 void GameSceneUI::initialize(int32_t level) {
-	controlSprite[0][0] = std::make_unique<SpriteInstance>(".png");
-	controlSprite[0][1] = std::make_unique<SpriteInstance>(".png");
-	controlSprite[0][2] = std::make_unique<SpriteInstance>(".png");
-	controlSprite[0][3] = std::make_unique<SpriteInstance>(".png");
-	controlSprite[0][4] = std::make_unique<SpriteInstance>(".png");
-	controlSprite[0][5] = std::make_unique<SpriteInstance>(".png");
-	controlSprite[0][6] = std::make_unique<SpriteInstance>(".png");
-	controlSprite[0][7] = std::make_unique<SpriteInstance>(".png", Vector2(0.5f, 0.5f));
+	controlSprite[0][0] = std::make_unique<SpriteInstance>("Wkey.png");
+	controlSprite[0][1] = std::make_unique<SpriteInstance>("Akey.png");
+	controlSprite[0][2] = std::make_unique<SpriteInstance>("Skey.png");
+	controlSprite[0][3] = std::make_unique<SpriteInstance>("Dkey.png");
+	controlSprite[0][4] = std::make_unique<SpriteInstance>("ResetUIController.png");
+	controlSprite[0][5] = std::make_unique<SpriteInstance>("ESCkeyController.png");
+	controlSprite[0][6] = std::make_unique<SpriteInstance>("UndoController.png");
+	controlSprite[0][7] = std::make_unique<SpriteInstance>("ReleseUIController.png", Vector2(0.5f, 0.5f));
 
 	controlSprite[1][0] = std::make_unique<SpriteInstance>("Wkey.png");
 	controlSprite[1][1] = std::make_unique<SpriteInstance>("Akey.png");
@@ -34,22 +34,35 @@ void GameSceneUI::initialize(int32_t level) {
 	controlSprite[1][6] = std::make_unique<SpriteInstance>("Undo.png");
 	controlSprite[1][7] = std::make_unique<SpriteInstance>("ReleseUI.png", Vector2(0.5f, 0.5f));
 
+	noneButtonSprite = std::make_unique<SpriteInstance>("NoneButton.png");
+
 	tutorialUI = std::make_unique<SpriteInstance>("Tutorial1.png");
 
 	for (int i = 0; i < 2; ++i) {
-		for (int j = 0; j < uiIndex;j++) {
+		for (int j = 0; j < uiIndex; j++) {
 			controlSprite[i][j]->get_transform().set_scale({ 0.5f, 1.0f });
 			controlSprite[i][j]->get_uv_transform().set_scale({ 0.5f, 1.0f });
 		}
-		controlSprite[i][0]->get_transform().set_translate({ 106.2f,103 });
-		controlSprite[i][1]->get_transform().set_translate({ 37.3f,30 });
-		controlSprite[i][2]->get_transform().set_translate({ 106.2f,30 });
-		controlSprite[i][3]->get_transform().set_translate({ 173.7f,30 });
-		controlSprite[i][4]->get_transform().set_translate({ 30,218 });
-		controlSprite[i][5]->get_transform().set_translate({ 1141,30 });
-		controlSprite[i][6]->get_transform().set_translate({ 171,218 });
-		controlSprite[i][7]->get_transform().set_translate({ 138.2f,379 });
 	}
+	controlSprite[0][0]->get_transform().set_translate({ 106.2f,176 });
+	controlSprite[0][1]->get_transform().set_translate({ 37.3f,103 });
+	controlSprite[0][2]->get_transform().set_translate({ 106.2f,30 });
+	controlSprite[0][3]->get_transform().set_translate({ 173.7f,103 });
+	controlSprite[0][4]->get_transform().set_translate({ 115,453 });
+	controlSprite[0][5]->get_transform().set_translate({ 1141,30 });
+	controlSprite[0][6]->get_transform().set_translate({ 171,379 });
+	controlSprite[0][7]->get_transform().set_translate({ 147,307 });
+
+	controlSprite[1][0]->get_transform().set_translate({ 106.2f,103 });
+	controlSprite[1][1]->get_transform().set_translate({ 37.3f,30 });
+	controlSprite[1][2]->get_transform().set_translate({ 106.2f,30 });
+	controlSprite[1][3]->get_transform().set_translate({ 173.7f,30 });
+	controlSprite[1][4]->get_transform().set_translate({ 30,218 });
+	controlSprite[1][5]->get_transform().set_translate({ 1141,30 });
+	controlSprite[1][6]->get_transform().set_translate({ 171,218 });
+	controlSprite[1][7]->get_transform().set_translate({ 138.2f,379 });
+
+	noneButtonSprite->get_transform().set_translate({ 56,379 });
 
 	tutorialUI->get_transform().set_translate({ 924,524 });
 
@@ -110,14 +123,10 @@ void GameSceneUI::debugUpdate() {
 	ImGui::Begin("debug");
 	ImGui::Text("ratio=%f", ratio);
 	ImGui::End();
+	ImGui::Begin(("noneButtonSprite"));
+	noneButtonSprite->debug_gui();
+	ImGui::End();
 
-	/*for(int i = 0; i < uiIndex; i++)
-	{
-
-		ImGui::Begin(("sprite" + std::to_string(i)).c_str());
-		wasdSprite[i]->debug_gui();
-		ImGui::End();
-	}*/
 }
 #endif
 void GameSceneUI::begin_rendering() {
@@ -126,6 +135,7 @@ void GameSceneUI::begin_rendering() {
 		controlSprite[controlType][i]->begin_rendering();
 	}
 
+	noneButtonSprite->begin_rendering();
 	stageFrame->begin_rendering();
 	numberUi->begin_rendering();
 	numberUi10->begin_rendering();
@@ -137,6 +147,9 @@ void GameSceneUI::darw() {
 	int controlType = (int)GameValue::UiType.get_type();
 	for (int i = 0; i < uiIndex; i++) {
 		controlSprite[controlType][i]->draw();
+	}
+	if (GameValue::UiType.get_type() == InputType::Pad) {
+		noneButtonSprite->draw();
 	}
 	tutorialUI->draw();
 	stageFrame->draw();

@@ -74,6 +74,13 @@ void GameScene::load() {
 	TextureManager::RegisterLoadQue("./GameResources/Texture/UI/ResetUI.png");
 	TextureManager::RegisterLoadQue("./GameResources/Texture/UI/ESCkey.png");
 	TextureManager::RegisterLoadQue("./GameResources/Texture/UI/ReleseUI.png");
+
+	TextureManager::RegisterLoadQue("./GameResources/Texture/UI/ResetUIController.png"); 
+	TextureManager::RegisterLoadQue("./GameResources/Texture/UI/ESCkeyController.png");
+	TextureManager::RegisterLoadQue("./GameResources/Texture/UI/UndoController.png");
+	TextureManager::RegisterLoadQue("./GameResources/Texture/UI/ReleseUIController.png");
+	TextureManager::RegisterLoadQue("./GameResources/Texture/UI/NoneButton.png");
+	
 	TextureManager::RegisterLoadQue("./GameResources/Texture/UI/Tutorial1.png");
 	TextureManager::RegisterLoadQue("./GameResources/Texture/UI/Next.png");
 	TextureManager::RegisterLoadQue("./GameResources/Texture/UI/Retry.png");

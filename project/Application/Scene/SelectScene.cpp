@@ -50,6 +50,8 @@ void SelectScene::load() {
 	PolygonMeshManager::RegisterLoadQue("./GameResources/Models/GoalObj/GoalObjStatic.obj");
 
 	TextureManager::RegisterLoadQue("./GameResources/Texture/UI/StageSelectUI.png");
+	TextureManager::RegisterLoadQue("./GameResources/Texture/UI/StartController.png");
+	TextureManager::RegisterLoadQue("./GameResources/Texture/UI/ESCkeyController.png");
 	TextureManager::RegisterLoadQue("./GameResources/Texture/UI/start.png");
 	TextureManager::RegisterLoadQue("./GameResources/Texture/UI/number.png");
 	TextureManager::RegisterLoadQue("./GameResources/Texture/obi.png");
@@ -84,7 +86,7 @@ void SelectScene::initialize() {
 	parentKoala = eps::CreateUnique<AnimatedMeshInstance>("ParentKoala.gltf", "Standby", true);
 	childKoala = eps::CreateUnique<AnimatedMeshInstance>("ChiledKoala.gltf", "Standby", true);
 
-	startUi[0] = eps::CreateUnique<SpriteInstance>(".png", Vector2{0.5f, 0.5f});
+	startUi[0] = eps::CreateUnique<SpriteInstance>("StartController.png", Vector2{0.5f, 0.5f});
 	startUi[0]->get_transform().set_translate({ 640.0f,90 });
 	startUi[1] = eps::CreateUnique<SpriteInstance>("start.png", Vector2{ 0.5f, 0.5f });
 	startUi[1]->get_transform().set_translate({ 640.0f,90 });
@@ -172,10 +174,14 @@ void SelectScene::initialize() {
 	backTitle->initialize("backAudio.wav");
 	backTitle->set_volume(0.5f);
 
-	backTitleSprite = std::make_unique<SpriteInstance>("ESCkey.png");
-	backTitleSprite->get_transform().set_scale({ 0.5f, 1.0f });
-	backTitleSprite->get_uv_transform().set_scale({ 0.5f, 1.0f });
-	backTitleSprite->get_transform().set_translate({ 1141,30 });
+	backTitleSprite[0] = std::make_unique<SpriteInstance>("ESCkeyController.png");
+	backTitleSprite[0]->get_transform().set_scale({ 0.5f, 1.0f });
+	backTitleSprite[0]->get_uv_transform().set_scale({ 0.5f, 1.0f });
+	backTitleSprite[0]->get_transform().set_translate({ 1141,30 });
+	backTitleSprite[1] = std::make_unique<SpriteInstance>("ESCkey.png");
+	backTitleSprite[1]->get_transform().set_scale({ 0.5f, 1.0f });
+	backTitleSprite[1]->get_uv_transform().set_scale({ 0.5f, 1.0f });
+	backTitleSprite[1]->get_transform().set_translate({ 1141,30 });
 
 	// 入力遅延時間
 	InputDowntime = 0.3f;
@@ -241,7 +247,8 @@ void SelectScene::begin_rendering() {
 	obSprite->begin_rendering();
 	background->begin_rendering();
 	transition->begin_rendering();
-	backTitleSprite->begin_rendering();
+	backTitleSprite[0]->begin_rendering();
+	backTitleSprite[1]->begin_rendering();
 }
 
 void SelectScene::late_update() {
@@ -277,7 +284,7 @@ void SelectScene::draw() const {
 	numberUi10->draw();
 	selectUi->draw();
 	startUi[(int)GameValue::UiType.get_type()]->draw();
-	backTitleSprite->draw();
+	backTitleSprite[(int)GameValue::UiType.get_type()]->draw();
 	transition->draw();
 
 	renderPath->next();
@@ -362,7 +369,8 @@ void SelectScene::default_update() {
 			eps::CreateUnique<TitleScene>(), 0.5f);
 		backTitle->play();
 
-		backTitleSprite->get_uv_transform().set_translate_x(0.5f);
+		backTitleSprite[0]->get_uv_transform().set_translate_x(0.5f);
+		backTitleSprite[1]->get_uv_transform().set_translate_x(0.5f);
 	}
 	// 2桁表示
 	if (selectIndex >= 10) {
