@@ -27,7 +27,7 @@ private:
 
 public:
 	SelectScene();
-	SelectScene(int32_t selectLevel);
+	SelectScene(int32_t selectLevel, bool isFromGame);
 	~SelectScene();
 
 public:
@@ -51,6 +51,8 @@ private:
 	void default_update();
 	void out_update();
 
+	void from_game_update();
+
 #ifdef _DEBUG
 public:
 	void debug_update() override;
@@ -63,6 +65,9 @@ private:
 	float inputTimer{ 0 };
 	float InputDowntime{ 0 };
 	std::unique_ptr<SpriteInstance> transition;
+
+	std::unique_ptr<SpriteInstance>fromGameBack;
+	std::unique_ptr<SpriteInstance>fromGameKoara;
 
 	std::unique_ptr<RenderPath> renderPath;
 
@@ -100,4 +105,7 @@ private:
 	std::unique_ptr< AudioPlayer>selectAudio;
 	std::unique_ptr< AudioPlayer>backTitle;
 
+	const float fromGameMaxTime = 0.5f;
+	float fromGameCurrentTime;
+	bool isFromGameScene = false;
 };

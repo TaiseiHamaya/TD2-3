@@ -24,6 +24,8 @@ private:
 	void selectFunc();
 	// リセットの更新処理
 	void reset_update();
+	// エスケープの処理
+	void to_select_update();
 public:
 	//アクセッサ
 	void SetClearFlag(bool value) { clearFlag = value; }
@@ -53,9 +55,11 @@ private:
 	//std::unique_ptr<SpriteInstance>failedReasonUI;//0:子どもを置いてゴール 1:子コアラがゴール　2:コアラを落とす　3:ターン経過
 	std::unique_ptr<SpriteInstance>resetBack;
 	std::unique_ptr<SpriteInstance>resetKoara;
+	std::unique_ptr<SpriteInstance>toSelectBack;
+	std::unique_ptr<SpriteInstance>toSelectKoara;
 
-	std::unique_ptr< FailedUI>failedUI;
-	std::unique_ptr< ClearUI>clearUI;
+	std::unique_ptr<FailedUI>failedUI;
+	std::unique_ptr<ClearUI>clearUI;
 
 	bool isTransition{ false };
 
@@ -71,11 +75,18 @@ private:
 		Completed   // リセット完了後
 	};
 	ResetState resetState;
+	
 
 	const float resetMaxTime = 0.5f;
 	float resetCurrentTime;
 	bool isReset;
 	bool isTutorial;
+
+	ResetState toSelectState;
+	const float toSelectMaxTime = 0.5f;
+	float toSelectCurrentTime;
+	//bool isToSelect;
+	//bool isTutorial;
 
 	bool isNext;
 	bool isUndoRestart;
