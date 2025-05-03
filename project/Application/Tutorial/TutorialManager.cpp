@@ -128,6 +128,8 @@ void TutorialManager::begin_rendering() {
 }
 
 void TutorialManager::draw() {
+	tutorialImage_->draw();
+
 	tutorialFrame_->draw();
 	tutorialText_->draw();
 	tutorialImage_->draw();
