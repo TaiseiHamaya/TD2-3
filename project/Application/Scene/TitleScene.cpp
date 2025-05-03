@@ -27,6 +27,7 @@ TitleScene::~TitleScene() {}
 
 void TitleScene::load() {
 	TextureManager::RegisterLoadQue("./GameResources/Texture/UI/start.png");
+	TextureManager::RegisterLoadQue("./GameResources/Texture/UI/StartController.png");
 	TextureManager::RegisterLoadQue("./GameResources/Texture/black.png");
 	TextureManager::RegisterLoadQue("./GameResources/Texture/TitleLogo.png");
 	AudioManager::RegisterLoadQue("./GameResources/Audio/BGM/TitleBGM.wav");
@@ -49,7 +50,7 @@ void TitleScene::initialize() {
 
 	directionalLight = eps::CreateUnique<DirectionalLightInstance>();
 
-	startUi[0] = eps::CreateUnique<SpriteInstance>(".png", Vector2{0.5f, 0.5f});
+	startUi[0] = eps::CreateUnique<SpriteInstance>("StartController.png", Vector2{0.5f, 0.5f});
 	startUi[1] = eps::CreateUnique<SpriteInstance>("start.png", Vector2{0.5f, 0.5f});
 	startUi[0]->get_transform().set_translate({ 440.0f,140 });
 	startUi[1]->get_transform().set_translate({ 440.0f,140 });
