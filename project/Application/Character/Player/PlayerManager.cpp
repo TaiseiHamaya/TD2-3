@@ -15,7 +15,8 @@ void PlayerManager::initialize(Reference<const LevelLoader> level, MapchipField*
 	if (isResetLogger) {
 		moveLogger = std::make_unique<MoveLogger>();
 		moveLogger->initialize();
-	} else {
+	}
+	else {
 		if (player->is_moved()) {
 			emplace_log(player->get_translate(), player->get_rotation());
 		}
@@ -64,6 +65,9 @@ void PlayerManager::initialize(Reference<const LevelLoader> level, MapchipField*
 	terminalPoint = goalPosition;
 	terminalPoint.y += 1.0f;
 
+	inputTimer = 0;
+	InputDowntime = 0.4f;
+
 	//音関連
 	holdAudio = std::make_unique<AudioPlayer>();
 	holdAudio->initialize("hold.wav");
@@ -79,6 +83,8 @@ void PlayerManager::finalize() {
 }
 
 void PlayerManager::update() {
+	inputTimer -= WorldClock::DeltaSeconds();
+
 	isStackMovement = false;
 	// それぞれ落下処理はゲームオーバー時でも動くようにする
 	child->update();
@@ -214,7 +220,7 @@ void PlayerManager::update() {
 	// この条件式でできない理由 is 何
 	if (stageSituation == 0 &&
 		!(player->get_state() != PlayerState::Idle || player->is_falling() || child->is_falling()) &&
-		moveLogger->can_undo() && Input::IsTriggerKey(KeyID::Z)) {
+		moveLogger->can_undo() && (Input::IsTriggerKey(KeyID::Z) || Input::IsTriggerPad(PadID::B))) {
 		if (player->get_state() == PlayerState::Idle) {
 			undo();
 		}
@@ -260,26 +266,54 @@ void PlayerManager::handle_input() {
 		return;
 	}
 
-	Vector3 directions[] = {
+	constexpr Vector3 directions[] = {
 		{0.0f, 0.0f, 1.0f},  // 前
 		{-1.0f, 0.0f, 0.0f}, // 左
 		{0.0f, 0.0f, -1.0f}, // 後ろ
 		{1.0f, 0.0f, 0.0f}   // 右
 	};
 
-	KeyID keysWASD[] = { KeyID::W, KeyID::A, KeyID::S, KeyID::D };
-	KeyID keysArrow[] = { KeyID::Up, KeyID::Left, KeyID::Down, KeyID::Right };
+	constexpr KeyID keysWASD[] = { KeyID::W, KeyID::A, KeyID::S, KeyID::D };
+	constexpr KeyID keysArrow[] = { KeyID::Up, KeyID::Left, KeyID::Down, KeyID::Right };
+	constexpr std::array<PadID, 4> padTrigger = { PadID::Up, PadID::Left, PadID::Down, PadID::Right };
+	constexpr std::array<Vector2, 4> stickDirection{
+		CVector2::UP,
+		CVector2::BACKWARD,
+		CVector2::BACK,
+		CVector2::FORWARD,
+	};
 
+
+	if (inputTimer > 0) {
+		bool isReleased = true;
+		for (size_t i = 0; i < 4; ++i) {
+			if (Input::IsPressKey(keysWASD[i]) || Input::IsPressKey(keysArrow[i]) ||
+				Input::IsPressPad(padTrigger[i])) {
+				isReleased = false;
+			}
+		}
+		float stickLength = Input::StickL().length();
+		isReleased &= stickLength < 0.5f;
+		// キーを離したら強制的にInputDownTimerを0にする
+		if (isReleased) {
+			inputTimer = 0;
+		}
+		return;
+	}
+	Vector2 stickL = Input::StickL().normalize_safe(1e-4f, CVector2::ZERO);
 	for (size_t i = 0; i < 4; ++i) {
 		//if (Input::GetInstance().IsTriggerKey(keys[i])) {
-		if (Input::IsTriggerKey(keysWASD[i]) || Input::IsTriggerKey(keysArrow[i])) {
+		if (Input::IsPressKey(keysWASD[i]) || Input::IsPressKey(keysArrow[i]) ||
+			Input::IsPressPad(padTrigger[i]) || Vector2::DotProduct(stickL, stickDirection[i]) < std::cos(PI_H)) {
+			inputTimer = InputDowntime;
 			//player->set = directions[i];
 			Vector3 nextPosition = player->get_translate() + directions[i];
 
 			// 回転中の衝突チェック
 			if (mapchipHandler->can_player_rotate(player.get(), child.get(), directions[i])) {
 				set_rotate_parameters(directions[i]);
-			} else {
+			}
+			else {
 				set_rotate_failed_parameters(directions[i]);
 			}
 
@@ -287,7 +321,8 @@ void PlayerManager::handle_input() {
 			if (mapchipHandler->can_player_move_to(player.get(), child.get(), directions[i])) {
 				// 成功時のパラメータ設定
 				set_move_parameters(directions[i]);
-			} else {
+			}
+			else {
 				set_move_failed_parameters(directions[i]);
 			}
 
@@ -330,10 +365,12 @@ void PlayerManager::particle_update() {
 		// その中でも氷の中だったら氷用
 		if (player->get_move_type() == MoveType::SlidingOnIce) {
 			iceDustEmitter->set_active(true);
-		} else {
+		}
+		else {
 			dustEmitter->set_active(true);
 		}
-	} else {
+	}
+	else {
 		dustEmitter->set_active(false);
 		iceDustEmitter->set_active(false);
 	}
@@ -369,12 +406,13 @@ void PlayerManager::manage_parent_child_relationship() {
 				//releaseEffect_->get_animation()->restart();
 			}
 		}
-	} else {
+	}
+	else {
 		if (player->is_moving()) {
 			return;
 		}
 		// 子をプレイヤーから切り離す処理
-		if (Input::IsTriggerKey(KeyID::Space)) {
+		if (Input::IsTriggerKey(KeyID::Space) || Input::IsTriggerPad(PadID::A)) {
 			emplace_log(player->get_translate(), player->get_rotation());
 			detach_child_from_player(player.get(), child.get());
 		}
@@ -481,7 +519,8 @@ void PlayerManager::detach_child_from_player(Player* player, Child* child) {
 		anim->set_loop(false);
 		anim->restart();
 		isRerease = true;
-	} else {
+	}
+	else {
 		anim->reset_animation("Falling");
 		anim->set_loop(true);
 		anim->restart();
@@ -507,7 +546,8 @@ void PlayerManager::undo() {
 	float childY;
 	if (popped.isSticking) {
 		childY = 0.0f;
-	} else {
+	}
+	else {
 		childY = 1.0f;
 	}
 
@@ -565,7 +605,8 @@ void PlayerManager::undo() {
 		if (isPlayerOnGround) {
 			playerAnimation->reset_animation("Standby");
 			playerAnimation->set_loop(true);
-		} else {
+		}
+		else {
 			playerAnimation->reset_animation("Flustered");
 			playerAnimation->set_loop(true);
 
@@ -576,7 +617,8 @@ void PlayerManager::undo() {
 			childAnimation->reset_animation("Hold");
 			childAnimation->set_time_force(1000);
 			childAnimation->set_loop(false);
-		} else {
+		}
+		else {
 			childAnimation->reset_animation("Flustered");
 			childAnimation->set_time_force(1000);
 			childAnimation->set_loop(true);
@@ -725,7 +767,8 @@ void PlayerManager::set_rotate_parameters(const Vector3& direction) {
 		if (player->get_how_rotation() == RotationDirection::Left) {
 			midDir = GameUtility::rotate_direction_90_left(direction);
 			player->set_mid_rotation(Quaternion::FromToRotation({ 0.0f, 0.0f, -1.0f }, midDir));
-		} else if (player->get_how_rotation() == RotationDirection::Right) {
+		}
+		else if (player->get_how_rotation() == RotationDirection::Right) {
 			midDir = GameUtility::rotate_direction_90_right(direction);
 			player->set_mid_rotation(Quaternion::FromToRotation({ 0.0f, 0.0f, -1.0f }, midDir));
 		}
@@ -738,9 +781,11 @@ void PlayerManager::set_rotate_failed_parameters(const Vector3& direction) {
 	Vector3 childDirection;
 	if (std::round(child->get_translate().x) == 1.0f) {
 		childDirection = GameUtility::rotate_direction_90_left(direction);
-	} else if (std::round(child->get_translate().x) == -1.0f) {
+	}
+	else if (std::round(child->get_translate().x) == -1.0f) {
 		childDirection = GameUtility::rotate_direction_90_right(direction);
-	} else {
+	}
+	else {
 		childDirection = direction;
 	}
 
@@ -810,13 +855,16 @@ void PlayerManager::set_rotate_failed_parameters(const Vector3& direction) {
 			if (playerForward.x > 0) {
 				if (childDirection.z > 0) {
 					player->set_mid_rotation(rotate15Right * player->get_rotation());
-				} else {
+				}
+				else {
 					player->set_mid_rotation(rotate15Left * player->get_rotation()); // ok
 				}
-			} else if (playerForward.x < 0) {
+			}
+			else if (playerForward.x < 0) {
 				if (childDirection.z > 0) {
 					player->set_mid_rotation(rotate15Right * player->get_rotation());
-				} else {
+				}
+				else {
 					player->set_mid_rotation(rotate15Left * player->get_rotation()); // ok
 				}
 			}
@@ -824,29 +872,36 @@ void PlayerManager::set_rotate_failed_parameters(const Vector3& direction) {
 			if (playerForward.z > 0) {
 				if (childDirection.x > 0) {
 					player->set_mid_rotation(rotate15Right * player->get_rotation());
-				} else {
+				}
+				else {
 					player->set_mid_rotation(rotate15Left * player->get_rotation()); // ok
 				}
-			} else if (playerForward.z < 0) {
+			}
+			else if (playerForward.z < 0) {
 				if (childDirection.x > 0) {
 					player->set_mid_rotation(rotate15Right * player->get_rotation());
-				} else {
+				}
+				else {
 					player->set_mid_rotation(rotate15Left * player->get_rotation());
 				}
 			}
-		} else if (std::round(child->get_translate().x) == -1.0f) {
+		}
+		else if (std::round(child->get_translate().x) == -1.0f) {
 			Vector3 playerForward = Vector3(0.0f, 0.0f, -1.0f) * player->get_rotation();
 
 			if (playerForward.x > 0) {
 				if (childDirection.z > 0) {
 					player->set_mid_rotation(rotate15Left * player->get_rotation());
-				} else {
+				}
+				else {
 					player->set_mid_rotation(rotate15Right * player->get_rotation());
 				}
-			} else if (playerForward.x < 0) {
+			}
+			else if (playerForward.x < 0) {
 				if (childDirection.z > 0) {
 					player->set_mid_rotation(rotate15Left * player->get_rotation());
-				} else {
+				}
+				else {
 					player->set_mid_rotation(rotate15Right * player->get_rotation()); // ok
 				}
 			}
@@ -854,29 +909,36 @@ void PlayerManager::set_rotate_failed_parameters(const Vector3& direction) {
 			if (playerForward.z > 0) {
 				if (childDirection.x > 0) {
 					player->set_mid_rotation(rotate15Left * player->get_rotation());
-				} else {
-					player->set_mid_rotation(rotate15Right * player->get_rotation()); // ok
 				}
-			} else if (playerForward.z < 0) {
-				if (childDirection.x > 0) {
-					player->set_mid_rotation(rotate15Left * player->get_rotation());
-				} else {
+				else {
 					player->set_mid_rotation(rotate15Right * player->get_rotation()); // ok
 				}
 			}
-		} else {
+			else if (playerForward.z < 0) {
+				if (childDirection.x > 0) {
+					player->set_mid_rotation(rotate15Left * player->get_rotation());
+				}
+				else {
+					player->set_mid_rotation(rotate15Right * player->get_rotation()); // ok
+				}
+			}
+		}
+		else {
 			Vector3 playerForward = Vector3(0.0f, 0.0f, -1.0f) * player->get_rotation();
 
 			if (playerForward.x > 0) {
 				if (childDirection.z > 0) {
 					player->set_mid_rotation(rotate15Right * player->get_rotation());
-				} else {
+				}
+				else {
 					player->set_mid_rotation(rotate15Left * player->get_rotation());
 				}
-			} else if (playerForward.x < 0) {
+			}
+			else if (playerForward.x < 0) {
 				if (childDirection.z > 0) {
 					player->set_mid_rotation(rotate15Left * player->get_rotation());
-				} else {
+				}
+				else {
 					player->set_mid_rotation(rotate15Right * player->get_rotation());
 				}
 			}
@@ -884,13 +946,16 @@ void PlayerManager::set_rotate_failed_parameters(const Vector3& direction) {
 			if (playerForward.z > 0) {
 				if (childDirection.x > 0) {
 					player->set_mid_rotation(rotate15Left * player->get_rotation());
-				} else {
+				}
+				else {
 					player->set_mid_rotation(rotate15Right * player->get_rotation());
 				}
-			} else if (playerForward.z < 0) {
+			}
+			else if (playerForward.z < 0) {
 				if (childDirection.x > 0) {
 					player->set_mid_rotation(rotate15Right * player->get_rotation());
-				} else {
+				}
+				else {
 					player->set_mid_rotation(rotate15Left * player->get_rotation());
 				}
 			}
@@ -908,13 +973,16 @@ void PlayerManager::set_rotate_failed_parameters(const Vector3& direction) {
 			if (playerForward.x > 0) {
 				if (childDirection.z > 0) {
 					player->set_mid_rotation(rotate70Right * player->get_rotation());
-				} else {
+				}
+				else {
 					player->set_mid_rotation(rotate70Left * player->get_rotation());
 				}
-			} else if (playerForward.x < 0) {
+			}
+			else if (playerForward.x < 0) {
 				if (childDirection.z > 0) {
 					player->set_mid_rotation(rotate70Right * player->get_rotation());
-				} else {
+				}
+				else {
 					player->set_mid_rotation(rotate70Left * player->get_rotation());
 				}
 			}
@@ -922,29 +990,36 @@ void PlayerManager::set_rotate_failed_parameters(const Vector3& direction) {
 			if (playerForward.z > 0) {
 				if (childDirection.x > 0) {
 					player->set_mid_rotation(rotate70Right * player->get_rotation());
-				} else {
-					player->set_mid_rotation(rotate70Left * player->get_rotation());
 				}
-			} else if (playerForward.z < 0) {
-				if (childDirection.x > 0) {
-					player->set_mid_rotation(rotate70Right * player->get_rotation());
-				} else {
+				else {
 					player->set_mid_rotation(rotate70Left * player->get_rotation());
 				}
 			}
-		} else if (std::round(child->get_translate().x) == -1.0f) {
+			else if (playerForward.z < 0) {
+				if (childDirection.x > 0) {
+					player->set_mid_rotation(rotate70Right * player->get_rotation());
+				}
+				else {
+					player->set_mid_rotation(rotate70Left * player->get_rotation());
+				}
+			}
+		}
+		else if (std::round(child->get_translate().x) == -1.0f) {
 			Vector3 playerForward = Vector3(0.0f, 0.0f, -1.0f) * player->get_rotation();
 
 			if (playerForward.x > 0) {
 				if (childDirection.z > 0) {
 					player->set_mid_rotation(rotate70Left * player->get_rotation());
-				} else {
+				}
+				else {
 					player->set_mid_rotation(rotate70Right * player->get_rotation());
 				}
-			} else if (playerForward.x < 0) {
+			}
+			else if (playerForward.x < 0) {
 				if (childDirection.z > 0) {
 					player->set_mid_rotation(rotate70Left * player->get_rotation());
-				} else {
+				}
+				else {
 					player->set_mid_rotation(rotate70Right * player->get_rotation());
 				}
 			}
@@ -952,29 +1027,36 @@ void PlayerManager::set_rotate_failed_parameters(const Vector3& direction) {
 			if (playerForward.z > 0) {
 				if (childDirection.x > 0) {
 					player->set_mid_rotation(rotate70Left * player->get_rotation());
-				} else {
-					player->set_mid_rotation(rotate70Right * player->get_rotation());
 				}
-			} else if (playerForward.z < 0) {
-				if (childDirection.x > 0) {
-					player->set_mid_rotation(rotate70Left * player->get_rotation());
-				} else {
+				else {
 					player->set_mid_rotation(rotate70Right * player->get_rotation());
 				}
 			}
-		} else {
+			else if (playerForward.z < 0) {
+				if (childDirection.x > 0) {
+					player->set_mid_rotation(rotate70Left * player->get_rotation());
+				}
+				else {
+					player->set_mid_rotation(rotate70Right * player->get_rotation());
+				}
+			}
+		}
+		else {
 			Vector3 playerForward = Vector3(0.0f, 0.0f, -1.0f) * player->get_rotation();
 
 			if (playerForward.x > 0) {
 				if (childDirection.z > 0) {
 					player->set_mid_rotation(rotate70Right * player->get_rotation());
-				} else {
+				}
+				else {
 					player->set_mid_rotation(rotate70Left * player->get_rotation());
 				}
-			} else if (playerForward.x < 0) {
+			}
+			else if (playerForward.x < 0) {
 				if (childDirection.z > 0) {
 					player->set_mid_rotation(rotate70Left * player->get_rotation());
-				} else {
+				}
+				else {
 					player->set_mid_rotation(rotate70Right * player->get_rotation());
 				}
 			}
@@ -982,13 +1064,16 @@ void PlayerManager::set_rotate_failed_parameters(const Vector3& direction) {
 			if (playerForward.z > 0) {
 				if (childDirection.x > 0) {
 					player->set_mid_rotation(rotate70Left * player->get_rotation());
-				} else {
+				}
+				else {
 					player->set_mid_rotation(rotate70Right * player->get_rotation());
 				}
-			} else if (playerForward.z < 0) {
+			}
+			else if (playerForward.z < 0) {
 				if (childDirection.x > 0) {
 					player->set_mid_rotation(rotate70Right * player->get_rotation());
-				} else {
+				}
+				else {
 					player->set_mid_rotation(rotate70Left * player->get_rotation());
 				}
 			}
@@ -1006,13 +1091,16 @@ void PlayerManager::set_rotate_failed_parameters(const Vector3& direction) {
 			if (playerForward.x > 0) {
 				if (childDirection.z > 0) {
 					player->set_mid_rotation(rotate70Right * player->get_rotation());
-				} else {
+				}
+				else {
 					player->set_mid_rotation(rotate70Left * player->get_rotation());
 				}
-			} else if (playerForward.x < 0) {
+			}
+			else if (playerForward.x < 0) {
 				if (childDirection.z > 0) {
 					player->set_mid_rotation(rotate70Right * player->get_rotation());
-				} else {
+				}
+				else {
 					player->set_mid_rotation(rotate70Left * player->get_rotation());
 				}
 			}
@@ -1020,29 +1108,36 @@ void PlayerManager::set_rotate_failed_parameters(const Vector3& direction) {
 			if (playerForward.z > 0) {
 				if (childDirection.x > 0) {
 					player->set_mid_rotation(rotate70Right * player->get_rotation());
-				} else {
-					player->set_mid_rotation(rotate70Left * player->get_rotation());
 				}
-			} else if (playerForward.z < 0) {
-				if (childDirection.x > 0) {
-					player->set_mid_rotation(rotate70Right * player->get_rotation());
-				} else {
+				else {
 					player->set_mid_rotation(rotate70Left * player->get_rotation());
 				}
 			}
-		} else if (std::round(child->get_translate().x) == -1.0f) {
+			else if (playerForward.z < 0) {
+				if (childDirection.x > 0) {
+					player->set_mid_rotation(rotate70Right * player->get_rotation());
+				}
+				else {
+					player->set_mid_rotation(rotate70Left * player->get_rotation());
+				}
+			}
+		}
+		else if (std::round(child->get_translate().x) == -1.0f) {
 			Vector3 playerForward = Vector3(0.0f, 0.0f, -1.0f) * player->get_rotation();
 
 			if (playerForward.x > 0) {
 				if (childDirection.z > 0) {
 					player->set_mid_rotation(rotate70Left * player->get_rotation());
-				} else {
+				}
+				else {
 					player->set_mid_rotation(rotate70Right * player->get_rotation());
 				}
-			} else if (playerForward.x < 0) {
+			}
+			else if (playerForward.x < 0) {
 				if (childDirection.z > 0) {
 					player->set_mid_rotation(rotate70Left * player->get_rotation());
-				} else {
+				}
+				else {
 					player->set_mid_rotation(rotate70Right * player->get_rotation());
 				}
 			}
@@ -1050,29 +1145,36 @@ void PlayerManager::set_rotate_failed_parameters(const Vector3& direction) {
 			if (playerForward.z > 0) {
 				if (childDirection.x > 0) {
 					player->set_mid_rotation(rotate70Left * player->get_rotation());
-				} else {
-					player->set_mid_rotation(rotate70Right * player->get_rotation());
 				}
-			} else if (playerForward.z < 0) {
-				if (childDirection.x > 0) {
-					player->set_mid_rotation(rotate70Left * player->get_rotation());
-				} else {
+				else {
 					player->set_mid_rotation(rotate70Right * player->get_rotation());
 				}
 			}
-		} else {
+			else if (playerForward.z < 0) {
+				if (childDirection.x > 0) {
+					player->set_mid_rotation(rotate70Left * player->get_rotation());
+				}
+				else {
+					player->set_mid_rotation(rotate70Right * player->get_rotation());
+				}
+			}
+		}
+		else {
 			Vector3 playerForward = Vector3(0.0f, 0.0f, -1.0f) * player->get_rotation();
 
 			if (playerForward.x > 0) {
 				if (childDirection.z > 0) {
 					player->set_mid_rotation(rotate70Right * player->get_rotation());
-				} else {
+				}
+				else {
 					player->set_mid_rotation(rotate70Left * player->get_rotation());
 				}
-			} else if (playerForward.x < 0) {
+			}
+			else if (playerForward.x < 0) {
 				if (childDirection.z > 0) {
 					player->set_mid_rotation(rotate70Left * player->get_rotation());
-				} else {
+				}
+				else {
 					player->set_mid_rotation(rotate70Right * player->get_rotation());
 				}
 			}
@@ -1080,13 +1182,16 @@ void PlayerManager::set_rotate_failed_parameters(const Vector3& direction) {
 			if (playerForward.z > 0) {
 				if (childDirection.x > 0) {
 					player->set_mid_rotation(rotate70Left * player->get_rotation());
-				} else {
+				}
+				else {
 					player->set_mid_rotation(rotate70Right * player->get_rotation());
 				}
-			} else if (playerForward.z < 0) {
+			}
+			else if (playerForward.z < 0) {
 				if (childDirection.x > 0) {
 					player->set_mid_rotation(rotate70Right * player->get_rotation());
-				} else {
+				}
+				else {
 					player->set_mid_rotation(rotate70Left * player->get_rotation());
 				}
 			}
@@ -1099,7 +1204,8 @@ void PlayerManager::set_rotate_failed_parameters(const Vector3& direction) {
 
 		if (player->get_how_rotation() == RotationDirection::Left) {
 			player->set_mid_rotation(rotate15Left * player->get_rotation());
-		} else if (player->get_how_rotation() == RotationDirection::Right) {
+		}
+		else if (player->get_how_rotation() == RotationDirection::Right) {
 			player->set_mid_rotation(rotate15Right * player->get_rotation());
 		}
 		break;
@@ -1110,7 +1216,8 @@ void PlayerManager::set_rotate_failed_parameters(const Vector3& direction) {
 
 		if (player->get_how_rotation() == RotationDirection::Left) {
 			player->set_mid_rotation(rotate70Left * player->get_rotation());
-		} else if (player->get_how_rotation() == RotationDirection::Right) {
+		}
+		else if (player->get_how_rotation() == RotationDirection::Right) {
 			player->set_mid_rotation(rotate70Right * player->get_rotation());
 		}
 		break;
@@ -1120,7 +1227,8 @@ void PlayerManager::set_rotate_failed_parameters(const Vector3& direction) {
 
 		if (player->get_how_rotation() == RotationDirection::Left) {
 			player->set_mid_rotation(rotate70Left * player->get_rotation());
-		} else if (player->get_how_rotation() == RotationDirection::Right) {
+		}
+		else if (player->get_how_rotation() == RotationDirection::Right) {
 			player->set_mid_rotation(rotate70Right * player->get_rotation());
 		}
 		break;
@@ -1130,7 +1238,8 @@ void PlayerManager::set_rotate_failed_parameters(const Vector3& direction) {
 
 		if (player->get_how_rotation() == RotationDirection::Left) {
 			player->set_mid_rotation(rotate135Left * player->get_rotation());
-		} else if (player->get_how_rotation() == RotationDirection::Right) {
+		}
+		else if (player->get_how_rotation() == RotationDirection::Right) {
 			player->set_mid_rotation(rotate135Right * player->get_rotation());
 		}
 		break;
@@ -1140,9 +1249,11 @@ void PlayerManager::set_rotate_failed_parameters(const Vector3& direction) {
 
 		if (player->get_how_rotation() == RotationDirection::Left) {
 			player->set_mid_rotation(rotate160Left * player->get_rotation());
-		} else if (player->get_how_rotation() == RotationDirection::Right) {
+		}
+		else if (player->get_how_rotation() == RotationDirection::Right) {
 			player->set_mid_rotation(rotate160Right * player->get_rotation());
-		} else {
+		}
+		else {
 			player->set_how_rotation(RotationDirection::Reverce);
 			player->set_mid_rotation(rotate160Right * player->get_rotation());
 		}
@@ -1153,9 +1264,11 @@ void PlayerManager::set_rotate_failed_parameters(const Vector3& direction) {
 
 		if (player->get_how_rotation() == RotationDirection::Left) {
 			player->set_mid_rotation(rotate160Left * player->get_rotation());
-		} else if (player->get_how_rotation() == RotationDirection::Right) {
+		}
+		else if (player->get_how_rotation() == RotationDirection::Right) {
 			player->set_mid_rotation(rotate160Right * player->get_rotation());
-		} else {
+		}
+		else {
 			player->set_how_rotation(RotationDirection::Reverce);
 			player->set_mid_rotation(rotate160Right * player->get_rotation());
 		}

@@ -174,6 +174,9 @@ void SelectScene::initialize() {
 	backTitleSprite->get_transform().set_scale({ 0.5f, 1.0f });
 	backTitleSprite->get_uv_transform().set_scale({ 0.5f, 1.0f });
 	backTitleSprite->get_transform().set_translate({ 1141,30 });
+
+	// 入力遅延時間
+	InputDowntime = 0.3f;
 }
 
 void SelectScene::popped() {
@@ -185,6 +188,8 @@ void SelectScene::finalize() {
 void SelectScene::begin() {
 	parentKoala->begin();
 	childKoala->begin();
+
+	inputTimer -= WorldClock::DeltaSeconds();
 }
 
 void SelectScene::update() {
@@ -316,22 +321,39 @@ void SelectScene::default_update() {
 		transition->get_color().alpha = fadeEase;
 	}
 
-	if (Input::IsTriggerKey(KeyID::D) || Input::IsTriggerKey(KeyID::Right)) {
-		++selectIndex;
-		selectIndex = (selectIndex - 1) % GameValue::MaxLevel + 1;
-		crate_field_view();
-		selectAudio->restart();
-	}
-	else if (Input::IsTriggerKey(KeyID::A) || Input::IsTriggerKey(KeyID::Left)) {
-		--selectIndex;
-		selectIndex = (selectIndex - 1) % GameValue::MaxLevel + 1;
-		if (selectIndex <= 0) {
-			selectIndex += GameValue::MaxLevel;
+	Vector2 stickL = Input::StickL().normalize_safe(1e-4f, CVector2::ZERO);
+	if (inputTimer <= 0.0f) {
+		if (Input::IsPressKey(KeyID::D) || Input::IsPressKey(KeyID::Right) ||
+			Input::IsPressPad(PadID::Right) || stickL.x > 0) {
+			++selectIndex;
+			selectIndex = (selectIndex - 1) % GameValue::MaxLevel + 1;
+			crate_field_view();
+			selectAudio->restart();
+			inputTimer = InputDowntime;
 		}
-		crate_field_view();
-		selectAudio->restart();
+		else if (Input::IsPressKey(KeyID::A) || Input::IsPressKey(KeyID::Left) ||
+			Input::IsPressPad(PadID::Left) || stickL.x < 0) {
+			--selectIndex;
+			selectIndex = (selectIndex - 1) % GameValue::MaxLevel + 1;
+			if (selectIndex <= 0) {
+				selectIndex += GameValue::MaxLevel;
+			}
+			crate_field_view();
+			selectAudio->restart();
+			inputTimer = InputDowntime;
+		}
 	}
-	if (Input::IsTriggerKey(KeyID::Escape)) {
+	else {
+		// キーを離したら強制的にInputDownTimerを0にする
+		if (!(Input::IsPressKey(KeyID::D) || Input::IsPressKey(KeyID::Right) ||
+			Input::IsPressPad(PadID::Right) ||
+			Input::IsPressKey(KeyID::A) || Input::IsPressKey(KeyID::Left) ||
+			Input::IsPressPad(PadID::Left) || stickL.x != 0)
+			) {
+			inputTimer = 0;
+		}
+	}
+	if (Input::IsTriggerKey(KeyID::Escape) || Input::IsTriggerPad(PadID::Back)) {
 		SceneManager::SetSceneChange(
 			eps::CreateUnique<TitleScene>(), 0.5f);
 		backTitle->play();
@@ -349,7 +371,7 @@ void SelectScene::default_update() {
 		numberUi10->set_active(false);
 	}
 
-	if (Input::IsTriggerKey(KeyID::Space)) {
+	if (Input::IsTriggerKey(KeyID::Space) || Input::IsTriggerPad(PadID::A)) {
 		SceneManager::SetSceneChange(
 			eps::CreateUnique<GameScene>(selectIndex), 1.f
 		);

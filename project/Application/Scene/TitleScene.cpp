@@ -173,7 +173,7 @@ void TitleScene::in_update() {
 }
 
 void TitleScene::default_update() {
-	if (Input::IsTriggerKey(KeyID::Space)) {
+	if (Input::IsTriggerKey(KeyID::Space) || Input::IsTriggerPad(PadID::A)) {
 		SceneManager::SetSceneChange(
 			eps::CreateUnique<SelectScene>(), 1.0f);
 		transitionTimer = WorldClock::DeltaSeconds();

@@ -50,8 +50,9 @@ void FailedUI::init() {
 
 void FailedUI::update() {
 	KeyID keys[] = { KeyID::Space, KeyID::R, KeyID::Z };
+	PadID pad[] = { PadID::A, PadID::Y, PadID::B };
 	for (int i = 0; i < 3; i++) {
-		if (!canOperation && Input::IsTriggerKey(keys[i])) {
+		if (!canOperation && (Input::IsTriggerKey(keys[i]) || Input::IsTriggerPad(pad[i]))) {
 			curIndex = 7;
 			for (int i = 0; i < curIndex; i++) {
 				curEaseT[i] = totalEaseT;

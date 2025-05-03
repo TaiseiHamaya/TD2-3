@@ -77,7 +77,7 @@ void GameManagement::init() {
 
 void GameManagement::begin() {
 	// 長押し対応
-	if (Input::IsTriggerKey(KeyID::Escape)) {
+	if (Input::IsTriggerKey(KeyID::Escape) || Input::IsTriggerPad(PadID::Back)) {
 		toSelectTimer = 10;
 		backTitle->play();
 	}
@@ -86,7 +86,7 @@ void GameManagement::begin() {
 	}
 	// クリア、失敗状態ではない
 	if (!(clearFlag || failedFlag)) {
-		if (Input::IsTriggerKey(KeyID::R)) {
+		if (Input::IsTriggerKey(KeyID::R) || Input::IsTriggerPad(PadID::Y)) {
 			isReset = true;
 			resetAudio->restart();
 		}
@@ -106,7 +106,7 @@ void GameManagement::begin() {
 			resultSoundFlag = true;
 		}
 		//toSelectTimer = 0;
-		if (Input::IsTriggerKey(KeyID::Space)&& canOperation) {
+		if ((Input::IsTriggerKey(KeyID::Space) || Input::IsTriggerPad(PadID::A)) && canOperation) {
 
 			decision->restart();//確定の音
 			isTransition = true;
@@ -199,11 +199,11 @@ void GameManagement::darw() {
 void GameManagement::resultKeyInput() {
 	if (!canOperation) { return; }
 	if (!clearFlag && !failedFlag) { return; }
-	if (Input::IsTriggerKey(KeyID::R)) {
+	if (Input::IsTriggerKey(KeyID::R) || Input::IsTriggerPad(PadID::Y)) {
 		isReset = true;
 		resetAudio->restart();
 	}
-	if (Input::IsTriggerKey(KeyID::Z)) {
+	if (Input::IsTriggerKey(KeyID::Z) || Input::IsTriggerPad(PadID::B)) {
 		isUndoRestart = true;
 		undoAudio->restart();
 	}
@@ -213,11 +213,11 @@ void GameManagement::selectFunc() {
 	if (!clearFlag && !failedFlag) {
 		return;
 	}
-	if (Input::IsTriggerKey(KeyID::A)||Input::IsTriggerKey(KeyID::Left)) {
+	if (Input::IsTriggerKey(KeyID::A) || Input::IsTriggerKey(KeyID::Left) || Input::IsTriggerPad(PadID::Left)) {
 		selectIndex--;
 		operation->restart();//選択時の音
 	}
-	if (Input::IsTriggerKey(KeyID::D) || Input::IsTriggerKey(KeyID::Right)) {
+	if (Input::IsTriggerKey(KeyID::D) || Input::IsTriggerKey(KeyID::Right) || Input::IsTriggerPad(PadID::Right)) {
 		selectIndex++;
 		operation->restart();//選択時の音
 	}
