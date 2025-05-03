@@ -30,7 +30,7 @@ void TutorialManager::initialize(uint32_t stage) {
 		tutorialStep_ = TutorialStep::HoldingHasDirection;
 	}
 	else if (stage == 5) {
-		tutorialStep_ = TutorialStep::CannotProceedIfFall;
+		tutorialStep_ = TutorialStep::ChildSupportsParent;
 	}
 	else if (stage == 10) {
 		tutorialStep_ = TutorialStep::IceSlippery;
@@ -90,7 +90,7 @@ void TutorialManager::update() {
 				if (tutorialStep_ != TutorialStep::Count &&
 					tutorialStep_ != TutorialStep::LetParentGoalFirst &&
 					tutorialStep_ != TutorialStep::ParentChildSupportEach &&
-					tutorialStep_ != TutorialStep::ChildSupportsParent) {
+					tutorialStep_ != TutorialStep::CannotProceedIfFall) {
 					tutorialStep_ = static_cast<TutorialStep>(static_cast<int>(tutorialStep_) + 1);
 				}
 				else {
