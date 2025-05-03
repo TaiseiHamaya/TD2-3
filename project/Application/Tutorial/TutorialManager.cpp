@@ -22,6 +22,8 @@ void TutorialManager::initialize(uint32_t stage) {
 	tutorialImage_->get_transform().set_scale({ 1.3f, 0.13f });
 	tutorialImage_->get_uv_transform().set_scale({ 1.0f, 0.095f });
 	tutorialImage_->set_active(false);
+	Abutton_ = eps::CreateUnique<SpriteInstance>("Abutton.png");
+	Abutton_->get_transform().set_translate({ 1080.0f, 75.0f });
 
 	if (stage == 1) {
 		tutorialStep_ = TutorialStep::RescueChild;
@@ -122,22 +124,20 @@ void TutorialManager::begin_rendering() {
 	tutorialFrame_->begin_rendering();
 	tutorialText_->begin_rendering();
 	tutorialImage_->begin_rendering();
+	Abutton_->begin_rendering();
 }
 
 void TutorialManager::draw() {
 	tutorialFrame_->draw();
 	tutorialText_->draw();
 	tutorialImage_->draw();
+	Abutton_->draw();
 }
 
 #ifdef _DEBUG
 void TutorialManager::debug_update() {
 	ImGui::Begin("TutorialText");
-	tutorialText_->debug_gui();
-	ImGui::End();
-
-	ImGui::Begin("TutorialText");
-	tutorialImage_->debug_gui();
+	Abutton_->debug_gui();
 	ImGui::End();
 }
 #endif // _DEBUG

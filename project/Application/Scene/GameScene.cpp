@@ -113,6 +113,7 @@ void GameScene::load() {
 	TextureManager::RegisterLoadQue("./GameResources/Texture/Tutorial/TutorialImage.png");
 	TextureManager::RegisterLoadQue("./GameResources/Texture/UI/KoaraFace.png");
 	TextureManager::RegisterLoadQue("./GameResources/Texture/UI/ResetBack.png");
+	TextureManager::RegisterLoadQue("./GameResources/Texture/UI/Abutton.png");
 
 	AudioManager::RegisterLoadQue("./GameResources/Audio/move.wav");
 	AudioManager::RegisterLoadQue("./GameResources/Audio/hold.wav");

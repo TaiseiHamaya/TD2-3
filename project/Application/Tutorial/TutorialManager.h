@@ -48,6 +48,7 @@ private:
 	std::unique_ptr<SpriteInstance> tutorialFrame_;
 	std::unique_ptr<SpriteInstance> tutorialText_;
 	std::unique_ptr<SpriteInstance> tutorialImage_;
+	std::unique_ptr<SpriteInstance> Abutton_;
 
 	// ステージ管理クラスのポインタ
 	GameManagement* gameManager_;
