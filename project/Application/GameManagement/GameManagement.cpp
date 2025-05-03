@@ -90,6 +90,9 @@ void GameManagement::init() {
 	backTitle->initialize("backAudio.wav");
 
 	undoAudio->initialize("undo.wav");
+
+	SelectInputTime = 0.2f;
+	selectInputTimer = SelectInputTime;
 }
 
 void GameManagement::begin() {
@@ -123,6 +126,9 @@ void GameManagement::begin() {
 				failedAudio->restart();
 			}
 			resultSoundFlag = true;
+		}
+		if (canOperation) {
+			selectInputTimer -= WorldClock::DeltaSeconds();
 		}
 		//toSelectTimer = 0;
 		if ((Input::IsTriggerKey(KeyID::Space) || Input::IsTriggerPad(PadID::A)) && canOperation) {
@@ -245,14 +251,16 @@ void GameManagement::selectFunc() {
 	if (!clearFlag && !failedFlag) {
 		return;
 	}
-	Vector2 stickL = Input::StickL();
-	if (Input::IsTriggerKey(KeyID::A) || Input::IsTriggerKey(KeyID::Left) || Input::IsTriggerPad(PadID::Left) || stickL.x < -0.5f) {
-		selectIndex--;
-		operation->restart();//選択時の音
-	}
-	if (Input::IsTriggerKey(KeyID::D) || Input::IsTriggerKey(KeyID::Right) || Input::IsTriggerPad(PadID::Right) || stickL.x > 0.5f) {
-		selectIndex++;
-		operation->restart();//選択時の音
+	if (selectInputTimer < 0) {
+		Vector2 stickL = Input::StickL();
+		if (Input::IsTriggerKey(KeyID::A) || Input::IsTriggerKey(KeyID::Left) || Input::IsTriggerPad(PadID::Left) || stickL.x < -0.5f) {
+			selectIndex--;
+			operation->restart();//選択時の音
+		}
+		if (Input::IsTriggerKey(KeyID::D) || Input::IsTriggerKey(KeyID::Right) || Input::IsTriggerPad(PadID::Right) || stickL.x > 0.5f) {
+			selectIndex++;
+			operation->restart();//選択時の音
+		}
 	}
 	selectIndex = std::clamp(selectIndex, 0, 1);
 

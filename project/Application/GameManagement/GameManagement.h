@@ -67,6 +67,8 @@ private:
 	bool failedFlag;
 	bool isRestart;
 
+	float selectInputTimer;
+	float SelectInputTime;
 
 	enum class ResetState {
 		Idle,       // ボタンを押していない
