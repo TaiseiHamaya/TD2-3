@@ -13,13 +13,13 @@ void TutorialManager::initialize(uint32_t stage) {
 	tutorialFrame_ = eps::CreateUnique<SpriteInstance>("Frame.png");
 	tutorialFrame_->set_active(false);
 	tutorialText_ = eps::CreateUnique<SpriteInstance>("TutorialText.png");
-	tutorialText_->get_transform().set_translate({ 80.0f, 160.0f });
+	tutorialText_->get_transform().set_translate({ 80.0f, 120.0f });
 	tutorialText_->get_transform().set_scale({ 1.0f, 0.1f });
 	tutorialText_->get_uv_transform().set_scale({ 1.0f, 0.09f });
 	tutorialText_->set_active(false);
 	tutorialImage_ = eps::CreateUnique<SpriteInstance>("TutorialImage.png");
-	tutorialImage_->get_transform().set_translate({ 160.0f, 320.0f });
-	tutorialImage_->get_transform().set_scale({ 1.0f, 0.1f });
+	tutorialImage_->get_transform().set_translate({ -40.0f, 200.0f });
+	tutorialImage_->get_transform().set_scale({ 1.3f, 0.13f });
 	tutorialImage_->get_uv_transform().set_scale({ 1.0f, 0.095f });
 	tutorialImage_->set_active(false);
 
