@@ -4,9 +4,9 @@
 
 #include <Library/Math/Definition.h>
 
+#include "Engine/Rendering/DirectX/DirectXResourceObject/ConstantBuffer/Material/Material.h"
 #include "Engine/Resources/Animation/NodeAnimation/NodeAnimationPlayer.h"
 #include "Engine/Runtime/Input/Input.h"
-#include "Engine/Rendering/DirectX/DirectXResourceObject/ConstantBuffer/Material/Material.h"
 #include <Engine/Utility/Tools/SmartPointer.h>
 
 #include <Application/Utility/GameUtility.h>
@@ -248,7 +248,7 @@ void PlayerManager::update() {
 	}
 
 	// ゴールと一定以上近ければ
-	if (GameUtility::approximately_equal(player->get_translate(), {2.0f, 1.0f, 2.0f})) {
+	if (GameUtility::approximately_equal(player->get_translate(), { 2.0f, 1.0f, 2.0f })) {
 		// チュートリアル親をゴールさせよう
 		if (tutorialManager_->get_tutorial_step() == TutorialManager::TutorialStep::LetParentGoalFirst) {
 			tutorialManager_->set_is_tutorial(true);

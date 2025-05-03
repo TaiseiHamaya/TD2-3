@@ -192,13 +192,13 @@ void GameSceneUI::keyControl(int index) {
 void GameSceneUI::padControl(int index) {
 	constexpr std::array<PadID, 7> padTrigger = { PadID::Up, PadID::Left, PadID::Down, PadID::Right,PadID::Y,PadID::Start,PadID::B };
 	constexpr std::array<Vector2, 4> stickDirection{
-		CVector2::BACK,
-		CVector2::FORWARD,
 		CVector2::UP,
 		CVector2::BACKWARD,
+		CVector2::BACK,
+		CVector2::FORWARD,
 	};
 	Vector2 stickL = Input::StickL().normalize_safe(1e-4f, CVector2::ZERO);
-	bool stickInput = index < 4 ? Vector2::DotProduct(stickL, stickDirection[index]) < std::cos(PI_H) && stickL.length() != 0.0f : false;
+	bool stickInput = index < 4 ? Vector2::DotProduct(stickL, stickDirection[index]) > std::cos(PI / 4) && stickL.length() != 0.0f : false;
 	if (Input::IsPressPad(padTrigger[index]) || stickInput) {
 		controlSprite[0][index]->get_uv_transform().set_translate_x(0.5f);
 	}
