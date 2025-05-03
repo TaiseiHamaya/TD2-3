@@ -27,8 +27,8 @@ public:
 		LetParentGoalFirst,      // 親を先にゴールさせよう
 		HoldingHasDirection,     // 持ち方に向きがある
 		ParentChildSupportEach,  // 親と子は支えあう
-		CannotProceedIfFall,     // 親子どちらも落ちてしまう場合は進めない
 		ChildSupportsParent,     // 子供が親を支えることもできる
+		CannotProceedIfFall,     // 親子どちらも落ちてしまう場合は進めない
 		IceSlippery,             // 氷の床は滑る
 		NoSlideIfOneOnGround,    // 親子どちらかが床にいると滑らない
 		StopWhenStuckTogether,   // くっついたら止まる

@@ -252,11 +252,6 @@ void PlayerManager::update() {
 		}
 	}
 
-	// チュートリアル子供をおろす
-	if (tutorialManager_->get_tutorial_step() == TutorialManager::TutorialStep::CannotProceedIfFall) {
-		tutorialManager_->set_is_tutorial(true);
-	}
-
 	// 氷系のチュートリアル全部
 	if (tutorialManager_->get_tutorial_step() == TutorialManager::TutorialStep::IceSlippery ||
 		tutorialManager_->get_tutorial_step() == TutorialManager::TutorialStep::NoSlideIfOneOnGround ||
