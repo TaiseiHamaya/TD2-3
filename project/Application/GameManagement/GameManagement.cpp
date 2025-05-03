@@ -208,10 +208,8 @@ void GameManagement::darw() {
 		}
 
 	}
-	else if (1) {
-		resetBack->draw();
-		resetKoara->draw();
-	}
+	resetBack->draw();
+	resetKoara->draw();
 }
 
 void GameManagement::resultKeyInput() {
