@@ -65,3 +65,4 @@ enum class PlayerAnimation {
     // それ以外
     Normal,
 };
+
