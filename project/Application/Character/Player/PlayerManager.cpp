@@ -330,10 +330,10 @@ void PlayerManager::handle_input() {
 	constexpr KeyID keysArrow[] = { KeyID::Up, KeyID::Left, KeyID::Down, KeyID::Right };
 	constexpr std::array<PadID, 4> padTrigger = { PadID::Up, PadID::Left, PadID::Down, PadID::Right };
 	constexpr std::array<Vector2, 4> stickDirection{
-		CVector2::BACK,
-		CVector2::FORWARD,
 		CVector2::UP,
 		CVector2::BACKWARD,
+		CVector2::BACK,
+		CVector2::FORWARD,
 	};
 
 
@@ -357,7 +357,7 @@ void PlayerManager::handle_input() {
 	for (size_t i = 0; i < 4; ++i) {
 		//if (Input::GetInstance().IsTriggerKey(keys[i])) {
 		if (Input::IsPressKey(keysWASD[i]) || Input::IsPressKey(keysArrow[i]) ||
-			Input::IsPressPad(padTrigger[i]) || (Vector2::DotProduct(stickL, stickDirection[i]) < std::cos(PI_H / 2) && stickL.length() != 0.0f)) {
+			Input::IsPressPad(padTrigger[i]) || (Vector2::DotProduct(stickL, stickDirection[i]) > std::cos(PI / 4) && stickL.length() != 0.0f)) {
 			inputTimer = InputDowntime;
 			//player->set = directions[i];
 			Vector3 nextPosition = player->get_translate() + directions[i];
