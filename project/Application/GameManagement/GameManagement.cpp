@@ -85,9 +85,11 @@ void GameManagement::init() {
 
 void GameManagement::begin() {
 	// 長押し対応
-	if (Input::IsTriggerKey(KeyID::Escape) || Input::IsTriggerPad(PadID::Start)) {
-		toSelectTimer = 10;
-		backTitle->play();
+	if (Input::IsPressKey(KeyID::Escape) || Input::IsPressPad(PadID::Start)) {
+		if (toSelectTimer == 0) {
+			backTitle->restart();
+		}
+		toSelectTimer += WorldClock::DeltaSeconds();
 	}
 	else {
 		toSelectTimer = 0;

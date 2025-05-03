@@ -306,7 +306,7 @@ void GameScene::late_update() {
 		//ここで一手戻す処理をする
 		playerManager->restart_undo();
 	}
-	else if (managementUI->is_escape_game()) {
+	else if (managementUI->is_escape_game() && sceneState != TransitionState::Out) {
 		SceneManager::SetSceneChange(
 			eps::CreateUnique<SelectScene>(currentLevel), sceneChangeTime
 		);
