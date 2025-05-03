@@ -27,13 +27,14 @@ public:
 	void SetCurLevel(int value) { curLevel = value; }
 private:
 	void keyControl(int index);
+	void padControl(int index);
 	float OutBack(float t, float totaltime, float min, float max, float s);
 
 private:
 
 	static const  int uiIndex = 8;
 
-	std::array<std::unique_ptr<SpriteInstance>, uiIndex>wasdSprite;
+	std::array<std::array<std::unique_ptr<SpriteInstance>, uiIndex>, 2> controlSprite;
 	//std::unique_ptr<SpriteInstance>wasdSprite[];
 	std::unique_ptr<SpriteInstance>tutorialUI;
 

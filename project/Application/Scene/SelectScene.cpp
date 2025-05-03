@@ -84,8 +84,10 @@ void SelectScene::initialize() {
 	parentKoala = eps::CreateUnique<AnimatedMeshInstance>("ParentKoala.gltf", "Standby", true);
 	childKoala = eps::CreateUnique<AnimatedMeshInstance>("ChiledKoala.gltf", "Standby", true);
 
-	startUi = eps::CreateUnique<SpriteInstance>("start.png", Vector2{ 0.5f, 0.5f });
-	startUi->get_transform().set_translate({ 640.0f,90 });
+	startUi[0] = eps::CreateUnique<SpriteInstance>(".png", Vector2{0.5f, 0.5f});
+	startUi[0]->get_transform().set_translate({ 640.0f,90 });
+	startUi[1] = eps::CreateUnique<SpriteInstance>("start.png", Vector2{ 0.5f, 0.5f });
+	startUi[1]->get_transform().set_translate({ 640.0f,90 });
 	selectUi = eps::CreateUnique<SpriteInstance>("StageSelectUI.png", Vector2{ 0.5f, 0.5f });
 	selectUi->get_transform().set_translate({ 640.0f,650.0f });
 	numberUi = eps::CreateUnique<SpriteInstance>("number.png", Vector2{ 0.5f, 0.5f });
@@ -186,6 +188,7 @@ void SelectScene::finalize() {
 }
 
 void SelectScene::begin() {
+	GameValue::UiType.update();
 	parentKoala->begin();
 	childKoala->begin();
 
@@ -233,7 +236,8 @@ void SelectScene::begin_rendering() {
 	numberUi->begin_rendering();
 	numberUi10->begin_rendering();
 	selectUi->begin_rendering();
-	startUi->begin_rendering();
+	startUi[0]->begin_rendering();
+	startUi[1]->begin_rendering();
 	obSprite->begin_rendering();
 	background->begin_rendering();
 	transition->begin_rendering();
@@ -272,7 +276,7 @@ void SelectScene::draw() const {
 	numberUi->draw();
 	numberUi10->draw();
 	selectUi->draw();
-	startUi->draw();
+	startUi[(int)GameValue::UiType.get_type()]->draw();
 	backTitleSprite->draw();
 	transition->draw();
 
@@ -405,7 +409,7 @@ void SelectScene::debug_update() {
 	selectUi->debug_gui();
 	ImGui::End();
 	ImGui::Begin("startUi");
-	startUi->debug_gui();
+	startUi[1]->debug_gui();
 	ImGui::End();
 
 

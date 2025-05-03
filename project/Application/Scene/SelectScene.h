@@ -77,7 +77,7 @@ private:
 
 	int32_t selectIndex;
 	std::unique_ptr<SpriteInstance> selectUi;
-	std::unique_ptr<SpriteInstance> startUi;
+	std::array<std::unique_ptr<SpriteInstance>, 2> startUi;
 	std::unique_ptr<SpriteInstance> numberUi;
 	std::unique_ptr<SpriteInstance> numberUi10;
 	std::unique_ptr<SpriteInstance> obSprite;

@@ -2,10 +2,11 @@
 
 #include "Engine/Runtime/Scene/BaseScene.h"
 
+#include <array>
 #include <memory>
 
-#include <Engine/Module/Render/RenderPath/RenderPath.h>
 #include "Engine/Resources/Audio/AudioPlayer.h"
+#include <Engine/Module/Render/RenderPath/RenderPath.h>
 #include <Library/Math/Vector3.h>
 
 class Camera3D;
@@ -57,7 +58,7 @@ private:
 	std::unique_ptr<DirectionalLightInstance> directionalLight;
 
 	std::unique_ptr<SpriteInstance> transition;
-	std::unique_ptr<SpriteInstance> startUi;
+	std::array<std::unique_ptr<SpriteInstance>, 2> startUi;
 	std::unique_ptr<SpriteInstance> titleLogo;
 
 	//BGM
