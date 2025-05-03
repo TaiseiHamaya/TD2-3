@@ -102,6 +102,7 @@ void GameManagement::begin() {
 	//	toSelectTimer = 0;
 	//}
 	to_select_update();
+
 	// クリア、失敗状態ではない
 	if (!(clearFlag || failedFlag || isTutorial)) {
 		//if (Input::IsTriggerKey(KeyID::R) || Input::IsTriggerPad(PadID::Y)) {
@@ -111,7 +112,7 @@ void GameManagement::begin() {
 		reset_update();
 
 	}
-	else {
+	else if (!isTutorial){
 		//resultSoundFlagを使って効果音を鳴らす
 
 		if (!resultSoundFlag) {
@@ -244,11 +245,12 @@ void GameManagement::selectFunc() {
 	if (!clearFlag && !failedFlag) {
 		return;
 	}
-	if (Input::IsTriggerKey(KeyID::A) || Input::IsTriggerKey(KeyID::Left) || Input::IsTriggerPad(PadID::Left)) {
+	Vector2 stickL = Input::StickL();
+	if (Input::IsTriggerKey(KeyID::A) || Input::IsTriggerKey(KeyID::Left) || Input::IsTriggerPad(PadID::Left) || stickL.x < 0) {
 		selectIndex--;
 		operation->restart();//選択時の音
 	}
-	if (Input::IsTriggerKey(KeyID::D) || Input::IsTriggerKey(KeyID::Right) || Input::IsTriggerPad(PadID::Right)) {
+	if (Input::IsTriggerKey(KeyID::D) || Input::IsTriggerKey(KeyID::Right) || Input::IsTriggerPad(PadID::Right) || stickL.x > 0) {
 		selectIndex++;
 		operation->restart();//選択時の音
 	}

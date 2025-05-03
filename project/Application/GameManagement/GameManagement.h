@@ -36,7 +36,7 @@ public:
 	bool is_restart() const { return isRestart; }
 	bool is_next() const { return isNext; }
 	bool is_undoRestart()const { return isUndoRestart; }
-	bool is_escape_game() const { return toSelectTimer >= 0.1f; }
+	bool is_escape_game() const { return toSelectTimer >= 1.0f; }
 	void SetFailedSelect(int value) { failedUI->SetReasonIndex(value); }
 	void SetCurLevel(int value) { curLevel = value; }
 	void SetMaxLevel(int value) { maxLevel = value; }

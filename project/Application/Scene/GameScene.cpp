@@ -34,7 +34,8 @@
 GameScene::GameScene() : GameScene(1) {}
 
 GameScene::GameScene(int32_t level) :
-	currentLevel(level) {}
+	currentLevel(level) {
+}
 ;
 
 GameScene::~GameScene() = default;
@@ -75,12 +76,12 @@ void GameScene::load() {
 	TextureManager::RegisterLoadQue("./GameResources/Texture/UI/ESCkey.png");
 	TextureManager::RegisterLoadQue("./GameResources/Texture/UI/ReleseUI.png");
 
-	TextureManager::RegisterLoadQue("./GameResources/Texture/UI/ResetUIController.png"); 
+	TextureManager::RegisterLoadQue("./GameResources/Texture/UI/ResetUIController.png");
 	TextureManager::RegisterLoadQue("./GameResources/Texture/UI/ESCkeyController.png");
 	TextureManager::RegisterLoadQue("./GameResources/Texture/UI/UndoController.png");
 	TextureManager::RegisterLoadQue("./GameResources/Texture/UI/ReleseUIController.png");
 	TextureManager::RegisterLoadQue("./GameResources/Texture/UI/NoneButton.png");
-	
+
 	TextureManager::RegisterLoadQue("./GameResources/Texture/UI/Tutorial1.png");
 	TextureManager::RegisterLoadQue("./GameResources/Texture/UI/Next.png");
 	TextureManager::RegisterLoadQue("./GameResources/Texture/UI/Retry.png");
@@ -238,7 +239,7 @@ void GameScene::initialize() {
 	bgm = std::make_unique<AudioPlayer>();
 	bgm->initialize("Game.wav");
 	bgm->set_loop(true);
-	bgm->set_volume(0.1f);
+	bgm->set_volume(GameValue::GameBgmVolume);
 	bgm->play();
 
 	background = std::make_unique<BackGround>();
@@ -251,9 +252,25 @@ void GameScene::popped() {}
 void GameScene::finalize() {}
 
 void GameScene::begin() {
+	if (Input::IsTriggerKey(KeyID::One)) {
+		float masterVolume = AudioManager::GetMasterVolume();
+		AudioManager::SetMasterVolume(masterVolume - 0.1f);
+	}
+	else if (Input::IsTriggerKey(KeyID::Two)) {
+		float masterVolume = AudioManager::GetMasterVolume();
+		AudioManager::SetMasterVolume(masterVolume + 0.1f);
+	}
+	if (Input::IsTriggerKey(KeyID::Three)) {
+		GameValue::GameBgmVolume -= 0.1f;
+		bgm->set_volume(GameValue::GameBgmVolume);
+	}
+	else if (Input::IsTriggerKey(KeyID::Four)) {
+		GameValue::GameBgmVolume += 0.1f;
+		bgm->set_volume(GameValue::GameBgmVolume);
+	}
 	GameValue::UiType.update();
-	if (playerManager->get_player_state() == PlayerState::Idle||
-		managementUI->GetClearFlag()|| managementUI->GetFailedFlag()
+	if (playerManager->get_player_state() == PlayerState::Idle ||
+		managementUI->GetClearFlag() || managementUI->GetFailedFlag()
 		) {
 		managementUI->begin();
 	}
@@ -305,7 +322,7 @@ void GameScene::late_update() {
 		//ここで一手戻す処理をする
 		playerManager->restart_undo();
 	}
-	else if (managementUI->is_escape_game()) {
+	else if (managementUI->is_escape_game() && sceneState != TransitionState::Out) {
 		SceneManager::SetSceneChange(
 			eps::CreateUnique<SelectScene>(currentLevel, true), sceneChangeTime
 		);
