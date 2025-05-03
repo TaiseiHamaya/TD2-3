@@ -240,7 +240,7 @@ void GameScene::initialize() {
 
 	background = std::make_unique<BackGround>();
 	rocketObj = std::make_unique<Rocket>(fieldObjs->GetGoalPos());
-
+	Input::SetDeadZone(0.6f);
 }
 
 void GameScene::popped() {}
