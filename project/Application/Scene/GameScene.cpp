@@ -403,9 +403,11 @@ void GameScene::draw() const {
 	gameUI->darw();
 	managementUI->darw();
 
-	transition->draw();
 	playerManager->draw_sprite();
 	tutorialManager->draw();
+
+	transition->draw();
+
 
 	renderPath->next();
 

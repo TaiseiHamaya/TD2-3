@@ -32,7 +32,7 @@ void TutorialManager::initialize(uint32_t stage) {
 	else if (stage == 5) {
 		tutorialStep_ = TutorialStep::CannotProceedIfFall;
 	}
-	else if (stage == 11) {
+	else if (stage == 10) {
 		tutorialStep_ = TutorialStep::IceSlippery;
 	}
 	else {
