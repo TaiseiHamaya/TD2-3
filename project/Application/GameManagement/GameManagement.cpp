@@ -77,7 +77,7 @@ void GameManagement::init() {
 
 void GameManagement::begin() {
 	// 長押し対応
-	if (Input::IsTriggerKey(KeyID::Escape) || Input::IsTriggerPad(PadID::Back)) {
+	if (Input::IsTriggerKey(KeyID::Escape) || Input::IsTriggerPad(PadID::Start)) {
 		toSelectTimer = 10;
 		backTitle->play();
 	}

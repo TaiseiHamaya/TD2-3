@@ -353,7 +353,7 @@ void SelectScene::default_update() {
 			inputTimer = 0;
 		}
 	}
-	if (Input::IsTriggerKey(KeyID::Escape) || Input::IsTriggerPad(PadID::Back)) {
+	if (Input::IsTriggerKey(KeyID::Escape) || Input::IsTriggerPad(PadID::Start)) {
 		SceneManager::SetSceneChange(
 			eps::CreateUnique<TitleScene>(), 0.5f);
 		backTitle->play();

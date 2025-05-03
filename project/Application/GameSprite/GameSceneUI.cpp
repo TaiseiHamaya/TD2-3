@@ -1,12 +1,13 @@
 #include "GameSceneUI.h"
 
 #include <algorithm>
+#include <array>
+
+#include <Library/Math/Definition.h>
 
 #include <Engine/Module/World/Sprite/SpriteInstance.h>
 #include <Engine/Runtime/Input/Input.h>
 #include <Engine/Utility/Tools/SmartPointer.h>
-
-#include <algorithm>
 
 GameSceneUI::GameSceneUI() = default;
 
@@ -143,7 +144,17 @@ void GameSceneUI::ReleseUIUpdate() {
 void GameSceneUI::keyControl(int index) {
 	KeyID keys[] = { KeyID::W, KeyID::A, KeyID::S, KeyID::D,KeyID::R,KeyID::Escape,KeyID::Z };
 	KeyID keys2[] = { KeyID::Up,KeyID::Left,KeyID::Down,KeyID::Right,KeyID::R,KeyID::Escape,KeyID::Z };
-	if (Input::IsPressKey(keys[index]) || Input::IsPressKey(keys2[index])) {
+	constexpr std::array<PadID, 7> padTrigger = { PadID::Up, PadID::Left, PadID::Down, PadID::Right,PadID::Y,PadID::Start,PadID::B };
+	constexpr std::array<Vector2, 4> stickDirection{
+		CVector2::BACK,
+		CVector2::FORWARD,
+		CVector2::UP,
+		CVector2::BACKWARD,
+	};
+	Vector2 stickL = Input::StickL().normalize_safe(1e-4f, CVector2::ZERO);
+	bool stickInput = index < 4 ? Vector2::DotProduct(stickL, stickDirection[index]) < std::cos(PI_H) && stickL.length() != 0.0f : false;
+	if (Input::IsPressKey(keys[index]) || Input::IsPressKey(keys2[index]) ||
+		Input::IsPressPad(padTrigger[index]) || stickInput) {
 		wasdSprite[index]->get_uv_transform().set_translate_x(0.5f);
 	}
 	else {
