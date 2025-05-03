@@ -197,6 +197,7 @@ void SelectScene::initialize() {
 
 	// 入力遅延時間
 	InputDowntime = 0.3f;
+	inputTimer = InputDowntime;
 }
 
 void SelectScene::popped() {
@@ -371,7 +372,7 @@ void SelectScene::default_update() {
 	Vector2 stickL = Input::StickL().normalize_safe(1e-4f, CVector2::ZERO);
 	if (inputTimer <= 0.0f) {
 		if (Input::IsPressKey(KeyID::D) || Input::IsPressKey(KeyID::Right) ||
-			Input::IsPressPad(PadID::Right) || stickL.x > 0) {
+			Input::IsPressPad(PadID::Right) || stickL.x > 0.5f) {
 			++selectIndex;
 			selectIndex = (selectIndex - 1) % GameValue::MaxLevel + 1;
 			crate_field_view();
@@ -379,7 +380,7 @@ void SelectScene::default_update() {
 			inputTimer = InputDowntime;
 		}
 		else if (Input::IsPressKey(KeyID::A) || Input::IsPressKey(KeyID::Left) ||
-			Input::IsPressPad(PadID::Left) || stickL.x < 0) {
+			Input::IsPressPad(PadID::Left) || stickL.x < -0.5f) {
 			--selectIndex;
 			selectIndex = (selectIndex - 1) % GameValue::MaxLevel + 1;
 			if (selectIndex <= 0) {

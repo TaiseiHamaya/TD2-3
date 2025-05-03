@@ -246,11 +246,11 @@ void GameManagement::selectFunc() {
 		return;
 	}
 	Vector2 stickL = Input::StickL();
-	if (Input::IsTriggerKey(KeyID::A) || Input::IsTriggerKey(KeyID::Left) || Input::IsTriggerPad(PadID::Left) || stickL.x < 0) {
+	if (Input::IsTriggerKey(KeyID::A) || Input::IsTriggerKey(KeyID::Left) || Input::IsTriggerPad(PadID::Left) || stickL.x < -0.5f) {
 		selectIndex--;
 		operation->restart();//選択時の音
 	}
-	if (Input::IsTriggerKey(KeyID::D) || Input::IsTriggerKey(KeyID::Right) || Input::IsTriggerPad(PadID::Right) || stickL.x > 0) {
+	if (Input::IsTriggerKey(KeyID::D) || Input::IsTriggerKey(KeyID::Right) || Input::IsTriggerPad(PadID::Right) || stickL.x > 0.5f) {
 		selectIndex++;
 		operation->restart();//選択時の音
 	}
