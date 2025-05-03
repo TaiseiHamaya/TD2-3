@@ -24,6 +24,7 @@ void TutorialManager::initialize(uint32_t stage) {
 	tutorialImage_->set_active(false);
 	Abutton_ = eps::CreateUnique<SpriteInstance>("Abutton.png");
 	Abutton_->get_transform().set_translate({ 1080.0f, 75.0f });
+	Abutton_->set_active(false);
 
 	if (stage == 1) {
 		tutorialStep_ = TutorialStep::RescueChild;

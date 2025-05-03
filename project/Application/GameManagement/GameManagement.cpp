@@ -103,7 +103,7 @@ void GameManagement::begin() {
 		reset_update();
 
 	}
-	else {
+	else if (!isTutorial){
 		//resultSoundFlagを使って効果音を鳴らす
 
 		if (!resultSoundFlag) {
