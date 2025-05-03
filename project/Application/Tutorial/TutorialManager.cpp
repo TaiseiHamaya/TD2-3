@@ -20,7 +20,7 @@ void TutorialManager::initialize(uint32_t stage) {
 	tutorialImage_ = eps::CreateUnique<SpriteInstance>("TutorialImage.png");
 	tutorialImage_->get_transform().set_translate({ 160.0f, 320.0f });
 	tutorialImage_->get_transform().set_scale({ 1.0f, 0.1f });
-	tutorialImage_->get_uv_transform().set_scale({ 1.0f, 0.1f });
+	tutorialImage_->get_uv_transform().set_scale({ 1.0f, 0.095f });
 	tutorialImage_->set_active(false);
 
 	if (stage == 1) {
@@ -41,7 +41,7 @@ void TutorialManager::initialize(uint32_t stage) {
 
 	// 最初のテキストを用意しておく
 	tutorialText_->get_uv_transform().set_translate_y(0.0875f * static_cast<int>(tutorialStep_));
-	tutorialImage_->get_uv_transform().set_translate_y(0.0905f * static_cast<int>(tutorialStep_));
+	tutorialImage_->get_uv_transform().set_translate_y(0.091f * static_cast<int>(tutorialStep_));
 }
 
 void TutorialManager::update() {
@@ -103,7 +103,7 @@ void TutorialManager::update() {
 				tutorialImage_->set_active(false);
 				// 次のテキストを用意しておく
 				tutorialText_->get_uv_transform().set_translate_y(0.0875f * static_cast<int>(tutorialStep_));
-				tutorialImage_->get_uv_transform().set_translate_y(0.0905f * static_cast<int>(tutorialStep_));
+				tutorialImage_->get_uv_transform().set_translate_y(0.091f * static_cast<int>(tutorialStep_));
 
 				// チュートリアルの終了
 				isTutorial_ = false;
