@@ -18,6 +18,7 @@ class LevelLoader;
 #include "Engine/Module/Render/RenderNode/Posteffect/Outline/OutlineNode.h"
 
 #include "Application/Rocket/Rocket.h"
+#include "Application/Tutorial/TutorialManager.h"
 
 class GameScene : public BaseScene {
 private:
@@ -60,6 +61,8 @@ private:
 	std::unique_ptr<PlayerManager> playerManager;
 	std::unique_ptr<MapchipField> fieldObjs;
 	std::unique_ptr<GameManagement> managementUI;//ゲームクリア、ゲームオーバーをまとめて管理してる
+	// チュートリアルの管理
+	std::unique_ptr<TutorialManager> tutorialManager;
 
 	std::unique_ptr<Camera3D> camera3D;
 	std::unique_ptr<DirectionalLightInstance> directionalLight;

@@ -101,6 +101,9 @@ void GameScene::load() {
 	TextureManager::RegisterLoadQue("./GameResources/Texture/Clear/A.png");
 	TextureManager::RegisterLoadQue("./GameResources/Texture/Clear/R.png");
 	TextureManager::RegisterLoadQue("./GameResources/Texture/Clear/!.png");
+	TextureManager::RegisterLoadQue("./GameResources/Texture/Tutorial/Frame.png");
+	TextureManager::RegisterLoadQue("./GameResources/Texture/Tutorial/TutorialText.png");
+	TextureManager::RegisterLoadQue("./GameResources/Texture/Tutorial/TutorialImage.png");
 
 
 	AudioManager::RegisterLoadQue("./GameResources/Audio/move.wav");
@@ -142,6 +145,9 @@ void GameScene::initialize() {
 	playerManager = std::make_unique<PlayerManager>();
 	playerManager->initialize(levelLoader, fieldObjs.get(), fieldObjs->GetGoalPos());
 
+	tutorialManager = std::make_unique<TutorialManager>();
+	tutorialManager->initialize(currentLevel);
+	playerManager->set_tutorial_manager(tutorialManager.get());
 
 	transition = eps::CreateUnique<SpriteInstance>("black.png");
 
@@ -255,6 +261,7 @@ void GameScene::update() {
 	background->update();
 	gameUI->setIsCanRelese(playerManager->get_isParent());
 	rocketObj->update(playerManager->getStageSituation());
+	tutorialManager->update();
 }
 
 void GameScene::begin_rendering() {
@@ -269,6 +276,7 @@ void GameScene::begin_rendering() {
 	rocketObj->begin_rendering();
 
 	transition->begin_rendering();
+	tutorialManager->begin_rendering();
 }
 
 void GameScene::late_update() {
@@ -396,6 +404,8 @@ void GameScene::draw() const {
 	managementUI->darw();
 
 	transition->draw();
+	playerManager->draw_sprite();
+	tutorialManager->draw();
 
 	renderPath->next();
 
@@ -428,6 +438,8 @@ void GameScene::debug_update() {
 	//ImGui::Begin("OutlineNode");
 	//outlineNode->
 	//ImGui::End();
+	tutorialManager->debug_update();
+
 
 	AudioManager::DebugGui();
 }
