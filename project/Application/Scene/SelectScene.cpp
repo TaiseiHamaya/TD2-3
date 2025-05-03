@@ -172,7 +172,7 @@ void SelectScene::initialize() {
 	selectAudio->set_volume(0.5f);
 	backTitle = std::make_unique<AudioPlayer>();
 	backTitle->initialize("backAudio.wav");
-	backTitle->set_volume(0.5f);
+	backTitle->set_volume(GameValue::SelectBgmVolume);
 
 	backTitleSprite[0] = std::make_unique<SpriteInstance>("ESCkeyController.png");
 	backTitleSprite[0]->get_transform().set_scale({ 0.5f, 1.0f });
@@ -194,6 +194,22 @@ void SelectScene::finalize() {
 }
 
 void SelectScene::begin() {
+	if (Input::IsTriggerKey(KeyID::One)) {
+		float masterVolume = AudioManager::GetMasterVolume();
+		AudioManager::SetMasterVolume(masterVolume - 0.1f);
+	}
+	else if (Input::IsTriggerKey(KeyID::Two)) {
+		float masterVolume = AudioManager::GetMasterVolume();
+		AudioManager::SetMasterVolume(masterVolume + 0.1f);
+	}
+	if (Input::IsTriggerKey(KeyID::Three)) {
+		GameValue::SelectBgmVolume -= 0.1f;
+		bgm->set_volume(GameValue::SelectBgmVolume);
+	}
+	else if (Input::IsTriggerKey(KeyID::Four)) {
+		GameValue::SelectBgmVolume += 0.1f;
+		bgm->set_volume(GameValue::SelectBgmVolume);
+	}
 	GameValue::UiType.update();
 	parentKoala->begin();
 	childKoala->begin();

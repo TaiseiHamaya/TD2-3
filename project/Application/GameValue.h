@@ -13,4 +13,8 @@ inline int32_t MaxLevel = 16;
 
 inline InputUiType UiType{};
 
+inline float GameBgmVolume{ 0.1f };
+inline float TitleBgmVolume{ 0.2f };
+inline float SelectBgmVolume{ 0.5f };
+
 };

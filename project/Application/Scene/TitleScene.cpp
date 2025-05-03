@@ -84,7 +84,7 @@ void TitleScene::initialize() {
 	bgm = std::make_unique<AudioPlayer>();
 	bgm->initialize("TitleBGM.wav");
 	bgm->set_loop(true);
-	bgm->set_volume(0.2f);
+	bgm->set_volume(GameValue::TitleBgmVolume);
 	bgm->play();
 
 	parentObj = std::make_unique<AnimatedMeshInstance>("ParentKoala.gltf", "Hello", true);
@@ -104,6 +104,22 @@ void TitleScene::popped() {}
 void TitleScene::finalize() {}
 
 void TitleScene::begin() {
+	if (Input::IsTriggerKey(KeyID::One)) {
+		float masterVolume = AudioManager::GetMasterVolume();
+		AudioManager::SetMasterVolume(masterVolume - 0.1f);
+	}
+	else if (Input::IsTriggerKey(KeyID::Two)) {
+		float masterVolume = AudioManager::GetMasterVolume();
+		AudioManager::SetMasterVolume(masterVolume + 0.1f);
+	}
+	if (Input::IsTriggerKey(KeyID::Three)) {
+		GameValue::TitleBgmVolume -= 0.1f;
+		bgm->set_volume(GameValue::TitleBgmVolume);
+	}
+	else if (Input::IsTriggerKey(KeyID::Four)) {
+		GameValue::TitleBgmVolume += 0.1f;
+		bgm->set_volume(GameValue::TitleBgmVolume);
+	}
 	GameValue::UiType.update();
 }
 
