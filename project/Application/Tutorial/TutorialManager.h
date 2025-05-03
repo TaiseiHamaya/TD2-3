@@ -1,6 +1,7 @@
 #pragma once
 #include <memory>
 #include <Engine/Module/World/Sprite/SpriteInstance.h>
+#include <Application/GameManagement/GameManagement.h>
 class TutorialManager
 {
 public:
@@ -40,12 +41,17 @@ public:
 	// アクセッサ
 	bool get_is_tutorial() const { return isTutorial_; }
 	void set_is_tutorial(bool flag) { isTutorial_ = flag; }
+	void set_game_management(GameManagement* gameManagement) { gameManager_ = gameManagement; }
 private:
 
 	// チュートリアル用スプライト
 	std::unique_ptr<SpriteInstance> tutorialFrame_;
 	std::unique_ptr<SpriteInstance> tutorialText_;
 	std::unique_ptr<SpriteInstance> tutorialImage_;
+	std::unique_ptr<SpriteInstance> Abutton_;
+
+	// ステージ管理クラスのポインタ
+	GameManagement* gameManager_;
 
 	// 現段階のチュートリアルの段階
 	TutorialStep tutorialStep_ = TutorialStep::RescueChild;

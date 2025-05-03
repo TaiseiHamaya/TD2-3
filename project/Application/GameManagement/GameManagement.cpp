@@ -7,6 +7,7 @@
 #include <Engine/Module/World/Sprite/SpriteInstance.h>
 #include <Engine/Runtime/Input/Input.h>
 #include <Engine/Runtime/WorldClock/WorldClock.h>
+#include <Engine/Utility/Tools/SmartPointer.h>
 
 
 GameManagement::GameManagement() {
@@ -35,7 +36,14 @@ void GameManagement::init() {
 	selectIndex = 1;//リトライ時に最初に選んでる方　0リトライ　1ネクスト、1手前からリスタート
 	//clearSprite = std::make_unique<SpriteInstance>("ClearTex.png");
 	//failedSprite = std::make_unique<SpriteInstance>("FailedTex.png");
-
+	if (!resetBack) {
+		resetBack = std::make_unique<SpriteInstance>("ResetBack.png", Vector2(0.5f, 0.5f));
+		resetBack->get_transform().set_translate({ 640.0f, -360.0f });
+	}
+	if (!resetKoara) {
+		resetKoara = std::make_unique<SpriteInstance>("KoaraFace.png", Vector2(0.5f, 0.5f));
+		resetKoara->get_transform().set_translate({640.0f, -360.0f });
+	}
 
 	goSelect = std::make_unique<SpriteInstance>("GoSelect.png", Vector2(0.5f, 0.5f));
 	goSelect->get_transform().set_scale({ 0.5f,1.0f });
@@ -85,12 +93,12 @@ void GameManagement::begin() {
 		toSelectTimer = 0;
 	}
 	// クリア、失敗状態ではない
-	if (!(clearFlag || failedFlag)) {
-		if (Input::IsTriggerKey(KeyID::R) || Input::IsTriggerPad(PadID::Y)) {
-			isReset = true;
-			resetAudio->restart();
-		}
-		
+	if (!(clearFlag || failedFlag || isTutorial)) {
+		//if (Input::IsTriggerKey(KeyID::R) || Input::IsTriggerPad(PadID::Y)) {
+		//	isReset = true;
+		//	resetAudio->restart();
+		//}
+		reset_update();
 
 	}
 	else {
@@ -134,7 +142,7 @@ void GameManagement::update() {
 
 	resultKeyInput();
 	selectFunc();
-	if (failedFlag) { 
+	if (failedFlag) {
 		failedUI->update();
 		canOperation = failedUI->GetCanOperation();
 	}
@@ -154,6 +162,11 @@ void GameManagement::debug_update() {
 	ImGui::End();
 	failedUI->debugUpdate();
 	clearUI->debugUpdate();
+
+	ImGui::Begin("Reset");
+	resetBack->debug_gui();
+	resetKoara->debug_gui();
+	ImGui::End();
 }
 #endif
 void GameManagement::begin_rendering() {
@@ -165,7 +178,8 @@ void GameManagement::begin_rendering() {
 	selectFrame->begin_rendering();
 	undoRetryUI->begin_rendering();
 	goSelect->begin_rendering();
-
+	resetBack->begin_rendering();
+	resetKoara->begin_rendering();
 }
 
 void GameManagement::darw() {
@@ -194,15 +208,18 @@ void GameManagement::darw() {
 		}
 
 	}
+	resetBack->draw();
+	resetKoara->draw();
 }
 
 void GameManagement::resultKeyInput() {
 	if (!canOperation) { return; }
 	if (!clearFlag && !failedFlag) { return; }
-	if (Input::IsTriggerKey(KeyID::R) || Input::IsTriggerPad(PadID::Y)) {
-		isReset = true;
-		resetAudio->restart();
-	}
+	//if (Input::IsTriggerKey(KeyID::R) || Input::IsTriggerPad(PadID::Y)) {
+	//	isReset = true;
+	//	resetAudio->restart();
+	//}
+	reset_update();
 	if (Input::IsTriggerKey(KeyID::Z) || Input::IsTriggerPad(PadID::B)) {
 		isUndoRestart = true;
 		undoAudio->restart();
@@ -261,5 +278,81 @@ void GameManagement::selectFunc() {
 		}
 
 	}
+
+}
+
+void GameManagement::reset_update() {
+	float t = 0.0f;
+	float newPos = 0.0f;
+	float koaraAngle = 0.0f;
+	switch (resetState) {
+	case ResetState::Idle:
+		// 今の時間を0にしておく
+		if (resetCurrentTime < 0.0f) {
+			resetCurrentTime = 0.0f;
+		}
+		else {
+			resetCurrentTime -= WorldClock::DeltaSeconds();
+		}
+
+		t = std::clamp(resetCurrentTime / resetMaxTime, 0.0f, 1.0f);
+
+		newPos = -360.0f + (360.0f + 360.0f) * t;
+		resetBack->get_transform().set_translate_y(newPos);
+		resetKoara->get_transform().set_translate_y(newPos);
+
+		if (Input::IsTriggerKey(KeyID::R) || Input::IsTriggerPad(PadID::Y)) {
+			resetState = ResetState::Pressing;
+		}
+		break;
+	case ResetState::Pressing:
+		resetCurrentTime += WorldClock::DeltaSeconds();
+
+		t = std::clamp(resetCurrentTime / resetMaxTime, 0.0f, 1.0f);
+
+		newPos = -360.0f + (360.0f + 360.0f) * t;
+		resetBack->get_transform().set_translate_y(newPos);
+		resetKoara->get_transform().set_translate_y(newPos);
+
+		if (resetCurrentTime >= resetMaxTime) {
+			resetState = ResetState::Resetting;
+			resetAudio->restart();
+			resetCurrentTime = 0.0f;
+		}
+
+		if (!Input::IsPressKey(KeyID::R) && !Input::IsPressPad(PadID::Y)) {
+			resetState = ResetState::Idle;
+		}
+		break;
+	case ResetState::Resetting:
+		resetCurrentTime += WorldClock::DeltaSeconds();
+		t = std::clamp(resetCurrentTime / resetMaxTime, 0.0f, 1.0f);
+
+		koaraAngle = 0.8f * std::exp(-0.6f * t) * std::sin(2 * 3.14159f * 1.5f * t);
+		resetKoara->get_transform().set_rotate(koaraAngle);
+
+		if (resetCurrentTime >= resetMaxTime) {
+			resetState = ResetState::Completed;
+			resetCurrentTime = 0.0f;
+			isReset = true;
+		}
+		break;
+	case ResetState::Completed:
+		resetCurrentTime += WorldClock::DeltaSeconds();
+
+		t = std::clamp(resetCurrentTime / resetMaxTime, 0.0f, 1.0f);
+		newPos = 360.0f + (1080.0f + -360.0f) * t;
+		resetBack->get_transform().set_translate_y(newPos);
+		resetKoara->get_transform().set_translate_y(newPos);
+
+
+		if (resetCurrentTime >= resetMaxTime) {
+			resetState = ResetState::Idle;
+			resetCurrentTime = 0.0f;
+		}
+
+		break;
+	}
+
 
 }

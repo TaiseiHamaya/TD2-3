@@ -22,6 +22,8 @@ public:
 
 private:
 	void selectFunc();
+	// リセットの更新処理
+	void reset_update();
 public:
 	//アクセッサ
 	void SetClearFlag(bool value) { clearFlag = value; }
@@ -38,6 +40,7 @@ public:
 	void SetMaxLevel(int value) { maxLevel = value; }
 	bool is_transition() const { return isTransition; }
 	bool GetCanOperation() { return canOperation; }
+	void SetIsTutorial(bool flag) { isTutorial = flag; }
 private:
 	//std::unique_ptr<SpriteInstance> clearSprite;
 	//std::unique_ptr<SpriteInstance> failedSprite;
@@ -48,6 +51,8 @@ private:
 	std::unique_ptr<SpriteInstance>goSelect;
 	std::unique_ptr<SpriteInstance>selectFrame;
 	//std::unique_ptr<SpriteInstance>failedReasonUI;//0:子どもを置いてゴール 1:子コアラがゴール　2:コアラを落とす　3:ターン経過
+	std::unique_ptr<SpriteInstance>resetBack;
+	std::unique_ptr<SpriteInstance>resetKoara;
 
 	std::unique_ptr< FailedUI>failedUI;
 	std::unique_ptr< ClearUI>clearUI;
@@ -58,7 +63,20 @@ private:
 	bool failedFlag;
 	bool isRestart;
 
+
+	enum class ResetState {
+		Idle,       // ボタンを押していない
+		Pressing,   // 押し続けている最中
+		Resetting,  // リセット中（ちょうどリセットが発動した瞬間）
+		Completed   // リセット完了後
+	};
+	ResetState resetState;
+
+	const float resetMaxTime = 0.5f;
+	float resetCurrentTime;
 	bool isReset;
+	bool isTutorial;
+
 	bool isNext;
 	bool isUndoRestart;
 

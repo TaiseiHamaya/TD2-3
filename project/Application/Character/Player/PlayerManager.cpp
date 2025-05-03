@@ -156,8 +156,6 @@ void PlayerManager::update() {
 		handle_input();
 		// 親子関係の管理
 		manage_parent_child_relationship();
-
-
 	}
 
 	// 子供をプレイヤーの向かせる処理
@@ -227,13 +225,16 @@ void PlayerManager::update() {
 	}
 
 	// この条件式でできない理由 is 何
-	if (stageSituation == 0 &&
-		!(player->get_state() != PlayerState::Idle || player->is_falling() || child->is_falling()) &&
-		moveLogger->can_undo() && (Input::IsTriggerKey(KeyID::Z) || Input::IsTriggerPad(PadID::B))) {
-		if (player->get_state() == PlayerState::Idle) {
-			undo();
+	// チュートリアル表示中だったら入力をスルー
+	if (!tutorialManager_->get_is_tutorial()) {
+		if (stageSituation == 0 &&
+			!(player->get_state() != PlayerState::Idle || player->is_falling() || child->is_falling()) &&
+			moveLogger->can_undo() && (Input::IsTriggerKey(KeyID::Z) || Input::IsTriggerPad(PadID::B))) {
+			if (player->get_state() == PlayerState::Idle) {
+				undo();
+			}
+			undoAudio->restart();
 		}
-		undoAudio->restart();
 	}
 
 	// 最初のフレームだったらチュートリアルを出す
