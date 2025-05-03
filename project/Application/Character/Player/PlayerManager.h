@@ -8,6 +8,8 @@
 #include "Application/Mapchip/MapchipHandler.h"
 #include "Application/GameManagement/GameManagement.h"
 #include "Engine/Resources/Audio/AudioPlayer.h"
+#include "Engine/Module/World/Sprite/SpriteInstance.h"
+#include "Application/Tutorial/TutorialManager.h"
 
 class PlayerManager {
 public:
@@ -18,6 +20,7 @@ public:
 	void begin_rendering();
 	void draw() const;
 	void draw_particle() const;
+	void draw_sprite() const;
 
 	PlayerState get_player_state() { return player->get_state(); }
 
@@ -31,6 +34,8 @@ public:
 	void set_game_management(GameManagement* gameManagement) { gameManagement_ = gameManagement; }
 	bool get_isParent() const { return isParent; }
 	int getStageSituation() const { return stageSituation; }
+
+	void set_tutorial_manager(TutorialManager* tutorialManager) { tutorialManager_ = tutorialManager; }
 private:
 	void particle_update();
 	void only_child_ride_update();
@@ -60,12 +65,14 @@ private:
 	std::unique_ptr<AnimatedMeshInstance> catchEffect_;
 	std::unique_ptr<AnimatedMeshInstance> releaseEffect_;
 
+
 	// パーティクルの召還
 	std::unique_ptr<ParticleEmitterInstance> dustEmitter;
 	std::unique_ptr<ParticleEmitterInstance> iceDustEmitter;
 
 	GameManagement* gameManagement_;
 	MapchipField* mapchipField_;
+	TutorialManager* tutorialManager_;
 
 	Vector3 playerPos{}; // プレイヤーの現在位置
 	Vector3 childPos{};  // 子オブジェクトの現在位置
@@ -94,4 +101,6 @@ private:
 	Vector3 initialPoint;
 	Vector3 controlPoint;
 	Vector3 terminalPoint;
+
+
 };

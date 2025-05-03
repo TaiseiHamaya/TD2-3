@@ -7,9 +7,9 @@
 namespace GameValue {
 
 /// <summary>
-/// ステージ数
+/// 繧ｹ繝・・繧ｸ謨ｰ
 /// </summary>
-inline int32_t MaxLevel = 14;
+inline int32_t MaxLevel = 16;
 
 inline InputUiType UiType{};
 

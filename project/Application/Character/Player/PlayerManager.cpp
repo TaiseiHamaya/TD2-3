@@ -11,6 +11,7 @@
 
 #include <Application/Utility/GameUtility.h>
 
+
 void PlayerManager::initialize(Reference<const LevelLoader> level, MapchipField* mapchipField, const Vector3& goalPosition, bool isResetLogger) {
 	if (isResetLogger) {
 		moveLogger = std::make_unique<MoveLogger>();
@@ -33,6 +34,8 @@ void PlayerManager::initialize(Reference<const LevelLoader> level, MapchipField*
 	releaseEffect_->reset_animated_mesh("ReleaseEffect.gltf", "Standby", false);
 	releaseEffect_->set_active(false);
 	releaseEffect_->get_transform().set_quaternion({ 0.0f, 0.5f, 0.0f, 0.5f });
+
+
 
 	auto& catchMat = catchEffect_->get_materials();
 	auto& releaseMat = releaseEffect_->get_materials();
@@ -147,10 +150,16 @@ void PlayerManager::update() {
 		emplace_log(player->move_start_position(), player->start_rotation());
 	}
 
-	// 入力処理を受け付ける
-	handle_input();
-	// 親子関係の管理
-	manage_parent_child_relationship();
+	// チュートリアル表示中だったら入力をスルー
+	if (!tutorialManager_->get_is_tutorial()) {
+		// 入力処理を受け付ける
+		handle_input();
+		// 親子関係の管理
+		manage_parent_child_relationship();
+
+
+	}
+
 	// 子供をプレイヤーの向かせる処理
 	set_child_rotate();
 	// パーティクルのオンオフの切り替え処理
@@ -226,6 +235,46 @@ void PlayerManager::update() {
 		}
 		undoAudio->restart();
 	}
+
+	// 最初のフレームだったらチュートリアルを出す
+	if (tutorialManager_->get_tutorial_step() == TutorialManager::TutorialStep::RescueChild) {
+		tutorialManager_->set_is_tutorial(true);
+	}
+
+	// チュートリアル子供をおろす
+	if (tutorialManager_->get_tutorial_step() == TutorialManager::TutorialStep::DropOffChild) {
+		tutorialManager_->set_is_tutorial(true);
+	}
+
+	// ゴールと一定以上近ければ
+	if (GameUtility::approximately_equal(player->get_translate(), {2.0f, 1.0f, 2.0f})) {
+		// チュートリアル親をゴールさせよう
+		if (tutorialManager_->get_tutorial_step() == TutorialManager::TutorialStep::LetParentGoalFirst) {
+			tutorialManager_->set_is_tutorial(true);
+		}
+	}
+
+	// 氷系のチュートリアル全部
+	if (tutorialManager_->get_tutorial_step() == TutorialManager::TutorialStep::IceSlippery ||
+		tutorialManager_->get_tutorial_step() == TutorialManager::TutorialStep::NoSlideIfOneOnGround ||
+		tutorialManager_->get_tutorial_step() == TutorialManager::TutorialStep::StopWhenStuckTogether) {
+		tutorialManager_->set_is_tutorial(true);
+	}
+
+	// 子が浮いていたら
+	if (child->is_out_ground()) {
+		// チュートリアル
+		if (tutorialManager_->get_tutorial_step() == TutorialManager::TutorialStep::ParentChildSupportEach) {
+			tutorialManager_->set_is_tutorial(true);
+		}
+	}
+	// 親が浮いていたら
+	if (player->is_out_ground()) {
+		// チュートリアル
+		if (tutorialManager_->get_tutorial_step() == TutorialManager::TutorialStep::ChildSupportsParent) {
+			tutorialManager_->set_is_tutorial(true);
+		}
+	}
 }
 
 void PlayerManager::begin_rendering() {
@@ -249,6 +298,10 @@ void PlayerManager::draw() const {
 void PlayerManager::draw_particle() const {
 	dustEmitter->draw();
 	iceDustEmitter->draw();
+}
+
+void PlayerManager::draw_sprite() const {
+
 }
 
 void PlayerManager::handle_input() {
@@ -315,6 +368,7 @@ void PlayerManager::handle_input() {
 			}
 			else {
 				set_rotate_failed_parameters(directions[i]);
+
 			}
 
 			// MapchipHandlerに移動可能かを問い合わせ
@@ -324,6 +378,11 @@ void PlayerManager::handle_input() {
 			}
 			else {
 				set_move_failed_parameters(directions[i]);
+
+				// チュートリアル
+				if (tutorialManager_->get_tutorial_step() == TutorialManager::TutorialStep::CannotProceedIfFall) {
+					tutorialManager_->set_is_tutorial(true);
+				}
 			}
 
 			// いろいろと判定が完了したらプレイヤーの状態を回転にする
@@ -354,6 +413,8 @@ void PlayerManager::debug_update() {
 	//ImGui::Begin("iceDustEmitter");
 	//iceDustEmitter->debug_gui();
 	//ImGui::End();
+
+
 }
 #endif
 
@@ -404,6 +465,12 @@ void PlayerManager::manage_parent_child_relationship() {
 
 				releaseEffect_->set_active(false);
 				//releaseEffect_->get_animation()->restart();
+
+				// 初めてつかんでたら兼子供に向きがあるチュートリアル
+				if (tutorialManager_->get_tutorial_step() == TutorialManager::TutorialStep::MoveToRocket ||
+					tutorialManager_->get_tutorial_step() == TutorialManager::TutorialStep::HoldingHasDirection) {
+					tutorialManager_->set_is_tutorial(true);
+				}
 			}
 		}
 	}
