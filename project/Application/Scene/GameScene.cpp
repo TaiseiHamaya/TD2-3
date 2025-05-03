@@ -111,7 +111,8 @@ void GameScene::load() {
 	TextureManager::RegisterLoadQue("./GameResources/Texture/Tutorial/Frame.png");
 	TextureManager::RegisterLoadQue("./GameResources/Texture/Tutorial/TutorialText.png");
 	TextureManager::RegisterLoadQue("./GameResources/Texture/Tutorial/TutorialImage.png");
-
+	TextureManager::RegisterLoadQue("./GameResources/Texture/UI/KoaraFace.png");
+	TextureManager::RegisterLoadQue("./GameResources/Texture/UI/ResetBack.png");
 
 	AudioManager::RegisterLoadQue("./GameResources/Audio/move.wav");
 	AudioManager::RegisterLoadQue("./GameResources/Audio/hold.wav");
@@ -231,6 +232,8 @@ void GameScene::initialize() {
 	managementUI->SetCurLevel(currentLevel);
 	gameUI = std::make_unique<GameSceneUI>();
 	gameUI->initialize(currentLevel);
+
+	tutorialManager->set_game_management(managementUI.get());
 
 	bgm = std::make_unique<AudioPlayer>();
 	bgm->initialize("Game.wav");
@@ -409,10 +412,11 @@ void GameScene::draw() const {
 
 	renderPath->next();
 	gameUI->darw();
+	tutorialManager->draw();
 	managementUI->darw();
 
 	playerManager->draw_sprite();
-	tutorialManager->draw();
+
 
 	transition->draw();
 
