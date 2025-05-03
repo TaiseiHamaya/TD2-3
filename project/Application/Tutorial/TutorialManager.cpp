@@ -58,6 +58,7 @@ void TutorialManager::update() {
 			tutorialFrame_->set_active(true);
 			tutorialText_->set_active(true);
 			tutorialImage_->set_active(true);
+			Abutton_->set_active(true);
 
 			// 今の時間にΔタイムを足す
 			currentTimer_ += WorldClock::DeltaSeconds();
@@ -66,6 +67,7 @@ void TutorialManager::update() {
 			tutorialText_->get_color().alpha = t_;
 			tutorialFrame_->get_color().alpha = t_;
 			tutorialImage_->get_color().alpha = t_;
+			Abutton_->get_color().alpha = t_;
 
 			if (currentTimer_ >= maxTimer_) {
 				state_ = TutorialState::Staying;
@@ -88,6 +90,7 @@ void TutorialManager::update() {
 			tutorialText_->get_color().alpha = t_;
 			tutorialFrame_->get_color().alpha = t_;
 			tutorialImage_->get_color().alpha = t_;
+			Abutton_->get_color().alpha = t_;
 
 			if (currentTimer_ >= maxTimer_) {
 				// 進める処理
@@ -105,6 +108,7 @@ void TutorialManager::update() {
 				tutorialFrame_->set_active(false);
 				tutorialText_->set_active(false);
 				tutorialImage_->set_active(false);
+				Abutton_->set_active(false);
 				// 次のテキストを用意しておく
 				tutorialText_->get_uv_transform().set_translate_y(0.0875f * static_cast<int>(tutorialStep_));
 				tutorialImage_->get_uv_transform().set_translate_y(0.091f * static_cast<int>(tutorialStep_));
