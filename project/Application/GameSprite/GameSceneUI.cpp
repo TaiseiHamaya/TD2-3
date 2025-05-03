@@ -158,7 +158,7 @@ void GameSceneUI::darw() {
 }
 
 void GameSceneUI::ReleseUIUpdate() {
-	if (curLevel <= 1) { return; }//ステージ３以降からUIを表示するため
+	//if (curLevel <= 1) { return; }//ステージ３以降からUIを表示するため
 	if (curEaseT > totalEaseT) { return; }
 
 	int controlType = (int)GameValue::UiType.get_type();
