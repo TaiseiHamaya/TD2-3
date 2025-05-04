@@ -270,7 +270,7 @@ void PlayerManager::update() {
 		}
 	}
 	// 親が浮いていたら
-	if (player->is_out_ground()) {
+	{
 		// チュートリアル
 		if (tutorialManager_->get_tutorial_step() == TutorialManager::TutorialStep::ChildSupportsParent) {
 			tutorialManager_->set_is_tutorial(true);
