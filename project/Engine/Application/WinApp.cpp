@@ -127,10 +127,12 @@ void WinApp::BeginFrame() {
 			int y = GetSystemMetrics(SM_CYSCREEN);
 
 			SetWindowPos(instance->hWnd, 0, 0, 0, x, y, SWP_SHOWWINDOW);
+			ShowCursor(false);
 		}
 		else {
 			SetWindowLong(instance->hWnd, GWL_STYLE, WindowStyle::Window);
 			SetWindowPos(instance->hWnd, 0, 100, 100, 1280, 720, SWP_SHOWWINDOW);
+			ShowCursor(true);
 		}
 	}
 

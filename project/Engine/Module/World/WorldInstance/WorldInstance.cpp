@@ -45,6 +45,9 @@ Affine WorldInstance::create_world_affine() const {
 
 void WorldInstance::reparent(Reference<const WorldInstance> instance, bool isKeepPose) {
 	const Affine& worldAffine = this->world_affine();
+	if (instance == hierarchy.get_parent()) {
+		return;
+	}
 	if (isKeepPose) {
 		if (instance) {
 			const Affine& parentAffineInv = instance->world_affine().inverse();

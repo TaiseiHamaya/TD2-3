@@ -110,7 +110,7 @@ void DirectXSwapChain::swap_screen() {
 		swapChain->Present(0, DXGI_PRESENT_ALLOW_TEARING);
 	}
 	else {
-		swapChain->Present(0, 0);
+		swapChain->Present(1, 0);
 	}
 #else
 	swapChain->Present(1, 0);
