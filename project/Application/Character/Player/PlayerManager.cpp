@@ -237,43 +237,45 @@ void PlayerManager::update() {
 		}
 	}
 
-	// 最初のフレームだったらチュートリアルを出す
-	if (tutorialManager_->get_tutorial_step() == TutorialManager::TutorialStep::RescueChild) {
-		tutorialManager_->set_is_tutorial(true);
-	}
-
-	// チュートリアル子供をおろす
-	if (tutorialManager_->get_tutorial_step() == TutorialManager::TutorialStep::DropOffChild) {
-		tutorialManager_->set_is_tutorial(true);
-	}
-
-	// ゴールと一定以上近ければ
-	if (GameUtility::approximately_equal(player->get_translate(), { 2.0f, 1.0f, 2.0f })) {
-		// チュートリアル親をゴールさせよう
-		if (tutorialManager_->get_tutorial_step() == TutorialManager::TutorialStep::LetParentGoalFirst) {
+	// リセットの途中じゃなければ通る
+	if (gameManagement_->get_reset_state() != GameManagement::ResetState::Completed) {
+		// 最初のフレームだったらチュートリアルを出す
+		if (tutorialManager_->get_tutorial_step() == TutorialManager::TutorialStep::RescueChild) {
 			tutorialManager_->set_is_tutorial(true);
 		}
-	}
-
-	// 氷系のチュートリアル全部
-	if (tutorialManager_->get_tutorial_step() == TutorialManager::TutorialStep::IceSlippery ||
-		tutorialManager_->get_tutorial_step() == TutorialManager::TutorialStep::NoSlideIfOneOnGround ||
-		tutorialManager_->get_tutorial_step() == TutorialManager::TutorialStep::StopWhenStuckTogether) {
-		tutorialManager_->set_is_tutorial(true);
-	}
-
-	// 子が浮いていたら
-	if (child->is_out_ground()) {
-		// チュートリアル
-		if (tutorialManager_->get_tutorial_step() == TutorialManager::TutorialStep::ParentChildSupportEach) {
+		// チュートリアル子供をおろす
+		if (tutorialManager_->get_tutorial_step() == TutorialManager::TutorialStep::DropOffChild) {
 			tutorialManager_->set_is_tutorial(true);
 		}
-	}
-	// 親が浮いていたら
-	{
-		// チュートリアル
-		if (tutorialManager_->get_tutorial_step() == TutorialManager::TutorialStep::ChildSupportsParent) {
+
+		// ゴールと一定以上近ければ
+		if (GameUtility::approximately_equal(player->get_translate(), { 2.0f, 1.0f, 2.0f })) {
+			// チュートリアル親をゴールさせよう
+			if (tutorialManager_->get_tutorial_step() == TutorialManager::TutorialStep::LetParentGoalFirst) {
+				tutorialManager_->set_is_tutorial(true);
+			}
+		}
+
+		// 氷系のチュートリアル全部
+		if (tutorialManager_->get_tutorial_step() == TutorialManager::TutorialStep::IceSlippery ||
+			tutorialManager_->get_tutorial_step() == TutorialManager::TutorialStep::NoSlideIfOneOnGround ||
+			tutorialManager_->get_tutorial_step() == TutorialManager::TutorialStep::StopWhenStuckTogether) {
 			tutorialManager_->set_is_tutorial(true);
+		}
+
+		// 子が浮いていたら
+		if (child->is_out_ground()) {
+			// チュートリアル
+			if (tutorialManager_->get_tutorial_step() == TutorialManager::TutorialStep::ParentChildSupportEach) {
+				tutorialManager_->set_is_tutorial(true);
+			}
+		}
+		// 親が浮いていたら
+		{
+			// チュートリアル
+			if (tutorialManager_->get_tutorial_step() == TutorialManager::TutorialStep::ChildSupportsParent) {
+				tutorialManager_->set_is_tutorial(true);
+			}
 		}
 	}
 }

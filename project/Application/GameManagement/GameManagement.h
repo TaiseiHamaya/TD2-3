@@ -33,6 +33,7 @@ public:
 	bool GetFailedFlag() { return failedFlag; }
 	void SetFailedFlag(bool value) { failedFlag = value; }
 	bool is_reset() const { return isReset; }
+
 	bool is_restart() const { return isRestart; }
 	bool is_next() const { return isNext; }
 	bool is_undoRestart()const { return isUndoRestart; }
@@ -43,6 +44,15 @@ public:
 	bool is_transition() const { return isTransition; }
 	bool GetCanOperation() { return canOperation; }
 	void SetIsTutorial(bool flag) { isTutorial = flag; }
+
+	enum class ResetState {
+		Idle,       // ボタンを押していない
+		Pressing,   // 押し続けている最中
+		Resetting,  // リセット中（ちょうどリセットが発動した瞬間）
+		Completed   // リセット完了後
+	};
+	ResetState resetState;
+	ResetState get_reset_state() const { return resetState; }
 private:
 	//std::unique_ptr<SpriteInstance> clearSprite;
 	//std::unique_ptr<SpriteInstance> failedSprite;
@@ -70,14 +80,8 @@ private:
 	float selectInputTimer;
 	float SelectInputTime;
 
-	enum class ResetState {
-		Idle,       // ボタンを押していない
-		Pressing,   // 押し続けている最中
-		Resetting,  // リセット中（ちょうどリセットが発動した瞬間）
-		Completed   // リセット完了後
-	};
-	ResetState resetState;
-	
+
+
 
 	const float resetMaxTime = 0.5f;
 	float resetCurrentTime;
