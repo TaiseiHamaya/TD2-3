@@ -308,11 +308,14 @@ void GameScene::begin_rendering() {
 }
 
 void GameScene::late_update() {
+
 	if (managementUI->is_reset()) {
+		tutorialManager->initialize(currentLevel);
 		fieldObjs->initialize(levelLoader);
 		playerManager->initialize(levelLoader, fieldObjs.get(), fieldObjs->GetGoalPos(), false);
 		managementUI->init();
 		rocketObj->init();
+
 	}
 	else if (managementUI->is_undoRestart()) {
 		//fieldObjs->initialize(levelLoader);

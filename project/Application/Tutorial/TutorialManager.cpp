@@ -48,6 +48,7 @@ void TutorialManager::initialize(uint32_t stage) {
 }
 
 void TutorialManager::update() {
+	// ゲームの管理クラスに今チュートリアルが出てるかどうかを送っておく
 	gameManager_->SetIsTutorial(isTutorial_);
 
 	// チュートリアルが起動されてたらそれ用の処理にする
