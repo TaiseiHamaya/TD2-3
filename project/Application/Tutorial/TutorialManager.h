@@ -24,9 +24,9 @@ public:
 	enum class TutorialStep {
 		RescueChild,             // 子供を救出しよう
 		MoveToRocket,            // ロケットに向かおう
-		DropOffChild,            // 子供を下す
 		LetParentGoalFirst,      // 親を先にゴールさせよう
 		HoldingHasDirection,     // 持ち方に向きがある
+		DropOffChild,            // 子供を下す
 		ParentChildSupportEach,  // 親と子は支えあう
 		ChildSupportsParent,     // 子供が親を支えることもできる
 		CannotProceedIfFall,     // 親子どちらも落ちてしまう場合は進めない
