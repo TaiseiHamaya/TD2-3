@@ -127,6 +127,7 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClCompile Include="Application\Scene\DebugScene.cpp" />
     <ClCompile Include="Application\UI\ClearUI.cpp" />
     <ClCompile Include="Application\GameSprite\BackGround.cpp" />
+    <ClCompile Include="Application\Configuration\Configuration.cpp" />
     <ClCompile Include="Engine\Module\Render\RenderNode\Deferred\Lighting\DirectionalLighingNode.cpp" />
     <ClCompile Include="Engine\Module\Render\RenderNode\Deferred\Mesh\MeshNodeDeferred.cpp" />
     <ClCompile Include="Engine\Module\DrawExecutor\PrimitiveLineDrawExecutor\PrimitiveLineDrawExecutor.cpp" />
@@ -268,6 +269,7 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClInclude Include="Application\GameValue.h" />
     <ClInclude Include="Application\UI\ClearUI.h" />
     <ClInclude Include="Application\GameSprite\BackGround.h" />
+    <ClInclude Include="Application\Configuration\Configuration.h" />
     <ClInclude Include="Engine\Module\Render\RenderNode\Deferred\DeferredAdaptor.h" />
     <ClInclude Include="Engine\Module\Render\RenderNode\Deferred\Lighting\DirectionalLighingNode.h" />
     <ClInclude Include="Engine\Module\Render\RenderNode\Deferred\Mesh\MeshNodeDeferred.h" />

@@ -21,6 +21,8 @@
 #include <Engine/Resources/Animation/Skeleton/SkeletonManager.h>
 #include <Engine/Resources/Animation/NodeAnimation/NodeAnimationManager.h>
 
+#include "../Configuration/Configuration.h"
+
 TitleScene::TitleScene() {}
 
 TitleScene::~TitleScene() {}
@@ -40,6 +42,8 @@ void TitleScene::load() {
 	NodeAnimationManager::RegisterLoadQue("./GameResources/Models/ChiledKoala/ChiledKoala.gltf");
 
 	AudioManager::RegisterLoadQue("./GameResources/Audio/gameStart.wav");
+	AudioManager::RegisterLoadQue("./GameResources/Audio/move.wav");
+	AudioManager::RegisterLoadQue("./GameResources/Audio/unmovable.wav");
 }
 
 void TitleScene::initialize() {
@@ -97,6 +101,11 @@ void TitleScene::initialize() {
 
 	startAudio = std::make_unique<AudioPlayer>();
 	startAudio->initialize("gameStart.wav");
+
+	selectSeSuccussed = std::make_unique<AudioPlayer>();
+	selectSeSuccussed->initialize("move.wav");
+	selectSeFailed = std::make_unique<AudioPlayer>();
+	selectSeFailed->initialize("unmovable.wav");
 }
 
 void TitleScene::popped() {}
@@ -121,6 +130,7 @@ void TitleScene::begin() {
 		bgm->set_volume(GameValue::TitleBgmVolume);
 	}
 	GameValue::UiType.update();
+	languageSelectTimer -= WorldClock::DeltaSeconds();
 }
 
 void TitleScene::update() {
@@ -134,6 +144,33 @@ void TitleScene::update() {
 	case TransitionState::Out:
 		out_update();
 		break;
+	}
+
+	if (languageSelectTimer <= 0.0f) {
+		Configuration::Language language = Configuration::GetLanguage();
+		if (Input::IsTriggerKey(KeyID::Down)) {
+			if (language == Configuration::Language::Japanese) {
+				// SE成功
+				selectSeSuccussed->restart();
+			}
+			else {
+				// SE失敗
+				selectSeFailed->restart();
+
+			}
+			Configuration::SetLanguage(Configuration::Language::English);
+		}
+		else if (Input::IsTriggerKey(KeyID::Up)) {
+			if (language == Configuration::Language::English) {
+				// SE成功
+				selectSeSuccussed->restart();
+			}
+			else {
+				// SE失敗
+				selectSeFailed->restart();
+			}
+			Configuration::SetLanguage(Configuration::Language::Japanese);
+		}
 	}
 
 	parentObj->begin();

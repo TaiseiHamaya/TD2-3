@@ -157,6 +157,7 @@
     <ClCompile Include="Application\Rocket\Rocket.cpp" />
     <ClCompile Include="Application\Tutorial\TutorialManager.cpp" />
     <ClCompile Include="Application\InputUiType.cpp" />
+    <ClCompile Include="Application\Configuration\Configuration.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Engine\Module\Render\RenderNode\Deferred\DeferredAdaptor.h" />
@@ -324,6 +325,7 @@
     <ClInclude Include="Application\Rocket\Rocket.h" />
     <ClInclude Include="Application\Tutorial\TutorialManager.h" />
     <ClInclude Include="Application\InputUiType.h" />
+    <ClInclude Include="Application\Configuration\Configuration.h" />
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="EngineResources\HLSL\FullscreenShader.hlsl">

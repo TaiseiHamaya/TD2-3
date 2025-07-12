@@ -72,5 +72,9 @@ private:
 	Vector3 movePos;
 
 	std::unique_ptr< AudioPlayer>startAudio;
+
+	float languageSelectTimer{ 0.0f };
+	std::unique_ptr<AudioPlayer> selectSeSuccussed;
+	std::unique_ptr<AudioPlayer> selectSeFailed;
 };
 
