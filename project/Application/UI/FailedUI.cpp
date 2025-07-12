@@ -71,12 +71,14 @@ void FailedUI::update() {
 		}
 	}
 	
+	
 
 	for (int i = 0; i < curIndex; i++) {
 		curEaseT[i] += WorldClock::DeltaSeconds();
 		EaseChange(i, curEaseT[i]);
 	}
-	if (curEaseT[6] > totalEaseT) { reaUpdateFlag = true; }
+	if (curEaseT[6] > totalEaseT) { reaUpdateFlag = true; canOperation = true;
+	}
 	updateReason();
 }
 #ifdef _DEBUG
