@@ -4,6 +4,8 @@
 
 #include <Library/Math/Transform2D.h>
 
+#include <Application/Configuration/Configuration.h>
+
 #include <Engine/Module/World/Sprite/SpriteInstance.h>
 #include <Engine/Runtime/Input/Input.h>
 #include <Engine/Runtime/WorldClock/WorldClock.h>
@@ -42,7 +44,7 @@ void GameManagement::init() {
 	}
 	if (!resetKoara) {
 		resetKoara = std::make_unique<SpriteInstance>("KoaraFace.png", Vector2(0.5f, 0.5f));
-		resetKoara->get_transform().set_translate({640.0f, -360.0f });
+		resetKoara->get_transform().set_translate({ 640.0f, -360.0f });
 	}
 
 	if (!toSelectBack) {
@@ -70,7 +72,14 @@ void GameManagement::init() {
 
 	selectFrame = std::make_unique<SpriteInstance>("SelectFrame.png", Vector2(0.5f, 0.5f));
 
-	undoRetryUI = std::make_unique<SpriteInstance>("undoRetry.png", Vector2(0.5f, 0.5f));
+	switch (Configuration::GetLanguage()) {
+	case Configuration::Language::Japanese:
+		undoRetryUI = std::make_unique<SpriteInstance>("undoRetry.png", Vector2(0.5f, 0.5f));
+		break;
+	case Configuration::Language::English:
+		undoRetryUI = std::make_unique<SpriteInstance>("undoRetry_EN.png", Vector2(0.5f, 0.5f));
+		break;
+	}
 	undoRetryUI->get_transform().set_scale({ 0.5f,1.0f });
 	undoRetryUI->get_uv_transform().set_scale({ 0.5f,1.0f });
 	undoRetryUI->get_transform().set_translate({ 789,169 });
@@ -115,7 +124,7 @@ void GameManagement::begin() {
 		reset_update();
 
 	}
-	else if (!isTutorial){
+	else if (!isTutorial) {
 		//resultSoundFlagを使って効果音を鳴らす
 
 		if (!resultSoundFlag) {

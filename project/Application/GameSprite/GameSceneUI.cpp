@@ -10,6 +10,7 @@
 #include <Engine/Utility/Tools/SmartPointer.h>
 
 #include "Application/GameValue.h"
+#include <Application/Configuration/Configuration.h>
 
 GameSceneUI::GameSceneUI() = default;
 
@@ -23,7 +24,14 @@ void GameSceneUI::initialize(int32_t level) {
 	controlSprite[0][4] = std::make_unique<SpriteInstance>("ResetUIController.png");
 	controlSprite[0][5] = std::make_unique<SpriteInstance>("ESCkeyController.png");
 	controlSprite[0][6] = std::make_unique<SpriteInstance>("UndoController.png");
-	controlSprite[0][7] = std::make_unique<SpriteInstance>("ReleseUIController.png", Vector2(0.5f, 0.5f));
+	switch (Configuration::GetLanguage()) {
+	case Configuration::Language::Japanese:
+		controlSprite[0][7] = std::make_unique<SpriteInstance>("ReleseUIController.png", Vector2(0.5f, 0.5f));
+		break;
+	case Configuration::Language::English:
+		controlSprite[0][7] = std::make_unique<SpriteInstance>("ReleseUIController_EN.png", Vector2(0.5f, 0.5f));
+		break;
+	}
 
 	controlSprite[1][0] = std::make_unique<SpriteInstance>("Wkey.png");
 	controlSprite[1][1] = std::make_unique<SpriteInstance>("Akey.png");
@@ -32,7 +40,14 @@ void GameSceneUI::initialize(int32_t level) {
 	controlSprite[1][4] = std::make_unique<SpriteInstance>("ResetUI.png");
 	controlSprite[1][5] = std::make_unique<SpriteInstance>("ESCkey.png");
 	controlSprite[1][6] = std::make_unique<SpriteInstance>("Undo.png");
-	controlSprite[1][7] = std::make_unique<SpriteInstance>("ReleseUI.png", Vector2(0.5f, 0.5f));
+	switch (Configuration::GetLanguage()) {
+	case Configuration::Language::Japanese:
+		controlSprite[1][7] = std::make_unique<SpriteInstance>("ReleseUI.png", Vector2(0.5f, 0.5f));
+		break;
+	case Configuration::Language::English:
+		controlSprite[1][7] = std::make_unique<SpriteInstance>("ReleseUI_EN.png", Vector2(0.5f, 0.5f));
+		break;
+	}
 
 	noneButtonSprite = std::make_unique<SpriteInstance>("NoneButton.png");
 
