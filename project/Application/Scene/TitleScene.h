@@ -58,7 +58,7 @@ private:
 	std::unique_ptr<DirectionalLightInstance> directionalLight;
 
 	std::unique_ptr<SpriteInstance> transition;
-	std::array<std::unique_ptr<SpriteInstance>, 2> startUi;
+	std::array<std::unique_ptr<SpriteInstance>, 4> startUi;
 	std::unique_ptr<SpriteInstance> titleLogo;
 
 	//BGM
