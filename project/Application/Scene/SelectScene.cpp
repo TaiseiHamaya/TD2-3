@@ -27,6 +27,7 @@
 #include "Application/GameValue.h"
 #include "Application/LevelLoader/LevelLoader.h"
 #include "Application/Scene/GameScene.h"
+#include <Application/Configuration/Configuration.h>
 
 SelectScene::SelectScene() : SelectScene(1, false) {};
 
@@ -89,9 +90,17 @@ void SelectScene::initialize() {
 	parentKoala = eps::CreateUnique<AnimatedMeshInstance>("ParentKoala.gltf", "Standby", true);
 	childKoala = eps::CreateUnique<AnimatedMeshInstance>("ChiledKoala.gltf", "Standby", true);
 
-	startUi[0] = eps::CreateUnique<SpriteInstance>("StartController.png", Vector2{0.5f, 0.5f});
+	switch (Configuration::GetLanguage()) {
+	case Configuration::Language::Japanese:
+		startUi[0] = eps::CreateUnique<SpriteInstance>("StartController.png", Vector2{ 0.5f, 0.5f });
+		startUi[1] = eps::CreateUnique<SpriteInstance>("start.png", Vector2{ 0.5f, 0.5f });
+		break;
+	case Configuration::Language::English:
+		startUi[0] = eps::CreateUnique<SpriteInstance>("StartController_EN.png", Vector2{ 0.5f, 0.5f });
+		startUi[1] = eps::CreateUnique<SpriteInstance>("start_EN.png", Vector2{ 0.5f, 0.5f });
+		break;
+	}
 	startUi[0]->get_transform().set_translate({ 640.0f,90 });
-	startUi[1] = eps::CreateUnique<SpriteInstance>("start.png", Vector2{ 0.5f, 0.5f });
 	startUi[1]->get_transform().set_translate({ 640.0f,90 });
 	selectUi = eps::CreateUnique<SpriteInstance>("StageSelectUI.png", Vector2{ 0.5f, 0.5f });
 	selectUi->get_transform().set_translate({ 640.0f,650.0f });

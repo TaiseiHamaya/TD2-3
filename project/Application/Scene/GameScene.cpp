@@ -74,12 +74,13 @@ void GameScene::load() {
 	TextureManager::RegisterLoadQue("./GameResources/Texture/UI/Dkey.png");
 	TextureManager::RegisterLoadQue("./GameResources/Texture/UI/ResetUI.png");
 	TextureManager::RegisterLoadQue("./GameResources/Texture/UI/ESCkey.png");
-	TextureManager::RegisterLoadQue("./GameResources/Texture/UI/ReleseUI.png");
+	TextureManager::RegisterLoadQue("./GameResources/Texture/UI/ReleseUI_EN.png");
 
 	TextureManager::RegisterLoadQue("./GameResources/Texture/UI/ResetUIController.png");
 	TextureManager::RegisterLoadQue("./GameResources/Texture/UI/ESCkeyController.png");
 	TextureManager::RegisterLoadQue("./GameResources/Texture/UI/UndoController.png");
 	TextureManager::RegisterLoadQue("./GameResources/Texture/UI/ReleseUIController.png");
+	TextureManager::RegisterLoadQue("./GameResources/Texture/UI/ReleseUIController_EN.png");
 	TextureManager::RegisterLoadQue("./GameResources/Texture/UI/NoneButton.png");
 
 	TextureManager::RegisterLoadQue("./GameResources/Texture/UI/Tutorial1.png");
@@ -88,6 +89,7 @@ void GameScene::load() {
 	TextureManager::RegisterLoadQue("./GameResources/Texture/UI/SelectFrame.png");
 	TextureManager::RegisterLoadQue("./GameResources/Texture/UI/FailedUI_1.png");
 	TextureManager::RegisterLoadQue("./GameResources/Texture/UI/undoRetry.png");
+	TextureManager::RegisterLoadQue("./GameResources/Texture/UI/undoRetry_EN.png");
 	TextureManager::RegisterLoadQue("./GameResources/Texture/UI/GoSelect.png");
 	TextureManager::RegisterLoadQue("./GameResources/Texture/UI/Undo.png");
 	TextureManager::RegisterLoadQue("./GameResources/Texture/UI/smallNumber.png");
@@ -111,6 +113,7 @@ void GameScene::load() {
 	TextureManager::RegisterLoadQue("./GameResources/Texture/Clear/!.png");
 	TextureManager::RegisterLoadQue("./GameResources/Texture/Tutorial/Frame.png");
 	TextureManager::RegisterLoadQue("./GameResources/Texture/Tutorial/TutorialText.png");
+	TextureManager::RegisterLoadQue("./GameResources/Texture/Tutorial/TutorialText_EN.png");
 	TextureManager::RegisterLoadQue("./GameResources/Texture/Tutorial/TutorialImage.png");
 
 	TextureManager::RegisterLoadQue("./GameResources/Texture/UI/Abutton.png");
