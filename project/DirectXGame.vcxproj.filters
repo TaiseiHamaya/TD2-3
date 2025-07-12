@@ -158,6 +158,8 @@
     <ClCompile Include="Application\Tutorial\TutorialManager.cpp" />
     <ClCompile Include="Application\InputUiType.cpp" />
     <ClCompile Include="Application\Configuration\Configuration.cpp" />
+    <ClCompile Include="Engine\Application\CrashHandler.cpp" />
+    <ClCompile Include="Engine\Utility\Tools\ChronoUtility.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Engine\Module\Render\RenderNode\Deferred\DeferredAdaptor.h" />
@@ -326,6 +328,10 @@
     <ClInclude Include="Application\Tutorial\TutorialManager.h" />
     <ClInclude Include="Application\InputUiType.h" />
     <ClInclude Include="Application\Configuration\Configuration.h" />
+    <ClInclude Include="Engine\Application\CrashHandler.h" />
+    <ClInclude Include="Engine\Utility\Tools\ChronoUtility.h" />
+    <ClInclude Include="Library\Math\Fraction.h" />
+    <ClInclude Include="Library\BuiltinTypes.h" />
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="EngineResources\HLSL\FullscreenShader.hlsl">

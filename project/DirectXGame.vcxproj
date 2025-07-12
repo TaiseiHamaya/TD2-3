@@ -60,7 +60,7 @@
     <ClCompile>
       <WarningLevel>Level3</WarningLevel>
       <SDLCheck>true</SDLCheck>
-      <PreprocessorDefinitions>_DEBUG;_WINDOWS;NOMINMAX;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>_DEBUG;_WINDOWS;NOMINMAX;DEBUG_FEATURES_ENABLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <LanguageStandard>stdcpp20</LanguageStandard>
       <AdditionalIncludeDirectories>$(ProjectDir);$(ProjectDir)Library\Externals\nlohmann;$(ProjectDir)Library\Externals\DirectXTex;$(ProjectDir)Library\Externals\assimp\include;$(ProjectDir)Library\Externals\imgui</AdditionalIncludeDirectories>
@@ -69,6 +69,7 @@
       <AdditionalOptions>/utf-8 %(AdditionalOptions)</AdditionalOptions>
       <TreatWarningAsError>true</TreatWarningAsError>
       <LanguageStandard_C>stdc17</LanguageStandard_C>
+      <ForcedIncludeFiles>$(SolutionDir)Library\BuiltinTypes.h;%(ForcedIncludeFiles)</ForcedIncludeFiles>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -103,6 +104,7 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
       <LanguageStandard_C>stdc17</LanguageStandard_C>
+      <ForcedIncludeFiles>$(SolutionDir)Library\BuiltinTypes.h;%(ForcedIncludeFiles)</ForcedIncludeFiles>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -128,6 +130,7 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClCompile Include="Application\UI\ClearUI.cpp" />
     <ClCompile Include="Application\GameSprite\BackGround.cpp" />
     <ClCompile Include="Application\Configuration\Configuration.cpp" />
+    <ClCompile Include="Engine\Application\CrashHandler.cpp" />
     <ClCompile Include="Engine\Module\Render\RenderNode\Deferred\Lighting\DirectionalLighingNode.cpp" />
     <ClCompile Include="Engine\Module\Render\RenderNode\Deferred\Mesh\MeshNodeDeferred.cpp" />
     <ClCompile Include="Engine\Module\DrawExecutor\PrimitiveLineDrawExecutor\PrimitiveLineDrawExecutor.cpp" />
@@ -142,6 +145,7 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClCompile Include="Application\UI\FailedUI.cpp" />
     <ClCompile Include="Application\GameSprite\GameSceneUI.cpp" />
     <ClCompile Include="Application\InputUiType.cpp" />
+    <ClCompile Include="Engine\Utility\Tools\ChronoUtility.cpp" />
     <ClCompile Include="Library\Math\Affine.cpp" />
     <ClCompile Include="Library\Math\Basis.cpp" />
     <ClCompile Include="Engine\Resources\Audio\AudioResourceBuilder.cpp" />
@@ -270,6 +274,7 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClInclude Include="Application\UI\ClearUI.h" />
     <ClInclude Include="Application\GameSprite\BackGround.h" />
     <ClInclude Include="Application\Configuration\Configuration.h" />
+    <ClInclude Include="Engine\Application\CrashHandler.h" />
     <ClInclude Include="Engine\Module\Render\RenderNode\Deferred\DeferredAdaptor.h" />
     <ClInclude Include="Engine\Module\Render\RenderNode\Deferred\Lighting\DirectionalLighingNode.h" />
     <ClInclude Include="Engine\Module\Render\RenderNode\Deferred\Mesh\MeshNodeDeferred.h" />
@@ -285,6 +290,8 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClInclude Include="Application\UI\FailedUI.h" />
     <ClInclude Include="Application\GameSprite\GameSceneUI.h" />
     <ClInclude Include="Application\InputUiType.h" />
+    <ClInclude Include="Engine\Utility\Tools\ChronoUtility.h" />
+    <ClInclude Include="Library\BuiltinTypes.h" />
     <ClInclude Include="Library\Math\Affine.h" />
     <ClInclude Include="Library\Math\Basis.h" />
     <ClInclude Include="Engine\Resources\Audio\AudioResourceBuilder.h" />
@@ -326,6 +333,7 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClInclude Include="Application\Character\Player\MoveLogger\MoveLogger.h" />
     <ClInclude Include="Library\Math\Easing.h" />
     <ClInclude Include="Application\Rocket\Rocket.h" />
+    <ClInclude Include="Library\Math\Fraction.h" />
     <ClInclude Include="TestCode\CallbackManagerDemo.h" />
     <ClInclude Include="Engine\Module\World\Collision\CollisionCallbackManager.h" />
     <ClInclude Include="Engine\Module\World\Light\DirectionalLight\DirectionalLightInstance.h" />

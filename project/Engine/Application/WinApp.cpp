@@ -2,6 +2,7 @@
 
 #include <cassert>
 
+#include "Engine/Application/CrashHandler.h"
 #include "Engine/Debug/Output.h"
 #include "Engine/Rendering/DirectX/DirectXCore.h"
 #include "Engine/Resources/Audio/AudioManager.h"
@@ -17,6 +18,7 @@
 #include "EngineSettings.h"
 
 #pragma comment(lib, "winmm.lib")
+#pragma comment(lib, "Dbghelp.lib") // Symとか
 
 #ifdef _DEBUG
 #include "Engine/Debug/ImGui/ImGuiManager/ImGuiManager.h"
@@ -59,6 +61,9 @@ void WinApp::Initialize(DWORD windowConfig) {
 #endif // _DEBUG
 	// chrono時間精度の設定
 	timeBeginPeriod(1);
+
+	// クラッシュハンドラの設定
+	CrashHandler::Initialize();
 
 	assert(!instance);
 	instance.reset(new WinApp{});

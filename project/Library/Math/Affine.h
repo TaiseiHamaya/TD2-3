@@ -20,6 +20,10 @@ public:
 public:
 	static Affine FromTransform3D(const Transform3D& transform);
 	static Affine FromSRT(const Vector3& scale, const Quaternion& rotation, const Vector3& translate);
+	static Affine FromScale(const Vector3& scale);
+	static Affine FromRotation(const Quaternion& rotation);
+	static Affine FromTranslate(const Vector3& translate);
+	static Affine FromMatrix(const Matrix4x4& matrix);
 
 public:
 	constexpr Vector3 transform(const Vector3& v) const;

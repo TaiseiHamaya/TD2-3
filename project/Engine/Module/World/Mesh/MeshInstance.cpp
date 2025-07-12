@@ -20,7 +20,6 @@ MeshInstance::MeshInstance() noexcept(false) :
 	// 各メモリの取得
 	transformMatrix(std::make_unique<TransformMatrix>()) {
 	meshMaterials.clear();
-	hierarchy.initialize(world_affine());
 }
 
 MeshInstance::MeshInstance(const std::string& meshName_) noexcept(false) :

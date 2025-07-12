@@ -3,10 +3,6 @@
 #define TRANSFORM3D_SERIALIZER
 #include <Engine/Resources/Json/JsonSerializer.h>
 
-WorldInstance::WorldInstance() {
-	hierarchy.initialize(affine);
-}
-
 void WorldInstance::update_affine() {
 	if (!isActive) {
 		return;

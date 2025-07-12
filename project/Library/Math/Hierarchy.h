@@ -1,13 +1,13 @@
 #pragma once
 
+#include <Engine/Utility/Template/Reference.h>
+
 class Affine;
 class WorldInstance;
 
-#include <Engine/Utility/Template/Reference.h>
-
 class Hierarchy final {
 public:
-	Hierarchy() = default;
+	Hierarchy(Reference<const Affine> selfAffine_);
 	~Hierarchy() = default;
 
 public:// コピー禁止、ムーブ許可
@@ -17,18 +17,14 @@ public:// コピー禁止、ムーブ許可
 	Hierarchy& operator=(Hierarchy&&) = default;
 
 public:
-	void initialize(const Affine& worldMatrix) noexcept;
-
-public:
-	void set_parent(const WorldInstance& hierarchy) noexcept;
+	void set_parent(const WorldInstance& instance) noexcept;
 	void reset_parent() noexcept;
 	const Reference<const WorldInstance>& get_parent() const noexcept;
-	//const WorldInstance* get_parent_address() const noexcept;
 	bool has_parent() const noexcept;
 	const Affine& parent_affine() const;
 	const Affine& parent_matrix_safe() const noexcept;
 
 private:
 	Reference<const WorldInstance> parent;
-	Reference<const Affine> currentMatrix;
+	Reference<const Affine> selfAffine;
 };

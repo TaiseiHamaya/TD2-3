@@ -378,7 +378,7 @@ void SelectScene::default_update() {
 		transition->get_color().alpha = fadeEase;
 	}
 
-	Vector2 stickL = Input::StickL().normalize_safe(1e-4f, CVector2::ZERO);
+	Vector2 stickL = Input::StickL().normalize_safe(CVector2::ZERO);
 	if (inputTimer <= 0.0f) {
 		if (Input::IsPressKey(KeyID::D) || Input::IsPressKey(KeyID::Right) ||
 			Input::IsPressPad(PadID::Right) || stickL.x > 0.5f) {

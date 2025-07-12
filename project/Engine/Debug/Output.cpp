@@ -8,6 +8,7 @@
 #include <format>
 
 #include <Engine/Utility/Tools/ConvertString.h>
+#include <Engine/Application/EngineSettings.h>
 
 namespace chrono = std::chrono;
 
@@ -19,21 +20,16 @@ LocalTimeSeconds NowLocalSecond() {
 	return nowZtFloor;
 }
 
-static const std::string LogFile{
-	std::format("./Log/{:%F-%H%M%S}.log",
-		NowLocalSecond())
-};
-
 void InitializeLog() {
-	std::filesystem::path path{ LogFile };
+	std::filesystem::path path{ EngineSettings::LogFilePath };
 	std::filesystem::create_directory(path.parent_path());
 	std::ofstream file;
 	file.exceptions(std::ios_base::badbit | std::ios_base::failbit);
-	file.open(LogFile);
+	file.open(EngineSettings::LogFilePath);
 }
 
 void ConsoleA(const std::string& msg) {
-	std::ofstream outputFile{ LogFile, std::ios_base::app };
+	std::ofstream outputFile{ EngineSettings::LogFilePath, std::ios_base::app };
 	outputFile.exceptions(std::ios_base::badbit | std::ios_base::failbit);
 	outputFile << msg;
 	outputFile.close();
@@ -41,7 +37,7 @@ void ConsoleA(const std::string& msg) {
 }
 
 void ConsoleW(const std::wstring& msg) {
-	std::ofstream outputFile{ LogFile, std::ios_base::app };
+	std::ofstream outputFile{ EngineSettings::LogFilePath, std::ios_base::app };
 	outputFile.exceptions(std::ios_base::badbit | std::ios_base::failbit);
 	outputFile << ConvertString(msg);
 	outputFile.close();

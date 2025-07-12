@@ -335,7 +335,7 @@ void PlayerManager::handle_input() {
 	constexpr std::array<Vector2, 4> stickDirection{
 		CVector2::UP,
 		CVector2::BACKWARD,
-		CVector2::BACK,
+		CVector2::DOWN,
 		CVector2::FORWARD,
 	};
 
@@ -356,11 +356,11 @@ void PlayerManager::handle_input() {
 		}
 		return;
 	}
-	Vector2 stickL = Input::StickL().normalize_safe(1e-4f, CVector2::ZERO);
+	Vector2 stickL = Input::StickL().normalize_safe(CVector2::ZERO);
 	for (size_t i = 0; i < 4; ++i) {
 		//if (Input::GetInstance().IsTriggerKey(keys[i])) {
 		if (Input::IsPressKey(keysWASD[i]) || Input::IsPressKey(keysArrow[i]) ||
-			Input::IsPressPad(padTrigger[i]) || (Vector2::DotProduct(stickL, stickDirection[i]) > std::cos(PI / 4) && stickL.length() != 0.0f)) {
+			Input::IsPressPad(padTrigger[i]) || (Vector2::Dot(stickL, stickDirection[i]) > std::cos(PI / 4) && stickL.length() != 0.0f)) {
 			inputTimer = InputDowntime;
 			//player->set = directions[i];
 			Vector3 nextPosition = player->get_translate() + directions[i];
@@ -535,7 +535,7 @@ void PlayerManager::set_child_rotate() {
 	Quaternion currentRotation = child->get_rotation();
 
 	// Slerpのロジックを利用して反転防止を実現
-	float dot = Vector3::DotProduct(currentRotation.vector(), targetRotation.vector()) + currentRotation.real() * targetRotation.real();
+	float dot = Vector3::Dot(currentRotation.vector(), targetRotation.vector()) + currentRotation.real() * targetRotation.real();
 	if (dot < 0.0f) {
 		targetRotation = targetRotation * -1.0f;
 	}

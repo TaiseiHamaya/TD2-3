@@ -8,7 +8,7 @@
 
 class WorldInstance {
 public:
-	WorldInstance();
+	WorldInstance() = default;
 	virtual ~WorldInstance() = default;
 
 	WorldInstance(const WorldInstance&) = delete;
@@ -108,7 +108,7 @@ public:
 
 protected:
 	Transform3D transform{}; // Transform
-	Hierarchy hierarchy{}; // Hierarchy
+	Hierarchy hierarchy{ affine }; // Hierarchy
 
 private:
 	Affine affine;

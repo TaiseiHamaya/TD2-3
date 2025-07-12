@@ -209,11 +209,11 @@ void GameSceneUI::padControl(int index) {
 	constexpr std::array<Vector2, 4> stickDirection{
 		CVector2::UP,
 		CVector2::BACKWARD,
-		CVector2::BACK,
+		CVector2::DOWN,
 		CVector2::FORWARD,
 	};
-	Vector2 stickL = Input::StickL().normalize_safe(1e-4f, CVector2::ZERO);
-	bool stickInput = index < 4 ? Vector2::DotProduct(stickL, stickDirection[index]) > std::cos(PI / 4) && stickL.length() != 0.0f : false;
+	Vector2 stickL = Input::StickL().normalize_safe(CVector2::ZERO);
+	bool stickInput = index < 4 ? Vector2::Dot(stickL, stickDirection[index]) > std::cos(PI / 4) && stickL.length() != 0.0f : false;
 	if (Input::IsPressPad(padTrigger[index]) || stickInput) {
 		controlSprite[0][index]->get_uv_transform().set_translate_x(0.5f);
 	}
