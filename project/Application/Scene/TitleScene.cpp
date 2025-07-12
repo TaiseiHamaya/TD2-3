@@ -1,7 +1,9 @@
 #include "TitleScene.h"
 
 #include "Engine/Module/Render/RenderNode/2D/Sprite/SpriteNode.h"
+#include "Engine/Resources/Audio/AudioManager.h"
 #include <Engine/Module/Render/RenderNode/Forward/Object3DNode/Object3DNode.h>
+#include <Engine/Module/Render/RenderNode/Forward/SkinningMesh/SkinningMeshNode.h>
 #include <Engine/Module/World/Camera/Camera2D.h>
 #include <Engine/Module/World/Sprite/SpriteInstance.h>
 #include <Engine/Rendering/DirectX/DirectXSwapChain/DirectXSwapChain.h>
@@ -10,16 +12,14 @@
 #include <Engine/Runtime/Input/Input.h>
 #include <Engine/Runtime/Scene/SceneManager.h>
 #include <Engine/Utility/Tools/SmartPointer.h>
-#include "Engine/Resources/Audio/AudioManager.h"
-#include <Engine/Module/Render/RenderNode/Forward/SkinningMesh/SkinningMeshNode.h>
 
 #include "Application/GameValue.h"
 #include "Application/Scene/SelectScene.h"
 
-#include <utility>
 #include <Engine/Module/World/AnimatedMesh/AnimatedMeshInstance.h>
-#include <Engine/Resources/Animation/Skeleton/SkeletonManager.h>
 #include <Engine/Resources/Animation/NodeAnimation/NodeAnimationManager.h>
+#include <Engine/Resources/Animation/Skeleton/SkeletonManager.h>
+#include <utility>
 
 #include "../Configuration/Configuration.h"
 
@@ -30,6 +30,8 @@ TitleScene::~TitleScene() {}
 void TitleScene::load() {
 	TextureManager::RegisterLoadQue("./GameResources/Texture/UI/start.png");
 	TextureManager::RegisterLoadQue("./GameResources/Texture/UI/StartController.png");
+	TextureManager::RegisterLoadQue("./GameResources/Texture/UI/start_EN.png");
+	TextureManager::RegisterLoadQue("./GameResources/Texture/UI/StartController_EN.png");
 	TextureManager::RegisterLoadQue("./GameResources/Texture/black.png");
 	TextureManager::RegisterLoadQue("./GameResources/Texture/TitleLogo.png");
 	AudioManager::RegisterLoadQue("./GameResources/Audio/BGM/TitleBGM.wav");
@@ -54,10 +56,14 @@ void TitleScene::initialize() {
 
 	directionalLight = eps::CreateUnique<DirectionalLightInstance>();
 
-	startUi[0] = eps::CreateUnique<SpriteInstance>("StartController.png", Vector2{0.5f, 0.5f});
-	startUi[1] = eps::CreateUnique<SpriteInstance>("start.png", Vector2{0.5f, 0.5f});
+	startUi[0] = eps::CreateUnique<SpriteInstance>("StartController.png", Vector2{ 0.5f, 0.5f });
+	startUi[1] = eps::CreateUnique<SpriteInstance>("start.png", Vector2{ 0.5f, 0.5f });
+	startUi[2] = eps::CreateUnique<SpriteInstance>("StartController_EN.png", Vector2{ 0.5f, 0.5f });
+	startUi[3] = eps::CreateUnique<SpriteInstance>("start_EN.png", Vector2{ 0.5f, 0.5f });
 	startUi[0]->get_transform().set_translate({ 440.0f,140 });
 	startUi[1]->get_transform().set_translate({ 440.0f,140 });
+	startUi[2]->get_transform().set_translate({ 440.0f,140 });
+	startUi[3]->get_transform().set_translate({ 440.0f,140 });
 	titleLogo = eps::CreateUnique<SpriteInstance>("TitleLogo.png", Vector2{ 0.5f, 0.5f });
 	titleLogo->get_transform().set_translate({ 440.0f,540 });
 
@@ -147,9 +153,10 @@ void TitleScene::update() {
 		break;
 	}
 
+	float stickLx = Input::StickL().x;
 	if (languageSelectTimer <= 0.0f) {
 		Configuration::Language language = Configuration::GetLanguage();
-		if (Input::IsTriggerKey(KeyID::Down)) {
+		if (Input::IsPressKey(KeyID::Left) || Input::IsPressPad(PadID::Left) || stickLx >= 0.5f) {
 			if (language == Configuration::Language::Japanese) {
 				// SE成功
 				selectSeSuccussed->restart();
@@ -160,8 +167,9 @@ void TitleScene::update() {
 
 			}
 			Configuration::SetLanguage(Configuration::Language::English);
+			languageSelectTimer = 0.7f;
 		}
-		else if (Input::IsTriggerKey(KeyID::Up)) {
+		else if (Input::IsPressKey(KeyID::Right) || Input::IsPressPad(PadID::Right) || stickLx <= -0.5f) {
 			if (language == Configuration::Language::English) {
 				// SE成功
 				selectSeSuccussed->restart();
@@ -171,6 +179,15 @@ void TitleScene::update() {
 				selectSeFailed->restart();
 			}
 			Configuration::SetLanguage(Configuration::Language::Japanese);
+			languageSelectTimer = 0.7f;
+		}
+	}
+	else {
+		if (!(Input::IsPressKey(KeyID::Left) || Input::IsPressPad(PadID::Left) ||
+			Input::IsPressKey(KeyID::Right) || Input::IsPressPad(PadID::Right) ||
+			(stickLx >= 0.5f || stickLx <= -0.5f))
+		   ) {
+			languageSelectTimer = 0.0f;
 		}
 	}
 
@@ -189,6 +206,8 @@ void TitleScene::update() {
 void TitleScene::begin_rendering() {
 	startUi[0]->begin_rendering();
 	startUi[1]->begin_rendering();
+	startUi[2]->begin_rendering();
+	startUi[3]->begin_rendering();
 	titleLogo->begin_rendering();
 	transition->begin_rendering();
 
@@ -216,7 +235,7 @@ void TitleScene::draw() const {
 	chiledObj->draw();
 	// Sprite
 	renderPath->next();
-	startUi[(int)GameValue::UiType.get_type()]->draw();
+	startUi[(int)GameValue::UiType.get_type() + 2 * (size_t)Configuration::GetLanguage()]->draw();
 	titleLogo->draw();
 	transition->draw();
 
