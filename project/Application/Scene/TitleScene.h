@@ -60,6 +60,7 @@ private:
 	std::unique_ptr<SpriteInstance> transition;
 	std::array<std::unique_ptr<SpriteInstance>, 4> startUi;
 	std::unique_ptr<SpriteInstance> titleLogo;
+	std::unique_ptr<SpriteInstance> languageSelection;
 
 	//BGM
 	std::unique_ptr<AudioPlayer>bgm;

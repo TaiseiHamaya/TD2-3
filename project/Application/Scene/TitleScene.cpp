@@ -34,6 +34,7 @@ void TitleScene::load() {
 	TextureManager::RegisterLoadQue("./GameResources/Texture/UI/StartController_EN.png");
 	TextureManager::RegisterLoadQue("./GameResources/Texture/black.png");
 	TextureManager::RegisterLoadQue("./GameResources/Texture/TitleLogo.png");
+	TextureManager::RegisterLoadQue("./GameResources/Texture/UI/ChangeLanguage.png");
 	AudioManager::RegisterLoadQue("./GameResources/Audio/BGM/TitleBGM.wav");
 
 	PolygonMeshManager::RegisterLoadQue("./GameResources/Models/ParentKoala/ParentKoala.gltf");
@@ -68,6 +69,11 @@ void TitleScene::initialize() {
 	titleLogo->get_transform().set_translate({ 440.0f,540 });
 
 	transition = eps::CreateUnique<SpriteInstance>("black.png", Vector2{ 0.f, 0.f });
+
+	languageSelection = eps::CreateUnique<SpriteInstance>("ChangeLanguage.png", Vector2{ 0.0f, 0.0f });
+	languageSelection->get_transform().set_translate({ 30.0f, 30.0f });
+	languageSelection->get_transform().set_scale({ 0.5f, 1.0f });
+	languageSelection->get_uv_transform().set_scale({ 0.5f, 1.0f });
 
 	// Node&Path
 	std::shared_ptr<Object3DNode> object3dNode;
@@ -156,7 +162,7 @@ void TitleScene::update() {
 	float stickLx = Input::StickL().x;
 	if (languageSelectTimer <= 0.0f) {
 		Configuration::Language language = Configuration::GetLanguage();
-		if (Input::IsPressKey(KeyID::Left) || Input::IsPressPad(PadID::Left) || stickLx >= 0.5f) {
+		if (Input::IsPressKey(KeyID::Right) || Input::IsPressPad(PadID::Right) || stickLx >= 0.5f) {
 			if (language == Configuration::Language::Japanese) {
 				// SE成功
 				selectSeSuccussed->restart();
@@ -167,9 +173,10 @@ void TitleScene::update() {
 
 			}
 			Configuration::SetLanguage(Configuration::Language::English);
+			languageSelection->get_uv_transform().set_translate({ 0.5f, 0.0f });
 			languageSelectTimer = 0.7f;
 		}
-		else if (Input::IsPressKey(KeyID::Right) || Input::IsPressPad(PadID::Right) || stickLx <= -0.5f) {
+		else if (Input::IsPressKey(KeyID::Left) || Input::IsPressPad(PadID::Left) || stickLx <= -0.5f) {
 			if (language == Configuration::Language::English) {
 				// SE成功
 				selectSeSuccussed->restart();
@@ -179,6 +186,7 @@ void TitleScene::update() {
 				selectSeFailed->restart();
 			}
 			Configuration::SetLanguage(Configuration::Language::Japanese);
+			languageSelection->get_uv_transform().set_translate({ 0.0f, 0.0f });
 			languageSelectTimer = 0.7f;
 		}
 	}
@@ -210,6 +218,7 @@ void TitleScene::begin_rendering() {
 	startUi[3]->begin_rendering();
 	titleLogo->begin_rendering();
 	transition->begin_rendering();
+	languageSelection->begin_rendering();
 
 	camera3D->update_matrix();
 	directionalLight->begin_rendering();
@@ -236,6 +245,7 @@ void TitleScene::draw() const {
 	// Sprite
 	renderPath->next();
 	startUi[(int)GameValue::UiType.get_type() + 2 * (size_t)Configuration::GetLanguage()]->draw();
+	languageSelection->draw();
 	titleLogo->draw();
 	transition->draw();
 
