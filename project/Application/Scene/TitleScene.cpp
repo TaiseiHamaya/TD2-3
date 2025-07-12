@@ -43,7 +43,7 @@ void TitleScene::load() {
 
 	AudioManager::RegisterLoadQue("./GameResources/Audio/gameStart.wav");
 	AudioManager::RegisterLoadQue("./GameResources/Audio/move.wav");
-	AudioManager::RegisterLoadQue("./GameResources/Audio/unmovable.wav");
+	AudioManager::RegisterLoadQue("./GameResources/Audio/SelectFaild.wav");
 }
 
 void TitleScene::initialize() {
@@ -105,7 +105,8 @@ void TitleScene::initialize() {
 	selectSeSuccussed = std::make_unique<AudioPlayer>();
 	selectSeSuccussed->initialize("move.wav");
 	selectSeFailed = std::make_unique<AudioPlayer>();
-	selectSeFailed->initialize("unmovable.wav");
+	selectSeFailed->initialize("SelectFaild.wav");
+	selectSeFailed->set_volume(0.2f);
 }
 
 void TitleScene::popped() {}
