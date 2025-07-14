@@ -1,24 +1,26 @@
 #include "TitleScene.h"
 
-#include "Engine/Module/Render/RenderNode/2D/Sprite/SpriteNode.h"
-#include "Engine/Resources/Audio/AudioManager.h"
-#include <Engine/Module/Render/RenderNode/Forward/Object3DNode/Object3DNode.h>
-#include <Engine/Module/Render/RenderNode/Forward/SkinningMesh/SkinningMeshNode.h>
+#include <Engine/Assets/Animation/NodeAnimation/NodeAnimationLibrary.h>
+#include <Engine/Assets/Animation/Skeleton/SkeletonLibrary.h>
+#include <Engine/Assets/Audio/AudioLibrary.h>
+#include <Engine/Assets/Audio/AudioManager.h>
+#include <Engine/Assets/PolygonMesh/PolygonMeshLibrary.h>
+#include <Engine/Assets/Texture/TextureLibrary.h>
+#include <Engine/Module/Render/RenderNode/2D/Sprite/SpriteNode.h>
+#include <Engine/Module/Render/RenderNode/Forward/Mesh/SkinningMeshNodeForward.h>
+#include <Engine/Module/Render/RenderNode/Forward/Mesh/StaticMeshNodeForward.h>
 #include <Engine/Module/World/Camera/Camera2D.h>
+#include <Engine/Module/World/Mesh/SkinningMeshInstance.h>
 #include <Engine/Module/World/Sprite/SpriteInstance.h>
-#include <Engine/Rendering/DirectX/DirectXSwapChain/DirectXSwapChain.h>
-#include <Engine/Resources/PolygonMesh/PolygonMeshManager.h>
-#include <Engine/Resources/Texture/TextureManager.h>
+#include <Engine/Runtime/Clock/WorldClock.h>
 #include <Engine/Runtime/Input/Input.h>
 #include <Engine/Runtime/Scene/SceneManager.h>
-#include <Engine/Utility/Tools/SmartPointer.h>
 
 #include "Application/GameValue.h"
 #include "Application/Scene/SelectScene.h"
 
-#include <Engine/Module/World/AnimatedMesh/AnimatedMeshInstance.h>
-#include <Engine/Resources/Animation/NodeAnimation/NodeAnimationManager.h>
-#include <Engine/Resources/Animation/Skeleton/SkeletonManager.h>
+#include <Library/Utility/Tools/SmartPointer.h>
+
 #include <utility>
 
 #include "../Configuration/Configuration.h"
@@ -28,25 +30,25 @@ TitleScene::TitleScene() {}
 TitleScene::~TitleScene() {}
 
 void TitleScene::load() {
-	TextureManager::RegisterLoadQue("./GameResources/Texture/UI/start.png");
-	TextureManager::RegisterLoadQue("./GameResources/Texture/UI/StartController.png");
-	TextureManager::RegisterLoadQue("./GameResources/Texture/UI/start_EN.png");
-	TextureManager::RegisterLoadQue("./GameResources/Texture/UI/StartController_EN.png");
-	TextureManager::RegisterLoadQue("./GameResources/Texture/black.png");
-	TextureManager::RegisterLoadQue("./GameResources/Texture/TitleLogo.png");
-	TextureManager::RegisterLoadQue("./GameResources/Texture/UI/ChangeLanguage.png");
-	AudioManager::RegisterLoadQue("./GameResources/Audio/BGM/TitleBGM.wav");
+	TextureLibrary::RegisterLoadQue("./GameResources/Texture/UI/start.png");
+	TextureLibrary::RegisterLoadQue("./GameResources/Texture/UI/StartController.png");
+	TextureLibrary::RegisterLoadQue("./GameResources/Texture/UI/start_EN.png");
+	TextureLibrary::RegisterLoadQue("./GameResources/Texture/UI/StartController_EN.png");
+	TextureLibrary::RegisterLoadQue("./GameResources/Texture/black.png");
+	TextureLibrary::RegisterLoadQue("./GameResources/Texture/TitleLogo.png");
+	TextureLibrary::RegisterLoadQue("./GameResources/Texture/UI/ChangeLanguage.png");
+	AudioLibrary::RegisterLoadQue("./GameResources/Audio/BGM/TitleBGM.wav");
 
-	PolygonMeshManager::RegisterLoadQue("./GameResources/Models/ParentKoala/ParentKoala.gltf");
-	PolygonMeshManager::RegisterLoadQue("./GameResources/Models/ChiledKoala/ChiledKoala.gltf");
-	SkeletonManager::RegisterLoadQue("./GameResources/Models/ParentKoala/ParentKoala.gltf");
-	SkeletonManager::RegisterLoadQue("./GameResources/Models/ChiledKoala/ChiledKoala.gltf");
-	NodeAnimationManager::RegisterLoadQue("./GameResources/Models/ParentKoala/ParentKoala.gltf");
-	NodeAnimationManager::RegisterLoadQue("./GameResources/Models/ChiledKoala/ChiledKoala.gltf");
+	PolygonMeshLibrary::RegisterLoadQue("./GameResources/Models/ParentKoala/ParentKoala.gltf");
+	PolygonMeshLibrary::RegisterLoadQue("./GameResources/Models/ChiledKoala/ChiledKoala.gltf");
+	SkeletonLibrary::RegisterLoadQue("./GameResources/Models/ParentKoala/ParentKoala.gltf");
+	SkeletonLibrary::RegisterLoadQue("./GameResources/Models/ChiledKoala/ChiledKoala.gltf");
+	NodeAnimationLibrary::RegisterLoadQue("./GameResources/Models/ParentKoala/ParentKoala.gltf");
+	NodeAnimationLibrary::RegisterLoadQue("./GameResources/Models/ChiledKoala/ChiledKoala.gltf");
 
-	AudioManager::RegisterLoadQue("./GameResources/Audio/gameStart.wav");
-	AudioManager::RegisterLoadQue("./GameResources/Audio/move.wav");
-	AudioManager::RegisterLoadQue("./GameResources/Audio/SelectFaild.wav");
+	AudioLibrary::RegisterLoadQue("./GameResources/Audio/gameStart.wav");
+	AudioLibrary::RegisterLoadQue("./GameResources/Audio/move.wav");
+	AudioLibrary::RegisterLoadQue("./GameResources/Audio/SelectFaild.wav");
 }
 
 void TitleScene::initialize() {
@@ -76,23 +78,22 @@ void TitleScene::initialize() {
 	languageSelection->get_uv_transform().set_scale({ 0.5f, 1.0f });
 
 	// Node&Path
-	std::shared_ptr<Object3DNode> object3dNode;
-	object3dNode = std::make_unique<Object3DNode>();
+	std::shared_ptr<StaticMeshNodeForward> object3dNode;
+	object3dNode = std::make_unique<StaticMeshNodeForward>();
 	object3dNode->initialize();
-	object3dNode->set_config(RenderNodeConfig::ContinueDrawBefore | RenderNodeConfig::ContinueUseDpehtBefore);
-	object3dNode->set_render_target_SC(DirectXSwapChain::GetRenderTarget());
+	object3dNode->set_render_target_SC();
 
-	std::shared_ptr<SkinningMeshNode> skinningMeshNode;
-	skinningMeshNode = std::make_unique<SkinningMeshNode>();
+	std::shared_ptr<SkinningMeshNodeForward> skinningMeshNode;
+	skinningMeshNode = std::make_unique<SkinningMeshNodeForward>();
 	skinningMeshNode->initialize();
-	skinningMeshNode->set_config(RenderNodeConfig::ContinueDrawAfter | RenderNodeConfig::ContinueDrawBefore | RenderNodeConfig::ContinueUseDpehtAfter);
-	skinningMeshNode->set_render_target_SC(DirectXSwapChain::GetRenderTarget());
+	skinningMeshNode->set_config(RenderNodeConfig::NoClearDepth | RenderNodeConfig::NoClearRenderTarget);
+	skinningMeshNode->set_render_target_SC();
 
 	std::shared_ptr<SpriteNode> spriteNode;
 	spriteNode = std::make_unique<SpriteNode>();
 	spriteNode->initialize();
-	spriteNode->set_config(RenderNodeConfig::ContinueDrawAfter);
-	spriteNode->set_render_target_SC(DirectXSwapChain::GetRenderTarget());
+	spriteNode->set_config(RenderNodeConfig::NoClearRenderTarget);
+	spriteNode->set_render_target_SC();
 
 	renderPath = eps::CreateUnique<RenderPath>();
 	renderPath->initialize({ object3dNode,skinningMeshNode,spriteNode });
@@ -103,11 +104,11 @@ void TitleScene::initialize() {
 	bgm->set_volume(GameValue::TitleBgmVolume);
 	bgm->play();
 
-	parentObj = std::make_unique<AnimatedMeshInstance>("ParentKoala.gltf", "Hello", true);
+	parentObj = std::make_unique<SkinningMeshInstance>("ParentKoala.gltf", "Hello", true);
 	parentObj->get_transform().set_translate({ 0.6f,-0.8f,3.7f });
 	parentObj->get_transform().set_quaternion(Quaternion::EulerDegree(0.f, 0.f, 10.f));
 
-	chiledObj = std::make_unique<AnimatedMeshInstance>("ChiledKoala.gltf", "Hello", true);
+	chiledObj = std::make_unique<SkinningMeshInstance>("ChiledKoala.gltf", "Hello", true);
 	easeT = 0;
 	movePos = { -7.f,-0.5f,14.4f };
 
@@ -212,18 +213,18 @@ void TitleScene::update() {
 }
 
 void TitleScene::begin_rendering() {
-	startUi[0]->begin_rendering();
-	startUi[1]->begin_rendering();
-	startUi[2]->begin_rendering();
-	startUi[3]->begin_rendering();
-	titleLogo->begin_rendering();
-	transition->begin_rendering();
-	languageSelection->begin_rendering();
+	//startUi[0]->begin_rendering();
+	//startUi[1]->begin_rendering();
+	//startUi[2]->begin_rendering();
+	//startUi[3]->begin_rendering();
+	//titleLogo->begin_rendering();
+	//transition->begin_rendering();
+	//languageSelection->begin_rendering();
 
-	camera3D->update_matrix();
-	directionalLight->begin_rendering();
-	parentObj->begin_rendering();
-	chiledObj->begin_rendering();
+	//camera3D->update_matrix();
+	//directionalLight->begin_rendering();
+	//parentObj->begin_rendering();
+	//chiledObj->begin_rendering();
 }
 
 void TitleScene::late_update() {}
@@ -233,15 +234,15 @@ void TitleScene::draw() const {
 	renderPath->begin();
 	camera3D->register_world_projection(1);
 	camera3D->register_world_lighting(4);
-	directionalLight->register_world(5);
+//	directionalLight->register_world(5);
 
 	// SkinningMesh
 	renderPath->next();
 	camera3D->register_world_projection(1);
 	camera3D->register_world_lighting(5);
-	directionalLight->register_world(6);
-	parentObj->draw();
-	chiledObj->draw();
+	//directionalLight->register_world(6);
+	//parentObj->draw();
+	//chiledObj->draw();
 	// Sprite
 	renderPath->next();
 	startUi[(int)GameValue::UiType.get_type() + 2 * (size_t)Configuration::GetLanguage()]->draw();
@@ -280,9 +281,9 @@ void TitleScene::out_update() {
 
 #ifdef _DEBUG
 void TitleScene::debug_update() {
-	ImGui::Begin("parent");
-	chiledObj->debug_gui();
-	ImGui::End();
+	//ImGui::Begin("parent");
+	//chiledObj->debug_gui();
+	//ImGui::End();
 }
 #endif // _DEBUG
 

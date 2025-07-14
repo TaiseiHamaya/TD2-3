@@ -1,5 +1,11 @@
 #include "FailedUI.h"
+
+#include <Engine/Debug/ImGui/ImGuiLoadManager/ImGuiLoadManager.h>
 #include <Engine/Module/World/Sprite/SpriteInstance.h>
+#include <Engine/Runtime/Input/Input.h>
+#include <Engine/Runtime/Clock/WorldClock.h>
+
+#include <Library/Utility/Tools/Easing.h>
 
 #include <algorithm>
 
@@ -24,17 +30,17 @@ void FailedUI::init() {
 	endPos[4] = { 691.f,endPosHeight };
 	endPos[5] = { 786.f,endPosHeight };
 	endPos[6] = { 919.f,endPosHeight };
-	
+
 	for (int i = 0; i < 7; i++) {
 		curEaseT[i] = 0;
 		letterTex[i]->get_transform().set_translate_x(endPos[i].x);
 		letterTex[i]->get_color().alpha = 0.f;
-		startPos[i] = { 640-(3-i)*30.0f,720};
+		startPos[i] = { 640 - (3 - i) * 30.0f,720 };
 	}
 	curDelayTime = 0;
 	curIndex = 0;
 
-	failedReasonUI = std::make_unique<SpriteInstance>("FailedUI_1.png",Vector2(0.5f,0.5f));
+	failedReasonUI = std::make_unique<SpriteInstance>("FailedUI_1.png", Vector2(0.5f, 0.5f));
 	failedReasonUI->get_transform().set_scale({ 0.25f,1 });
 	failedReasonUI->get_uv_transform().set_scale({ 0.25f,1 });
 	failedReasonUI->get_transform().set_translate({ 640,265 });
@@ -62,7 +68,7 @@ void FailedUI::update() {
 			canOperation = true;
 		}
 	}
-	
+
 	if (curIndex < 7) {
 		curDelayTime += WorldClock::DeltaSeconds();
 		if (curDelayTime >= delayTotalTime) {
@@ -70,14 +76,15 @@ void FailedUI::update() {
 			curIndex++;
 		}
 	}
-	
-	
+
+
 
 	for (int i = 0; i < curIndex; i++) {
 		curEaseT[i] += WorldClock::DeltaSeconds();
 		EaseChange(i, curEaseT[i]);
 	}
-	if (curEaseT[6] > totalEaseT) { reaUpdateFlag = true; canOperation = true;
+	if (curEaseT[6] > totalEaseT) {
+		reaUpdateFlag = true; canOperation = true;
 	}
 	updateReason();
 }
@@ -126,7 +133,7 @@ void FailedUI::EaseChange(int index, float easeT) {
 		startPos[index].y,
 		endPos[index].y,
 		Easing::Out::Quad(ratio)) }
-	
+
 	);
 }
 

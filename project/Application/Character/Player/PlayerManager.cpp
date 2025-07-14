@@ -3,11 +3,11 @@
 #include <cmath>
 
 #include <Library/Math/Definition.h>
+#include <Library/Utility/Tools/Easing.h>
+#include <Library/Utility/Tools/SmartPointer.h>
 
-#include "Engine/Rendering/DirectX/DirectXResourceObject/ConstantBuffer/Material/Material.h"
-#include "Engine/Resources/Animation/NodeAnimation/NodeAnimationPlayer.h"
+#include "Engine/Assets/Animation/NodeAnimation/NodeAnimationPlayer.h"
 #include "Engine/Runtime/Input/Input.h"
-#include <Engine/Utility/Tools/SmartPointer.h>
 
 #include <Application/Utility/GameUtility.h>
 
@@ -25,12 +25,12 @@ void PlayerManager::initialize(Reference<const LevelLoader> level, MapchipField*
 
 	mapchipField_ = mapchipField;
 
-	catchEffect_ = std::make_unique<AnimatedMeshInstance>();
+	catchEffect_ = std::make_unique<SkinningMeshInstance>();
 	catchEffect_->reset_animated_mesh("CatchEffect.gltf", "Standby", false);
 	catchEffect_->set_active(false);
 	catchEffect_->get_transform().set_quaternion({ 0.0f, 0.5f, 0.0f, 0.5f });
 
-	releaseEffect_ = std::make_unique<AnimatedMeshInstance>();
+	releaseEffect_ = std::make_unique<SkinningMeshInstance>();
 	releaseEffect_->reset_animated_mesh("ReleaseEffect.gltf", "Standby", false);
 	releaseEffect_->set_active(false);
 	releaseEffect_->get_transform().set_quaternion({ 0.0f, 0.5f, 0.0f, 0.5f });
@@ -280,24 +280,6 @@ void PlayerManager::update() {
 	}
 }
 
-void PlayerManager::begin_rendering() {
-	player->begin_rendering();
-	child->begin_rendering();
-	catchEffect_->begin_rendering();
-	releaseEffect_->begin_rendering();
-	dustEmitter->begin_rendering();
-	iceDustEmitter->begin_rendering();
-
-}
-
-void PlayerManager::draw() const {
-	player->draw();
-	child->draw();
-	catchEffect_->draw();
-	releaseEffect_->draw();
-
-}
-
 void PlayerManager::draw_particle() const {
 	dustEmitter->draw();
 	iceDustEmitter->draw();
@@ -401,13 +383,13 @@ void PlayerManager::debug_update() {
 	player->debug_update();
 	child->debug_update();
 
-	ImGui::Begin("CatchEffect");
-	catchEffect_->debug_gui();
-	ImGui::End();
+	//ImGui::Begin("CatchEffect");
+	//catchEffect_->debug_gui();
+	//ImGui::End();
 
-	ImGui::Begin("ReleaseEffect");
-	releaseEffect_->debug_gui();
-	ImGui::End();
+	//ImGui::Begin("ReleaseEffect");
+	//releaseEffect_->debug_gui();
+	//ImGui::End();
 
 	//ImGui::Begin("dustEmitter");
 	//dustEmitter->debug_gui();
@@ -632,8 +614,8 @@ void PlayerManager::undo() {
 		player->get_translate()
 	);
 
-	AnimatedMeshInstance* childMesh = child->get_object();
-	AnimatedMeshInstance* playerMesh = player->get_object();
+	SkinningMeshInstance* childMesh = child->get_object();
+	SkinningMeshInstance* playerMesh = player->get_object();
 	NodeAnimationPlayer* childAnimation = childMesh->get_animation();
 	NodeAnimationPlayer* playerAnimation = playerMesh->get_animation();
 
@@ -659,8 +641,8 @@ void PlayerManager::undo() {
 	Vector3 childWorld = child->get_object()->get_transform().get_translate();
 	child->set_translate({ std::round(childWorld.x), std::round(childWorld.y), std::round(childWorld.z) });
 
-	player->begin_rendering();
-	child->begin_rendering();
+	player->update_affine();
+	child->update_affine();
 
 	// アニメーション設定
 	// くっつき状態

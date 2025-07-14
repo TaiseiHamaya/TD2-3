@@ -5,11 +5,12 @@
 #include "./MoveLogger/MoveLogger.h"
 #include "Application/Character/Child/Child.h"
 #include "Application/Character/Player/Player.h"
-#include "Application/Mapchip/MapchipHandler.h"
 #include "Application/GameManagement/GameManagement.h"
-#include "Engine/Resources/Audio/AudioPlayer.h"
-#include "Engine/Module/World/Sprite/SpriteInstance.h"
+#include "Application/Mapchip/MapchipHandler.h"
 #include "Application/Tutorial/TutorialManager.h"
+
+#include "Engine/Assets/Audio/AudioPlayer.h"
+#include "Engine/Module/World/Sprite/SpriteInstance.h"
 
 class PlayerManager {
 public:
@@ -62,8 +63,8 @@ private:
 	std::unique_ptr<Child> child;
 	std::unique_ptr<MapchipHandler> mapchipHandler;
 	std::unique_ptr<MoveLogger> moveLogger;
-	std::unique_ptr<AnimatedMeshInstance> catchEffect_;
-	std::unique_ptr<AnimatedMeshInstance> releaseEffect_;
+	std::unique_ptr<SkinningMeshInstance> catchEffect_;
+	std::unique_ptr<SkinningMeshInstance> releaseEffect_;
 
 
 	// パーティクルの召還

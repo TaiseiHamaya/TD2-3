@@ -4,17 +4,19 @@
 
 #include <memory>
 
+#include <Engine/Assets/Audio/AudioPlayer.h>
+#include <Engine/GraphicsAPI/DirectX/DxResource/TextureResource/RenderTexture.h>
+#include <Engine/Module/Render/RenderPath/RenderPath.h>
 #include <Engine/Module/World/Camera/Camera3D.h>
 #include <Engine/Module/World/Light/DirectionalLight/DirectionalLightInstance.h>
-#include <Engine/Resources/Audio/AudioPlayer.h>
+
+#include <Application/GameSprite/BackGround.h>
 #include <Application/Mapchip/MapchipField.h>
-#include <Engine/Module/Render/RenderPath/RenderPath.h>
-#include "Application/GameSprite/BackGround.h"
 
 #include "Engine/Module/Render/RenderNode/Posteffect/Outline/OutlineNode.h"
 
-class MeshInstance;
-class AnimatedMeshInstance;
+class StaticMeshInstance;
+class SkinningMeshInstance;
 class SpriteInstance;
 
 class SelectScene : public BaseScene {
@@ -69,6 +71,7 @@ private:
 	std::unique_ptr<SpriteInstance>fromGameBack;
 	std::unique_ptr<SpriteInstance>fromGameKoara;
 
+	std::unique_ptr<RenderTexture> renderTexture;
 	std::unique_ptr<RenderPath> renderPath;
 
 	std::shared_ptr<OutlineNode> outlineNode;
@@ -76,9 +79,9 @@ private:
 	std::unique_ptr<Camera3D> camera3D;
 	std::unique_ptr<DirectionalLightInstance> directionalLight;
 
-	std::unique_ptr<AnimatedMeshInstance> parentKoala;
-	std::unique_ptr<AnimatedMeshInstance> childKoala;
-	std::unique_ptr<MeshInstance> goalMesh;
+	std::unique_ptr<SkinningMeshInstance> parentKoala;
+	std::unique_ptr<SkinningMeshInstance> childKoala;
+	std::unique_ptr<StaticMeshInstance> goalMesh;
 
 	int32_t selectIndex;
 	std::unique_ptr<SpriteInstance> selectUi;

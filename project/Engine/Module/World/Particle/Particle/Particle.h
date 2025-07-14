@@ -4,8 +4,10 @@
 
 #include <variant>
 
-#include "Library/Math/Color4.h"
-#include "Library/Math/Transform2D.h"
+#include <Library/Math/Color4.h>
+#include <Library/Math/Transform2D.h>
+
+#include "Engine/Runtime/Clock/WorldTimer.h"
 
 class Particle final : public WorldInstance {
 public:
@@ -13,6 +15,7 @@ public:
 		Constant,
 		Velocity,
 		LookAt,
+		LookAtAngle,
 		Random,
 	};
 
@@ -21,17 +24,20 @@ public:
 	};
 	struct Random {
 		Vector3 axis;
-		float angle;
+		r32 angle;
+	};
+	struct LookAtAngle {
+		r32 angleParSec;
 	};
 
 public: // Constructor/Destructor
 	Particle(
 		const Vector3& translate,
-		float lifetime_,
+		r32 lifetime_,
 		const Vector3& velocity_, const Vector3& acceleration_,
 		const Color4& startColor_, const Color4& endColor_,
 		const Vector3& startSize_, const Vector3& endSize_,
-		RotationType rotationType, std::variant<Constant, std::monostate, Random> rotationData
+		RotationType rotationType, std::variant<Constant, std::monostate, Random, LookAtAngle> rotationData
 	);
 	~Particle() = default;
 
@@ -41,7 +47,7 @@ public: // Constructor/Destructor
 	Particle& operator=(Particle&&) = delete;
 
 public: // Member function
-	void update();
+	void update() override;
 
 public: // Getter/Setter
 	const Color4& get_color() const { return color; };
@@ -52,8 +58,8 @@ public: // Getter/Setter
 protected: // Member variable
 	bool isDestroy = false;
 
-	float timer;
-	float lifetime;
+	WorldTimer timer;
+	r32 lifetime;
 
 	Vector3 velocity;
 	Vector3 acceleration;
@@ -67,7 +73,7 @@ protected: // Member variable
 
 	RotationType rotationType;
 
-	std::variant<Constant, std::monostate, Random> rotationData;
+	std::variant<Constant, std::monostate, Random, LookAtAngle> rotationData;
 
 	Transform2D uvTransform;
 

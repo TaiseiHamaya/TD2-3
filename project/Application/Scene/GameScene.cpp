@@ -1,36 +1,39 @@
 #include "GameScene.h"
 
+//#include <Engine/Rendering/DirectX/DirectXResourceObject/DepthStencil/DepthStencil.h>
+//#include <Engine/Rendering/DirectX/DirectXResourceObject/OffscreenRender/OffscreenRender.h>
+//#include <Engine/Rendering/DirectX/DirectXSwapChain/DirectXSwapChain.h>
+#include <Engine/Assets/Animation/NodeAnimation/NodeAnimationLibrary.h>
+#include <Engine/Assets/Animation/Skeleton/SkeletonLibrary.h>
+#include <Engine/Assets/Audio/AudioLibrary.h>
+#include <Engine/Assets/Audio/AudioManager.h>
+#include <Engine/Assets/PolygonMesh/PolygonMeshLibrary.h>
+#include <Engine/Assets/Texture/TextureLibrary.h>
+#include <Engine/GraphicsAPI/RenderingSystemValues.h>
 #include <Engine/Module/Render/RenderNode/2D/Sprite/SpriteNode.h>
-#include <Engine/Module/Render/RenderNode/Forward/Object3DNode/Object3DNode.h>
+#include <Engine/Module/Render/RenderNode/Forward/Mesh/SkinningMeshNodeForward.h>
+#include <Engine/Module/Render/RenderNode/Forward/Mesh/StaticMeshNodeForward.h>
 #include <Engine/Module/Render/RenderNode/Forward/Particle/ParticleMeshNode/ParticleMeshNode.h>
-#include <Engine/Module/Render/RenderNode/Forward/SkinningMesh/SkinningMeshNode.h>
+#include <Engine/Module/Render/RenderNode/Posteffect/Outline/OutlineNode.h>
 #include <Engine/Module/Render/RenderPath/RenderPath.h>
 #include <Engine/Module/Render/RenderTargetGroup/SingleRenderTarget.h>
 #include <Engine/Module/World/Camera/Camera2D.h>
 #include <Engine/Module/World/Camera/Camera3D.h>
 #include <Engine/Module/World/Sprite/SpriteInstance.h>
-#include <Engine/Rendering/DirectX/DirectXResourceObject/DepthStencil/DepthStencil.h>
-#include <Engine/Rendering/DirectX/DirectXResourceObject/OffscreenRender/OffscreenRender.h>
-#include <Engine/Rendering/DirectX/DirectXSwapChain/DirectXSwapChain.h>
-#include <Engine/Resources/Animation/NodeAnimation/NodeAnimationManager.h>
-#include <Engine/Resources/Animation/Skeleton/SkeletonManager.h>
-#include <Engine/Resources/Audio/AudioManager.h>
-#include <Engine/Resources/PolygonMesh/PolygonMeshManager.h>
-#include <Engine/Resources/Texture/TextureManager.h>
+#include <Engine/Runtime/Clock/WorldClock.h>
 #include <Engine/Runtime/Scene/SceneManager.h>
-#include <Engine/Runtime/WorldClock/WorldClock.h>
-#include <Engine/Utility/Tools/SmartPointer.h>
 
 #include "Application/GameValue.h"
+#include "Application/LevelLoader/LevelLoader.h"
 #include "Application/Scene/SelectScene.h"
 #include "Application/Scene/TitleScene.h"
 
-#include "Application/LevelLoader/LevelLoader.h"
+#include <Library/Utility/Tools/SmartPointer.h>
 
 #ifdef _DEBUG
 #include "Engine/Module/Render/RenderNode/Debug/PrimitiveLine/PrimitiveLineNode.h"
 #endif // _DEBUG
-
+	
 GameScene::GameScene() : GameScene(1) {}
 
 GameScene::GameScene(int32_t level) :
@@ -42,99 +45,99 @@ GameScene::~GameScene() = default;
 
 void GameScene::load() {
 	//PolygonMeshManager::RegisterLoadQue("./EngineResources/Models/Primitive/Sphere.obj");
-	PolygonMeshManager::RegisterLoadQue("./GameResources/Models/ParentKoala/ParentKoala.gltf");
-	PolygonMeshManager::RegisterLoadQue("./GameResources/Models/ChiledKoala/ChiledKoala.gltf");
-	PolygonMeshManager::RegisterLoadQue("./GameResources/Models/CatchEffect/CatchEffect.gltf");
-	PolygonMeshManager::RegisterLoadQue("./GameResources/Models/ReleaseEffect/ReleaseEffect.gltf");
-	PolygonMeshManager::RegisterLoadQue("./GameResources/Models/exclamation/exclamation.gltf");
-	PolygonMeshManager::RegisterLoadQue("./GameResources/Models/FlusteredEffect/FlusteredEffect.gltf");
-	SkeletonManager::RegisterLoadQue("./GameResources/Models/ParentKoala/ParentKoala.gltf");
-	SkeletonManager::RegisterLoadQue("./GameResources/Models/ChiledKoala/ChiledKoala.gltf");
-	SkeletonManager::RegisterLoadQue("./GameResources/Models/CatchEffect/CatchEffect.gltf");
-	SkeletonManager::RegisterLoadQue("./GameResources/Models/ReleaseEffect/ReleaseEffect.gltf");
-	SkeletonManager::RegisterLoadQue("./GameResources/Models/exclamation/exclamation.gltf");
-	SkeletonManager::RegisterLoadQue("./GameResources/Models/FlusteredEffect/FlusteredEffect.gltf");
-	NodeAnimationManager::RegisterLoadQue("./GameResources/Models/ParentKoala/ParentKoala.gltf");
-	NodeAnimationManager::RegisterLoadQue("./GameResources/Models/ChiledKoala/ChiledKoala.gltf");
-	NodeAnimationManager::RegisterLoadQue("./GameResources/Models/CatchEffect/CatchEffect.gltf");
-	NodeAnimationManager::RegisterLoadQue("./GameResources/Models/ReleaseEffect/ReleaseEffect.gltf");
-	NodeAnimationManager::RegisterLoadQue("./GameResources/Models/exclamation/exclamation.gltf");
-	NodeAnimationManager::RegisterLoadQue("./GameResources/Models/FlusteredEffect/FlusteredEffect.gltf");
-	TextureManager::RegisterLoadQue("./GameResources/Texture/ClearTex.png");
-	TextureManager::RegisterLoadQue("./GameResources/Texture/FailedTex.png");
+	PolygonMeshLibrary::RegisterLoadQue("./GameResources/Models/ParentKoala/ParentKoala.gltf");
+	PolygonMeshLibrary::RegisterLoadQue("./GameResources/Models/ChiledKoala/ChiledKoala.gltf");
+	PolygonMeshLibrary::RegisterLoadQue("./GameResources/Models/CatchEffect/CatchEffect.gltf");
+	PolygonMeshLibrary::RegisterLoadQue("./GameResources/Models/ReleaseEffect/ReleaseEffect.gltf");
+	PolygonMeshLibrary::RegisterLoadQue("./GameResources/Models/exclamation/exclamation.gltf");
+	PolygonMeshLibrary::RegisterLoadQue("./GameResources/Models/FlusteredEffect/FlusteredEffect.gltf");
+	SkeletonLibrary::RegisterLoadQue("./GameResources/Models/ParentKoala/ParentKoala.gltf");
+	SkeletonLibrary::RegisterLoadQue("./GameResources/Models/ChiledKoala/ChiledKoala.gltf");
+	SkeletonLibrary::RegisterLoadQue("./GameResources/Models/CatchEffect/CatchEffect.gltf");
+	SkeletonLibrary::RegisterLoadQue("./GameResources/Models/ReleaseEffect/ReleaseEffect.gltf");
+	SkeletonLibrary::RegisterLoadQue("./GameResources/Models/exclamation/exclamation.gltf");
+	SkeletonLibrary::RegisterLoadQue("./GameResources/Models/FlusteredEffect/FlusteredEffect.gltf");
+	NodeAnimationLibrary::RegisterLoadQue("./GameResources/Models/ParentKoala/ParentKoala.gltf");
+	NodeAnimationLibrary::RegisterLoadQue("./GameResources/Models/ChiledKoala/ChiledKoala.gltf");
+	NodeAnimationLibrary::RegisterLoadQue("./GameResources/Models/CatchEffect/CatchEffect.gltf");
+	NodeAnimationLibrary::RegisterLoadQue("./GameResources/Models/ReleaseEffect/ReleaseEffect.gltf");
+	NodeAnimationLibrary::RegisterLoadQue("./GameResources/Models/exclamation/exclamation.gltf");
+	NodeAnimationLibrary::RegisterLoadQue("./GameResources/Models/FlusteredEffect/FlusteredEffect.gltf");
+	TextureLibrary::RegisterLoadQue("./GameResources/Texture/ClearTex.png");
+	TextureLibrary::RegisterLoadQue("./GameResources/Texture/FailedTex.png");
 
-	PolygonMeshManager::RegisterLoadQue("./GameResources/Models/GoalObj/GoalObj.gltf");
-	SkeletonManager::RegisterLoadQue("./GameResources/Models/GoalObj/GoalObj.gltf");
-	NodeAnimationManager::RegisterLoadQue("./GameResources/Models/GoalObj/GoalObj.gltf");
+	PolygonMeshLibrary::RegisterLoadQue("./GameResources/Models/GoalObj/GoalObj.gltf");
+	SkeletonLibrary::RegisterLoadQue("./GameResources/Models/GoalObj/GoalObj.gltf");
+	NodeAnimationLibrary::RegisterLoadQue("./GameResources/Models/GoalObj/GoalObj.gltf");
 
 
-	TextureManager::RegisterLoadQue("./GameResources/Texture/UI/Wkey.png");
-	TextureManager::RegisterLoadQue("./GameResources/Texture/UI/Akey.png");
-	TextureManager::RegisterLoadQue("./GameResources/Texture/UI/Skey.png");
-	TextureManager::RegisterLoadQue("./GameResources/Texture/UI/Dkey.png");
-	TextureManager::RegisterLoadQue("./GameResources/Texture/UI/ResetUI.png");
-	TextureManager::RegisterLoadQue("./GameResources/Texture/UI/ESCkey.png");
-	TextureManager::RegisterLoadQue("./GameResources/Texture/UI/ReleseUI_EN.png");
+	TextureLibrary::RegisterLoadQue("./GameResources/Texture/UI/Wkey.png");
+	TextureLibrary::RegisterLoadQue("./GameResources/Texture/UI/Akey.png");
+	TextureLibrary::RegisterLoadQue("./GameResources/Texture/UI/Skey.png");
+	TextureLibrary::RegisterLoadQue("./GameResources/Texture/UI/Dkey.png");
+	TextureLibrary::RegisterLoadQue("./GameResources/Texture/UI/ResetUI.png");
+	TextureLibrary::RegisterLoadQue("./GameResources/Texture/UI/ESCkey.png");
+	TextureLibrary::RegisterLoadQue("./GameResources/Texture/UI/ReleseUI_EN.png");
 
-	TextureManager::RegisterLoadQue("./GameResources/Texture/UI/ResetUIController.png");
-	TextureManager::RegisterLoadQue("./GameResources/Texture/UI/ESCkeyController.png");
-	TextureManager::RegisterLoadQue("./GameResources/Texture/UI/UndoController.png");
-	TextureManager::RegisterLoadQue("./GameResources/Texture/UI/ReleseUIController.png");
-	TextureManager::RegisterLoadQue("./GameResources/Texture/UI/ReleseUIController_EN.png");
-	TextureManager::RegisterLoadQue("./GameResources/Texture/UI/NoneButton.png");
+	TextureLibrary::RegisterLoadQue("./GameResources/Texture/UI/ResetUIController.png");
+	TextureLibrary::RegisterLoadQue("./GameResources/Texture/UI/ESCkeyController.png");
+	TextureLibrary::RegisterLoadQue("./GameResources/Texture/UI/UndoController.png");
+	TextureLibrary::RegisterLoadQue("./GameResources/Texture/UI/ReleseUIController.png");
+	TextureLibrary::RegisterLoadQue("./GameResources/Texture/UI/ReleseUIController_EN.png");
+	TextureLibrary::RegisterLoadQue("./GameResources/Texture/UI/NoneButton.png");
 
-	TextureManager::RegisterLoadQue("./GameResources/Texture/UI/Tutorial1.png");
-	TextureManager::RegisterLoadQue("./GameResources/Texture/UI/Next.png");
-	TextureManager::RegisterLoadQue("./GameResources/Texture/UI/Retry.png");
-	TextureManager::RegisterLoadQue("./GameResources/Texture/UI/SelectFrame.png");
-	TextureManager::RegisterLoadQue("./GameResources/Texture/UI/FailedUI_1.png");
-	TextureManager::RegisterLoadQue("./GameResources/Texture/UI/undoRetry.png");
-	TextureManager::RegisterLoadQue("./GameResources/Texture/UI/undoRetry_EN.png");
-	TextureManager::RegisterLoadQue("./GameResources/Texture/UI/GoSelect.png");
-	TextureManager::RegisterLoadQue("./GameResources/Texture/UI/Undo.png");
-	TextureManager::RegisterLoadQue("./GameResources/Texture/UI/smallNumber.png");
-	TextureManager::RegisterLoadQue("./GameResources/Texture/UI/stageFrame.png");
-	TextureManager::RegisterLoadQue("./GameResources/Texture/backGround.png");
-	TextureManager::RegisterLoadQue("./GameResources/Texture/backGround2.png");
-	TextureManager::RegisterLoadQue("./GameResources/Texture/Failed/Failed.png");
-	TextureManager::RegisterLoadQue("./GameResources/Texture/Failed/F.png");
-	TextureManager::RegisterLoadQue("./GameResources/Texture/Failed/a.png");
-	TextureManager::RegisterLoadQue("./GameResources/Texture/Failed/i.png");
-	TextureManager::RegisterLoadQue("./GameResources/Texture/Failed/l.png");
-	TextureManager::RegisterLoadQue("./GameResources/Texture/Failed/e.png");
-	TextureManager::RegisterLoadQue("./GameResources/Texture/Failed/d.png");
-	TextureManager::RegisterLoadQue("./GameResources/Texture/Failed/ten.png");
-	TextureManager::RegisterLoadQue("./GameResources/Texture/Clear/Clear.png");
-	TextureManager::RegisterLoadQue("./GameResources/Texture/Clear/C.png");
-	TextureManager::RegisterLoadQue("./GameResources/Texture/Clear/L.png");
-	TextureManager::RegisterLoadQue("./GameResources/Texture/Clear/E.png");
-	TextureManager::RegisterLoadQue("./GameResources/Texture/Clear/A.png");
-	TextureManager::RegisterLoadQue("./GameResources/Texture/Clear/R.png");
-	TextureManager::RegisterLoadQue("./GameResources/Texture/Clear/!.png");
-	TextureManager::RegisterLoadQue("./GameResources/Texture/Tutorial/Frame.png");
-	TextureManager::RegisterLoadQue("./GameResources/Texture/Tutorial/TutorialText.png");
-	TextureManager::RegisterLoadQue("./GameResources/Texture/Tutorial/TutorialText_EN.png");
-	TextureManager::RegisterLoadQue("./GameResources/Texture/Tutorial/TutorialImage.png");
+	TextureLibrary::RegisterLoadQue("./GameResources/Texture/UI/Tutorial1.png");
+	TextureLibrary::RegisterLoadQue("./GameResources/Texture/UI/Next.png");
+	TextureLibrary::RegisterLoadQue("./GameResources/Texture/UI/Retry.png");
+	TextureLibrary::RegisterLoadQue("./GameResources/Texture/UI/SelectFrame.png");
+	TextureLibrary::RegisterLoadQue("./GameResources/Texture/UI/FailedUI_1.png");
+	TextureLibrary::RegisterLoadQue("./GameResources/Texture/UI/undoRetry.png");
+	TextureLibrary::RegisterLoadQue("./GameResources/Texture/UI/undoRetry_EN.png");
+	TextureLibrary::RegisterLoadQue("./GameResources/Texture/UI/GoSelect.png");
+	TextureLibrary::RegisterLoadQue("./GameResources/Texture/UI/Undo.png");
+	TextureLibrary::RegisterLoadQue("./GameResources/Texture/UI/smallNumber.png");
+	TextureLibrary::RegisterLoadQue("./GameResources/Texture/UI/stageFrame.png");
+	TextureLibrary::RegisterLoadQue("./GameResources/Texture/backGround.png");
+	TextureLibrary::RegisterLoadQue("./GameResources/Texture/backGround2.png");
+	TextureLibrary::RegisterLoadQue("./GameResources/Texture/Failed/Failed.png");
+	TextureLibrary::RegisterLoadQue("./GameResources/Texture/Failed/F.png");
+	TextureLibrary::RegisterLoadQue("./GameResources/Texture/Failed/a.png");
+	TextureLibrary::RegisterLoadQue("./GameResources/Texture/Failed/i.png");
+	TextureLibrary::RegisterLoadQue("./GameResources/Texture/Failed/l.png");
+	TextureLibrary::RegisterLoadQue("./GameResources/Texture/Failed/e.png");
+	TextureLibrary::RegisterLoadQue("./GameResources/Texture/Failed/d.png");
+	TextureLibrary::RegisterLoadQue("./GameResources/Texture/Failed/ten.png");
+	TextureLibrary::RegisterLoadQue("./GameResources/Texture/Clear/Clear.png");
+	TextureLibrary::RegisterLoadQue("./GameResources/Texture/Clear/C.png");
+	TextureLibrary::RegisterLoadQue("./GameResources/Texture/Clear/L.png");
+	TextureLibrary::RegisterLoadQue("./GameResources/Texture/Clear/E.png");
+	TextureLibrary::RegisterLoadQue("./GameResources/Texture/Clear/A.png");
+	TextureLibrary::RegisterLoadQue("./GameResources/Texture/Clear/R.png");
+	TextureLibrary::RegisterLoadQue("./GameResources/Texture/Clear/!.png");
+	TextureLibrary::RegisterLoadQue("./GameResources/Texture/Tutorial/Frame.png");
+	TextureLibrary::RegisterLoadQue("./GameResources/Texture/Tutorial/TutorialText.png");
+	TextureLibrary::RegisterLoadQue("./GameResources/Texture/Tutorial/TutorialText_EN.png");
+	TextureLibrary::RegisterLoadQue("./GameResources/Texture/Tutorial/TutorialImage.png");
 
-	TextureManager::RegisterLoadQue("./GameResources/Texture/UI/Abutton.png");
+	TextureLibrary::RegisterLoadQue("./GameResources/Texture/UI/Abutton.png");
 
-	AudioManager::RegisterLoadQue("./GameResources/Audio/move.wav");
-	AudioManager::RegisterLoadQue("./GameResources/Audio/hold.wav");
-	AudioManager::RegisterLoadQue("./GameResources/Audio/release.wav");
-	AudioManager::RegisterLoadQue("./GameResources/Audio/fall.wav");
-	AudioManager::RegisterLoadQue("./GameResources/Audio/unmovable.wav");
-	AudioManager::RegisterLoadQue("./GameResources/Audio/iceMove.wav");
-	AudioManager::RegisterLoadQue("./GameResources/Audio/decision.wav");
-	AudioManager::RegisterLoadQue("./GameResources/Audio/operation.wav");
-	AudioManager::RegisterLoadQue("./GameResources/Audio/clearSound.wav");
-	AudioManager::RegisterLoadQue("./GameResources/Audio/failedSound.wav");
-	AudioManager::RegisterLoadQue("./GameResources/Audio/rotate.wav");
-	AudioManager::RegisterLoadQue("./GameResources/Audio/undo.wav");
-	AudioManager::RegisterLoadQue("./GameResources/Audio/explosion.wav");
-	AudioManager::RegisterLoadQue("./GameResources/Audio/gushing.wav");
-	AudioManager::RegisterLoadQue("./GameResources/Audio/reset.wav");
-	AudioManager::RegisterLoadQue("./GameResources/Audio/backAudio.wav");
-	AudioManager::RegisterLoadQue("./GameResources/Audio/BGM/Game.wav");
+	AudioLibrary::RegisterLoadQue("./GameResources/Audio/move.wav");
+	AudioLibrary::RegisterLoadQue("./GameResources/Audio/hold.wav");
+	AudioLibrary::RegisterLoadQue("./GameResources/Audio/release.wav");
+	AudioLibrary::RegisterLoadQue("./GameResources/Audio/fall.wav");
+	AudioLibrary::RegisterLoadQue("./GameResources/Audio/unmovable.wav");
+	AudioLibrary::RegisterLoadQue("./GameResources/Audio/iceMove.wav");
+	AudioLibrary::RegisterLoadQue("./GameResources/Audio/decision.wav");
+	AudioLibrary::RegisterLoadQue("./GameResources/Audio/operation.wav");
+	AudioLibrary::RegisterLoadQue("./GameResources/Audio/clearSound.wav");
+	AudioLibrary::RegisterLoadQue("./GameResources/Audio/failedSound.wav");
+	AudioLibrary::RegisterLoadQue("./GameResources/Audio/rotate.wav");
+	AudioLibrary::RegisterLoadQue("./GameResources/Audio/undo.wav");
+	AudioLibrary::RegisterLoadQue("./GameResources/Audio/explosion.wav");
+	AudioLibrary::RegisterLoadQue("./GameResources/Audio/gushing.wav");
+	AudioLibrary::RegisterLoadQue("./GameResources/Audio/reset.wav");
+	AudioLibrary::RegisterLoadQue("./GameResources/Audio/backAudio.wav");
+	AudioLibrary::RegisterLoadQue("./GameResources/Audio/BGM/Game.wav");
 
 }
 
@@ -165,54 +168,48 @@ void GameScene::initialize() {
 
 	directionalLight = eps::CreateUnique<DirectionalLightInstance>();
 
+	renderTexture = std::make_unique<RenderTexture>();
+	renderTexture->initialize(DXGI_FORMAT_R8G8B8A8_UNORM);
+
 	std::shared_ptr<SingleRenderTarget> meshRT;
 	meshRT = std::make_shared<SingleRenderTarget>();
-	meshRT->initialize();
+	meshRT->initialize(renderTexture);
 
 	Particle::lookAtDefault = camera3D.get();
 
 	std::shared_ptr<SpriteNode> bgSpriteNode;
 	bgSpriteNode = std::make_unique<SpriteNode>();
 	bgSpriteNode->initialize();
-	bgSpriteNode->set_config(
-		RenderNodeConfig::ContinueDrawBefore
-	);
-	bgSpriteNode->set_render_target(meshRT);
+	bgSpriteNode->set_render_target(meshRT.get());
 
-	std::shared_ptr<Object3DNode> object3dNode;
-	object3dNode = std::make_unique<Object3DNode>();
+	std::shared_ptr<StaticMeshNodeForward> object3dNode;
+	object3dNode = std::make_unique<StaticMeshNodeForward>();
 	object3dNode->initialize();
-	object3dNode->set_config(RenderNodeConfig::ContinueDrawAfter | RenderNodeConfig::ContinueDrawBefore | RenderNodeConfig::ContinueUseDpehtBefore);
-	object3dNode->set_render_target(meshRT);
+	object3dNode->set_config(RenderNodeConfig::NoClearRenderTarget);
+	object3dNode->set_render_target(meshRT.get());
 
-	std::shared_ptr<SkinningMeshNode> skinningMeshNode;
-	skinningMeshNode = std::make_unique<SkinningMeshNode>();
+	std::shared_ptr<SkinningMeshNodeForward> skinningMeshNode;
+	skinningMeshNode = std::make_unique<SkinningMeshNodeForward>();
 	skinningMeshNode->initialize();
-	skinningMeshNode->set_config(RenderNodeConfig::ContinueDrawAfter | RenderNodeConfig::ContinueUseDpehtAfter);
-	skinningMeshNode->set_render_target(meshRT);
+	skinningMeshNode->set_config(RenderNodeConfig::NoClearRenderTarget | RenderNodeConfig::NoClearDepth);
+	skinningMeshNode->set_render_target(meshRT.get());
 
 	outlineNode = std::make_shared<OutlineNode>();
 	outlineNode->initialize();
-	outlineNode->set_config(RenderNodeConfig::ContinueDrawBefore);
-	outlineNode->set_depth_resource(DepthStencilValue::depthStencil->texture_gpu_handle());
-	outlineNode->set_texture_resource(meshRT->offscreen_render().texture_gpu_handle());
-	outlineNode->set_render_target_SC(DirectXSwapChain::GetRenderTarget());
+	outlineNode->set_shader_texture(renderTexture, RenderingSystemValues::GetDepthStencilTexture());
+	outlineNode->set_render_target_SC();
 
 	std::shared_ptr<ParticleMeshNode> particleMeshNode;
 	particleMeshNode = std::make_unique<ParticleMeshNode>();
 	particleMeshNode->initialize();
-	//particleBillboardNode->set_config(RenderNodeConfig::ContinueDrawAfter | RenderNodeConfig::ContinueUseDpehtBefore);
-	particleMeshNode->set_config(RenderNodeConfig::ContinueDrawAfter | RenderNodeConfig::NoClearDepth | RenderNodeConfig::ContinueDrawBefore);
-	//particleBillboardNode->set_render_target(renderTarget);s
-	particleMeshNode->set_render_target_SC(DirectXSwapChain::GetRenderTarget());
+	particleMeshNode->set_config(RenderNodeConfig::NoClearRenderTarget | RenderNodeConfig::NoClearDepth);
+	particleMeshNode->set_render_target_SC();
 
 	std::shared_ptr<SpriteNode> spriteNode;
 	spriteNode = std::make_unique<SpriteNode>();
 	spriteNode->initialize();
-	spriteNode->set_config(
-		RenderNodeConfig::ContinueDrawAfter | RenderNodeConfig::ContinueDrawBefore
-	);
-	spriteNode->set_render_target_SC(DirectXSwapChain::GetRenderTarget());
+	spriteNode->set_config(RenderNodeConfig::NoClearRenderTarget);
+	spriteNode->set_render_target_SC();
 
 #ifdef _DEBUG
 	std::shared_ptr<PrimitiveLineNode> primitiveLineNode;
@@ -299,8 +296,8 @@ void GameScene::begin_rendering() {
 	playerManager->begin_rendering();
 	fieldObjs->begin_rendering();
 
-	camera3D->update_matrix();
-	directionalLight->begin_rendering();
+	camera3D->update_affine();
+	directionalLight->update_affine();
 	managementUI->begin_rendering();
 	gameUI->begin_rendering();
 	background->begin_rendering();
@@ -406,7 +403,7 @@ void GameScene::draw() const {
 	renderPath->next();
 	camera3D->register_world_projection(1);
 	camera3D->register_world_lighting(4);
-	directionalLight->register_world(5);
+	//directionalLight->register_world(5);
 
 	fieldObjs->draw();
 
@@ -418,7 +415,7 @@ void GameScene::draw() const {
 	renderPath->next();
 	camera3D->register_world_projection(1);
 	camera3D->register_world_lighting(5);
-	directionalLight->register_world(6);
+	//directionalLight->register_world(6);
 	playerManager->draw();
 	rocketObj->draw();
 	background->animeDraw();

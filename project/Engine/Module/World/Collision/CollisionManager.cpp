@@ -2,18 +2,18 @@
 
 #include <ranges>
 
-#include "Engine/Utility/Tools/SmartPointer.h"
+#include "Library/Utility/Tools/SmartPointer.h"
 #include "Engine/Module/World/Collision/CollisionFunctions.h"
 
 CollisionManager::CollisionManager() {
 #ifdef _DEBUG
 
-	sphereDebugDrawExecutor = eps::CreateUnique<PrimitiveLineDrawExecutor>(
-		"SphereCollider", 1024
-	);
-	aabbDebugDrawExecutor = eps::CreateUnique<PrimitiveLineDrawExecutor>(
-		"AABBCollider", 1024
-	);
+	//sphereDebugDrawExecutor = eps::CreateUnique<PrimitiveLineDrawExecutor>(
+	//	"SphereCollider", 1024
+	//);
+	//aabbDebugDrawExecutor = eps::CreateUnique<PrimitiveLineDrawExecutor>(
+	//	"AABBCollider", 1024
+	//);
 
 #endif // _DEBUG
 }
@@ -127,25 +127,25 @@ void CollisionManager::debug_gui() {
 }
 
 void CollisionManager::debug_draw3d() {
-	if (!isShowDebugDraw) {
-		return;
-	}
+	//if (!isShowDebugDraw) {
+	//	return;
+	//}
 
-	uint32_t sphereIndex = 0;
-	uint32_t aabbIndex = 0;
-	for (const Colliders& colliders : colliderList | std::views::values) {
-		for (const std::weak_ptr<SphereCollider>& sphereCollider : colliders.sphereColliders) {
-			sphereDebugDrawExecutor->write_to_buffer(sphereIndex, sphereCollider.lock()->debug_matrix());
-			++sphereIndex;
-		}
+	//uint32_t sphereIndex = 0;
+	//uint32_t aabbIndex = 0;
+	//for (const Colliders& colliders : colliderList | std::views::values) {
+	//	for (const std::weak_ptr<SphereCollider>& sphereCollider : colliders.sphereColliders) {
+	//		sphereDebugDrawExecutor->write_to_buffer(sphereIndex, sphereCollider.lock()->debug_matrix());
+	//		++sphereIndex;
+	//	}
 
-		for (const std::weak_ptr<AABBCollider>& aabbCollider : colliders.aabbColliders) {
-			aabbDebugDrawExecutor->write_to_buffer(aabbIndex, aabbCollider.lock()->debug_matrix());
-			++aabbIndex;
-		}
-	}
+	//	for (const std::weak_ptr<AABBCollider>& aabbCollider : colliders.aabbColliders) {
+	//		aabbDebugDrawExecutor->write_to_buffer(aabbIndex, aabbCollider.lock()->debug_matrix());
+	//		++aabbIndex;
+	//	}
+	//}
 
-	sphereDebugDrawExecutor->draw_command(sphereIndex);
-	aabbDebugDrawExecutor->draw_command(aabbIndex);
+	//sphereDebugDrawExecutor->draw_command(sphereIndex);
+	//aabbDebugDrawExecutor->draw_command(aabbIndex);
 }
 #endif // _DEBUG

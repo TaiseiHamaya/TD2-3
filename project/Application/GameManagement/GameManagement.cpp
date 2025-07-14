@@ -8,8 +8,8 @@
 
 #include <Engine/Module/World/Sprite/SpriteInstance.h>
 #include <Engine/Runtime/Input/Input.h>
-#include <Engine/Runtime/WorldClock/WorldClock.h>
-#include <Engine/Utility/Tools/SmartPointer.h>
+#include <Engine/Runtime/Clock/WorldClock.h>
+#include <Library/Utility/Tools/SmartPointer.h>
 
 
 GameManagement::GameManagement() {

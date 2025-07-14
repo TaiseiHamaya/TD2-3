@@ -1,9 +1,12 @@
 #include "Application/Mapchip/MapchipField.h"
-#include "Engine/Module/World/Mesh/MeshInstance.h"
-#include "Application/LevelLoader/LevelLoader.h"
-#include <Engine/Utility/Template/Reference.h>
-#include "Engine/Rendering/DirectX/DirectXResourceObject/ConstantBuffer/Material/Material.h"
 
+#include <cmath>
+
+#include "Application/LevelLoader/LevelLoader.h"
+
+#include <Library/Utility/Template/Reference.h>
+
+#include "Engine/Module/World/Mesh/StaticMeshInstance.h"
 
 MapchipField::MapchipField() = default;
 
@@ -63,25 +66,6 @@ void MapchipField::update() {
 
 }
 
-void MapchipField::begin_rendering() {
-	fieldRoot->update_affine();
-	for (uint32_t i = 0; i < rowSize; ++i) {
-		for (uint32_t j = 0; j < columnSize; ++j) {
-			field[i][j].mesh->begin_rendering();
-		}
-	}
-}
-
-void MapchipField::draw() {
-	for (uint32_t i = 0; i < rowSize; ++i) {
-		for (uint32_t j = 0; j < columnSize; ++j) {
-			if (field[i][j].type != 0) {
-				field[i][j].mesh->draw();
-			}
-		}
-	}
-}
-
 Reference<WorldInstance> MapchipField::field_root() const {
 	return fieldRoot;
 }
@@ -101,7 +85,7 @@ int MapchipField::getElement(float x, float y) {
 }
 
 MapchipField::Field::Field() :
-	mesh(std::make_unique<MeshInstance>()),
+	mesh(std::make_unique<StaticMeshInstance>()),
 	type(0),
 	isZeroGravity(false) {
 }

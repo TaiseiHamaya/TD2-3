@@ -1,11 +1,11 @@
 #pragma once
 #include <memory>
-#include "Engine/Resources/Audio/AudioPlayer.h"
+#include "Engine/Assets/Audio/AudioPlayer.h"
 #include <Engine/Module/World/Particle/ParticleEmitterInstance.h>
-#include "Engine/Runtime/WorldClock/WorldClock.h"
+#include "Engine/Runtime/Clock/WorldClock.h"
 
 
-class AnimatedMeshInstance;
+class SkinningMeshInstance;
 #include <Library/Math/Vector3.h>
 class Rocket
 {
@@ -25,7 +25,7 @@ public:
 	void isFailed();
 	void particleUpdate();
 private:
-	std::unique_ptr<AnimatedMeshInstance> animatedMeshInstance;
+	std::unique_ptr<SkinningMeshInstance> animatedMeshInstance;
 	bool isResult;
 	// パーティクルの召還
 	std::unique_ptr<ParticleEmitterInstance> gushingEmitter;

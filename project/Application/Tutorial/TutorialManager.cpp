@@ -5,8 +5,8 @@
 #include <Library/Math/Transform2D.h>
 
 #include <Engine/Runtime/Input/Input.h>
-#include <Engine/Runtime/WorldClock/WorldClock.h>
-#include <Engine/Utility/Tools/SmartPointer.h>
+#include <Engine/Runtime/Clock/WorldClock.h>
+#include <Library/Utility/Tools/SmartPointer.h>
 
 #include "Application/Configuration/Configuration.h"
 

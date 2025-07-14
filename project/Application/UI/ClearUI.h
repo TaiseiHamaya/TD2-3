@@ -1,11 +1,8 @@
 #pragma once
 
+#include <Library/Math/Transform2D.h>
+
 #include <memory>
-#include "Engine/Debug/ImGui/ImGuiLoadManager/ImGuiLoadManager.h"
-#include "Library/Math/Transform2D.h"
-#include "Engine/Runtime/WorldClock/WorldClock.h"
-#include "Library/Math/Easing.h"
-#include <Engine/Runtime/Input/Input.h>
 
 class SpriteInstance;
 
@@ -37,7 +34,7 @@ private:
 	float curEaseT[6];
 	float totalEaseT = 0.8f;
 	float endPosHeight = 417.f;//最終的な位置の高さ
-	
+
 	float boundTotalEaseT = 0.5f;
 	float boundCurEaseT[6];
 	float boundEaseDir[6];

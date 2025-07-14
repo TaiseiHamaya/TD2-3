@@ -16,6 +16,7 @@ class LevelLoader;
 #include "Application/GameSprite/BackGround.h"
 
 #include "Engine/Module/Render/RenderNode/Posteffect/Outline/OutlineNode.h"
+#include <Engine/GraphicsAPI/DirectX/DxResource/TextureResource/RenderTexture.h>
 
 #include "Application/Rocket/Rocket.h"
 #include "Application/Tutorial/TutorialManager.h"
@@ -55,6 +56,8 @@ public:
 #endif // _DEBUG
 private:
 	std::unique_ptr<RenderPath> renderPath;
+
+	std::unique_ptr<RenderTexture> renderTexture;
 
 	std::shared_ptr<OutlineNode> outlineNode;
 	// プレイヤーの生成

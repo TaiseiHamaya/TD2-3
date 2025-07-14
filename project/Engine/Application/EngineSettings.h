@@ -6,7 +6,7 @@
 #include <string_view>
 
 #include <Library/Math/Vector2.h>
-#include <Engine/Utility/Tools/ChronoUtility.h>
+#include <Library/Utility/Tools/ChronoUtility.h>
 
 namespace EngineSettings {
 	// Windowタイトル
@@ -30,6 +30,9 @@ namespace EngineSettings {
 	// FixDeltaSeconds
 	static constexpr float FixDeltaSeconds{ 1.0f / 60.0f };
 
+	extern inline bool IsFixDeltaTime{ false };
+	extern inline bool IsUnlimitedFPS{ false };
+
 	extern inline const std::filesystem::path LogFileName{
 		std::format(L"{:%F-%H%M%S}.log", ChronoUtility::NowLocalSecond())
 	};
@@ -37,4 +40,25 @@ namespace EngineSettings {
 	extern inline const std::filesystem::path LogFilePath{
 		std::format(L"./Log/{}", EngineSettings::LogFileName.native())
 	};
+
+	// メモ
+	// 上位ビットから6bitずつCritical,Error,Warning,Information
+	// 各6bitの割り当ては上から
+	//    コンソール出力
+	//    ファイル出力
+	//    Editor出力(未実装)
+	//    ウィンドウ出力
+	//    ブレークポイント命令
+	//    Stacktrace出力
+	//
+	// つまり
+	// [CriticalConfig6bit][ErrorConfig6bit][WarningConfig6bit][InfoConfig6bit]
+	// の24bit
+#ifdef DEBUG_FEATURES_ENABLE
+//                                                C     E     W     I    
+	static constexpr u32 LogOutputConfigFlags{ 0b111111111111111000111000 };
+#else
+//                                                C     E     W     I    
+	static constexpr u32 LogOutputConfigFlags{ 0b110111110101110000000000 };
+#endif // DEBUG_FEATURES_ENABLE
 };

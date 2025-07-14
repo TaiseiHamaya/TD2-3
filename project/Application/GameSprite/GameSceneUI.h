@@ -1,15 +1,12 @@
 #pragma once
 
 #include <memory>
-#include "Engine/Debug/ImGui/ImGuiLoadManager/ImGuiLoadManager.h"
-#include "Library/Math/Transform2D.h"
-#include "Engine/Runtime/WorldClock/WorldClock.h"
+
+#include <Engine/Module/World/Sprite/SpriteInstance.h>
 
 enum class KeyID;
-class SpriteInstance;
 
-
-class GameSceneUI{
+class GameSceneUI {
 public:
 	GameSceneUI();
 	~GameSceneUI();

@@ -1,5 +1,11 @@
 #include "ClearUI.h"
+
 #include <Engine/Module/World/Sprite/SpriteInstance.h>
+#include <Engine/Debug/ImGui/ImGuiLoadManager/ImGuiLoadManager.h>
+#include <Engine/Runtime/Input/Input.h>
+#include <Engine/Runtime/Clock/WorldClock.h>
+
+#include <Library/Utility/Tools/Easing.h>
 
 #include <algorithm>
 

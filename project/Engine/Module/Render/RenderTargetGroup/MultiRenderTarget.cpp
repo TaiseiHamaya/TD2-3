@@ -3,8 +3,8 @@
 //#include <d3d12.h>
 //
 //#include "Engine/DirectX/DirectXCommand/DirectXCommand.h"
-//#include "Engine/DirectX/DirectXResourceObject/DepthStencil/DepthStencil.h"
-//#include "Engine/DirectX/DirectXResourceObject/OffscreenRender/OffscreenRender.h"
+//#include "Engine/DirectX/DxResource/DepthStencil/DepthStencil.h"
+//#include "Engine/DirectX/DxResource/OffscreenRender/OffscreenRender.h"
 //
 //MultiRenderTarget::MultiRenderTarget() = default;
 //
@@ -20,7 +20,7 @@
 //	}
 //}
 //
-//void MultiRenderTarget::initialize(std::uint32_t width, std::uint32_t hight, std::uint32_t size) {
+//void MultiRenderTarget::initialize(u32 width, u32 hight, u32 size) {
 //	renderTargets.resize(size);
 //	for (auto itr = renderTargets.begin(); itr < renderTargets.end(); ++itr) {
 //		itr->initialize(width, hight);
@@ -29,7 +29,7 @@
 //	create_view_port(width, hight);
 //}
 //
-//void MultiRenderTarget::initialize(std::uint32_t size) {
+//void MultiRenderTarget::initialize(u32 size) {
 //	initialize(WinApp::GetClientWidth(), WinApp::GetClientHight(), size);
 //}
 //
@@ -42,7 +42,7 @@
 //}
 //
 //void MultiRenderTarget::set_render_target(const std::shared_ptr<DepthStencil>& depthStencil) {
-//	auto&& commandList = DirectXCommand::GetCommandList();
+//	auto&& commandList = DxCommand::GetCommandList();
 //	commandList->OMSetRenderTargets(
 //		static_cast<UINT>(renderTargetsHandles.size()), renderTargetsHandles.data(),
 //		depthStencil ? 1 : 0,
@@ -51,7 +51,7 @@
 //}
 //
 //void MultiRenderTarget::clear_render_target() {
-//	auto&& commandList = DirectXCommand::GetCommandList();
+//	auto&& commandList = DxCommand::GetCommandList();
 //	for (OffscreenRender& renderTarget : renderTargets) {
 //		renderTarget.clear_resource();
 //	}

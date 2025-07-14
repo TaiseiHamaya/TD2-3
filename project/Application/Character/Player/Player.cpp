@@ -1,16 +1,16 @@
 #include "Player.h"
 #include "Engine/Runtime/Input/Input.h"
 #include "Application/Utility/GameUtility.h"
-#include "Engine/Rendering/DirectX/DirectXResourceObject/ConstantBuffer/Material/Material.h"
-#include <Engine/Resources/Animation/NodeAnimation/NodeAnimationPlayer.h>
+
+#include <Engine/Assets/Animation/NodeAnimation/NodeAnimationPlayer.h>
 
 void Player::initialize(const LevelLoader& level, MapchipHandler* mapchipHandler) {
-	object_ = std::make_unique<AnimatedMeshInstance>();
+	object_ = std::make_unique<SkinningMeshInstance>();
 	object_->reset_animated_mesh("ParentKoala.gltf", "Standby", true);
 	object_->get_transform().set_translate(level.get_player_position());
 
 	// ビックリマークの生成
-	exclamation_ = std::make_unique<AnimatedMeshInstance>();
+	exclamation_ = std::make_unique<SkinningMeshInstance>();
 	exclamation_->reset_animated_mesh("exclamation.gltf", "Standby", false);
 
 	auto& objMat = object_->get_materials();
@@ -19,7 +19,7 @@ void Player::initialize(const LevelLoader& level, MapchipHandler* mapchipHandler
 	}
 	mapchipHandler_ = mapchipHandler;
 
-	flusteredEffect_ = std::make_unique<AnimatedMeshInstance>();
+	flusteredEffect_ = std::make_unique<SkinningMeshInstance>();
 	flusteredEffect_->reset_animated_mesh("FlusteredEffect.gltf", "Standby", true);
 	flusteredEffect_->set_active(false);
 
@@ -108,18 +108,10 @@ void Player::update() {
 	preIsMoving = isMoving;
 }
 
-void Player::begin_rendering() {
-	object_->begin_rendering();
-	exclamation_->begin_rendering();
-	flusteredEffect_->begin_rendering();
-}
-
-void Player::draw() const {
-	object_->draw();
-	if (exclamationData_.isActive) {
-		exclamation_->draw();
-	}
-	//flusteredEffect_->draw();
+void Player::update_affine() {
+	object_->update_affine();
+	exclamation_->update_affine();
+	flusteredEffect_->update_affine();
 }
 
 void Player::on_undo(Vector3 position, Quaternion rotation, bool setParent) {
@@ -133,10 +125,10 @@ void Player::on_undo(Vector3 position, Quaternion rotation, bool setParent) {
 
 #ifdef _DEBUG
 void Player::debug_update() {
-	ImGui::Begin("Player");
-	ImGui::Text("%d", isParent);
-	object_->debug_gui();
-	ImGui::End();
+	//ImGui::Begin("Player");
+	//ImGui::Text("%d", isParent);
+	//object_->debug_gui();
+	//ImGui::End();
 
 	//ImGui::Begin("flust");
 	//flusteredEffect_->debug_gui();

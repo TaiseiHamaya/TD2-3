@@ -1,40 +1,49 @@
 #pragma once
 
-#include "Library/Math/Transform3D.h"
-#include "Library/Math/Hierarchy.h"
-#include "Library/Math/Affine.h"
+#include <Library/Math/Affine.h>
+#include <Library/Math/Hierarchy.h>
+#include <Library/Math/Transform3D.h>
+#include <Library/Utility/Template/Reference.h>
+#include <Library/Utility/Tools/ConstructorMacro.h>
 
-#include <Engine/Resources/Json/JsonResource.h>
+class WorldManager;
 
 class WorldInstance {
+#ifdef DEBUG_FEATURES_ENABLE
+	friend class RemoteWorldInstance;
+#endif // DEBUG_FEATURES_ENABLE
+
 public:
-	WorldInstance() = default;
+	WorldInstance() noexcept = default;
 	virtual ~WorldInstance() = default;
 
-	WorldInstance(const WorldInstance&) = delete;
-	WorldInstance& operator=(const WorldInstance&&) = delete;
-	WorldInstance(WorldInstance&&) = default;
-	WorldInstance& operator=(WorldInstance&&) = default;
+	__CLASS_NON_COPYABLE(WorldInstance)
 
 public:
 	/// <summary>
-	/// 行列の更新
+	/// 開始処理
 	/// </summary>
-	void update_affine();
+	virtual void begin() {};
 
 	/// <summary>
-	/// Targetの方向を向く
+	/// 更新処理
 	/// </summary>
-	/// <param name="target">向く方向</param>
-	/// <param name="upward">上方向</param>
-	void look_at(const WorldInstance& target, const Vector3& upward = CVector3::BASIS_Y) noexcept;
+	virtual void update() {};
 
 	/// <summary>
-	/// pointの方向を向く
+	/// Affine更新直前処理
 	/// </summary>
-	/// <param name="point">World座標系上の点</param>
-	/// <param name="upward">上方向</param>
-	void look_at(const Vector3& point, const Vector3& upward = CVector3::BASIS_Y) noexcept;
+	virtual void fixed_update() {};
+
+	/// <summary>
+	/// Affine行列の更新
+	/// </summary>
+	virtual void update_affine();
+
+	/// <summary>
+	/// 遅延更新処理
+	/// </summary>
+	virtual void late_update() {};
 
 private:
 	/// <summary>
@@ -44,6 +53,23 @@ private:
 	Affine create_world_affine() const;
 
 public:
+	/// <summary>
+	/// Targetの方向を向く
+	/// </summary>
+	/// <param name="target">向く方向</param>
+	/// <param name="upward">上方向</param>
+	void look_at(Reference<const WorldInstance> rhs, r32 angle = 0.0f, const Vector3& upward = CVector3::BASIS_Y) noexcept;
+
+	/// <summary>
+	/// pointの方向を向く
+	/// </summary>
+	/// <param name="point">World座標系上の点</param>
+	/// <param name="upward">上方向</param>
+	void look_at(const Vector3& point, r32 angle = 0.0f, const Vector3& upward = CVector3::BASIS_Y) noexcept;
+
+	void look_at_axis(Reference<const WorldInstance> target, const Vector3& axis = CVector3::BASIS_Y, r32 angle = 0.0f) noexcept;
+	void look_at_axis(const Vector3& point, const Vector3& axis = CVector3::BASIS_Y, r32 angle = 0.0f) noexcept;
+
 	/// <summary>
 	/// アクティブフラグの設定
 	/// </summary>
@@ -56,9 +82,11 @@ public:
 	/// <returns></returns>
 	bool is_active() const { return isActive; };
 
-	// 削除するかも？
-	const Hierarchy& get_hierarchy() const { return hierarchy; };
-	Hierarchy& get_hierarchy() { return hierarchy; };
+	/// <summary>
+	/// 階層構造の震度
+	/// </summary>
+	/// <returns></returns>
+	u32 depth() const { return hierarchyDepth; };
 
 	/// <summary>
 	/// Transformの取得(Const)
@@ -97,14 +125,7 @@ public:
 	/// <param name="isKeepPose">現在の姿勢を維持する</param>
 	void reparent(Reference<const WorldInstance> instance, bool isKeepPose = true);
 
-public:
-	void from_json(const JsonResource& json);
-	void to_json(JsonResource& json);
-
-#ifdef _DEBUG
-public:
-	virtual void debug_gui();
-#endif // _DEBUG
+	void set_world_manager(Reference<WorldManager> worldManager_);
 
 protected:
 	Transform3D transform{}; // Transform
@@ -112,6 +133,9 @@ protected:
 
 private:
 	Affine affine;
+
+	Reference<WorldManager> worldManager{ nullptr };
+	u32 hierarchyDepth{ 0 };
 
 protected:
 	bool isActive = true;

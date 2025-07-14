@@ -3,7 +3,7 @@
 #include "Application/Character/Player/Player.h"
 #include "Application/Character/Child/Child.h"
 
-#include <Engine/Resources/Animation/NodeAnimation/NodeAnimationPlayer.h>
+#include <Engine/Assets/Animation/NodeAnimation/NodeAnimationPlayer.h>
 
 void MapchipHandler::initialize(MapchipField* mapchipField) {
 	mapchipField_ = mapchipField;

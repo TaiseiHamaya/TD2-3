@@ -1,0 +1,26 @@
+#pragma once
+
+#include <chrono>
+
+#include <Library/Utility/Template/SingletonInterface.h>
+
+class WorldClock final : public SingletonInterface<WorldClock> {
+	__CLASS_SINGLETON_INTERFACE(WorldClock)
+
+public:
+	static void Initialize();
+	static void Update();
+
+public:
+	static r32 DeltaSeconds();
+	static const std::chrono::high_resolution_clock::time_point& BeginTime();
+
+#ifdef DEBUG_FEATURES_ENABLE
+public:
+	static void DebugGui();
+#endif // _DEBUG
+
+private:
+	r32 deltaSeconds{ 0.0f };
+	std::chrono::high_resolution_clock::time_point startFrameTimePoint;
+};

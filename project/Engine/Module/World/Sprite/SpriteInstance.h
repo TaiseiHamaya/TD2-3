@@ -7,10 +7,10 @@
 #include "Library/Math/Matrix4x4.h"
 #include "Library/Math/Vector2.h"
 
-#include "Engine/Rendering/DirectX/DirectXResourceObject/ConstantBuffer/ConstantBuffer.h"
-#include "Engine/Rendering/DirectX/DirectXResourceObject/VertexBuffer/VertexBuffer.h"
+#include "Engine/GraphicsAPI/DirectX/DxResource/ConstantBuffer/ConstantBuffer.h"
+#include "Engine/GraphicsAPI/DirectX/DxResource/VertexBuffer/VertexBuffer.h"
 
-class Texture;
+class TextureAsset;
 class Transform2D;
 class IndexBuffer;
 
@@ -62,7 +62,7 @@ private:
 
 	std::unique_ptr<Object3DVertexBuffer> vertices;
 	std::unique_ptr<IndexBuffer> indexes;
-	std::shared_ptr<const Texture> texture;
+	std::shared_ptr<const TextureAsset> texture;
 
 	struct SpriteMaterial {
 		Color4 color;

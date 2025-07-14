@@ -5,10 +5,10 @@
 
 #include <Engine/Runtime/Input/Input.h>
 
-#include <Engine/Utility/Tools/ConstructorMacro.h>
+#include <Library/Utility/Tools/ConstructorMacro.h>
 #include <Library/Math/Vector3.h>
 
-class MeshInstance;
+class StaticMeshInstance;
 class WorldInstance;
 
 template<typename T>
@@ -19,13 +19,13 @@ class LevelLoader;
 class MapchipField {
 private:
 	struct Field {
-		std::unique_ptr<MeshInstance> mesh;
+		std::unique_ptr<StaticMeshInstance> mesh;
 		uint32_t type;
 		bool isZeroGravity;
 
 		Field();
 		~Field() = default;
-		__NON_COPYABLE_CLASS(Field)
+		__CLASS_NON_COPYABLE(Field)
 	};
 
 public:

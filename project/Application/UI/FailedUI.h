@@ -1,11 +1,8 @@
 #pragma once
 
+#include <Library/Math/Transform2D.h>
+
 #include <memory>
-#include "Engine/Debug/ImGui/ImGuiLoadManager/ImGuiLoadManager.h"
-#include "Library/Math/Transform2D.h"
-#include "Engine/Runtime/WorldClock/WorldClock.h"
-#include "Library/Math/Easing.h"
-#include <Engine/Runtime/Input/Input.h>
 
 class SpriteInstance;
 

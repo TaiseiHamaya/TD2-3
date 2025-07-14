@@ -1,12 +1,12 @@
 #include "Rocket.h"
-#include "Engine/Module/World/AnimatedMesh/AnimatedMeshInstance.h"
-#include<Engine/Resources/Animation/NodeAnimation/NodeAnimationPlayer.h>
-#include "Engine/Rendering/DirectX/DirectXResourceObject/ConstantBuffer/Material/Material.h"
+
+#include <Engine/Assets/Animation/NodeAnimation/NodeAnimationPlayer.h>
+#include <Engine/Module/World/Mesh/SkinningMeshInstance.h>
 
 Rocket::Rocket(const Vector3& pos) {
-	
 
-	animatedMeshInstance = std::make_unique<AnimatedMeshInstance>("GoalObj.gltf", "Standby", false);
+
+	animatedMeshInstance = std::make_unique<SkinningMeshInstance>("GoalObj.gltf", "Standby", false);
 	gushingEmitter = std::make_unique<ParticleEmitterInstance>("gushing.json", 128);
 	explosionEmitter = std::make_unique<ParticleEmitterInstance>("explosion.json", 128);
 	explosion = std::make_unique <AudioPlayer>();
@@ -40,7 +40,7 @@ void Rocket::init() {
 	particleSpawnTime = 0;
 	explosionSpawnTime = 0;
 
-	
+
 
 
 }
@@ -49,7 +49,7 @@ void Rocket::update(int state) {
 	animatedMeshInstance->begin();
 	gushingEmitter->update();
 	explosionEmitter->update();
-	
+
 	//クリア時
 	if (state == 1 || state == 3) {
 		isClear();
@@ -58,7 +58,7 @@ void Rocket::update(int state) {
 		isFailed();
 	}
 
-	
+
 
 	particleUpdate();
 	animatedMeshInstance->update();
@@ -69,35 +69,24 @@ void Rocket::begin() {
 
 }
 
-void Rocket::begin_rendering() {
-	animatedMeshInstance->begin_rendering();
-	gushingEmitter->begin_rendering();
-	explosionEmitter->begin_rendering();
-
-}
 #ifdef _DEBUG
 
 #include <imgui.h>
-void Rocket::debug_update() {
-	ImGui::Begin("gushing");
-	gushingEmitter->debug_gui();
-	ImGui::End();
-	ImGui::Begin("Rocket");
-	animatedMeshInstance->debug_gui();
-	ImGui::End();
-	ImGui::Begin("explosion");
-	explosionEmitter->debug_gui();
-	ImGui::End();
-}
+//void Rocket::debug_update() {
+//	ImGui::Begin("gushing");
+//	gushingEmitter->debug_gui();
+//	ImGui::End();
+//	ImGui::Begin("Rocket");
+//	animatedMeshInstance->debug_gui();
+//	ImGui::End();
+//	ImGui::Begin("explosion");
+//	explosionEmitter->debug_gui();
+//	ImGui::End();
+//}
 #endif // _DEBUG
 
-void Rocket::draw() {
-	animatedMeshInstance->draw();
-
-}
-
 void Rocket::draw_particle() {
-	gushingEmitter->draw(); 
+	gushingEmitter->draw();
 	explosionEmitter->draw();
 }
 
@@ -131,13 +120,13 @@ void Rocket::particleUpdate() {
 			gushingEmitter->restart();
 			gushing->restart();
 		}
-		
+
 
 	}
 	particlePos.y = animatedMeshInstance->get_animation()->calculate_translate("Rocket").y;
 	gushingEmitter->get_transform().set_translate(particlePos);
 	if (isFailedFlag) {
-		explosionSpawnTime+= WorldClock::DeltaSeconds();
+		explosionSpawnTime += WorldClock::DeltaSeconds();
 
 		if (explosionSpawnTime > 2.8f) {
 			if (!spwanParticle2) {

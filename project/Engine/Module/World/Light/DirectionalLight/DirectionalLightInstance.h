@@ -2,11 +2,11 @@
 
 #include "../BaseLightInstance.h"
 
-#include "Library/Math/Color3.h"
+#include <Library/Math/Color3.h>
 
 struct DirectionalLightData {
 	Color3 color; // 色
-	float intensity{ 1 }; // 輝度
+	r32 intensity{ 1 }; // 輝度
 	Vector3 direction{ -CVector3::BASIS_Y }; // 向き
 };
 
@@ -21,12 +21,5 @@ public:
 	DirectionalLightInstance& operator=(DirectionalLightInstance&&) = default;
 
 public:
-	void begin_rendering() override;
-
-	void draw_deferred() const override;
-
-#ifdef _DEBUG
-public:
-	void debug_gui() override;
-#endif // _DEBUG
+	void transfer() override;
 };

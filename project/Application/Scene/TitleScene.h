@@ -5,14 +5,14 @@
 #include <array>
 #include <memory>
 
-#include "Engine/Resources/Audio/AudioPlayer.h"
+#include "Engine/Assets/Audio/AudioPlayer.h"
 #include <Engine/Module/Render/RenderPath/RenderPath.h>
 #include <Library/Math/Vector3.h>
 
 class Camera3D;
 class DirectionalLightInstance;
 class SpriteInstance;
-class AnimatedMeshInstance;
+class SkinningMeshInstance;
 
 class TitleScene : public BaseScene {
 private:
@@ -65,8 +65,8 @@ private:
 	//BGM
 	std::unique_ptr<AudioPlayer>bgm;
 
-	std::unique_ptr<AnimatedMeshInstance> parentObj;
-	std::unique_ptr<AnimatedMeshInstance> chiledObj;
+	std::unique_ptr<SkinningMeshInstance> parentObj;
+	std::unique_ptr<SkinningMeshInstance> chiledObj;
 
 	float easeT;
 	float totalEaseT = 6.0f;
