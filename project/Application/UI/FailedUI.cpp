@@ -3,6 +3,8 @@
 
 #include <algorithm>
 
+#include <Application/Configuration/Configuration.h>
+
 FailedUI::FailedUI() { init(); }
 
 FailedUI::~FailedUI() {}
@@ -34,7 +36,14 @@ void FailedUI::init() {
 	curDelayTime = 0;
 	curIndex = 0;
 
-	failedReasonUI = std::make_unique<SpriteInstance>("FailedUI_1.png",Vector2(0.5f,0.5f));
+	switch (Configuration::GetLanguage()) {
+	case Configuration::Language::Japanese:
+		failedReasonUI = std::make_unique<SpriteInstance>("FailedUI_1.png",Vector2(0.5f,0.5f));
+		break;
+	case Configuration::Language::English:
+		failedReasonUI = std::make_unique<SpriteInstance>("FailedUI_1_EN.png",Vector2(0.5f,0.5f));
+		break;
+	}
 	failedReasonUI->get_transform().set_scale({ 0.25f,1 });
 	failedReasonUI->get_uv_transform().set_scale({ 0.25f,1 });
 	failedReasonUI->get_transform().set_translate({ 640,265 });
