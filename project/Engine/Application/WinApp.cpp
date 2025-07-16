@@ -110,9 +110,13 @@ void WinApp::Initialize(DWORD windowConfig) {
 #endif // _DEBUG
 	// システム使用のオブジェクトをロード
 	PolygonMeshLibrary::RegisterLoadQue("./EngineResources/Models/ErrorObject/ErrorObject.obj");
-	PolygonMeshLibrary::RegisterLoadQue("./EngineResources/Models/Frustum/Frustum.obj");
 	PolygonMeshLibrary::RegisterLoadQue("./EngineResources/Models/Grid/Grid.obj");
 	PolygonMeshLibrary::RegisterLoadQue("./EngineResources/Models/Camera/CameraAxis.obj");
+
+	PrimitiveGeometryLibrary::Transfer(
+		"Rect3D",
+		std::make_shared<PrimitiveGeometryAsset>("./EngineResources/Json/PrimitiveGeometry/Primitive/Rect3D.json")
+	);
 
 #ifdef _DEBUG
 	//PrimitiveGeometryManager::Transfer(

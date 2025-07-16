@@ -43,6 +43,9 @@ void Camera3D::update_affine() {
 	// カメラそのもののMatrix更新
 	WorldInstance::update_affine();
 
+	debugCameraCenter->update_affine();
+	debugCamera->update_affine();
+
 	// カメラ位置をもとにViewMatrixを更新
 	make_view_matrix();
 	make_perspectivefov_matrix();

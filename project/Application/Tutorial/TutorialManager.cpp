@@ -3,10 +3,11 @@
 #include <algorithm>
 
 #include <Library/Math/Transform2D.h>
-
-#include <Engine/Runtime/Input/Input.h>
-#include <Engine/Runtime/Clock/WorldClock.h>
 #include <Library/Utility/Tools/SmartPointer.h>
+
+#include <Engine/Module/DrawExecutor/2D/SpriteDrawExecutor.h>
+#include <Engine/Runtime/Clock/WorldClock.h>
+#include <Engine/Runtime/Input/Input.h>
 
 #include "Application/Configuration/Configuration.h"
 
@@ -27,12 +28,12 @@ void TutorialManager::initialize(uint32_t stage) {
 	}
 	tutorialText_->get_transform().set_translate({ 80.0f, 120.0f });
 	tutorialText_->get_transform().set_scale({ 1.0f, 0.1f });
-	tutorialText_->get_uv_transform().set_scale({ 1.0f, 0.09f });
+	tutorialText_->get_material().uvTransform.set_scale({ 1.0f, 0.09f });
 	tutorialText_->set_active(false);
 	tutorialImage_ = eps::CreateUnique<SpriteInstance>("TutorialImage.png");
 	tutorialImage_->get_transform().set_translate({ -40.0f, 200.0f });
 	tutorialImage_->get_transform().set_scale({ 1.3f, 0.13f });
-	tutorialImage_->get_uv_transform().set_scale({ 1.0f, 0.095f });
+	tutorialImage_->get_material().uvTransform.set_scale({ 1.0f, 0.095f });
 	tutorialImage_->set_active(false);
 	Abutton_ = eps::CreateUnique<SpriteInstance>("Abutton.png");
 	Abutton_->get_transform().set_translate({ 1080.0f, 60.0f });
@@ -55,8 +56,8 @@ void TutorialManager::initialize(uint32_t stage) {
 	}
 
 	// 最初のテキストを用意しておく
-	tutorialText_->get_uv_transform().set_translate_y(0.0875f * static_cast<int>(tutorialStep_));
-	tutorialImage_->get_uv_transform().set_translate_y(0.091f * static_cast<int>(tutorialStep_));
+	tutorialText_->get_material().uvTransform.set_translate_y(0.0875f * static_cast<int>(tutorialStep_));
+	tutorialImage_->get_material().uvTransform.set_translate_y(0.091f * static_cast<int>(tutorialStep_));
 }
 
 void TutorialManager::update() {
@@ -78,10 +79,10 @@ void TutorialManager::update() {
 			currentTimer_ += WorldClock::DeltaSeconds();
 			// Clamp 0.0f ～ 1.0f
 			t_ = std::clamp(currentTimer_ / maxTimer_, 0.0f, 1.0f);
-			tutorialText_->get_color().alpha = t_;
-			tutorialFrame_->get_color().alpha = t_;
-			tutorialImage_->get_color().alpha = t_;
-			Abutton_->get_color().alpha = t_;
+			tutorialText_->get_material().color.alpha = t_;
+			tutorialFrame_->get_material().color.alpha = t_;
+			tutorialImage_->get_material().color.alpha = t_;
+			Abutton_->get_material().color.alpha = t_;
 
 			if (currentTimer_ >= maxTimer_) {
 				state_ = TutorialState::Staying;
@@ -101,10 +102,10 @@ void TutorialManager::update() {
 
 			// Clamp 0.0f ～ 1.0f
 			t_ = std::clamp(1.0f - (currentTimer_ / maxTimer_), 0.0f, 1.0f);
-			tutorialText_->get_color().alpha = t_;
-			tutorialFrame_->get_color().alpha = t_;
-			tutorialImage_->get_color().alpha = t_;
-			Abutton_->get_color().alpha = t_;
+			tutorialText_->get_material().color.alpha = t_;
+			tutorialFrame_->get_material().color.alpha = t_;
+			tutorialImage_->get_material().color.alpha = t_;
+			Abutton_->get_material().color.alpha = t_;
 
 			if (currentTimer_ >= maxTimer_) {
 				// 進める処理
@@ -124,8 +125,8 @@ void TutorialManager::update() {
 				tutorialImage_->set_active(false);
 				Abutton_->set_active(false);
 				// 次のテキストを用意しておく
-				tutorialText_->get_uv_transform().set_translate_y(0.0875f * static_cast<int>(tutorialStep_));
-				tutorialImage_->get_uv_transform().set_translate_y(0.091f * static_cast<int>(tutorialStep_));
+				tutorialText_->get_material().uvTransform.set_translate_y(0.0875f * static_cast<int>(tutorialStep_));
+				tutorialImage_->get_material().uvTransform.set_translate_y(0.091f * static_cast<int>(tutorialStep_));
 
 				// チュートリアルの終了
 				isTutorial_ = false;
@@ -138,19 +139,11 @@ void TutorialManager::update() {
 	}
 }
 
-void TutorialManager::begin_rendering() {
-	tutorialFrame_->begin_rendering();
-	tutorialText_->begin_rendering();
-	tutorialImage_->begin_rendering();
-	Abutton_->begin_rendering();
-}
-
-void TutorialManager::draw() {
-	tutorialImage_->draw();
-
-	tutorialFrame_->draw();
-	tutorialText_->draw();
-	Abutton_->draw();
+void TutorialManager::write_to_executor(Reference<SpriteDrawExecutor> executor) const {
+	executor->write_to_buffer(tutorialFrame_);
+	executor->write_to_buffer(tutorialText_);
+	executor->write_to_buffer(tutorialImage_);
+	executor->write_to_buffer(Abutton_);
 }
 
 #ifdef _DEBUG

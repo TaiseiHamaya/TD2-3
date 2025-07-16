@@ -227,12 +227,37 @@ void GameScene::initialize() {
 	renderPath->initialize({ bgSpriteNode,object3dNode,skinningMeshNode,outlineNode,particleMeshNode,spriteNode });
 #endif // _DEBUG
 
+	// ---------------------- DrawManager ----------------------
+	staticMeshDrawManager = std::make_unique<StaticMeshDrawManager>();
+	staticMeshDrawManager->make_instancing(0, "RordObj.obj", 256);
+	staticMeshDrawManager->make_instancing(0, "WallObj.obj", 256);
+	staticMeshDrawManager->make_instancing(0, "IceObj.obj", 256);
+	skinningMeshDrawManager = std::make_unique<SkinningMeshDrawManager>();
+	skinningMeshDrawManager->make_instancing(0, "ParentKoala.gltf", 1);
+	skinningMeshDrawManager->make_instancing(0, "ChiledKoala.gltf", 1);
+	skinningMeshDrawManager->make_instancing(0, "CatchEffect.gltf", 1);
+	skinningMeshDrawManager->make_instancing(0, "exclamation.gltf", 1);
+	skinningMeshDrawManager->make_instancing(0, "FlusteredEffect.gltf", 1);
+	skinningMeshDrawManager->make_instancing(0, "ReleaseEffect.gltf", 1);
+	skinningMeshDrawManager->make_instancing(0, "CatchEffect.gltf", 1);
+	skinningMeshDrawManager->make_instancing(0, "GoalObj.gltf", 1);
+	bgSpriteDrawExecutor = std::make_unique<SpriteDrawExecutor>();
+	bgSpriteDrawExecutor->reinitialize(16);
+	spriteDrawExecutor = std::make_unique<SpriteDrawExecutor>();
+	spriteDrawExecutor->reinitialize(256);
+
+	directionalLightingExecutor = std::make_unique<DirectionalLightingExecutor>();
+	directionalLightingExecutor->reinitialize(1);
+
 	managementUI = std::make_unique<GameManagement>();
 	playerManager->set_game_management(managementUI.get());
 	managementUI->SetMaxLevel(GameValue::MaxLevel);
 	managementUI->SetCurLevel(currentLevel);
 	gameUI = std::make_unique<GameSceneUI>();
 	gameUI->initialize(currentLevel);
+
+	playerManager->setup(skinningMeshDrawManager);
+	fieldObjs->setup(staticMeshDrawManager);
 
 	tutorialManager->set_game_management(managementUI.get());
 
@@ -293,18 +318,27 @@ void GameScene::update() {
 }
 
 void GameScene::begin_rendering() {
-	playerManager->begin_rendering();
-	fieldObjs->begin_rendering();
-
-	camera3D->update_affine();
+	// Update affine
 	directionalLight->update_affine();
-	managementUI->begin_rendering();
-	gameUI->begin_rendering();
-	background->begin_rendering();
-	rocketObj->begin_rendering();
+	camera3D->update_affine();
+	playerManager->update_affine();
+	fieldObjs->update_affine();
+	rocketObj->update_affine();
+	
+	// Transfer draw manager/executor
+	skinningMeshDrawManager->transfer();
+	staticMeshDrawManager->transfer();
+	directionalLightingExecutor->write_to_buffer(directionalLight);
 
-	transition->begin_rendering();
-	tutorialManager->begin_rendering();
+	// 2D
+	bgSpriteDrawExecutor->begin();
+	spriteDrawExecutor->begin();
+	// Transfer
+	background->write_to_executor(bgSpriteDrawExecutor);
+	managementUI->write_to_executor(spriteDrawExecutor);
+	gameUI->write_to_executor(spriteDrawExecutor);
+	spriteDrawExecutor->write_to_buffer(transition);
+	tutorialManager->write_to_executor(spriteDrawExecutor);
 }
 
 void GameScene::late_update() {
@@ -357,7 +391,7 @@ void GameScene::late_update() {
 	{
 		transitionTimer += WorldClock::DeltaSeconds();
 		float parametric = std::min(1.0f, transitionTimer / sceneChangeTime);
-		transition->get_color().alpha = 1 - parametric;
+		transition->get_material().color.alpha = 1 - parametric;
 		if (parametric >= 1.0f) {
 			sceneState = TransitionState::Main;
 		}
@@ -373,7 +407,7 @@ void GameScene::late_update() {
 	{
 		transitionTimer += WorldClock::DeltaSeconds();
 		float parametric = std::min(1.0f, transitionTimer / sceneChangeTime);
-		transition->get_color().alpha = parametric;
+		transition->get_material().color.alpha = parametric;
 		if (!managementUI->is_restart()) {
 			bgm->set_volume((1 - parametric) * 0.1f);
 		}
@@ -397,49 +431,37 @@ void GameScene::late_update() {
 void GameScene::draw() const {
 	// 背景スプライト
 	renderPath->begin();
-	background->draw();
+	bgSpriteDrawExecutor->draw_command();
 
 	// StaticMesh
 	renderPath->next();
-	camera3D->register_world_projection(1);
-	camera3D->register_world_lighting(4);
-	//directionalLight->register_world(5);
+	camera3D->register_world_projection(2);
+	camera3D->register_world_lighting(3);
+	directionalLightingExecutor->set_command(4);
+	staticMeshDrawManager->draw_layer(0);
 
-	fieldObjs->draw();
-
-#ifdef _DEBUG
-	camera3D->debug_draw_axis();
-#endif // _DEBUG
+	//fieldObjs->draw();
 
 	// SkinningMesh
 	renderPath->next();
-	camera3D->register_world_projection(1);
 	camera3D->register_world_lighting(5);
-	//directionalLight->register_world(6);
-	playerManager->draw();
-	rocketObj->draw();
-	background->animeDraw();
+	directionalLightingExecutor->set_command(6);
+	skinningMeshDrawManager->draw_layer(0);
+
 	// Outline
 	renderPath->next();
 	outlineNode->draw();
 
-	// 前景スプライト
+	// パーティクル
 	renderPath->next();
 	camera3D->register_world_projection(1);
 	playerManager->draw_particle();
 	rocketObj->draw_particle();
 	background->drawParticle();
 
+	// 全景スプライト
 	renderPath->next();
-	gameUI->darw();
-	tutorialManager->draw();
-	managementUI->darw();
-
-	playerManager->draw_sprite();
-
-
-	transition->draw();
-
+	spriteDrawExecutor->draw_command();
 
 	renderPath->next();
 
@@ -467,7 +489,7 @@ void GameScene::debug_update() {
 	ImGui::Begin("WorldClock");
 	WorldClock::DebugGui();
 	ImGui::End();
-	rocketObj->debug_update();
+	//rocketObj->debug_update();
 	background->debugUpdate();
 	//ImGui::Begin("OutlineNode");
 	//outlineNode->

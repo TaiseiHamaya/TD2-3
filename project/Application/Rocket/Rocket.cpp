@@ -39,10 +39,6 @@ void Rocket::init() {
 	spwanParticle2 = false;
 	particleSpawnTime = 0;
 	explosionSpawnTime = 0;
-
-
-
-
 }
 
 void Rocket::update(int state) {
@@ -65,8 +61,12 @@ void Rocket::update(int state) {
 }
 
 void Rocket::begin() {
+}
 
-
+void Rocket::update_affine() {
+	animatedMeshInstance->update_affine();
+	gushingEmitter->update_affine();
+	explosionEmitter->update_affine();
 }
 
 #ifdef _DEBUG

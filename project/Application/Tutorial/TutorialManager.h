@@ -1,14 +1,22 @@
 #pragma once
+
 #include <memory>
+
+#include <Library/Utility/Template/Reference.h>
+
 #include <Engine/Module/World/Sprite/SpriteInstance.h>
+
 #include <Application/GameManagement/GameManagement.h>
+
+class SpriteDrawExecutor;
+
 class TutorialManager
 {
 public:
 	void initialize(uint32_t stage);
 	void update();
-	void begin_rendering();
-	void draw();
+
+	void write_to_executor(Reference<SpriteDrawExecutor> executor) const;
 
 #ifdef _DEBUG
 	void debug_update();

@@ -12,7 +12,7 @@ void JsonAsset::load(const std::filesystem::path& file) {
 	if (file.extension() != ".json") {
 		Warning(L"This file's extension is not .json. File\'{}\'", file.native());
 	}
-	const std::filesystem::path DEFAULT_DIRECTORY{ "./Game/Resources/Json/" };
+	const std::filesystem::path DEFAULT_DIRECTORY{ "./Resources/Json/" };
 
 	// 相対ディレクトリで始まる場合
 	if (file.native().starts_with(L".\\") || file.native().starts_with(L"./")) {

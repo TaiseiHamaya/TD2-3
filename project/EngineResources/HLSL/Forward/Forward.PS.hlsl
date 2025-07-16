@@ -28,7 +28,7 @@ float4 main(VertexShaderOutput input) : SV_Target0 {
 	float3 transformedUV = mul(float3(input.texcoord, 1.0f), material.uvTransform);
 	float4 textureColor = texture.Sample(gSampler, transformedUV.xy);
 	
-	float alpha = 1.0f;
+	float alpha = textureColor.a;
 	
 	Pixel pixel;
 	pixel.color = textureColor.rgb * material.color.rgb;

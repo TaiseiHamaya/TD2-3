@@ -18,6 +18,10 @@ public:
 
 	void set_name(const std::wstring& name) override;
 
+public:
+	using ITextureResource::get_width;
+	using ITextureResource::get_height;
+
 private:
 	ShaderResourceView srv;
 };

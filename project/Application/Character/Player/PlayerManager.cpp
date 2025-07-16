@@ -8,6 +8,7 @@
 
 #include "Engine/Assets/Animation/NodeAnimation/NodeAnimationPlayer.h"
 #include "Engine/Runtime/Input/Input.h"
+#include <Engine/Module/DrawExecutor/Mesh/SkinningMeshDrawManager.h>
 
 #include <Application/Utility/GameUtility.h>
 
@@ -78,6 +79,13 @@ void PlayerManager::initialize(Reference<const LevelLoader> level, MapchipField*
 	releaseAudio->initialize("release.wav");
 	undoAudio = std::make_unique<AudioPlayer>();
 	undoAudio->initialize("undo.wav");
+}
+
+void PlayerManager::setup(Reference<SkinningMeshDrawManager> skinningManager) {
+	player->setup(skinningManager);
+	skinningManager->register_instance(child->get_object());
+	skinningManager->register_instance(catchEffect_);
+	skinningManager->register_instance(releaseEffect_);
 }
 
 void PlayerManager::finalize() {
@@ -280,13 +288,16 @@ void PlayerManager::update() {
 	}
 }
 
+void PlayerManager::update_affine() {
+	player->update_affine();
+	child->update_affine();
+	catchEffect_->update_affine();
+	releaseEffect_->update_affine();
+}
+
 void PlayerManager::draw_particle() const {
 	dustEmitter->draw();
 	iceDustEmitter->draw();
-}
-
-void PlayerManager::draw_sprite() const {
-
 }
 
 void PlayerManager::handle_input() {
@@ -376,7 +387,6 @@ void PlayerManager::handle_input() {
 		}
 	}
 }
-
 
 #ifdef _DEBUG
 void PlayerManager::debug_update() {

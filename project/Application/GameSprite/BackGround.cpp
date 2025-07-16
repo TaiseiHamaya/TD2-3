@@ -1,8 +1,10 @@
 #include "BackGround.h"
 
 #include <Library/Math/Transform2D.h>
-#include "Engine/Module/World/Mesh/SkinningMeshInstance.h"
 
+#include <Engine/Module/DrawExecutor/2D/SpriteDrawExecutor.h>
+#include <Engine/Module/DrawExecutor/Mesh/SkinningMeshDrawManager.h>
+#include <Engine/Module/World/Mesh/SkinningMeshInstance.h>
 #include <Engine/Module/World/Sprite/SpriteInstance.h>
 #include <Engine/Runtime/Clock/WorldClock.h>
 
@@ -20,20 +22,24 @@ BackGround::BackGround() {
 	gushingEmitter = std::make_unique<ParticleEmitterInstance>("gushing2.json", 128);
 	coolTime = 0;
 	easeT = totalEaseT;
-	
+
 	gushingEmitter->get_transform().set_translate_x(-100.f);
 	gushingEmitter->update_affine();
 	//gushingEmitter->set_active(false);
 }
 
-BackGround::~BackGround() {}
+BackGround::~BackGround() = default;
+
+void BackGround::setup(Reference<SkinningMeshDrawManager> manager) {
+	manager->register_instance(animatedMeshInstance);
+}
 
 void BackGround::update() {
 	timer += WorldClock::DeltaSeconds();
 	curScroll = scrollSpeed * timer;
 	curScroll2 = scrollSpeed2 * timer;
-	backGroundSprite->get_uv_transform().set_translate_x(curScroll);
-	backGroundSprite2->get_uv_transform().set_translate_x(curScroll2);
+	backGroundSprite->get_material().uvTransform.set_translate_x(curScroll);
+	backGroundSprite2->get_material().uvTransform.set_translate_x(curScroll2);
 
 	animatedMeshInstance->begin();
 	rocketUpdate();
@@ -57,9 +63,9 @@ void BackGround::debugUpdate() {
 }
 #endif
 
-void BackGround::draw() {
-	backGroundSprite->draw();
-	backGroundSprite2->draw();
+void BackGround::write_to_executor(Reference<SpriteDrawExecutor> executor) const {
+	executor->write_to_buffer(backGroundSprite);
+	executor->write_to_buffer(backGroundSprite2);
 }
 
 void BackGround::drawParticle() {
@@ -69,7 +75,7 @@ void BackGround::drawParticle() {
 void BackGround::rocketUpdate() {
 	easeT += WorldClock::DeltaSeconds();
 
-	float ratio = std::clamp(easeT/totalEaseT,0.f,1.f);
+	float ratio = std::clamp(easeT / totalEaseT, 0.f, 1.f);
 
 	Vector3 newPos = Vector3::Lerp(rocektStartPos, rocketEndPos, ratio);
 	animatedMeshInstance->get_transform().set_translate(newPos);

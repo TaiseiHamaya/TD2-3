@@ -7,6 +7,7 @@
 #include <Library/Utility/Template/Reference.h>
 
 #include "Engine/Module/World/Mesh/StaticMeshInstance.h"
+#include <Engine/Module/DrawExecutor/Mesh/StaticMeshDrawManager.h>
 
 MapchipField::MapchipField() = default;
 
@@ -43,11 +44,15 @@ void MapchipField::initialize(Reference<const LevelLoader> level) {
 			write.isZeroGravity = fieldZeroGravity[row][column];
 			write.type = fieldLevel[row][column];
 			if (write.type != 0) {
+				write.mesh->set_draw(true);
 				write.mesh->reset_mesh(fieldFileName[write.type]);
 				auto& objMat = write.mesh->get_materials();
 				for (auto& mat : objMat) {
 					mat.lightingType = LighingType::None;
 				}
+			}
+			else {
+				write.mesh->set_draw(false);
 			}
 
 			write.mesh->reparent(fieldRoot, false);
@@ -62,8 +67,25 @@ void MapchipField::initialize(Reference<const LevelLoader> level) {
 	}
 }
 
+void MapchipField::setup(Reference<StaticMeshDrawManager> manager) {
+	for (auto& row : field) {
+		for (auto& elem : row) {
+			manager->register_instance(elem.mesh);
+		}
+	}
+}
+
 void MapchipField::update() {
 
+}
+
+void MapchipField::update_affine() {
+	fieldRoot->update_affine();
+	for (auto& row : field) {
+		for (auto& elem : row) {
+			elem.mesh->update_affine();
+		}
+	}
 }
 
 Reference<WorldInstance> MapchipField::field_root() const {
@@ -76,7 +98,7 @@ int MapchipField::getElement(float x, float y) {
 	uint32_t iy = static_cast<uint32_t>(std::round(y));
 
 	// 範囲チェック (0 <= ix, iy <= 6)
-	if (ix < 0 || ix >= columnSize  || iy < 0 || iy >= rowSize) {
+	if (ix < 0 || ix >= columnSize || iy < 0 || iy >= rowSize) {
 		return 0; // 範囲外の場合は 0 を返す
 	}
 

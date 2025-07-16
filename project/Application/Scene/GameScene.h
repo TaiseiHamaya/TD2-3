@@ -3,8 +3,6 @@
 
 #include <memory>
 
-#include "Engine/Module/World/Light/DirectionalLight/DirectionalLightInstance.h"
-
 class RenderPath;
 class Camera3D;
 class LevelLoader;
@@ -15,8 +13,13 @@ class LevelLoader;
 #include "Application/GameSprite/GameSceneUI.h"
 #include "Application/GameSprite/BackGround.h"
 
-#include "Engine/Module/Render/RenderNode/Posteffect/Outline/OutlineNode.h"
+#include <Engine/Module/World/Light/DirectionalLight/DirectionalLightInstance.h>
+#include <Engine/Module/Render/RenderNode/Posteffect/Outline/OutlineNode.h>
 #include <Engine/GraphicsAPI/DirectX/DxResource/TextureResource/RenderTexture.h>
+#include <Engine/Module/DrawExecutor/Mesh/SkinningMeshDrawManager.h>
+#include <Engine/Module/DrawExecutor/Mesh/StaticMeshDrawManager.h>
+#include <Engine/Module/DrawExecutor/2D/SpriteDrawExecutor.h>
+#include <Engine/Module/DrawExecutor/LightingExecutor/DirectionalLightingExecutor.h>
 
 #include "Application/Rocket/Rocket.h"
 #include "Application/Tutorial/TutorialManager.h"
@@ -60,6 +63,13 @@ private:
 	std::unique_ptr<RenderTexture> renderTexture;
 
 	std::shared_ptr<OutlineNode> outlineNode;
+
+	std::unique_ptr<SkinningMeshDrawManager> skinningMeshDrawManager;
+	std::unique_ptr<StaticMeshDrawManager> staticMeshDrawManager;
+	std::unique_ptr<SpriteDrawExecutor> bgSpriteDrawExecutor;
+	std::unique_ptr<SpriteDrawExecutor> spriteDrawExecutor;
+	std::unique_ptr<DirectionalLightingExecutor> directionalLightingExecutor;
+
 	// プレイヤーの生成
 	std::unique_ptr<PlayerManager> playerManager;
 	std::unique_ptr<MapchipField> fieldObjs;

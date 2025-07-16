@@ -12,16 +12,19 @@
 #include "Engine/Assets/Audio/AudioPlayer.h"
 #include "Engine/Module/World/Sprite/SpriteInstance.h"
 
+class StaticMeshDrawManager;
+class SkinningMeshDrawManager;
+
 class PlayerManager {
 public:
 	void initialize(Reference<const LevelLoader> level, MapchipField* mapchipField, const Vector3& goalPosition, bool isResetLogger = true);
+	void setup(Reference<SkinningMeshDrawManager> executor);
 	void finalize();
 	void update();
+	void update_affine();
 	void handle_input();
-	void begin_rendering();
-	void draw() const;
+
 	void draw_particle() const;
-	void draw_sprite() const;
 
 	PlayerState get_player_state() { return player->get_state(); }
 

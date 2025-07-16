@@ -5,6 +5,7 @@
 #include <Engine/Assets/Audio/AudioLibrary.h>
 #include <Engine/Assets/Audio/AudioManager.h>
 #include <Engine/Assets/PolygonMesh/PolygonMeshLibrary.h>
+#include <Engine/Assets/Shader/ShaderLibrary.h>
 #include <Engine/Assets/Texture/TextureLibrary.h>
 #include <Engine/Module/Render/RenderNode/2D/Sprite/SpriteNode.h>
 #include <Engine/Module/Render/RenderNode/Forward/Mesh/SkinningMeshNodeForward.h>
@@ -15,6 +16,7 @@
 #include <Engine/Runtime/Clock/WorldClock.h>
 #include <Engine/Runtime/Input/Input.h>
 #include <Engine/Runtime/Scene/SceneManager.h>
+#include <Engine/GraphicsAPI/DirectX/DxSwapChain/DxSwapChain.h>
 
 #include "Application/GameValue.h"
 #include "Application/Scene/SelectScene.h"
@@ -49,9 +51,20 @@ void TitleScene::load() {
 	AudioLibrary::RegisterLoadQue("./GameResources/Audio/gameStart.wav");
 	AudioLibrary::RegisterLoadQue("./GameResources/Audio/move.wav");
 	AudioLibrary::RegisterLoadQue("./GameResources/Audio/SelectFaild.wav");
+
+	ShaderLibrary::RegisterLoadQue("./EngineResources/HLSL/Forward/Mesh/StaticMeshForward.VS.hlsl");
+	ShaderLibrary::RegisterLoadQue("./EngineResources/HLSL/Forward/Mesh/SkinningMeshForward.VS.hlsl");
+	ShaderLibrary::RegisterLoadQue("./EngineResources/HLSL/Forward/Forward.PS.hlsl");
+	ShaderLibrary::RegisterLoadQue("./EngineResources/HLSL/Forward/ForwardAlpha.PS.hlsl");
+	ShaderLibrary::RegisterLoadQue("./EngineResources/HLSL/Posteffect/Outline/Outline.PS.hlsl");
+	ShaderLibrary::RegisterLoadQue("./EngineResources/HLSL/FullscreenShader.VS.hlsl");
+	ShaderLibrary::RegisterLoadQue("./EngineResources/HLSL/Sprite/Sprite.VS.hlsl");
+	ShaderLibrary::RegisterLoadQue("./EngineResources/HLSL/Sprite/Sprite.PS.hlsl");
 }
 
 void TitleScene::initialize() {
+	DxSwapChain::SetClearColor(CColor4::BLACK);
+
 	Camera2D::Initialize();
 
 	camera3D = std::make_unique<Camera3D>();
@@ -75,7 +88,7 @@ void TitleScene::initialize() {
 	languageSelection = eps::CreateUnique<SpriteInstance>("ChangeLanguage.png", Vector2{ 0.0f, 0.0f });
 	languageSelection->get_transform().set_translate({ 30.0f, 30.0f });
 	languageSelection->get_transform().set_scale({ 0.5f, 1.0f });
-	languageSelection->get_uv_transform().set_scale({ 0.5f, 1.0f });
+	languageSelection->get_material().uvTransform.set_scale({ 0.5f, 1.0f });
 
 	// Node&Path
 	std::shared_ptr<StaticMeshNodeForward> object3dNode;
@@ -97,6 +110,18 @@ void TitleScene::initialize() {
 
 	renderPath = eps::CreateUnique<RenderPath>();
 	renderPath->initialize({ object3dNode,skinningMeshNode,spriteNode });
+
+	// ---------------------- DrawManager ----------------------
+	staticMeshDrawManager = std::make_unique<StaticMeshDrawManager>();
+	skinningMeshDrawManager = std::make_unique<SkinningMeshDrawManager>();
+	skinningMeshDrawManager->initialize(1);
+	skinningMeshDrawManager->make_instancing(0, "ParentKoala.gltf", 1);
+	skinningMeshDrawManager->make_instancing(0, "ChiledKoala.gltf", 1);
+	spriteDrawExecutor = std::make_unique<SpriteDrawExecutor>();
+	spriteDrawExecutor->reinitialize(256);
+
+	directionalLightingExecutor = std::make_unique<DirectionalLightingExecutor>();
+	directionalLightingExecutor->reinitialize(1);
 
 	bgm = std::make_unique<AudioPlayer>();
 	bgm->initialize("TitleBGM.wav");
@@ -120,6 +145,9 @@ void TitleScene::initialize() {
 	selectSeFailed = std::make_unique<AudioPlayer>();
 	selectSeFailed->initialize("SelectFaild.wav");
 	selectSeFailed->set_volume(0.2f);
+
+	skinningMeshDrawManager->register_instance(parentObj);
+	skinningMeshDrawManager->register_instance(chiledObj);
 }
 
 void TitleScene::popped() {}
@@ -174,7 +202,7 @@ void TitleScene::update() {
 
 			}
 			Configuration::SetLanguage(Configuration::Language::English);
-			languageSelection->get_uv_transform().set_translate({ 0.5f, 0.0f });
+			languageSelection->get_material().uvTransform.set_translate({ 0.5f, 0.0f });
 			languageSelectTimer = 0.7f;
 		}
 		else if (Input::IsPressKey(KeyID::Left) || Input::IsPressPad(PadID::Left) || stickLx <= -0.5f) {
@@ -187,7 +215,7 @@ void TitleScene::update() {
 				selectSeFailed->restart();
 			}
 			Configuration::SetLanguage(Configuration::Language::Japanese);
-			languageSelection->get_uv_transform().set_translate({ 0.0f, 0.0f });
+			languageSelection->get_material().uvTransform.set_translate({ 0.0f, 0.0f });
 			languageSelectTimer = 0.7f;
 		}
 	}
@@ -210,21 +238,31 @@ void TitleScene::update() {
 	if (easeT > totalEaseT) { easeT = 0.f; }
 	chiledObj->get_transform().set_translate(movePos);
 	chiledObj->update();
+	parentObj->update_animation();
+	chiledObj->update_animation();
 }
 
 void TitleScene::begin_rendering() {
-	//startUi[0]->begin_rendering();
-	//startUi[1]->begin_rendering();
-	//startUi[2]->begin_rendering();
-	//startUi[3]->begin_rendering();
-	//titleLogo->begin_rendering();
-	//transition->begin_rendering();
-	//languageSelection->begin_rendering();
+	spriteDrawExecutor->begin();
+	directionalLightingExecutor->begin();
 
-	//camera3D->update_matrix();
-	//directionalLight->begin_rendering();
-	//parentObj->begin_rendering();
-	//chiledObj->begin_rendering();
+	spriteDrawExecutor->write_to_buffer(startUi[(int)GameValue::UiType.get_type() + 2 * (size_t)Configuration::GetLanguage()]);
+	spriteDrawExecutor->write_to_buffer(titleLogo);
+	if(transition->get_material().color.alpha > 0.0f) {
+		spriteDrawExecutor->write_to_buffer(transition);
+	}
+	spriteDrawExecutor->write_to_buffer(languageSelection);
+
+	camera3D->update_affine();
+	directionalLight->update_affine();
+	parentObj->update_affine();
+	chiledObj->update_affine();
+
+	camera3D->transfer();
+
+	skinningMeshDrawManager->transfer();
+
+	directionalLightingExecutor->write_to_buffer(directionalLight);
 }
 
 void TitleScene::late_update() {}
@@ -232,23 +270,17 @@ void TitleScene::late_update() {}
 void TitleScene::draw() const {
 	// Mesh
 	renderPath->begin();
-	camera3D->register_world_projection(1);
-	camera3D->register_world_lighting(4);
-//	directionalLight->register_world(5);
 
 	// SkinningMesh
 	renderPath->next();
-	camera3D->register_world_projection(1);
+	camera3D->register_world_projection(2);
 	camera3D->register_world_lighting(5);
-	//directionalLight->register_world(6);
-	//parentObj->draw();
-	//chiledObj->draw();
+	directionalLightingExecutor->set_command(6);
+	skinningMeshDrawManager->draw_layer(0);
+
 	// Sprite
 	renderPath->next();
-	startUi[(int)GameValue::UiType.get_type() + 2 * (size_t)Configuration::GetLanguage()]->draw();
-	languageSelection->draw();
-	titleLogo->draw();
-	transition->draw();
+	spriteDrawExecutor->draw_command();
 
 	renderPath->next();
 }
@@ -256,7 +288,7 @@ void TitleScene::draw() const {
 void TitleScene::in_update() {
 	transitionTimer += WorldClock::DeltaSeconds();
 	float parametric = transitionTimer / 0.5f;
-	transition->get_color().alpha = 1 - std::min(1.f, parametric);
+	transition->get_material().color.alpha = 1 - std::min(1.f, parametric);
 	if (parametric >= 1.0f) {
 		sceneState = TransitionState::Main;
 	}
@@ -275,7 +307,7 @@ void TitleScene::default_update() {
 void TitleScene::out_update() {
 	transitionTimer += WorldClock::DeltaSeconds();
 	float parametric = transitionTimer / 0.5f;
-	transition->get_color().alpha = parametric;
+	transition->get_material().color.alpha = parametric;
 	bgm->set_volume((1 - parametric) * 0.2f);
 }
 
@@ -284,6 +316,14 @@ void TitleScene::debug_update() {
 	//ImGui::Begin("parent");
 	//chiledObj->debug_gui();
 	//ImGui::End();
+
+	ImGui::Begin("Light");
+	directionalLight->debug_gui();
+	ImGui::End();
+
+	ImGui::Begin("Camera");
+	camera3D->debug_gui();
+	ImGui::End();
 }
 #endif // _DEBUG
 

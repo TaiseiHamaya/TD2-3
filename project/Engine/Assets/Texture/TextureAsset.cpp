@@ -7,6 +7,7 @@ void TextureAsset::initialize(Microsoft::WRL::ComPtr<ID3D12Resource> resource, b
 	if (texture.get_srv()->get_index().has_value()) {
 		gpuIndex = texture.get_srv()->get_index().value();
 	}
+	textureSize = { static_cast<r32>(texture.get_width()), static_cast<r32>(texture.get_height()) };
 }
 
 D3D12_GPU_DESCRIPTOR_HANDLE TextureAsset::handle() const {

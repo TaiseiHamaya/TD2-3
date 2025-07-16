@@ -1,10 +1,12 @@
 #pragma once
 
 #include <Library/Math/Transform2D.h>
+#include <Library/Utility/Template/Reference.h>
 
 #include <memory>
 
 class SpriteInstance;
+class SpriteDrawExecutor;
 
 class ClearUI
 {
@@ -14,8 +16,8 @@ public:
 	void init();
 	void update();
 	void debugUpdate();
-	void begin_rendering();
-	void draw();
+
+	void write_to_executor(Reference<SpriteDrawExecutor> executor) const;
 
 public:
 	//アクセッサ

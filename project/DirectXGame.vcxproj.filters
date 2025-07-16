@@ -183,6 +183,7 @@
     <ClCompile Include="Engine\Module\Render\RenderNode\Forward\Mesh\SkinningMeshNodeForward.cpp" />
     <ClCompile Include="Engine\Module\Render\RenderNode\Forward\Mesh\StaticMeshNodeForward.cpp" />
     <ClCompile Include="Engine\Module\Render\RenderNode\Forward\Primitive\Rect3dNode.cpp" />
+    <ClCompile Include="Engine\Module\DrawExecutor\2D\SpriteDrawExecutor.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Engine\Module\Render\RenderNode\Deferred\DeferredAdaptor.h" />
@@ -388,6 +389,7 @@
     <ClInclude Include="Engine\Module\Render\RenderNode\Forward\Mesh\SkinningMeshNodeForward.h" />
     <ClInclude Include="Engine\Module\Render\RenderNode\Forward\Mesh\StaticMeshNodeForward.h" />
     <ClInclude Include="Engine\Module\Render\RenderNode\Forward\Primitive\Rect3dNode.h" />
+    <ClInclude Include="Engine\Module\DrawExecutor\2D\SpriteDrawExecutor.h" />
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="EngineResources\HLSL\FullscreenShader.hlsl">

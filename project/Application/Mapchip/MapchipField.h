@@ -5,8 +5,8 @@
 
 #include <Engine/Runtime/Input/Input.h>
 
-#include <Library/Utility/Tools/ConstructorMacro.h>
 #include <Library/Math/Vector3.h>
+#include <Library/Utility/Tools/ConstructorMacro.h>
 
 class StaticMeshInstance;
 class WorldInstance;
@@ -15,6 +15,7 @@ template<typename T>
 class Reference;
 
 class LevelLoader;
+class StaticMeshDrawManager;
 
 class MapchipField {
 private:
@@ -34,9 +35,9 @@ public:
 
 public:
 	void initialize(Reference<const LevelLoader> level);
+	void setup(Reference<StaticMeshDrawManager> executor);
 	void update();
-	void begin_rendering();
-	void draw();
+	void update_affine();
 
 public:
 	uint32_t row() const { return rowSize; }
@@ -46,7 +47,7 @@ public:
 public:
 	//アクセッサ
 	int getElement(float x, float y);
-	const Vector3 &GetGoalPos() { return goalPos; }
+	const Vector3& GetGoalPos() { return goalPos; }
 private:
 
 	uint32_t rowSize;

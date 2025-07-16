@@ -8,6 +8,7 @@
 #include <Library/Utility/Tools/SmartPointer.h>
 
 #include <Engine/Debug/ImGui/ImGuiLoadManager/ImGuiLoadManager.h>
+#include <Engine/Module/DrawExecutor/2D/SpriteDrawExecutor.h>
 #include <Engine/Module/World/Sprite/SpriteInstance.h>
 #include <Engine/Runtime/Clock/WorldClock.h>
 #include <Engine/Runtime/Input/Input.h>
@@ -59,7 +60,7 @@ void GameSceneUI::initialize(int32_t level) {
 	for (int i = 0; i < 2; ++i) {
 		for (int j = 0; j < uiIndex; j++) {
 			controlSprite[i][j]->get_transform().set_scale({ 0.5f, 1.0f });
-			controlSprite[i][j]->get_uv_transform().set_scale({ 0.5f, 1.0f });
+			controlSprite[i][j]->get_material().uvTransform.set_scale({ 0.5f, 1.0f });
 		}
 	}
 	controlSprite[0][0]->get_transform().set_translate({ 106.2f,176 });
@@ -93,15 +94,15 @@ void GameSceneUI::initialize(int32_t level) {
 	stageFrame = eps::CreateUnique<SpriteInstance>("stageFrame.png", Vector2{ 0.5f, 0.5f });
 	numberUi = eps::CreateUnique<SpriteInstance>("smallNumber.png", Vector2{ 0.5f, 0.5f });
 	numberUi->get_transform().set_scale({ 0.1f,1.0f });
-	numberUi->get_uv_transform().set_scale({ 0.1f,1.0f });
+	numberUi->get_material().uvTransform.set_scale({ 0.1f,1.0f });
 	numberUi10 = eps::CreateUnique<SpriteInstance>("smallNumber.png", Vector2{ 0.5f, 0.5f });
 	numberUi10->get_transform().set_scale({ 0.1f,1.0f });
-	numberUi10->get_uv_transform().set_scale({ 0.1f,1.0f });
+	numberUi10->get_material().uvTransform.set_scale({ 0.1f,1.0f });
 	if (level < 10) {
 		numberUi10->set_active(false);
 	}
-	numberUi->get_uv_transform().set_translate_x(level * 0.1f);
-	numberUi10->get_uv_transform().set_translate_x((level / 10) * 0.1f);
+	numberUi->get_material().uvTransform.set_translate_x(level * 0.1f);
+	numberUi10->get_material().uvTransform.set_translate_x((level / 10) * 0.1f);
 
 	numCenter = { 128,640 - 40 };
 	numberUi10->get_transform().set_translate({ numCenter.x - 59 / 2,numCenter.y });
@@ -127,8 +128,8 @@ void GameSceneUI::update() {
 		}
 	}
 	ReleseUIUpdate();
-	controlSprite[0][7]->get_uv_transform().set_translate_x(0.5f * !isCanRelese);
-	controlSprite[1][7]->get_uv_transform().set_translate_x(0.5f * !isCanRelese);
+	controlSprite[0][7]->get_material().uvTransform.set_translate_x(0.5f * !isCanRelese);
+	controlSprite[1][7]->get_material().uvTransform.set_translate_x(0.5f * !isCanRelese);
 }
 #ifdef _DEBUG
 
@@ -147,32 +148,19 @@ void GameSceneUI::debugUpdate() {
 
 }
 #endif
-void GameSceneUI::begin_rendering() {
+
+void GameSceneUI::write_to_executor(Reference<SpriteDrawExecutor> executor) const {
 	int controlType = (int)GameValue::UiType.get_type();
 	for (int i = 0; i < uiIndex; i++) {
-		controlSprite[controlType][i]->begin_rendering();
-	}
-
-	noneButtonSprite->begin_rendering();
-	stageFrame->begin_rendering();
-	numberUi->begin_rendering();
-	numberUi10->begin_rendering();
-	tutorialUI->begin_rendering();
-
-}
-
-void GameSceneUI::darw() {
-	int controlType = (int)GameValue::UiType.get_type();
-	for (int i = 0; i < uiIndex; i++) {
-		controlSprite[controlType][i]->draw();
+		executor->write_to_buffer(controlSprite[controlType][i]);
 	}
 	if (GameValue::UiType.get_type() == InputType::Pad) {
-		noneButtonSprite->draw();
+		executor->write_to_buffer(noneButtonSprite);
 	}
-	tutorialUI->draw();
-	stageFrame->draw();
-	numberUi->draw();
-	numberUi10->draw();
+	executor->write_to_buffer(stageFrame);
+	executor->write_to_buffer(numberUi);
+	executor->write_to_buffer(numberUi10);
+	executor->write_to_buffer(tutorialUI);
 }
 
 void GameSceneUI::ReleseUIUpdate() {
@@ -200,10 +188,10 @@ void GameSceneUI::keyControl(int index) {
 	KeyID keys[] = { KeyID::W, KeyID::A, KeyID::S, KeyID::D,KeyID::R,KeyID::Escape,KeyID::Z };
 	KeyID keys2[] = { KeyID::Up,KeyID::Left,KeyID::Down,KeyID::Right,KeyID::R,KeyID::Escape,KeyID::Z };
 	if (Input::IsPressKey(keys[index]) || Input::IsPressKey(keys2[index])) {
-		controlSprite[1][index]->get_uv_transform().set_translate_x(0.5f);
+		controlSprite[1][index]->get_material().uvTransform.set_translate_x(0.5f);
 	}
 	else {
-		controlSprite[1][index]->get_uv_transform().set_translate_x(0);
+		controlSprite[1][index]->get_material().uvTransform.set_translate_x(0);
 	}
 }
 
@@ -218,10 +206,10 @@ void GameSceneUI::padControl(int index) {
 	Vector2 stickL = Input::StickL().normalize_safe(CVector2::ZERO);
 	bool stickInput = index < 4 ? Vector2::Dot(stickL, stickDirection[index]) > std::cos(PI / 4) && stickL.length() != 0.0f : false;
 	if (Input::IsPressPad(padTrigger[index]) || stickInput) {
-		controlSprite[0][index]->get_uv_transform().set_translate_x(0.5f);
+		controlSprite[0][index]->get_material().uvTransform.set_translate_x(0.5f);
 	}
 	else {
-		controlSprite[0][index]->get_uv_transform().set_translate_x(0);
+		controlSprite[0][index]->get_material().uvTransform.set_translate_x(0);
 	}
 }
 

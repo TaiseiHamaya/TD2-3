@@ -3,6 +3,7 @@
 #include "Application/Utility/GameUtility.h"
 
 #include <Engine/Assets/Animation/NodeAnimation/NodeAnimationPlayer.h>
+#include <Engine/Module/DrawExecutor/Mesh/SkinningMeshDrawManager.h>
 
 void Player::initialize(const LevelLoader& level, MapchipHandler* mapchipHandler) {
 	object_ = std::make_unique<SkinningMeshInstance>();
@@ -39,6 +40,12 @@ void Player::initialize(const LevelLoader& level, MapchipHandler* mapchipHandler
 	fallSoundFlag = false;
 	unmovableFlag = false;
 	isMoved = false;
+}
+
+void Player::setup(Reference<SkinningMeshDrawManager> drawManager) {
+	drawManager->register_instance(object_);
+	drawManager->register_instance(exclamation_);
+	drawManager->register_instance(flusteredEffect_);
 }
 
 void Player::finalize() {}

@@ -5,7 +5,13 @@
 #include <memory>
 
 #include <Engine/Assets/Audio/AudioPlayer.h>
+
 #include <Engine/GraphicsAPI/DirectX/DxResource/TextureResource/RenderTexture.h>
+#include <Engine/Module/DrawExecutor/2D/SpriteDrawExecutor.h>
+#include <Engine/Module/DrawExecutor/LightingExecutor/DirectionalLightingExecutor.h>
+#include <Engine/Module/DrawExecutor/Mesh/SkinningMeshDrawManager.h>
+#include <Engine/Module/DrawExecutor/Mesh/StaticMeshDrawManager.h>
+#include <Engine/Module/Render/RenderNode/Posteffect/Outline/OutlineNode.h>
 #include <Engine/Module/Render/RenderPath/RenderPath.h>
 #include <Engine/Module/World/Camera/Camera3D.h>
 #include <Engine/Module/World/Light/DirectionalLight/DirectionalLightInstance.h>
@@ -13,11 +19,10 @@
 #include <Application/GameSprite/BackGround.h>
 #include <Application/Mapchip/MapchipField.h>
 
-#include "Engine/Module/Render/RenderNode/Posteffect/Outline/OutlineNode.h"
-
 class StaticMeshInstance;
 class SkinningMeshInstance;
 class SpriteInstance;
+class SingleRenderTarget;
 
 class SelectScene : public BaseScene {
 private:
@@ -72,9 +77,16 @@ private:
 	std::unique_ptr<SpriteInstance>fromGameKoara;
 
 	std::unique_ptr<RenderTexture> renderTexture;
+	std::unique_ptr<SingleRenderTarget> meshRT;
 	std::unique_ptr<RenderPath> renderPath;
 
 	std::shared_ptr<OutlineNode> outlineNode;
+
+	std::unique_ptr<SkinningMeshDrawManager> skinningMeshDrawManager;
+	std::unique_ptr<StaticMeshDrawManager> staticMeshDrawManager;
+	std::unique_ptr<SpriteDrawExecutor> bgSpriteDrawExecutor;
+	std::unique_ptr<SpriteDrawExecutor> spriteDrawExecutor;
+	std::unique_ptr<DirectionalLightingExecutor> directionalLightingExecutor;
 
 	std::unique_ptr<Camera3D> camera3D;
 	std::unique_ptr<DirectionalLightInstance> directionalLight;

@@ -1,8 +1,8 @@
 #pragma once
-#include <memory>
 #include "Engine/Assets/Audio/AudioPlayer.h"
-#include <Engine/Module/World/Particle/ParticleEmitterInstance.h>
 #include "Engine/Runtime/Clock/WorldClock.h"
+#include <Engine/Module/World/Particle/ParticleEmitterInstance.h>
+#include <memory>
 
 
 class SkinningMeshInstance;
@@ -14,11 +14,11 @@ public:
 	~Rocket();
 
 	void init();
-	void update(int state) ;
+	void update(int state);
 	void begin();
-	void begin_rendering() ;
-	void debug_update() ;
-	void draw();
+	void update_affine();
+	//void debug_update();
+
 	void draw_particle();
 
 	void isClear();
@@ -33,7 +33,7 @@ private:
 
 	bool isFailedFlag;
 	float particleSpawnTime;
-	
+
 	float explosionSpawnTime;
 	bool spwanParticle;
 	bool spwanParticle2;

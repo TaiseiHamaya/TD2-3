@@ -2,9 +2,12 @@
 
 #include <memory>
 
+#include <Library/Utility/Template/Reference.h>
+
 #include <Engine/Module/World/Sprite/SpriteInstance.h>
 
 enum class KeyID;
+class SpriteDrawExecutor;
 
 class GameSceneUI {
 public:
@@ -14,8 +17,9 @@ public:
 	void initialize(int32_t level);
 	void update();
 	void debugUpdate();
-	void begin_rendering();
-	void darw();
+
+	void write_to_executor(Reference<SpriteDrawExecutor> executor) const;
+
 	void ReleseUIUpdate();
 
 public:

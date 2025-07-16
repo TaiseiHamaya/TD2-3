@@ -1,9 +1,10 @@
 #include "ClearUI.h"
 
-#include <Engine/Module/World/Sprite/SpriteInstance.h>
 #include <Engine/Debug/ImGui/ImGuiLoadManager/ImGuiLoadManager.h>
-#include <Engine/Runtime/Input/Input.h>
+#include <Engine/Module/DrawExecutor/2D/SpriteDrawExecutor.h>
+#include <Engine/Module/World/Sprite/SpriteInstance.h>
 #include <Engine/Runtime/Clock/WorldClock.h>
+#include <Engine/Runtime/Input/Input.h>
 
 #include <Library/Utility/Tools/Easing.h>
 
@@ -31,7 +32,7 @@ void ClearUI::init() {
 	for (int i = 0; i < 6; i++) {
 		curEaseT[i] = 0;
 		letterTex[i]->get_transform().set_translate_x(endPos[i].x);
-		letterTex[i]->get_color().alpha = 0.f;
+		letterTex[i]->get_material().color.alpha = 0.f;
 		startPos[i] = { 640 - (3 - i) * 200.0f,0 };
 		boundCurEaseT[i] = 0;
 		boundEaseDir[i] = 1;
@@ -44,8 +45,8 @@ void ClearUI::init() {
 
 void ClearUI::update() {
 
-	KeyID keys[] = { KeyID::Space, KeyID::R, KeyID::Z};
-	PadID pad[] = { PadID::A, PadID::Y, PadID::B};
+	KeyID keys[] = { KeyID::Space, KeyID::R, KeyID::Z };
+	PadID pad[] = { PadID::A, PadID::Y, PadID::B };
 	for (int i = 0; i < 3; i++) {
 		if (!canOperation && (Input::IsTriggerKey(keys[i]) || Input::IsTriggerPad(pad[i]))) {
 			curIndex = 6;
@@ -56,7 +57,7 @@ void ClearUI::update() {
 			canOperation = true;
 		}
 	}
-	
+
 	if (curIndex < 6) {
 		curDelayTime += WorldClock::DeltaSeconds();
 		if (curDelayTime >= delayTotalTime) {
@@ -73,6 +74,14 @@ void ClearUI::update() {
 	}
 	if (curEaseT[5] > totalEaseT) { uiVisibleFlag = true; }
 }
+
+void ClearUI::write_to_executor(Reference<SpriteDrawExecutor> executor) const {
+	executor->write_to_buffer(alignmentTex);
+	for (int i = 0; i < 6; i++) {
+		executor->write_to_buffer(letterTex[i]);
+	}
+}
+
 #ifdef _DEBUG
 
 #include <imgui.h>
@@ -85,26 +94,13 @@ void ClearUI::debugUpdate() {
 	}*/
 }
 #endif
-void ClearUI::begin_rendering() {
-	alignmentTex->begin_rendering();
-	for (int i = 0; i < 6; i++) {
-		letterTex[i]->begin_rendering();
-	}
-}
-
-void ClearUI::draw() {
-	//alignmentTex->draw();
-	for (int i = 0; i < 6; i++) {
-		letterTex[i]->draw();
-	}
-}
 
 void ClearUI::EaseChange(int index, float easeT) {
 
 	float ratio = std::clamp(easeT / totalEaseT, 0.f, 1.f);
 	//色
 	//Easing::Out::Expo(ratio)
-	letterTex[index]->get_color().alpha = Easing::Out::Expo(ratio);
+	letterTex[index]->get_material().color.alpha = Easing::Out::Expo(ratio);
 	//座標
 	letterTex[index]->get_transform().set_translate(
 		{ std::lerp(

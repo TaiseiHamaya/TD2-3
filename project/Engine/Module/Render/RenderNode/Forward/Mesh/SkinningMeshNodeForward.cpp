@@ -20,8 +20,9 @@ void SkinningMeshNodeForward::create_pipeline_state() {
 	rootSignatureBuilder.add_structured(D3D12_SHADER_VISIBILITY_PIXEL, 0, 1, 0); // 1 : material(S0T0, P)
 	rootSignatureBuilder.add_cbv(D3D12_SHADER_VISIBILITY_VERTEX, 0, 1); // 2 : camera proj(S1B0, V)
 	rootSignatureBuilder.add_structured(D3D12_SHADER_VISIBILITY_VERTEX, 1, 1, 0); // 3 : bone(S0T1, V)
-	rootSignatureBuilder.add_cbv(D3D12_SHADER_VISIBILITY_PIXEL, 0, 1); // 4 : camera position(S1B0, P)
-	rootSignatureBuilder.add_cbv(D3D12_SHADER_VISIBILITY_PIXEL, 0, 2); // 5 : light(S2B0, P)
+	rootSignatureBuilder.add_cbv(D3D12_SHADER_VISIBILITY_VERTEX, 0, 0); // 4 : size of palette(S0B0, V)
+	rootSignatureBuilder.add_cbv(D3D12_SHADER_VISIBILITY_PIXEL, 0, 1); // 5 : camera ps(S1B0, P)
+	rootSignatureBuilder.add_structured(D3D12_SHADER_VISIBILITY_PIXEL, 0, 1, 2); // 6 : light(S1B0, P)
 	rootSignatureBuilder.sampler( // sampler
 		D3D12_SHADER_VISIBILITY_PIXEL,
 		0, 0,
@@ -29,7 +30,7 @@ void SkinningMeshNodeForward::create_pipeline_state() {
 	);
 
 	InputLayoutBuilder inputLayoutBuilder;
-	inputLayoutBuilder.add_element("POSITION", 0, DXGI_FORMAT_R32G32B32A32_FLOAT, 0);
+	inputLayoutBuilder.add_element("POSITION", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0);
 	inputLayoutBuilder.add_element("TEXCOORD", 0, DXGI_FORMAT_R32G32_FLOAT, 0);
 	inputLayoutBuilder.add_element("NORMAL", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0);
 
@@ -42,7 +43,7 @@ void SkinningMeshNodeForward::create_pipeline_state() {
 	psoBuilder->inputlayout(inputLayoutBuilder.build());
 	psoBuilder->rasterizerstate();
 	psoBuilder->rootsignature(rootSignatureBuilder.build());
-	psoBuilder->shaders(ShaderType::Vertex, "SkinningMesh.VS.hlsl");
+	psoBuilder->shaders(ShaderType::Vertex, "SkinningMeshForward.VS.hlsl");
 	psoBuilder->shaders(ShaderType::Pixel, "Forward.PS.hlsl");
 	psoBuilder->primitivetopologytype();
 	psoBuilder->rendertarget();

@@ -10,10 +10,12 @@
 
 #include <memory>
 
+class SkinningMeshDrawManager;
 
 class Player : public CharacterBase {
 public:
 	void initialize(const LevelLoader& level, MapchipHandler* mapchipHandler) override;
+	void setup(Reference<SkinningMeshDrawManager> drawManager);
 	void finalize() override;
 	void update() override;
 	void fall_update();

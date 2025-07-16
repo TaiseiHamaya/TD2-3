@@ -5,8 +5,13 @@
 #include <array>
 #include <memory>
 
-#include "Engine/Assets/Audio/AudioPlayer.h"
+#include <Engine/Assets/Audio/AudioPlayer.h>
 #include <Engine/Module/Render/RenderPath/RenderPath.h>
+#include <Engine/Module/DrawExecutor/Mesh/SkinningMeshDrawManager.h>
+#include <Engine/Module/DrawExecutor/Mesh/StaticMeshDrawManager.h>
+#include <Engine/Module/DrawExecutor/2D/SpriteDrawExecutor.h>
+#include <Engine/Module/DrawExecutor/LightingExecutor/DirectionalLightingExecutor.h> 
+
 #include <Library/Math/Vector3.h>
 
 class Camera3D;
@@ -53,6 +58,11 @@ private:
 	float transitionTimer{ 0 };
 
 	std::unique_ptr<RenderPath> renderPath;
+
+	std::unique_ptr<SkinningMeshDrawManager> skinningMeshDrawManager;
+	std::unique_ptr<StaticMeshDrawManager> staticMeshDrawManager;
+	std::unique_ptr<SpriteDrawExecutor> spriteDrawExecutor;
+	std::unique_ptr<DirectionalLightingExecutor> directionalLightingExecutor;
 
 	std::unique_ptr<Camera3D> camera3D;
 	std::unique_ptr<DirectionalLightInstance> directionalLight;

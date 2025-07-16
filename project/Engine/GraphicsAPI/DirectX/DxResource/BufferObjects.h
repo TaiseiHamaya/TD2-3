@@ -56,6 +56,15 @@ struct MaterialDataBuffer4 {
 };
 
 /// <summary>
+/// Sprite用MaterialBuffer
+/// </summary>
+struct SpriteMaterialDataBuffer {
+	Color4 color;
+	u32 textureIndex{ 0 };
+	Matrix3x3 uvTransformMatrix = CMatrix3x3::IDENTITY;
+};
+
+/// <summary>
 /// MatrixPaletteWell
 /// </summary>
 struct SkeletonMatrixPaletteWellBuffer {

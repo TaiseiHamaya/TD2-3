@@ -14,22 +14,16 @@ void SpriteNode::initialize() {
 
 void SpriteNode::create_pipeline_state() {
 	RootSignatureBuilder rootSignatureBuilder;
-	rootSignatureBuilder.add_cbv(D3D12_SHADER_VISIBILITY_VERTEX, 0);
-	rootSignatureBuilder.add_cbv(D3D12_SHADER_VISIBILITY_PIXEL, 0);
-	rootSignatureBuilder.add_texture(D3D12_SHADER_VISIBILITY_PIXEL);
+	rootSignatureBuilder.add_structured(D3D12_SHADER_VISIBILITY_VERTEX, 0);
+	rootSignatureBuilder.add_structured(D3D12_SHADER_VISIBILITY_PIXEL, 0);
 	rootSignatureBuilder.sampler(
 		D3D12_SHADER_VISIBILITY_PIXEL,
 		0, 0,
-		D3D12_FILTER_ANISOTROPIC
+		D3D12_FILTER_COMPARISON_MIN_MAG_MIP_LINEAR
 	);
-
-	InputLayoutBuilder inputLayoutBuilder;
-	inputLayoutBuilder.add_element("POSITION", 0, DXGI_FORMAT_R32G32B32A32_FLOAT);
-	inputLayoutBuilder.add_element("TEXCOORD", 0, DXGI_FORMAT_R32G32_FLOAT);
 
 	std::unique_ptr<PSOBuilder> psoBuilder = std::make_unique<PSOBuilder>();
 	psoBuilder->blendstate(BlendMode::Alpha);
-	psoBuilder->inputlayout(inputLayoutBuilder.build());
 	psoBuilder->rasterizerstate(D3D12_FILL_MODE_SOLID, D3D12_CULL_MODE_NONE);
 	psoBuilder->rootsignature(rootSignatureBuilder.build());
 	psoBuilder->shaders(ShaderType::Vertex, "Sprite.VS.hlsl");

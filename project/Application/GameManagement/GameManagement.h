@@ -1,11 +1,16 @@
 #pragma once
 
 #include <memory>
+
+#include <Library/Utility/Template/Reference.h>
+
 #include "Engine/Assets/Audio/AudioPlayer.h"
+
 #include"Application/UI/FailedUI.h"
 #include"Application/UI/ClearUI.h"
 
 class SpriteInstance;
+class SpriteDrawExecutor;
 
 class GameManagement {
 public:
@@ -16,8 +21,9 @@ public:
 	void begin();
 	void update();
 	void debug_update();
-	void begin_rendering();
-	void darw();
+
+	void write_to_executor(Reference<SpriteDrawExecutor> executor) const;
+
 	void resultKeyInput();
 
 private:
