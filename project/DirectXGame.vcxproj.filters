@@ -184,6 +184,10 @@
     <ClCompile Include="Engine\Module\Render\RenderNode\Forward\Mesh\StaticMeshNodeForward.cpp" />
     <ClCompile Include="Engine\Module\Render\RenderNode\Forward\Primitive\Rect3dNode.cpp" />
     <ClCompile Include="Engine\Module\DrawExecutor\2D\SpriteDrawExecutor.cpp" />
+    <ClCompile Include="Application\PostEffect\BloomNode.cpp" />
+    <ClCompile Include="Application\PostEffect\GaussianBlurNode.cpp" />
+    <ClCompile Include="Application\PostEffect\LuminanceExtractionNode.cpp" />
+    <ClCompile Include="Application\PostEffect\MargeTextureNode.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Engine\Module\Render\RenderNode\Deferred\DeferredAdaptor.h" />
@@ -390,6 +394,10 @@
     <ClInclude Include="Engine\Module\Render\RenderNode\Forward\Mesh\StaticMeshNodeForward.h" />
     <ClInclude Include="Engine\Module\Render\RenderNode\Forward\Primitive\Rect3dNode.h" />
     <ClInclude Include="Engine\Module\DrawExecutor\2D\SpriteDrawExecutor.h" />
+    <ClInclude Include="Application\PostEffect\BloomNode.h" />
+    <ClInclude Include="Application\PostEffect\GaussianBlurNode.h" />
+    <ClInclude Include="Application\PostEffect\LuminanceExtractionNode.h" />
+    <ClInclude Include="Application\PostEffect\MargeTextureNode.h" />
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="EngineResources\HLSL\FullscreenShader.hlsl">

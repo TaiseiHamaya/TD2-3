@@ -126,6 +126,10 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     </FxCompile>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="Application\PostEffect\BloomNode.cpp" />
+    <ClCompile Include="Application\PostEffect\GaussianBlurNode.cpp" />
+    <ClCompile Include="Application\PostEffect\LuminanceExtractionNode.cpp" />
+    <ClCompile Include="Application\PostEffect\MargeTextureNode.cpp" />
     <ClCompile Include="Application\Scene\DebugScene.cpp" />
     <ClCompile Include="Application\UI\ClearUI.cpp" />
     <ClCompile Include="Application\GameSprite\BackGround.cpp" />
@@ -293,6 +297,10 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Application\Character\Player\CharacterStates.h" />
+    <ClInclude Include="Application\PostEffect\BloomNode.h" />
+    <ClInclude Include="Application\PostEffect\GaussianBlurNode.h" />
+    <ClInclude Include="Application\PostEffect\LuminanceExtractionNode.h" />
+    <ClInclude Include="Application\PostEffect\MargeTextureNode.h" />
     <ClInclude Include="Application\Scene\DebugScene.h" />
     <ClInclude Include="Application\GameValue.h" />
     <ClInclude Include="Application\UI\ClearUI.h" />

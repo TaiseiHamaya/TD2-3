@@ -32,6 +32,11 @@
 #include "Application/Scene/GameScene.h"
 #include <Application/Configuration/Configuration.h>
 
+#include "Application/PostEffect/BloomNode.h"
+#include "Application/PostEffect/GaussianBlurNode.h"
+#include "Application/PostEffect/LuminanceExtractionNode.h"
+#include "Application/PostEffect/MargeTextureNode.h"
+
 SelectScene::SelectScene() : SelectScene(1, false) {};
 
 SelectScene::SelectScene(int32_t selectLevel, bool isFromGame) :
@@ -126,13 +131,26 @@ void SelectScene::initialize() {
 
 	fieldRotation = std::make_unique<WorldInstance>();
 
-	renderTexture = std::make_unique<RenderTexture>();
-	renderTexture->initialize(DXGI_FORMAT_R8G8B8A8_UNORM_SRGB);
-
-	meshRT = std::make_unique<SingleRenderTarget>();
-	meshRT->initialize(renderTexture);
-
 	Particle::lookAtDefault = camera3D.get();
+
+	renderTextures.resize(8);
+	renderTextures[0].initialize(DXGI_FORMAT_R8G8B8A8_UNORM_SRGB); // アウトライン前
+	renderTextures[1].initialize(DXGI_FORMAT_R8G8B8A8_UNORM_SRGB); // シーンアウト
+	renderTextures[2].initialize(DXGI_FORMAT_R8G8B8A8_UNORM_SRGB); // 輝度抽出
+	renderTextures[3].initialize(DXGI_FORMAT_R8G8B8A8_UNORM_SRGB, EngineSettings::CLIENT_WIDTH / 2, EngineSettings::CLIENT_HEIGHT / 2); // ダウンサンプリング 1/2
+	renderTextures[4].initialize(DXGI_FORMAT_R8G8B8A8_UNORM_SRGB, EngineSettings::CLIENT_WIDTH / 4, EngineSettings::CLIENT_HEIGHT / 4); // ダウンサンプリング 1/4
+	renderTextures[5].initialize(DXGI_FORMAT_R8G8B8A8_UNORM_SRGB, EngineSettings::CLIENT_WIDTH / 8, EngineSettings::CLIENT_HEIGHT / 8); // ダウンサンプリング 1/8
+	renderTextures[6].initialize(DXGI_FORMAT_R8G8B8A8_UNORM_SRGB, EngineSettings::CLIENT_WIDTH / 16, EngineSettings::CLIENT_HEIGHT / 16); // ダウンサンプリング 1/16
+	renderTextures[7].initialize(DXGI_FORMAT_R8G8B8A8_UNORM_SRGB); // ダウンサンプリングを合成
+
+	meshRT.initialize(renderTextures[0]);
+	baseRenderTexture.initialize(renderTextures[1]);
+	luminanceRenderTexture.initialize(renderTextures[2]);
+	downSampleRenderTexture2.initialize(renderTextures[3]);
+	downSampleRenderTexture4.initialize(renderTextures[4]);
+	downSampleRenderTexture8.initialize(renderTextures[5]);
+	downSampleRenderTexture16.initialize(renderTextures[6]);
+	bloomBaseRenderTexture.initialize(renderTextures[7]);
 
 	std::shared_ptr<SpriteNode> bgSpriteNode;
 	bgSpriteNode = std::make_unique<SpriteNode>();
@@ -153,17 +171,54 @@ void SelectScene::initialize() {
 
 	outlineNode = std::make_shared<OutlineNode>();
 	outlineNode->initialize();
-	outlineNode->set_shader_texture(renderTexture, RenderingSystemValues::GetDepthStencilTexture());
-	outlineNode->set_render_target_SC();
+	outlineNode->set_shader_texture(renderTextures[0], RenderingSystemValues::GetDepthStencilTexture());
+	outlineNode->set_render_target(baseRenderTexture);
 
 	std::shared_ptr<SpriteNode> spriteNode;
 	spriteNode = std::make_unique<SpriteNode>();
 	spriteNode->initialize();
 	spriteNode->set_config(RenderNodeConfig::NoClearRenderTarget);
-	spriteNode->set_render_target_SC();
+	spriteNode->set_render_target(baseRenderTexture);
+
+	luminanceExtractionNode = eps::CreateShared<LuminanceExtractionNode>();
+	luminanceExtractionNode->initialize();
+	luminanceExtractionNode->set_render_target(luminanceRenderTexture);
+	luminanceExtractionNode->set_texture_resource(renderTextures[1]);
+
+	gaussianBlurNode2 = eps::CreateShared<GaussianBlurNode>();
+	gaussianBlurNode2->initialize();
+	gaussianBlurNode2->set_render_target(downSampleRenderTexture2);
+	gaussianBlurNode2->set_base_texture(renderTextures[2]);
+
+	gaussianBlurNode4 = eps::CreateShared<GaussianBlurNode>();
+	gaussianBlurNode4->initialize();
+	gaussianBlurNode4->set_render_target(downSampleRenderTexture4);
+	gaussianBlurNode4->set_base_texture(renderTextures[3]);
+
+	gaussianBlurNode8 = eps::CreateShared<GaussianBlurNode>();
+	gaussianBlurNode8->initialize();
+	gaussianBlurNode8->set_render_target(downSampleRenderTexture8);
+	gaussianBlurNode8->set_base_texture(renderTextures[4]);
+
+	gaussianBlurNode16 = eps::CreateShared<GaussianBlurNode>();
+	gaussianBlurNode16->initialize();
+	gaussianBlurNode16->set_render_target(downSampleRenderTexture16);
+	gaussianBlurNode16->set_base_texture(renderTextures[5]);
+
+	margeTextureNode = eps::CreateShared<MargeTextureNode>();
+	margeTextureNode->initialize();
+	margeTextureNode->set_render_target(bloomBaseRenderTexture);
+	margeTextureNode->set_texture_resources({ renderTextures[3] ,renderTextures[4] ,renderTextures[5], renderTextures[6] });
+
+	bloomNode = eps::CreateShared<BloomNode>();
+	bloomNode->initialize();
+	bloomNode->set_render_target_SC();
+	bloomNode->set_base_texture(renderTextures[1]);
+	bloomNode->set_blur_texture(renderTextures[7]);
 
 	renderPath = eps::CreateUnique<RenderPath>();
-	renderPath->initialize({ bgSpriteNode,object3dNode,skinningMeshNode,outlineNode,spriteNode });
+	renderPath->initialize({ bgSpriteNode,object3dNode,skinningMeshNode,outlineNode,spriteNode,
+		luminanceExtractionNode, gaussianBlurNode2, gaussianBlurNode4, gaussianBlurNode8, gaussianBlurNode16, margeTextureNode, bloomNode });
 
 	// ---------------------- DrawManager ----------------------
 	staticMeshDrawManager = std::make_unique<StaticMeshDrawManager>();
@@ -229,6 +284,13 @@ void SelectScene::initialize() {
 	skinningMeshDrawManager->register_instance(parentKoala);
 	skinningMeshDrawManager->register_instance(childKoala);
 	staticMeshDrawManager->register_instance(goalMesh);
+
+	luminanceExtractionNode->set_param(0.67f, CColor3::WHITE);
+	gaussianBlurNode2->set_parameters(1.0f, 16.17f, 8);
+	gaussianBlurNode4->set_parameters(1.0f, 16.17f, 8);
+	gaussianBlurNode8->set_parameters(1.0f, 16.17f, 8);
+	gaussianBlurNode16->set_parameters(1.0f, 16.17f, 8);
+	bloomNode->set_param(0.247f);
 }
 
 void SelectScene::popped() {
@@ -354,6 +416,21 @@ void SelectScene::draw() const {
 	renderPath->next();
 	// 前景スプライト
 	spriteDrawExecutor->draw_command();
+
+	renderPath->next();
+	luminanceExtractionNode->draw();
+	renderPath->next();
+	gaussianBlurNode2->draw();
+	renderPath->next();
+	gaussianBlurNode4->draw();
+	renderPath->next();
+	gaussianBlurNode8->draw();
+	renderPath->next();
+	gaussianBlurNode16->draw();
+	renderPath->next();
+	margeTextureNode->draw();
+	renderPath->next();
+	bloomNode->draw();
 
 	renderPath->next();
 }
@@ -522,5 +599,30 @@ void SelectScene::debug_update() {
 	WorldClock::DebugGui();
 	ImGui::End();
 	background->debugUpdate();
+
+	ImGui::Begin("PostEffect");
+	if (ImGui::TreeNode("LuminanceExtraction")) {
+		luminanceExtractionNode->debug_gui();
+		ImGui::TreePop();
+	}
+	if (ImGui::TreeNode("GaussianBlurNode16")) {
+		ImGui::DragFloat("Weight", &blurData.dispersion, 0.001f, 0.0f, 1.0f, "%.4f");
+		ImGui::DragFloat("Length", &blurData.length, 0.01f);
+		constexpr uint32_t min = 1;
+		constexpr uint32_t max = 16;
+		ImGui::DragScalar("SampleCount", ImGuiDataType_U32, reinterpret_cast<int*>(&blurData.sampleCount), 0.02f, &min, &max);
+
+		gaussianBlurNode2->set_parameters(blurData.dispersion, blurData.length, blurData.sampleCount);
+		gaussianBlurNode4->set_parameters(blurData.dispersion, blurData.length, blurData.sampleCount);
+		gaussianBlurNode8->set_parameters(blurData.dispersion, blurData.length, blurData.sampleCount);
+		gaussianBlurNode16->set_parameters(blurData.dispersion, blurData.length, blurData.sampleCount);
+
+		ImGui::TreePop();
+	}
+	if (ImGui::TreeNode("BloomNode")) {
+		bloomNode->debug_gui();
+		ImGui::TreePop();
+	}
+	ImGui::End();
 }
 #endif // _DEBUG
