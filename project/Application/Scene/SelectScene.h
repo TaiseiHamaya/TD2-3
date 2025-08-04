@@ -4,14 +4,20 @@
 
 #include <memory>
 
+#include "Application/GameSprite/BackGround.h"
+#include <Application/Mapchip/MapchipField.h>
+#include <Engine/Module/Render/RenderPath/RenderPath.h>
 #include <Engine/Module/World/Camera/Camera3D.h>
 #include <Engine/Module/World/Light/DirectionalLight/DirectionalLightInstance.h>
 #include <Engine/Resources/Audio/AudioPlayer.h>
-#include <Application/Mapchip/MapchipField.h>
-#include <Engine/Module/Render/RenderPath/RenderPath.h>
-#include "Application/GameSprite/BackGround.h"
 
+#include "Application/PostEffect/GaussianBlurNode.h"
 #include "Engine/Module/Render/RenderNode/Posteffect/Outline/OutlineNode.h"
+
+class LuminanceExtractionNode;
+class MargeTextureNode;
+class BloomNode;
+class GaussianBlurNode;
 
 class MeshInstance;
 class AnimatedMeshInstance;
@@ -73,6 +79,14 @@ private:
 
 	std::shared_ptr<OutlineNode> outlineNode;
 
+	std::shared_ptr<LuminanceExtractionNode> luminanceExtractionNode;
+	std::shared_ptr<GaussianBlurNode> gaussianBlurNode2;
+	std::shared_ptr<GaussianBlurNode> gaussianBlurNode4;
+	std::shared_ptr<GaussianBlurNode> gaussianBlurNode8;
+	std::shared_ptr<GaussianBlurNode> gaussianBlurNode16;
+	std::shared_ptr<MargeTextureNode> margeTextureNode;
+	std::shared_ptr<BloomNode> bloomNode;
+
 	std::unique_ptr<Camera3D> camera3D;
 	std::unique_ptr<DirectionalLightInstance> directionalLight;
 
@@ -108,4 +122,12 @@ private:
 	const float fromGameMaxTime = 0.5f;
 	float fromGameCurrentTime;
 	bool isFromGameScene = false;
+
+#ifdef _DEBUG
+	GaussianBlurNode::GaussianBlurInfo blurData{
+		.dispersion = 1.0f,
+		.length = 40.0f,
+		.sampleCount = 8
+	};
+#endif
 };

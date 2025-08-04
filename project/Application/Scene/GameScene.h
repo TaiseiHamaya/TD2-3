@@ -19,6 +19,12 @@ class LevelLoader;
 
 #include "Application/Rocket/Rocket.h"
 #include "Application/Tutorial/TutorialManager.h"
+#include "Application/PostEffect/GaussianBlurNode.h"
+
+class LuminanceExtractionNode;
+class MargeTextureNode;
+class BloomNode;
+class GaussianBlurNode;
 
 class GameScene : public BaseScene {
 private:
@@ -57,6 +63,13 @@ private:
 	std::unique_ptr<RenderPath> renderPath;
 
 	std::shared_ptr<OutlineNode> outlineNode;
+	std::shared_ptr<LuminanceExtractionNode> luminanceExtractionNode;
+	std::shared_ptr<GaussianBlurNode> gaussianBlurNode2;
+	std::shared_ptr<GaussianBlurNode> gaussianBlurNode4;
+	std::shared_ptr<GaussianBlurNode> gaussianBlurNode8;
+	std::shared_ptr<GaussianBlurNode> gaussianBlurNode16;
+	std::shared_ptr<MargeTextureNode> margeTextureNode;
+	std::shared_ptr<BloomNode> bloomNode;
 	// プレイヤーの生成
 	std::unique_ptr<PlayerManager> playerManager;
 	std::unique_ptr<MapchipField> fieldObjs;
@@ -85,6 +98,14 @@ private:
 	std::unique_ptr<AudioPlayer>bgm;
 
 	float sceneChangeTime = 0.5f;
+
+#ifdef _DEBUG
+	GaussianBlurNode::GaussianBlurInfo blurData{
+		.dispersion = 1.0f,
+		.length = 40.0f,
+		.sampleCount = 8
+	};
+#endif
 
 };
 
