@@ -19,7 +19,7 @@ class LevelLoader;
 
 #include "Application/Rocket/Rocket.h"
 #include "Application/Tutorial/TutorialManager.h"
-#include <Application/PostEffect/GaussianBlurNode.h>
+#include "Application/PostEffect/GaussianBlurNode.h"
 
 class LuminanceExtractionNode;
 class MargeTextureNode;

@@ -299,7 +299,8 @@ void GameScene::initialize() {
 		luminanceExtractionNode, gaussianBlurNode2, gaussianBlurNode4, gaussianBlurNode8, gaussianBlurNode16, margeTextureNode, bloomNode,
 		primitiveLineNode });
 #else
-	renderPath->initialize({ bgSpriteNode,object3dNode,skinningMeshNode,outlineNode,particleMeshNode,spriteNode });
+	renderPath->initialize({ bgSpriteNode,object3dNode,skinningMeshNode,outlineNode,particleMeshNode,spriteNode,
+		luminanceExtractionNode, gaussianBlurNode2, gaussianBlurNode4, gaussianBlurNode8, gaussianBlurNode16, margeTextureNode, bloomNode });
 #endif // _DEBUG
 
 	managementUI = std::make_unique<GameManagement>();
