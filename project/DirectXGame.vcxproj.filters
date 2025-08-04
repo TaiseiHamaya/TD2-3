@@ -158,6 +158,10 @@
     <ClCompile Include="Application\Tutorial\TutorialManager.cpp" />
     <ClCompile Include="Application\InputUiType.cpp" />
     <ClCompile Include="Application\Configuration\Configuration.cpp" />
+    <ClCompile Include="Application\PostEffect\BloomNode.cpp" />
+    <ClCompile Include="Application\PostEffect\GaussianBlurNode.cpp" />
+    <ClCompile Include="Application\PostEffect\LuminanceExtractionNode.cpp" />
+    <ClCompile Include="Application\PostEffect\MargeTextureNode.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Engine\Module\Render\RenderNode\Deferred\DeferredAdaptor.h" />
@@ -326,6 +330,10 @@
     <ClInclude Include="Application\Tutorial\TutorialManager.h" />
     <ClInclude Include="Application\InputUiType.h" />
     <ClInclude Include="Application\Configuration\Configuration.h" />
+    <ClInclude Include="Application\PostEffect\BloomNode.h" />
+    <ClInclude Include="Application\PostEffect\GaussianBlurNode.h" />
+    <ClInclude Include="Application\PostEffect\LuminanceExtractionNode.h" />
+    <ClInclude Include="Application\PostEffect\MargeTextureNode.h" />
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="EngineResources\HLSL\FullscreenShader.hlsl">
