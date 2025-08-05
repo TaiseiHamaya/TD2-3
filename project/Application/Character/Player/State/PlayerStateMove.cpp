@@ -4,6 +4,7 @@
 
 void PlayerStateMove::Enter(Player& player) {
 	moveTimer = 0.0f;
+	player.set_state(PlayerState::Moving);
 }
 
 void PlayerStateMove::Update(Player& player) {

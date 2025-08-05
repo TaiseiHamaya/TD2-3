@@ -3,6 +3,7 @@
 #include <Application/Utility/GameUtility.h>
 
 void PlayerStateMoveCheck::Enter(Player& player) {
+
 }
 
 void PlayerStateMoveCheck::Update(Player& player) {

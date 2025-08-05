@@ -3,6 +3,7 @@
 
 void PlayerStateMoveFailed::Enter(Player& player) {
 	wallMoveTimer = 0.0f;
+	player.set_state(PlayerState::MoveFailed);
 }
 
 void PlayerStateMoveFailed::Update(Player& player) {
