@@ -167,6 +167,11 @@
     <ClCompile Include="Application\Character\Player\State\PlayerStateMove.cpp" />
     <ClCompile Include="Application\Character\Player\State\PlayerStateMoveFailed.cpp" />
     <ClCompile Include="Application\Character\Player\State\PlayerStateIceCheck.cpp" />
+    <ClCompile Include="Application\Configuration\Configuration.cpp" />
+    <ClCompile Include="Application\PostEffect\BloomNode.cpp" />
+    <ClCompile Include="Application\PostEffect\GaussianBlurNode.cpp" />
+    <ClCompile Include="Application\PostEffect\LuminanceExtractionNode.cpp" />
+    <ClCompile Include="Application\PostEffect\MargeTextureNode.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Engine\Module\Render\RenderNode\Deferred\DeferredAdaptor.h" />
@@ -346,6 +351,11 @@
     <ClInclude Include="Application\Character\Player\State\PlayerStateMove.h" />
     <ClInclude Include="Application\Character\Player\State\PlayerStateMoveFailed.h" />
     <ClInclude Include="Application\Character\Player\State\PlayerStateIceCheck.h" />
+    <ClInclude Include="Application\Configuration\Configuration.h" />
+    <ClInclude Include="Application\PostEffect\BloomNode.h" />
+    <ClInclude Include="Application\PostEffect\GaussianBlurNode.h" />
+    <ClInclude Include="Application\PostEffect\LuminanceExtractionNode.h" />
+    <ClInclude Include="Application\PostEffect\MargeTextureNode.h" />
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="EngineResources\HLSL\FullscreenShader.hlsl">

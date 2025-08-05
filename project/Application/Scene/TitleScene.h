@@ -14,6 +14,15 @@ class DirectionalLightInstance;
 class SpriteInstance;
 class AnimatedMeshInstance;
 
+#include "Application/Rocket/Rocket.h"
+#include "Application/Tutorial/TutorialManager.h"
+#include "Application/PostEffect/GaussianBlurNode.h"
+
+class LuminanceExtractionNode;
+class MargeTextureNode;
+class BloomNode;
+class GaussianBlurNode;
+
 class TitleScene : public BaseScene {
 private:
 	enum class TransitionState {
@@ -54,12 +63,21 @@ private:
 
 	std::unique_ptr<RenderPath> renderPath;
 
+	std::shared_ptr<LuminanceExtractionNode> luminanceExtractionNode;
+	std::shared_ptr<GaussianBlurNode> gaussianBlurNode2;
+	std::shared_ptr<GaussianBlurNode> gaussianBlurNode4;
+	std::shared_ptr<GaussianBlurNode> gaussianBlurNode8;
+	std::shared_ptr<GaussianBlurNode> gaussianBlurNode16;
+	std::shared_ptr<MargeTextureNode> margeTextureNode;
+	std::shared_ptr<BloomNode> bloomNode;
+
 	std::unique_ptr<Camera3D> camera3D;
 	std::unique_ptr<DirectionalLightInstance> directionalLight;
 
 	std::unique_ptr<SpriteInstance> transition;
-	std::array<std::unique_ptr<SpriteInstance>, 2> startUi;
+	std::array<std::unique_ptr<SpriteInstance>, 4> startUi;
 	std::unique_ptr<SpriteInstance> titleLogo;
+	std::unique_ptr<SpriteInstance> languageSelection;
 
 	//BGM
 	std::unique_ptr<AudioPlayer>bgm;
@@ -72,5 +90,16 @@ private:
 	Vector3 movePos;
 
 	std::unique_ptr< AudioPlayer>startAudio;
-};
 
+	float languageSelectTimer{ 0.0f };
+	std::unique_ptr<AudioPlayer> selectSeSuccussed;
+	std::unique_ptr<AudioPlayer> selectSeFailed;
+
+#ifdef _DEBUG
+	GaussianBlurNode::GaussianBlurInfo blurData{
+		.dispersion = 1.0f,
+		.length = 40.0f,
+		.sampleCount = 8
+	};
+#endif
+};

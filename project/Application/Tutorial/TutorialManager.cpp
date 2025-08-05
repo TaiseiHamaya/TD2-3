@@ -1,18 +1,30 @@
 #include "TutorialManager.h"
-#include <Engine/Utility/Tools/SmartPointer.h>
+
+#include <algorithm>
+
 #include <Library/Math/Transform2D.h>
+
 #include <Engine/Runtime/Input/Input.h>
+#include <Engine/Runtime/WorldClock/WorldClock.h>
+#include <Engine/Utility/Tools/SmartPointer.h>
+
+#include "Application/Configuration/Configuration.h"
 
 #ifdef _DEBUG
 #include <imgui.h>
 #endif
-#include <Engine/Runtime/WorldClock/WorldClock.h>
-#include <algorithm>
 
 void TutorialManager::initialize(uint32_t stage) {
 	tutorialFrame_ = eps::CreateUnique<SpriteInstance>("Frame.png");
 	tutorialFrame_->set_active(false);
-	tutorialText_ = eps::CreateUnique<SpriteInstance>("TutorialText.png");
+	switch (Configuration::GetLanguage()) {
+	case Configuration::Language::Japanese:
+		tutorialText_ = eps::CreateUnique<SpriteInstance>("TutorialText.png");
+		break;
+	case Configuration::Language::English:
+		tutorialText_ = eps::CreateUnique<SpriteInstance>("TutorialText_EN.png");
+		break;
+	}
 	tutorialText_->get_transform().set_translate({ 80.0f, 120.0f });
 	tutorialText_->get_transform().set_scale({ 1.0f, 0.1f });
 	tutorialText_->get_uv_transform().set_scale({ 1.0f, 0.09f });
@@ -23,7 +35,7 @@ void TutorialManager::initialize(uint32_t stage) {
 	tutorialImage_->get_uv_transform().set_scale({ 1.0f, 0.095f });
 	tutorialImage_->set_active(false);
 	Abutton_ = eps::CreateUnique<SpriteInstance>("Abutton.png");
-	Abutton_->get_transform().set_translate({ 1080.0f, 75.0f });
+	Abutton_->get_transform().set_translate({ 1080.0f, 60.0f });
 	Abutton_->set_active(false);
 
 	if (stage == 1) {
@@ -35,7 +47,7 @@ void TutorialManager::initialize(uint32_t stage) {
 	else if (stage == 5) {
 		tutorialStep_ = TutorialStep::ChildSupportsParent;
 	}
-	else if (stage == 10) {
+	else if (stage == 9) {
 		tutorialStep_ = TutorialStep::IceSlippery;
 	}
 	else {
@@ -138,7 +150,6 @@ void TutorialManager::draw() {
 
 	tutorialFrame_->draw();
 	tutorialText_->draw();
-	tutorialImage_->draw();
 	Abutton_->draw();
 }
 

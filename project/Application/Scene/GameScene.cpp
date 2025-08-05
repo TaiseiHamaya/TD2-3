@@ -27,6 +27,11 @@
 
 #include "Application/LevelLoader/LevelLoader.h"
 
+#include "Application/PostEffect/BloomNode.h"
+#include "Application/PostEffect/GaussianBlurNode.h"
+#include "Application/PostEffect/LuminanceExtractionNode.h"
+#include "Application/PostEffect/MargeTextureNode.h"
+
 #ifdef _DEBUG
 #include "Engine/Module/Render/RenderNode/Debug/PrimitiveLine/PrimitiveLineNode.h"
 #endif // _DEBUG
@@ -75,20 +80,27 @@ void GameScene::load() {
 	TextureManager::RegisterLoadQue("./GameResources/Texture/UI/ResetUI.png");
 	TextureManager::RegisterLoadQue("./GameResources/Texture/UI/ESCkey.png");
 	TextureManager::RegisterLoadQue("./GameResources/Texture/UI/ReleseUI.png");
+	TextureManager::RegisterLoadQue("./GameResources/Texture/UI/ReleseUI_EN.png");
 
 	TextureManager::RegisterLoadQue("./GameResources/Texture/UI/ResetUIController.png");
 	TextureManager::RegisterLoadQue("./GameResources/Texture/UI/ESCkeyController.png");
 	TextureManager::RegisterLoadQue("./GameResources/Texture/UI/UndoController.png");
 	TextureManager::RegisterLoadQue("./GameResources/Texture/UI/ReleseUIController.png");
+	TextureManager::RegisterLoadQue("./GameResources/Texture/UI/ReleseUIController_EN.png");
 	TextureManager::RegisterLoadQue("./GameResources/Texture/UI/NoneButton.png");
 
 	TextureManager::RegisterLoadQue("./GameResources/Texture/UI/Tutorial1.png");
 	TextureManager::RegisterLoadQue("./GameResources/Texture/UI/Next.png");
+	TextureManager::RegisterLoadQue("./GameResources/Texture/UI/Next_EN.png");
 	TextureManager::RegisterLoadQue("./GameResources/Texture/UI/Retry.png");
+	TextureManager::RegisterLoadQue("./GameResources/Texture/UI/Retry_EN.png");
 	TextureManager::RegisterLoadQue("./GameResources/Texture/UI/SelectFrame.png");
 	TextureManager::RegisterLoadQue("./GameResources/Texture/UI/FailedUI_1.png");
+	TextureManager::RegisterLoadQue("./GameResources/Texture/UI/FailedUI_1_EN.png");
 	TextureManager::RegisterLoadQue("./GameResources/Texture/UI/undoRetry.png");
+	TextureManager::RegisterLoadQue("./GameResources/Texture/UI/undoRetry_EN.png");
 	TextureManager::RegisterLoadQue("./GameResources/Texture/UI/GoSelect.png");
+	TextureManager::RegisterLoadQue("./GameResources/Texture/UI/GoSelect_EN.png");
 	TextureManager::RegisterLoadQue("./GameResources/Texture/UI/Undo.png");
 	TextureManager::RegisterLoadQue("./GameResources/Texture/UI/smallNumber.png");
 	TextureManager::RegisterLoadQue("./GameResources/Texture/UI/stageFrame.png");
@@ -111,6 +123,7 @@ void GameScene::load() {
 	TextureManager::RegisterLoadQue("./GameResources/Texture/Clear/!.png");
 	TextureManager::RegisterLoadQue("./GameResources/Texture/Tutorial/Frame.png");
 	TextureManager::RegisterLoadQue("./GameResources/Texture/Tutorial/TutorialText.png");
+	TextureManager::RegisterLoadQue("./GameResources/Texture/Tutorial/TutorialText_EN.png");
 	TextureManager::RegisterLoadQue("./GameResources/Texture/Tutorial/TutorialImage.png");
 
 	TextureManager::RegisterLoadQue("./GameResources/Texture/UI/Abutton.png");
@@ -166,6 +179,23 @@ void GameScene::initialize() {
 	meshRT = std::make_shared<SingleRenderTarget>();
 	meshRT->initialize();
 
+	std::shared_ptr<SingleRenderTarget> sceneOut;
+	sceneOut = std::make_shared<SingleRenderTarget>();
+	sceneOut->initialize();
+
+	std::shared_ptr<SingleRenderTarget> downSampled2;
+	downSampled2 = std::make_shared<SingleRenderTarget>();
+	downSampled2->initialize(EngineSettings::CLIENT_WIDTH / 2, EngineSettings::CLIENT_HEIGHT / 2);
+	std::shared_ptr<SingleRenderTarget> downSampled4;
+	downSampled4 = std::make_shared<SingleRenderTarget>();
+	downSampled4->initialize(EngineSettings::CLIENT_WIDTH / 4, EngineSettings::CLIENT_HEIGHT / 4);
+	std::shared_ptr<SingleRenderTarget> downSampled8;
+	downSampled8 = std::make_shared<SingleRenderTarget>();
+	downSampled8->initialize(EngineSettings::CLIENT_WIDTH / 8, EngineSettings::CLIENT_HEIGHT / 8);
+	std::shared_ptr<SingleRenderTarget> downSampled16;
+	downSampled16 = std::make_shared<SingleRenderTarget>();
+	downSampled16->initialize(EngineSettings::CLIENT_WIDTH / 16, EngineSettings::CLIENT_HEIGHT / 16);
+
 	Particle::lookAtDefault = camera3D.get();
 
 	std::shared_ptr<SpriteNode> bgSpriteNode;
@@ -193,23 +223,66 @@ void GameScene::initialize() {
 	outlineNode->set_config(RenderNodeConfig::ContinueDrawBefore);
 	outlineNode->set_depth_resource(DepthStencilValue::depthStencil->texture_gpu_handle());
 	outlineNode->set_texture_resource(meshRT->offscreen_render().texture_gpu_handle());
-	outlineNode->set_render_target_SC(DirectXSwapChain::GetRenderTarget());
+	outlineNode->set_render_target(sceneOut);
 
 	std::shared_ptr<ParticleMeshNode> particleMeshNode;
 	particleMeshNode = std::make_unique<ParticleMeshNode>();
 	particleMeshNode->initialize();
 	//particleBillboardNode->set_config(RenderNodeConfig::ContinueDrawAfter | RenderNodeConfig::ContinueUseDpehtBefore);
-	particleMeshNode->set_config(RenderNodeConfig::ContinueDrawAfter | RenderNodeConfig::NoClearDepth | RenderNodeConfig::ContinueDrawBefore);
+	particleMeshNode->set_config(RenderNodeConfig::ContinueDrawAfter | RenderNodeConfig::NoClearDepth);
 	//particleBillboardNode->set_render_target(renderTarget);s
-	particleMeshNode->set_render_target_SC(DirectXSwapChain::GetRenderTarget());
+	particleMeshNode->set_render_target(sceneOut);
 
 	std::shared_ptr<SpriteNode> spriteNode;
 	spriteNode = std::make_unique<SpriteNode>();
 	spriteNode->initialize();
 	spriteNode->set_config(
-		RenderNodeConfig::ContinueDrawAfter | RenderNodeConfig::ContinueDrawBefore
+		RenderNodeConfig::NoClearRenderTarget
 	);
-	spriteNode->set_render_target_SC(DirectXSwapChain::GetRenderTarget());
+	spriteNode->set_render_target(sceneOut);
+
+	luminanceExtractionNode = eps::CreateShared<LuminanceExtractionNode>();
+	luminanceExtractionNode->initialize();
+	luminanceExtractionNode->set_render_target();
+	luminanceExtractionNode->set_texture_resource(sceneOut->offscreen_render().texture_gpu_handle());
+
+	gaussianBlurNode2 = eps::CreateShared<GaussianBlurNode>();
+	gaussianBlurNode2->initialize();
+	gaussianBlurNode2->set_render_target(downSampled2);
+	gaussianBlurNode2->set_base_texture(luminanceExtractionNode->result_stv_handle());
+
+	gaussianBlurNode4 = eps::CreateShared<GaussianBlurNode>();
+	gaussianBlurNode4->initialize();
+	gaussianBlurNode4->set_render_target(downSampled4);
+	gaussianBlurNode4->set_base_texture(gaussianBlurNode2->result_stv_handle());
+
+	gaussianBlurNode8 = eps::CreateShared<GaussianBlurNode>();
+	gaussianBlurNode8->initialize();
+	gaussianBlurNode8->set_render_target(downSampled8);
+	gaussianBlurNode8->set_base_texture(gaussianBlurNode4->result_stv_handle());
+
+	gaussianBlurNode16 = eps::CreateShared<GaussianBlurNode>();
+	gaussianBlurNode16->initialize();
+	gaussianBlurNode16->set_render_target(downSampled16);
+	gaussianBlurNode16->set_base_texture(gaussianBlurNode8->result_stv_handle());
+
+	margeTextureNode = eps::CreateShared<MargeTextureNode>();
+	margeTextureNode->initialize();
+	margeTextureNode->set_render_target();
+	margeTextureNode->set_texture_resources(
+		{ 
+			gaussianBlurNode2->result_stv_handle(),
+			gaussianBlurNode4->result_stv_handle(),
+			gaussianBlurNode8->result_stv_handle(),
+			gaussianBlurNode16->result_stv_handle()
+		});
+
+	bloomNode = eps::CreateShared<BloomNode>();
+	bloomNode->initialize();
+	bloomNode->set_render_target_SC(DirectXSwapChain::GetRenderTarget());
+	bloomNode->set_base_texture(sceneOut->offscreen_render().texture_gpu_handle());
+	bloomNode->set_blur_texture(margeTextureNode->result_stv_handle());
+	//bloomNode->set_config();
 
 #ifdef _DEBUG
 	std::shared_ptr<PrimitiveLineNode> primitiveLineNode;
@@ -222,9 +295,12 @@ void GameScene::initialize() {
 
 	renderPath = eps::CreateUnique<RenderPath>();
 #ifdef _DEBUG
-	renderPath->initialize({ bgSpriteNode,object3dNode,skinningMeshNode,outlineNode,particleMeshNode,spriteNode,primitiveLineNode });
+	renderPath->initialize({ bgSpriteNode,object3dNode,skinningMeshNode,outlineNode,particleMeshNode,spriteNode,
+		luminanceExtractionNode, gaussianBlurNode2, gaussianBlurNode4, gaussianBlurNode8, gaussianBlurNode16, margeTextureNode, bloomNode,
+		primitiveLineNode });
 #else
-	renderPath->initialize({ bgSpriteNode,object3dNode,skinningMeshNode,outlineNode,particleMeshNode,spriteNode });
+	renderPath->initialize({ bgSpriteNode,object3dNode,skinningMeshNode,outlineNode,particleMeshNode,spriteNode,
+		luminanceExtractionNode, gaussianBlurNode2, gaussianBlurNode4, gaussianBlurNode8, gaussianBlurNode16, margeTextureNode, bloomNode });
 #endif // _DEBUG
 
 	managementUI = std::make_unique<GameManagement>();
@@ -245,6 +321,13 @@ void GameScene::initialize() {
 	background = std::make_unique<BackGround>();
 	rocketObj = std::make_unique<Rocket>(fieldObjs->GetGoalPos());
 	Input::SetDeadZone(0.6f);
+
+	luminanceExtractionNode->set_param(0.67f, CColor3::WHITE);
+	gaussianBlurNode2->set_parameters(1.0f, 30.48f, 8);
+	gaussianBlurNode4->set_parameters(1.0f, 30.48f, 8);
+	gaussianBlurNode8->set_parameters(1.0f, 30.48f, 8);
+	gaussianBlurNode16->set_parameters(1.0f, 30.48f, 8);
+	bloomNode->set_param(0.247f);
 }
 
 void GameScene::popped() {}
@@ -423,23 +506,37 @@ void GameScene::draw() const {
 	renderPath->next();
 	outlineNode->draw();
 
-	// 前景スプライト
+	// パーティクル
 	renderPath->next();
 	camera3D->register_world_projection(1);
 	playerManager->draw_particle();
 	rocketObj->draw_particle();
 	background->drawParticle();
 
+	// 前景スプライト
 	renderPath->next();
 	gameUI->darw();
 	tutorialManager->draw();
 	managementUI->darw();
-
 	playerManager->draw_sprite();
-
-
 	transition->draw();
 
+	// Bloom
+	renderPath->next();
+	luminanceExtractionNode->draw();
+
+	renderPath->next();
+	gaussianBlurNode2->draw();
+	renderPath->next();
+	gaussianBlurNode4->draw();
+	renderPath->next();
+	gaussianBlurNode8->draw();
+	renderPath->next();
+	gaussianBlurNode16->draw();
+	renderPath->next();
+	margeTextureNode->draw();
+	renderPath->next();
+	bloomNode->draw();
 
 	renderPath->next();
 
@@ -476,5 +573,30 @@ void GameScene::debug_update() {
 
 
 	AudioManager::DebugGui();
+
+	ImGui::Begin("PostEffect");
+	if (ImGui::TreeNode("LuminanceExtraction")) {
+		luminanceExtractionNode->debug_gui();
+		ImGui::TreePop();
+	}
+	if (ImGui::TreeNode("GaussianBlurNode16")) {
+		ImGui::DragFloat("Weight", &blurData.dispersion, 0.001f, 0.0f, 1.0f, "%.4f");
+		ImGui::DragFloat("Length", &blurData.length, 0.01f);
+		constexpr uint32_t min = 1;
+		constexpr uint32_t max = 16;
+		ImGui::DragScalar("SampleCount", ImGuiDataType_U32, reinterpret_cast<int*>(&blurData.sampleCount), 0.02f, &min, &max);
+
+		gaussianBlurNode2->set_parameters(blurData.dispersion, blurData.length, blurData.sampleCount);
+		gaussianBlurNode4->set_parameters(blurData.dispersion, blurData.length, blurData.sampleCount);
+		gaussianBlurNode8->set_parameters(blurData.dispersion, blurData.length, blurData.sampleCount);
+		gaussianBlurNode16->set_parameters(blurData.dispersion, blurData.length, blurData.sampleCount);
+
+		ImGui::TreePop();
+	}
+	if (ImGui::TreeNode("BloomNode")) {
+		bloomNode->debug_gui();
+		ImGui::TreePop();
+	}
+	ImGui::End();
 }
 #endif // _DEBUG

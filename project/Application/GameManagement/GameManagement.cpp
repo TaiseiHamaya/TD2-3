@@ -4,11 +4,14 @@
 
 #include <Library/Math/Transform2D.h>
 
+#include <Application/Configuration/Configuration.h>
+
 #include <Engine/Module/World/Sprite/SpriteInstance.h>
 #include <Engine/Runtime/Input/Input.h>
 #include <Engine/Runtime/WorldClock/WorldClock.h>
 #include <Engine/Utility/Tools/SmartPointer.h>
 
+#include <Application/Configuration/Configuration.h>
 
 GameManagement::GameManagement() {
 	operation = std::make_unique<AudioPlayer>();
@@ -36,13 +39,27 @@ void GameManagement::init() {
 	selectIndex = 1;//リトライ時に最初に選んでる方　0リトライ　1ネクスト、1手前からリスタート
 	//clearSprite = std::make_unique<SpriteInstance>("ClearTex.png");
 	//failedSprite = std::make_unique<SpriteInstance>("FailedTex.png");
+
+	switch (Configuration::GetLanguage()) {
+	case Configuration::Language::Japanese:
+		goSelect = std::make_unique<SpriteInstance>("GoSelect.png", Vector2(0.5f, 0.5f));
+		retryUI = std::make_unique<SpriteInstance>("Retry.png", Vector2(0.5f, 0.5f));
+		nextUI = std::make_unique<SpriteInstance>("Next.png", Vector2(0.5f, 0.5f));
+		break;
+	case Configuration::Language::English:
+		goSelect = std::make_unique<SpriteInstance>("GoSelect_EN.png", Vector2(0.5f, 0.5f));
+		retryUI = std::make_unique<SpriteInstance>("Retry_EN.png", Vector2(0.5f, 0.5f));
+		nextUI = std::make_unique<SpriteInstance>("Next_EN.png", Vector2(0.5f, 0.5f));
+		break;
+	}
+	bool isEn = Configuration::GetLanguage() == Configuration::Language::English;
 	if (!resetBack) {
 		resetBack = std::make_unique<SpriteInstance>("ResetBack.png", Vector2(0.5f, 0.5f));
 		resetBack->get_transform().set_translate({ 640.0f, -360.0f });
 	}
 	if (!resetKoara) {
 		resetKoara = std::make_unique<SpriteInstance>("KoaraFace.png", Vector2(0.5f, 0.5f));
-		resetKoara->get_transform().set_translate({640.0f, -360.0f });
+		resetKoara->get_transform().set_translate({ 640.0f, -360.0f });
 	}
 
 	if (!toSelectBack) {
@@ -53,14 +70,10 @@ void GameManagement::init() {
 		toSelectKoara = std::make_unique<SpriteInstance>("KoaraFace.png", Vector2(0.5f, 0.5f));
 		toSelectKoara->get_transform().set_translate({ 640.0f, -360.0f });
 	}
-
-	goSelect = std::make_unique<SpriteInstance>("GoSelect.png", Vector2(0.5f, 0.5f));
 	goSelect->get_transform().set_scale({ 0.5f,1.0f });
 	goSelect->get_uv_transform().set_scale({ 0.5f,1.0f });
 	goSelect->get_transform().set_translate({ 789,247 });
-	nextUI = std::make_unique<SpriteInstance>("Next.png", Vector2(0.5f, 0.5f));
 
-	retryUI = std::make_unique<SpriteInstance>("Retry.png", Vector2(0.5f, 0.5f));
 	nextUI->get_transform().set_scale({ 0.5f,1.0f });
 	nextUI->get_uv_transform().set_scale({ 0.5f,1.0f });
 	nextUI->get_transform().set_translate({ 789,247 });
@@ -70,7 +83,14 @@ void GameManagement::init() {
 
 	selectFrame = std::make_unique<SpriteInstance>("SelectFrame.png", Vector2(0.5f, 0.5f));
 
-	undoRetryUI = std::make_unique<SpriteInstance>("undoRetry.png", Vector2(0.5f, 0.5f));
+	switch (Configuration::GetLanguage()) {
+	case Configuration::Language::Japanese:
+		undoRetryUI = std::make_unique<SpriteInstance>("undoRetry.png", Vector2(0.5f, 0.5f));
+		break;
+	case Configuration::Language::English:
+		undoRetryUI = std::make_unique<SpriteInstance>("undoRetry_EN.png", Vector2(0.5f, 0.5f));
+		break;
+	}
 	undoRetryUI->get_transform().set_scale({ 0.5f,1.0f });
 	undoRetryUI->get_uv_transform().set_scale({ 0.5f,1.0f });
 	undoRetryUI->get_transform().set_translate({ 789,169 });
@@ -115,7 +135,7 @@ void GameManagement::begin() {
 		reset_update();
 
 	}
-	else if (!isTutorial){
+	else if (!isTutorial) {
 		//resultSoundFlagを使って効果音を鳴らす
 
 		if (!resultSoundFlag) {
