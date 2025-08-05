@@ -7,6 +7,7 @@ void PlayerStateIdle::Enter(Player& player)
 	//rotateType = RotateType::None;
 	//moveType = MoveType::Normal;
 	//exclamationData_.timer = 0.0f;
+	player.set_state(PlayerState::Idle);
 }
 
 void PlayerStateIdle::Update(Player& player)

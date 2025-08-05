@@ -10,6 +10,7 @@ PlayerStateRotate::PlayerStateRotate() {
 void PlayerStateRotate::Enter(Player& player) {
 	rotateTimer = 0.0f;
 	player.set_rotating(true);
+	player.set_state(PlayerState::Rotating);
 }
 
 void PlayerStateRotate::Update(Player& player) {

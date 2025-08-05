@@ -1,6 +1,7 @@
 #include "Rotate90Strategy.h"
 #include "Application/Character/Player/Player.h"
 #include <numbers>
+#include <Application/Utility/GameUtility.h>
 
 bool Rotate90Strategy::CanRotate(Player& player, const Vector3& childDirection) const {
 	// 今フレームで移動していたら抜ける(くっつく処理をしていた場合回転不要)
@@ -104,8 +105,16 @@ bool Rotate90Strategy::CanRotate(Player& player, const Vector3& childDirection) 
 	if (reversePathClear) {
 		Quaternion startRotation = player.get_rotation();
 		Quaternion endRotation = Quaternion::FromToRotation({ 0.0f, 0.0f, -1.0f }, player.get_move_direction());
+
+
+
 		Quaternion invertedEnd = endRotation.inverse(); // クォータニオンの反転
-		Quaternion midRotation = Quaternion::Slerp(startRotation, invertedEnd, 1.5f);
+		Quaternion midRotation = Quaternion::Slerp(startRotation, endRotation, 2.0f);
+
+		Vector3 midDir = player.get_translate() - midChildPos;
+		midDir += player.get_translate();
+
+		midRotation = Quaternion::EulerDegree(;
 
 		// ここで回転をセット
 		player.set_start_rotation(startRotation);
