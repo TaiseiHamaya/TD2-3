@@ -77,7 +77,7 @@ void ParticleEmitterInstance::update() {
 		return false;
 	});
 	// 生成
-	if (!is_end() && cycleTimer.just_crossed(emission.interval) && emittedCycle < emission.cycles) {
+	if (!is_end()) {
 		emit();
 	}
 }

@@ -61,6 +61,8 @@ Particle::Particle(
 	}
 
 	color = startColor_;
+
+	update_affine();
 }
 
 void Particle::update() {
@@ -109,6 +111,8 @@ void Particle::update() {
 	if (timer >= lifetime) {
 		isDestroy = true;
 	}
+
+	update_affine();
 }
 
 const Matrix4x4 Particle::create_uv_matrix() const {

@@ -51,6 +51,8 @@ void BackGround::update() {
 		coolTime = 0;
 		easeT = 0;
 	}
+
+	gushingEmitter->transfer();
 }
 
 #ifdef _DEBUG
@@ -81,4 +83,6 @@ void BackGround::rocketUpdate() {
 	animatedMeshInstance->get_transform().set_translate(newPos);
 	gushingEmitter->get_transform().set_translate(newPos);
 
+	animatedMeshInstance->update_affine();
+	gushingEmitter->update_affine();
 }

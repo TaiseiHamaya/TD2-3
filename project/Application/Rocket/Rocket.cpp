@@ -2,8 +2,8 @@
 
 #include "Engine/Runtime/Clock/WorldClock.h"
 #include <Engine/Assets/Animation/NodeAnimation/NodeAnimationPlayer.h>
-#include <Engine/Module/World/Mesh/SkinningMeshInstance.h>
 #include <Engine/Module/DrawExecutor/Mesh/SkinningMeshDrawManager.h>
+#include <Engine/Module/World/Mesh/SkinningMeshInstance.h>
 
 Rocket::Rocket(const Vector3& pos) {
 	animatedMeshInstance = std::make_unique<SkinningMeshInstance>("GoalObj.gltf", "Standby", false);
@@ -72,6 +72,9 @@ void Rocket::update_affine() {
 	animatedMeshInstance->update_affine();
 	gushingEmitter->update_affine();
 	explosionEmitter->update_affine();
+
+	gushingEmitter->transfer();
+	explosionEmitter->transfer();
 }
 
 #ifdef _DEBUG
@@ -98,7 +101,7 @@ void Rocket::draw_particle() {
 void Rocket::isClear() {
 	if (isResult)return;
 	isResult = true;
-	animatedMeshInstance->get_animation()->reset_animation("Clear");
+	animatedMeshInstance->reset_animation("Clear");
 	animatedMeshInstance->get_animation()->restart();
 	particleSpawnTime = 0;
 }
@@ -107,7 +110,7 @@ void Rocket::isFailed() {
 	if (isResult)return;
 	isResult = true;
 	isFailedFlag = true;
-	animatedMeshInstance->get_animation()->reset_animation("Failed");
+	animatedMeshInstance->reset_animation("Failed");
 	animatedMeshInstance->get_animation()->restart();
 
 }

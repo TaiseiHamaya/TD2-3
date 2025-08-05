@@ -105,8 +105,6 @@ void PlayerManager::update() {
 	player->fall_update();
 	catchEffect_->begin();
 	releaseEffect_->begin();
-	iceDustEmitter->update();
-	dustEmitter->update();
 
 	// クリアか失敗のフラグが立ってたら早期リターン
 	if (stageSituation != 0) {
@@ -154,6 +152,8 @@ void PlayerManager::update() {
 	dustEmitter->get_transform().set_translate(emitterPos);
 
 	iceDustEmitter->get_transform().set_translate(emitterPos);
+	dustEmitter->update_affine();
+	iceDustEmitter->update_affine();
 
 	//Vector3 playerFlusteredPos = 
 
@@ -289,6 +289,9 @@ void PlayerManager::update() {
 			}
 		}
 	}
+
+	iceDustEmitter->update();
+	dustEmitter->update();
 }
 
 void PlayerManager::update_affine() {
@@ -296,6 +299,9 @@ void PlayerManager::update_affine() {
 	child->update_affine();
 	catchEffect_->update_affine();
 	releaseEffect_->update_affine();
+
+	dustEmitter->transfer();
+	iceDustEmitter->transfer();
 }
 
 void PlayerManager::draw_particle() const {
