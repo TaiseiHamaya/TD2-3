@@ -303,7 +303,7 @@ void GameScene::initialize() {
 	skinningMeshDrawManager->make_instancing(0, "FlusteredEffect.gltf", 1);
 	skinningMeshDrawManager->make_instancing(0, "ReleaseEffect.gltf", 1);
 	skinningMeshDrawManager->make_instancing(0, "CatchEffect.gltf", 1);
-	skinningMeshDrawManager->make_instancing(0, "GoalObj.gltf", 1);
+	skinningMeshDrawManager->make_instancing(0, "GoalObj.gltf", 2);
 	bgSpriteDrawExecutor = std::make_unique<SpriteDrawExecutor>();
 	bgSpriteDrawExecutor->reinitialize(16);
 
@@ -350,6 +350,7 @@ void GameScene::initialize() {
 	playerManager->setup(skinningMeshDrawManager);
 	fieldObjs->setup(staticMeshDrawManager);
 	rocketObj->setup(skinningMeshDrawManager);
+	background->setup(skinningMeshDrawManager);
 
 	luminanceExtractionNode->set_param(0.67f, CColor3::WHITE);
 	gaussianBlurNode2->set_parameters(1.0f, 30.48f, 8);

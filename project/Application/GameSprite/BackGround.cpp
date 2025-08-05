@@ -44,6 +44,8 @@ void BackGround::update() {
 	animatedMeshInstance->begin();
 	rocketUpdate();
 	animatedMeshInstance->update();
+	animatedMeshInstance->update_affine();
+	animatedMeshInstance->update_animation();
 	gushingEmitter->update();
 
 	coolTime += WorldClock::DeltaSeconds();

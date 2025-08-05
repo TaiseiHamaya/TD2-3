@@ -256,6 +256,7 @@ void SelectScene::initialize() {
 	skinningMeshDrawManager->initialize(1);
 	skinningMeshDrawManager->make_instancing(0, "ParentKoala.gltf", 1);
 	skinningMeshDrawManager->make_instancing(0, "ChiledKoala.gltf", 1);
+	skinningMeshDrawManager->make_instancing(0, "GoalObj.gltf", 1);
 	bgSpriteDrawExecutor = std::make_unique<SpriteDrawExecutor>();
 	bgSpriteDrawExecutor->reinitialize(16);
 	spriteDrawExecutors.resize(4);
@@ -299,6 +300,7 @@ void SelectScene::initialize() {
 	skinningMeshDrawManager->register_instance(parentKoala);
 	skinningMeshDrawManager->register_instance(childKoala);
 	staticMeshDrawManager->register_instance(goalMesh);
+	background->setup(skinningMeshDrawManager);
 
 	luminanceExtractionNode->set_param(0.67f, CColor3::WHITE);
 	gaussianBlurNode2->set_parameters(1.0f, 16.17f, 8);
