@@ -265,8 +265,8 @@ void SelectScene::initialize() {
 	spriteDrawExecutors[1]->reinitialize(1);
 	spriteDrawExecutors[2] = std::make_unique<SpriteDrawExecutor>();
 	spriteDrawExecutors[2]->reinitialize(256);
-	spriteDrawExecutors[2] = std::make_unique<SpriteDrawExecutor>();
-	spriteDrawExecutors[2]->reinitialize(16);
+	spriteDrawExecutors[3] = std::make_unique<SpriteDrawExecutor>();
+	spriteDrawExecutors[3]->reinitialize(16);
 
 	directionalLightingExecutor = std::make_unique<DirectionalLightingExecutor>();
 	directionalLightingExecutor->reinitialize(1);

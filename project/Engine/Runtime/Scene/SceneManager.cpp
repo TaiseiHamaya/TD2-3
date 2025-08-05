@@ -1,6 +1,7 @@
 #include "SceneManager.h"
 
 #include <algorithm>
+#include <cassert>
 
 #include "Engine/Application/Output.h"
 #include "Engine/Assets/BackgroundLoader/BackgroundLoader.h"

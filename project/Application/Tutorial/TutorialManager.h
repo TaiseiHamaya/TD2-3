@@ -19,7 +19,7 @@ public:
 	void initialize(uint32_t stage);
 	void update();
 
-	void write_to_executor(Reference<SpriteDrawExecutor> executor) const;
+	void write_to_executor(Reference<SpriteDrawExecutor> executor0, Reference<SpriteDrawExecutor> executor1, Reference<SpriteDrawExecutor> executor2) const;
 
 #ifdef _DEBUG
 	void debug_update();

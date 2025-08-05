@@ -84,6 +84,7 @@ void GameScene::load() {
 	TextureLibrary::RegisterLoadQue("./GameResources/Texture/UI/ReleseUI.png");
 	TextureLibrary::RegisterLoadQue("./GameResources/Texture/UI/ReleseUI_EN.png");
 
+	TextureLibrary::RegisterLoadQue("./GameResources/Texture/UI/ResetUI.png");
 	TextureLibrary::RegisterLoadQue("./GameResources/Texture/UI/ResetUIController.png");
 	TextureLibrary::RegisterLoadQue("./GameResources/Texture/UI/ESCkeyController.png");
 	TextureLibrary::RegisterLoadQue("./GameResources/Texture/UI/UndoController.png");
@@ -306,7 +307,7 @@ void GameScene::initialize() {
 	bgSpriteDrawExecutor = std::make_unique<SpriteDrawExecutor>();
 	bgSpriteDrawExecutor->reinitialize(16);
 
-	spriteDrawExecutors.resize(6);
+	spriteDrawExecutors.resize(7);
 
 	spriteDrawExecutors[0] = std::make_unique<SpriteDrawExecutor>();
 	spriteDrawExecutors[1] = std::make_unique<SpriteDrawExecutor>();
@@ -314,6 +315,7 @@ void GameScene::initialize() {
 	spriteDrawExecutors[3] = std::make_unique<SpriteDrawExecutor>();
 	spriteDrawExecutors[4] = std::make_unique<SpriteDrawExecutor>();
 	spriteDrawExecutors[5] = std::make_unique<SpriteDrawExecutor>();
+	spriteDrawExecutors[6] = std::make_unique<SpriteDrawExecutor>();
 
 	spriteDrawExecutors[0]->reinitialize(256);
 	spriteDrawExecutors[1]->reinitialize(256);
@@ -321,6 +323,7 @@ void GameScene::initialize() {
 	spriteDrawExecutors[3]->reinitialize(256);
 	spriteDrawExecutors[4]->reinitialize(256);
 	spriteDrawExecutors[5]->reinitialize(256);
+	spriteDrawExecutors[6]->reinitialize(256);
 
 	directionalLightingExecutor = std::make_unique<DirectionalLightingExecutor>();
 	directionalLightingExecutor->reinitialize(1);
@@ -424,12 +427,12 @@ void GameScene::begin_rendering() {
 	// Transfer
 	background->write_to_executor(bgSpriteDrawExecutor);
 
-	spriteDrawExecutor->write_to_buffer(transition);
+	spriteDrawExecutors[0]->write_to_buffer(transition);
 	
-	tutorialManager->write_to_executor(spriteDrawExecutor);
+	tutorialManager->write_to_executor(spriteDrawExecutors[2], spriteDrawExecutors[3], spriteDrawExecutors[4]);
 	
-	managementUI->write_to_executor(spriteDrawExecutor);
-	gameUI->write_to_executor(spriteDrawExecutor);
+	managementUI->write_to_executor(spriteDrawExecutors[0], spriteDrawExecutors[1], spriteDrawExecutors[5], spriteDrawExecutors[6]);
+	gameUI->write_to_executor(spriteDrawExecutors[6]);
 }
 
 void GameScene::late_update() {
@@ -553,7 +556,7 @@ void GameScene::draw() const {
 
 	// 前景スプライト
 	renderPath->next();
-	for(const auto& executor : spriteDrawExecutors) {
+	for(const auto& executor : spriteDrawExecutors | std::views::reverse) {
 		executor->draw_command();
 	}
 

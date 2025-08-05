@@ -58,10 +58,10 @@ void SpriteDrawExecutor::write_to_buffer(Reference<const SpriteInstance> instanc
 		.textureIndex=  0,
 		.uvTransformMatrix= source.uvTransform.get_matrix(),
 	};
-	if (!source.texture) {
+	if (!source.textureIndex) {
 		material[next].textureIndex = TextureLibrary::GetTexture("Error.png")->index();
 	}
 	else {
-		material[next].textureIndex = source.texture->index();
+		material[next].textureIndex = source.textureIndex.value();
 	}
 }

@@ -142,11 +142,11 @@ void TutorialManager::update() {
 	}
 }
 
-void TutorialManager::write_to_executor(Reference<SpriteDrawExecutor> executor) const {
-	executor->write_to_buffer(tutorialFrame_);
-	executor->write_to_buffer(tutorialText_);
-	executor->write_to_buffer(tutorialImage_);
-	executor->write_to_buffer(Abutton_);
+void TutorialManager::write_to_executor(Reference<SpriteDrawExecutor> executor0, Reference<SpriteDrawExecutor> executor1, Reference<SpriteDrawExecutor> executor2) const {
+	executor1->write_to_buffer(tutorialFrame_);
+	executor0->write_to_buffer(tutorialText_);
+	executor2->write_to_buffer(tutorialImage_);
+	executor0->write_to_buffer(Abutton_);
 }
 
 #ifdef _DEBUG

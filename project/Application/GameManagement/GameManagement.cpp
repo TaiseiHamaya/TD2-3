@@ -205,19 +205,21 @@ void GameManagement::debug_update() {
 
 #endif
 
-void GameManagement::write_to_executor(Reference<SpriteDrawExecutor> executor) const {
-	failedUI->write_to_executor(executor);
-	clearUI->write_to_executor(executor);
+void GameManagement::write_to_executor(Reference<SpriteDrawExecutor> executor0, Reference<SpriteDrawExecutor> executor1, Reference<SpriteDrawExecutor> executor2, Reference<SpriteDrawExecutor> executor3) const {
+	failedUI->write_to_executor(executor2);
+	clearUI->write_to_executor(executor2);
 
-	executor->write_to_buffer(nextUI);
-	executor->write_to_buffer(retryUI);
-	executor->write_to_buffer(selectFrame);
-	executor->write_to_buffer(undoRetryUI);
-	executor->write_to_buffer(goSelect);
-	executor->write_to_buffer(resetBack);
-	executor->write_to_buffer(resetKoara);
-	executor->write_to_buffer(toSelectBack);
-	executor->write_to_buffer(toSelectKoara);
+	executor3->write_to_buffer(nextUI);
+	executor3->write_to_buffer(retryUI);
+	executor3->write_to_buffer(selectFrame);
+	executor3->write_to_buffer(undoRetryUI);
+	executor3->write_to_buffer(goSelect);
+
+	executor1->write_to_buffer(toSelectBack);
+	executor0->write_to_buffer(toSelectKoara);
+
+	executor1->write_to_buffer(resetBack);
+	executor0->write_to_buffer(resetKoara);
 }
 
 void GameManagement::resultKeyInput() {

@@ -43,8 +43,10 @@ void Camera3D::update_affine() {
 	// カメラそのもののMatrix更新
 	WorldInstance::update_affine();
 
+#ifdef DEBUG_FEATURES_ENABLE
 	debugCameraCenter->update_affine();
 	debugCamera->update_affine();
+#endif // DEBUG_FEATURES_ENABLE
 
 	// カメラ位置をもとにViewMatrixを更新
 	make_view_matrix();
