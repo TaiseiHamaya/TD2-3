@@ -8,7 +8,7 @@
 
 class Child : public CharacterBase {
 public:
-    void initialize(const LevelLoader& level, MapchipHandler* mapchipHandler) override;
+    void initialize(const LevelLoader& level, MapchipField* mapchipField) override;
     void finalize() override;
     void update() override;
     void begin_rendering() override;

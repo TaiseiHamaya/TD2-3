@@ -23,6 +23,7 @@ enum class RotateType {
     None,                  // 回転なし
     Normal,                // 普通に回転成功
     Rotate90_Normal,       // 90度の回転が成功
+    Rotate90_Reverce,       // 90度の回転が成功
 
     // 以降は失敗
     HitDiagonalFrontWall,   // 斜め前の壁にぶつかる
@@ -66,3 +67,11 @@ enum class PlayerAnimation {
     Normal,
 };
 
+// 回転失敗時のエフェクト情報
+struct ExclamationData {
+    // 回転失敗時エフェクト
+    std::unique_ptr<AnimatedMeshInstance> exclamation_;
+    bool isActive;
+    float timer;
+    float duration = 0.4f;
+};

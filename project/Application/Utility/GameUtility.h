@@ -12,5 +12,7 @@ public:
 
     // 角度の判別(90度であればtrue)
     static bool IsRotation90Degrees(const Quaternion& q1, const Quaternion& q2);
+
+    static bool IsRotation180Degrees(const Quaternion& q1, const Quaternion& q2);
 };
 

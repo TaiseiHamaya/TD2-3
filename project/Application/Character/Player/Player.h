@@ -7,11 +7,12 @@
 #include <Engine/Module/World/Particle/ParticleEmitterInstance.h>
 #include <memory>
 #include "Application/Character/Child/Child.h"
+#include "Application/Character/Player/State/PlayerStateBase.h"
 
 
 class Player : public CharacterBase {
 public:
-	void initialize(const LevelLoader& level, MapchipHandler* mapchipHandler) override;
+	void initialize(const LevelLoader& level, MapchipField* mapchipField) override;
 	void finalize() override;
 	void update() override;
 	void fall_update();
@@ -19,8 +20,13 @@ public:
 	void begin_rendering() override;
 	void draw() const override;
 
+	// 状態の切り替え
+	void change_state(const std::string& stateName);
 public: // アクセッサ
+	Child* get_child() { return child_; }
 	void set_child(Child* child) { child_ = child; }
+
+	MapchipField* get_mapchip() { return mapchipField_; }
 
 	bool is_parent() const { return isParent; }
 	void set_parent(bool flag) { isParent = flag; }
@@ -53,6 +59,9 @@ public: // アクセッサ
 
 	Vector3 get_previous_direction() const { return preMoveDirection; }
 
+	Vector3 get_move_direction() const { return moveDirection; }
+	void set_move_direction(const Vector3& direction) { moveDirection = direction; }
+
 	RotationDirection get_how_rotation() const { return rotateDirection; }
 	void set_how_rotation(RotationDirection rotate) { rotateDirection = rotate; }
 
@@ -68,6 +77,7 @@ public: // アクセッサ
 	PlayerAnimation get_animation_info() const { return playerAnimation; }
 	void set_animation_info(PlayerAnimation type) { playerAnimation = type; }
 
+	Quaternion get_mid_rotation() const { return midRotation; }
 	void set_mid_rotation(Quaternion Rotation) { midRotation = Rotation; }
 
 	Quaternion get_start_rotation() const { return startRotation; }
@@ -82,16 +92,19 @@ public: // アクセッサ
 	bool is_falled()const { return isFalled; }
 
 	bool is_stack_movement() const { return isStackMovement; }
+	void set_stack_movement(bool flag) { isStackMovement = flag; }
 	void on_undo(Vector3 position, Quaternion direction, bool isParent);
 	Vector3 move_start_position() const { return moveStartPosition; }
 	void set_start_position(const Vector3& pos) { moveStartPosition = pos; }
 
-	//Vector3 get_target_pos() const { return targetPosition; }
+	Vector3 get_target_pos() const { return targetPosition; }
 	void set_target_pos(const Vector3& pos) { targetPosition = pos; }
 
 	Quaternion start_rotation() const { return startRotation; }
 
 	void set_move_duration(float time) { moveDuration = time; };
+	float get_move_duration() const { return moveDuration; };
+
 	void set_move_timer(float timer) { moveTimer = timer; };
 
 	void set_wall_start_pos(const Vector3& pos) { wallStartPosition = pos; }
@@ -99,6 +112,14 @@ public: // アクセッサ
 	void set_wall_timer(float timer) { wallMoveTimer = timer; }
 	void set_wall_duration(float time) { wallMoveDuration = time; }
 	void set_wall_moving(bool flag) { isWallMoveing = flag; }
+	const Vector3& get_wall_start_pos() const { return wallStartPosition; }
+	const Vector3& get_wall_target_pos() const { return wallTargetPosition; }
+	float get_wall_timer() const { return wallMoveTimer; }
+	float get_wall_duration() const { return wallMoveDuration; }
+	bool is_wall_moving() const { return isWallMoveing; }
+
+	ExclamationData& exclamation_data() { return exclamationData_; }
+	const ExclamationData& exclamation_data() const { return exclamationData_; }
 
 #ifdef _DEBUG
 	void debug_update();
@@ -111,7 +132,13 @@ private:
 	void wall_move();
 	void rotate_failed_update();
 
+
+
 private:
+	// ステートの設定
+	std::unordered_map<std::string, std::unique_ptr<PlayerStateBase>> states_;
+	PlayerStateBase* currentState_ = nullptr;
+
 	// 回転の仕方をまとめたenum
 	RotationDirection rotateDirection;
 	// プレイヤーの状態
@@ -123,18 +150,15 @@ private:
 	// 特殊な操作が必要なアニメーションかどうか
 	PlayerAnimation playerAnimation = PlayerAnimation::Normal;
 
-	MapchipHandler* mapchipHandler_;
-	Child* child_; // 子オブジェクトへの参照
-	// 回転失敗時エフェクト
-	std::unique_ptr<AnimatedMeshInstance> exclamation_;
+	MapchipField* mapchipField_;
+	Child* child_; // 子オブジェクト
+
+
+
 	// 焦るときエフェクト
 	std::unique_ptr<AnimatedMeshInstance> flusteredEffect_;
 
-	struct ExclamationData {
-		bool isActive;
-		float timer;
-		float duration = 0.4f;
-	};
+
 	ExclamationData exclamationData_;
 
 	bool isMove = false; // 今フレームで移動をしたかどうか
@@ -181,7 +205,7 @@ private:
 	std::unique_ptr<AudioPlayer> fall;//落下音
 	bool fallSoundFlag;
 	std::unique_ptr<AudioPlayer> iceMove;//通常移動
-	std::unique_ptr<AudioPlayer> rotatAudio;//回転時間
+	//std::unique_ptr<AudioPlayer> rotatAudio;//回転時間
 
 	bool isMoved{ false };
 };
