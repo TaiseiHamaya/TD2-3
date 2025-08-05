@@ -9,9 +9,11 @@ void Child::initialize(const LevelLoader& level, MapchipHandler* mapchipHandler)
 {
 	object_->reparent(nullptr);
 	object_->reset_animated_mesh("ChiledKoala.gltf", "Standby", true);
+	object_->get_transform().set_scale(CVector3::ONE);
 	object_->get_transform().set_translate(level.get_child_position());
 	object_->set_active(true);
 	object_->set_draw(true);
+	object_->update_affine();
 
 	flusteredEffect_->reset_animated_mesh("FlusteredEffect.gltf", "Standby", true);
 	flusteredEffect_->set_active(false);

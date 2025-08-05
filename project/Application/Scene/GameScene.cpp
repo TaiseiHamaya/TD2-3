@@ -540,6 +540,7 @@ void GameScene::draw() const {
 
 	// SkinningMesh
 	renderPath->next();
+	camera3D->register_world_projection(2);
 	camera3D->register_world_lighting(5);
 	directionalLightingExecutor->set_command(6);
 	skinningMeshDrawManager->draw_layer(0);

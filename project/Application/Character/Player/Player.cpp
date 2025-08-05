@@ -21,6 +21,10 @@ void Player::initialize(const LevelLoader& level, MapchipHandler* mapchipHandler
 	object_->reset_animated_mesh("ParentKoala.gltf", "Standby", true);
 	object_->get_transform().set_translate(level.get_player_position());
 	object_->set_active(true);
+	object_->get_transform().set_scale(CVector3::ONE);
+	object_->update_affine();
+
+	playerState = PlayerState::Idle;
 
 	// ビックリマークの生成
 	exclamation_->reset_animated_mesh("exclamation.gltf", "Standby", false);
