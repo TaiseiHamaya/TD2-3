@@ -142,10 +142,13 @@ bool Rotate180Strategy::CanRotate(Player& player, const Vector3& childDirection)
 	// ここまで来たら回転できるので設定
 	Quaternion startRotation = player.get_rotation();
 	Quaternion endRotation = Quaternion::FromToRotation({ 0.0f, 0.0f, -1.0f }, player.get_move_direction());
-	//Quaternion midRotation = endRotation * startRotation.inverse();
-	Quaternion midRotation = Quaternion::Slerp(startRotation, endRotation, 0.5f);
 
-	// ここで回転をセット
+	Quaternion midRotation = Quaternion::Slerp(startRotation, endRotation, 0.5f);
+	midRotation = Quaternion::Slerp(startRotation, endRotation, -0.5f);
+	//}
+	midRotation = Quaternion::LookForward(secondPos, Vector3(0.0f, 1.0f, 0.0f));
+
+		// ここで回転をセット
 	player.set_start_rotation(startRotation);
 	player.set_target_rotation(endRotation);
 	player.set_mid_rotation(midRotation);

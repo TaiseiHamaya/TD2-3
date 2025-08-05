@@ -104,12 +104,13 @@ bool Rotate90Strategy::CanRotate(Player& player, const Vector3& childDirection) 
 	if (reversePathClear) {
 		Quaternion startRotation = player.get_rotation();
 		Quaternion endRotation = Quaternion::FromToRotation({ 0.0f, 0.0f, -1.0f }, player.get_move_direction());
-		Quaternion midRotation = endRotation * startRotation.inverse();
+		Quaternion invertedEnd = endRotation.inverse(); // クォータニオンの反転
+		Quaternion midRotation = Quaternion::Slerp(startRotation, invertedEnd, 1.5f);
 
 		// ここで回転をセット
 		player.set_start_rotation(startRotation);
 		player.set_target_rotation(endRotation);
-		player.set_mid_rotation(Quaternion::Slerp(startRotation, endRotation, 0.5f));
+		player.set_mid_rotation(midRotation);
 
 		player.set_rotate_type(RotateType::Rotate90_Reverce);
 		player.set_how_rotation(RotationDirection::Reverce); // 逆回転用
