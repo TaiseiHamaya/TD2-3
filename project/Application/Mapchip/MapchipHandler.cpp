@@ -143,311 +143,318 @@ int MapchipHandler::can_player_move_on_ice(Player* player, Child* child, const V
 	return moveNum;
 }
 
-bool MapchipHandler::player_move_to_wall_or_holl(Player* player, Child* child, const Vector3& direction) const {
-	// 落下中だったらモーションをしない
-	if (player->is_falling()) return false;
-
-	Vector3 nextPos = player->get_translate() + direction;
-	if (!player->is_parent()) {
-		auto element = mapchipField_->getElement(nextPos.x, nextPos.z);
-		if (element == 0 || element == 2) { return true; }//移動先が壁か穴ならtrue
-	}
-	else {
-		Vector3 childDirection{};
-		Vector3 nextChildPos{};
-		if (std::round(child->get_translate().x) == 1.0f) {
-			childDirection = GameUtility::rotate_direction_90_left(direction);
-		}
-		else if (std::round(child->get_translate().x) == -1.0f) {
-			childDirection = GameUtility::rotate_direction_90_right(direction);
-		}
-		else {
-			childDirection = direction;
-		}
-
-		nextChildPos = player->get_translate() + childDirection + direction;
-
-		auto elementNextPlayer = mapchipField_->getElement(std::round(nextPos.x), std::round(nextPos.z));
-		auto elementChild = mapchipField_->getElement(std::round(nextChildPos.x), std::round(nextChildPos.z));
-
-		// 移動先がどちらも穴だったらtrue
-		if (elementNextPlayer == 0 && elementChild == 0) {
-			player->set_on_ice(false);
-			return true;
-		}
-		// 移動先のどちらかが壁だったらtrue
-		if (elementNextPlayer == 2 || elementChild == 2) {
-			player->set_on_ice(false);
-			return true;
-		}
-	}
-	return false;
-}
+//bool MapchipHandler::player_move_to_wall_or_holl(Player* player, Child* child, const Vector3& direction) const {
+//	// 落下中だったらモーションをしない
+//	if (player->is_falling()) return false;
+//
+//	Vector3 nextPos = player->get_translate() + direction;
+//	if (!player->is_parent()) {
+//		auto element = mapchipField_->getElement(nextPos.x, nextPos.z);
+//		if (element == 0 || element == 2) { return true; }//移動先が壁か穴ならtrue
+//	}
+//	else {
+//		Vector3 childDirection{};
+//		Vector3 nextChildPos{};
+//		if (std::round(child->get_translate().x) == 1.0f) {
+//			childDirection = GameUtility::rotate_direction_90_left(direction);
+//		}
+//		else if (std::round(child->get_translate().x) == -1.0f) {
+//			childDirection = GameUtility::rotate_direction_90_right(direction);
+//		}
+//		else {
+//			childDirection = direction;
+//		}
+//
+//		nextChildPos = player->get_translate() + childDirection + direction;
+//
+//		auto elementNextPlayer = mapchipField_->getElement(std::round(nextPos.x), std::round(nextPos.z));
+//		auto elementChild = mapchipField_->getElement(std::round(nextChildPos.x), std::round(nextChildPos.z));
+//
+//		// 移動先がどちらも穴だったらtrue
+//		if (elementNextPlayer == 0 && elementChild == 0) {
+//			player->set_on_ice(false);
+//			return true;
+//		}
+//		// 移動先のどちらかが壁だったらtrue
+//		if (elementNextPlayer == 2 || elementChild == 2) {
+//			player->set_on_ice(false);
+//			return true;
+//		}
+//	}
+//	return false;
+//}
 
 bool MapchipHandler::can_player_move_to(Player* player, Child* child, const Vector3& direction) const {
-	// 既に回転のほうが失敗していたら回転も失敗
-	if (player->get_move_type() == MoveType::FallIntoHole ||
-		player->get_move_type() == MoveType::HitRock) {
-		return false;
-	}
+	//// 既に回転のほうが失敗していたら回転も失敗
+	//if (player->get_move_type() == MoveType::FallIntoHole ||
+	//	player->get_move_type() == MoveType::HitRock) {
+	//	return false;
+	//}
 
-	// 落下中だったら移動不可
-	if (player->is_falling()) return false;
-	// プレイヤーの移動予定地
-	Vector3 nextPos = player->get_translate() + direction;
-	// 親子付けしていない場合
-	if (!player->is_parent()) {
-		// 移動後の座標が子供と重なってたら移動不可
-		//if (nextPos == child->get_translate()) {
-		if (GameUtility::approximately_equal(nextPos, child->get_translate(), 0.1f)) {
-			//player->set_on_ice(false);
-			//player->set_on_child(true);
-			player->set_move_type(MoveType::MoveOnChild);
-			return false;
-		}
-		// 移動先のマップチップ番号を取得
-		auto element = mapchipField_->getElement(nextPos.x, nextPos.z);
-		// 移動先が氷だったら氷上にいるフラグをオン
-		if (element == 4) {
-			player->set_move_type(MoveType::SlidingOnIce);
-			return true;
-		}
-		// もし穴だったら
-		if (element == 0) {
-			player->set_move_type(MoveType::FallIntoHole);
-			return false;
-		}
-		// もし壁だったら
-		if (element == 2) {
-			player->set_move_type(MoveType::HitRock);
-			return false;
-		}
+	//// 落下中だったら移動不可
+	//if (player->is_falling()) return false;
+	//// プレイヤーの移動予定地
+	//Vector3 nextPos = player->get_translate() + direction;
+	//// 親子付けしていない場合
+	//if (!player->is_parent()) {
+	//	// 移動後の座標が子供と重なってたら移動不可
+	//	//if (nextPos == child->get_translate()) {
+	//	if (GameUtility::approximately_equal(nextPos, child->get_translate(), 0.1f)) {
+	//		//player->set_on_ice(false);
+	//		//player->set_on_child(true);
+	//		player->set_move_type(MoveType::MoveOnChild);
+	//		return false;
+	//	}
+	//	// 移動先のマップチップ番号を取得
+	//	auto element = mapchipField_->getElement(nextPos.x, nextPos.z);
+	//	// 移動先が氷だったら氷上にいるフラグをオン
+	//	if (element == 4) {
+	//		player->set_move_type(MoveType::SlidingOnIce);
+	//		return true;
+	//	}
+	//	// もし穴だったら
+	//	if (element == 0) {
+	//		player->set_move_type(MoveType::FallIntoHole);
+	//		return false;
+	//	}
+	//	// もし壁だったら
+	//	if (element == 2) {
+	//		player->set_move_type(MoveType::HitRock);
+	//		return false;
+	//	}
 
-		if (element == 1 || element == 3) {
-			player->set_move_type(MoveType::Normal);
-			return true;
-		}
-		// ここまで来たら普通に通る
-		return true;
-	}
-	else {
-		Vector3 childDirection{};
-		Vector3 nextChildPos{};
+	//	if (element == 1 || element == 3) {
+	//		player->set_move_type(MoveType::Normal);
+	//		return true;
+	//	}
+	//	// ここまで来たら普通に通る
+	//	return true;
+	//}
+	//else {
+	//	Vector3 childDirection{};
+	//	Vector3 nextChildPos{};
 
-		if (std::round(child->get_translate().x) == 1.0f) {
-			childDirection = GameUtility::rotate_direction_90_left(direction);
-		}
-		else if (std::round(child->get_translate().x) == -1.0f) {
-			childDirection = GameUtility::rotate_direction_90_right(direction);
-		}
-		else {
-			childDirection = direction;
-		}
+	//	if (std::round(child->get_translate().x) == 1.0f) {
+	//		childDirection = GameUtility::rotate_direction_90_left(direction);
+	//	}
+	//	else if (std::round(child->get_translate().x) == -1.0f) {
+	//		childDirection = GameUtility::rotate_direction_90_right(direction);
+	//	}
+	//	else {
+	//		childDirection = direction;
+	//	}
 
-		nextChildPos = player->get_translate() + childDirection + direction;
+	//	nextChildPos = player->get_translate() + childDirection + direction;
 
-		auto elementNextPlayer = mapchipField_->getElement(std::round(nextPos.x), std::round(nextPos.z));
-		auto elementChild = mapchipField_->getElement(std::round(nextChildPos.x), std::round(nextChildPos.z));
-		// 移動先がどちらも穴だったらfalse
-		if (elementNextPlayer == 0 && elementChild == 0) {
-			player->set_move_type(MoveType::FallIntoHole);
-			return false;
-		}
-		// 移動先のどちらかが壁だったらfalse
-		if (elementNextPlayer == 2 || elementChild == 2) {
-			player->set_move_type(MoveType::HitRock);
-			return false;
-		}
-		// 移動先がどちらも氷またはどちらかが氷どちらかが穴の場合
-		if ((elementNextPlayer == 4 || elementNextPlayer == 0) && (elementChild == 4 || elementChild == 0)) {
-			player->set_move_type(MoveType::SlidingOnIce);
-			return true;
-		}
-		// 特に何もなければ移動可能
-		player->set_move_type(MoveType::Normal);
-		return true;
-	}
+	//	auto elementNextPlayer = mapchipField_->getElement(std::round(nextPos.x), std::round(nextPos.z));
+	//	auto elementChild = mapchipField_->getElement(std::round(nextChildPos.x), std::round(nextChildPos.z));
+	//	// 移動先がどちらも穴だったらfalse
+	//	if (elementNextPlayer == 0 && elementChild == 0) {
+	//		player->set_move_type(MoveType::FallIntoHole);
+	//		return false;
+	//	}
+	//	// 移動先のどちらかが壁だったらfalse
+	//	if (elementNextPlayer == 2 || elementChild == 2) {
+	//		player->set_move_type(MoveType::HitRock);
+	//		return false;
+	//	}
+	//	// 移動先がどちらも氷またはどちらかが氷どちらかが穴の場合
+	//	if ((elementNextPlayer == 4 || elementNextPlayer == 0) && (elementChild == 4 || elementChild == 0)) {
+	//		player->set_move_type(MoveType::SlidingOnIce);
+	//		return true;
+	//	}
+	//	// 特に何もなければ移動可能
+	//	player->set_move_type(MoveType::Normal);
+	//	return true;
+	//}
+	return true;
 }
 
 bool MapchipHandler::can_player_rotate(Player* player, Child* child, const Vector3& direction) const {
-	Quaternion nextRotate = Quaternion::FromToRotation({ 0.0f, 0.0f, -1.0f }, direction);
-	Quaternion nowRotate = player->get_rotation();
+	return false;
+	//Quaternion nextRotate = Quaternion::FromToRotation({ 0.0f, 0.0f, -1.0f }, direction);
+	//Quaternion nowRotate = player->get_rotation();
 
-	if (std::abs(nextRotate.vector().y - nowRotate.vector().y) < 0.001) {
-		player->set_rotate_type(RotateType::None);
-		return false; // 同じ方向なら回転不要
-	}
-	// 今フレームで移動していたら抜ける(くっつく処理をしていた場合回転不要)
-	if (player->is_move()) {
-		//player->set_rotate_type(RotateType::None);
-		return false;
-	};
-	// 落下中だったら回転不可
-	if (player->is_falling()) return false;
-	// 親子付けしていなければ可能
-	if (!player->is_parent()) {
-		player->set_rotate_type(RotateType::Normal);
-		return true;
-	}
-	auto check_collision_wall = [&](const Vector3& pos) {
-		return mapchipField_->getElement(std::round(pos.x), std::round(pos.z)) == 2;
-	};
+	//if (std::abs(nextRotate.vector().y - nowRotate.vector().y) < 0.001) {
+	//	player->set_rotate_type(RotateType::None);
+	//	return false; // 同じ方向なら回転不要
+	//}
+	//// 今フレームで移動していたら抜ける(くっつく処理をしていた場合回転不要)
+	//if (player->is_move()) {
+	//	//player->set_rotate_type(RotateType::None);
+	//	return false;
+	//};
+	//// 落下中だったら回転不可
+	//if (player->is_falling()) return false;
+	//// 親子付けしていなければ可能
+	//if (!player->is_parent()) {
+	//	player->set_rotate_type(RotateType::Normal);
+	//	return true;
+	//}
+	//auto check_collision_wall = [&](const Vector3& pos) {
+	//	return mapchipField_->getElement(std::round(pos.x), std::round(pos.z)) == 2;
+	//};
 
-	auto check_collision_hole = [&](const Vector3& pos) {
-		return mapchipField_->getElement(std::round(pos.x), std::round(pos.z)) == 0;
-	};
+	//auto check_collision_hole = [&](const Vector3& pos) {
+	//	return mapchipField_->getElement(std::round(pos.x), std::round(pos.z)) == 0;
+	//};
 
-	// 子供の向きを設定
-	Vector3 childDirection;
-	if (std::round(child->get_translate().x) == 1.0f) {
-		childDirection = GameUtility::rotate_direction_90_left(direction);
-	}
-	else if (std::round(child->get_translate().x) == -1.0f) {
-		childDirection = GameUtility::rotate_direction_90_right(direction);
-	}
-	else {
-		childDirection = direction;
-	}
+	//// 子供の向きを設定
+	//Vector3 childDirection;
+	//if (std::round(child->get_translate().x) == 1.0f) {
+	//	childDirection = GameUtility::rotate_direction_90_left(direction);
+	//}
+	//else if (std::round(child->get_translate().x) == -1.0f) {
+	//	childDirection = GameUtility::rotate_direction_90_right(direction);
+	//}
+	//else {
+	//	childDirection = direction;
+	//}
 
-	// 現在のプレイヤーの位置
-	Vector3 nowPlayerPos = player->get_translate();
-	// 今の子供の位置
-	Vector3 nowChildPos = nowPlayerPos + child->get_translate() * player->get_rotation();
-	// 移動予定の位置
-	Vector3 nextChildPos = nowPlayerPos + childDirection;
-	// 一回転しない場合の経由点
-	Vector3 midChildPos = nowChildPos + childDirection;
+	//// 現在のプレイヤーの位置
+	//Vector3 nowPlayerPos = player->get_translate();
+	//// 今の子供の位置
+	//Vector3 nowChildPos = nowPlayerPos + child->get_translate() * player->get_rotation();
+	//// 移動予定の位置
+	//Vector3 nextChildPos = nowPlayerPos + childDirection;
+	//// 一回転しない場合の経由点
+	//Vector3 midChildPos = nowChildPos + childDirection;
 
-	// 回転が90度ならばそれ用の処理をする
-	if (GameUtility::IsRotation90Degrees(nowRotate, nextRotate)) {
-		// 斜め前方向に障害物
-		if (check_collision_wall(midChildPos)) {
-			player->set_moving(false);
-			// 回転失敗のフラグを立てておく
-			player->set_turn_success(false);
-			player->set_how_rotation(RotationDirection::Default);
-			player->set_rotate_type(RotateType::Rotate90_HitObstacleDiagonalFront);
-			return false;
-		}
-		// 移動先に障害物
-		if (check_collision_wall(nextChildPos)) {
-			player->set_moving(false);
-			// 回転失敗のフラグを立てておく
-			player->set_turn_success(false);
-			player->set_how_rotation(RotationDirection::Default);
-			player->set_rotate_type(RotateType::Rotate90_HitObstacleNextPosition);
-			return false;
-		}
+	//// 回転が90度ならばそれ用の処理をする
+	//if (GameUtility::IsRotation90Degrees(nowRotate, nextRotate)) {
+	//	// 斜め前方向に障害物
+	//	if (check_collision_wall(midChildPos)) {
+	//		player->set_moving(false);
+	//		// 回転失敗のフラグを立てておく
+	//		player->set_turn_success(false);
+	//		player->set_how_rotation(RotationDirection::Default);
+	//		player->set_rotate_type(RotateType::Rotate90_HitObstacleDiagonalFront);
+	//		return false;
+	//	}
+	//	// 移動先に障害物
+	//	if (check_collision_wall(nextChildPos)) {
+	//		player->set_moving(false);
+	//		// 回転失敗のフラグを立てておく
+	//		player->set_turn_success(false);
+	//		player->set_how_rotation(RotationDirection::Default);
+	//		player->set_rotate_type(RotateType::Rotate90_HitObstacleNextPosition);
+	//		return false;
+	//	}
 
-		// 回転後に穴に落ちる場合は回転させない
-		if (check_collision_hole(nowPlayerPos)) {
-			if (check_collision_hole(nextChildPos)) {
-				player->set_moving(false);
-				// 回転失敗のフラグを立てておく
-				player->set_turn_success(false);
-				player->set_how_rotation(RotationDirection::Default);
-				player->set_rotate_type(RotateType::Rotate90_NextPositionIsHole);
-				return false;
-			}
-		}
+	//	// 回転後に穴に落ちる場合は回転させない
+	//	if (check_collision_hole(nowPlayerPos)) {
+	//		if (check_collision_hole(nextChildPos)) {
+	//			// 回転が失敗したら移動に行けない
+	//			player->set_moving(false);
+	//			// 回転失敗のフラグを立てておく
+	//			player->set_turn_success(false);
+	//			// 回転の方向を設定
+	//			player->set_how_rotation(RotationDirection::Default);
+	//			// 回転の種類を設定
+	//			player->set_rotate_type(RotateType::Rotate90_NextPositionIsHole);
+	//			return false;
+	//		}
+	//	}
 
-		// ここまで来たら普通に回転できる
-		player->set_rotate_type(RotateType::Rotate90_Normal);
-		return true;
-	}
+	//	// ここまで来たら普通に回転できる
+	//	player->set_rotate_type(RotateType::Rotate90_Normal);
+	//	return true;
+	//}
 
-	// ここまで来たら180度回転なのでそれ用の回転の変数を用意
+	//// ここまで来たら180度回転なのでそれ用の回転の変数を用意
 
-	// 左右に障害物があるか判定
-	auto check_side_collisions_wall = [&](const Vector3& primaryDirection, const Vector3& secondaryDirection) {
-		Vector3 firstPos = nowPlayerPos + primaryDirection - childDirection;
-		Vector3 secondPos = firstPos + secondaryDirection;
-		Vector3 thirdPos = secondPos + secondaryDirection;
-		return check_collision_wall(firstPos) || check_collision_wall(secondPos) || check_collision_wall(thirdPos);
-	};
+	//// 左右に障害物があるか判定
+	//auto check_side_collisions_wall = [&](const Vector3& primaryDirection, const Vector3& secondaryDirection) {
+	//	Vector3 firstPos = nowPlayerPos + primaryDirection - childDirection;
+	//	Vector3 secondPos = firstPos + secondaryDirection;
+	//	Vector3 thirdPos = secondPos + secondaryDirection;
+	//	return check_collision_wall(firstPos) || check_collision_wall(secondPos) || check_collision_wall(thirdPos);
+	//};
 
-	// 左右に穴があるかを判定
-	auto check_side_collision_hole = [&](const Vector3& primaryDirection, const Vector3& secondaryDirection) {
-		Vector3 checkPos = nowPlayerPos + primaryDirection - childDirection + secondaryDirection;
-		return check_collision_hole(checkPos);
-	};
+	//// 左右に穴があるかを判定
+	//auto check_side_collision_hole = [&](const Vector3& primaryDirection, const Vector3& secondaryDirection) {
+	//	Vector3 checkPos = nowPlayerPos + primaryDirection - childDirection + secondaryDirection;
+	//	return check_collision_hole(checkPos);
+	//};
 
-	Vector3 leftDirection = GameUtility::rotate_direction_90_left(childDirection);
-	Vector3 rightDirection = GameUtility::rotate_direction_90_right(childDirection);
+	//Vector3 leftDirection = GameUtility::rotate_direction_90_left(childDirection);
+	//Vector3 rightDirection = GameUtility::rotate_direction_90_right(childDirection);
 
-	// 左方向に障害物があれば
-	if (check_side_collisions_wall(leftDirection, childDirection) ||
-		(check_side_collision_hole(leftDirection, childDirection) && check_collision_hole(nowPlayerPos))) {
-		player->set_how_rotation(RotationDirection::Right);
-	}
-	// 右方向に障害物があれば
-	else if (check_side_collisions_wall(rightDirection, childDirection) ||
-			(check_side_collision_hole(rightDirection, childDirection) && check_collision_hole(nowPlayerPos))) {
-		player->set_how_rotation(RotationDirection::Left);
-	}
-	// どちらもなければ
-	else {
-		player->set_how_rotation(RotationDirection::Default);
-	}
+	//// 左方向に障害物があれば
+	//if (check_side_collisions_wall(leftDirection, childDirection) ||
+	//	(check_side_collision_hole(leftDirection, childDirection) && check_collision_hole(nowPlayerPos))) {
+	//	player->set_how_rotation(RotationDirection::Right);
+	//}
+	//// 右方向に障害物があれば
+	//else if (check_side_collisions_wall(rightDirection, childDirection) ||
+	//		(check_side_collision_hole(rightDirection, childDirection) && check_collision_hole(nowPlayerPos))) {
+	//	player->set_how_rotation(RotationDirection::Left);
+	//}
+	//// どちらもなければ
+	//else {
+	//	player->set_how_rotation(RotationDirection::Default);
+	//}
 
 
-	auto check_collision = [&](const Vector3& pos) {
-		return mapchipField_->getElement(std::round(pos.x), std::round(pos.z));
-	};
+	//auto check_collision = [&](const Vector3& pos) {
+	//	return mapchipField_->getElement(std::round(pos.x), std::round(pos.z));
+	//};
 
-	Vector3 firstCheckPos;
-	Vector3 secondCheckPos;
-	Vector3 thirdCheckPos;
-	if (player->get_how_rotation() == RotationDirection::Left) {
-		firstCheckPos = nowPlayerPos + leftDirection - childDirection;
-		secondCheckPos = firstCheckPos + childDirection;
-		thirdCheckPos = secondCheckPos + childDirection;
-	}
-	else {
-		firstCheckPos = nowPlayerPos + rightDirection - childDirection;
-		secondCheckPos = firstCheckPos + childDirection;
-		thirdCheckPos = secondCheckPos + childDirection;
-	}
+	//Vector3 firstCheckPos;
+	//Vector3 secondCheckPos;
+	//Vector3 thirdCheckPos;
+	//if (player->get_how_rotation() == RotationDirection::Left) {
+	//	firstCheckPos = nowPlayerPos + leftDirection - childDirection;
+	//	secondCheckPos = firstCheckPos + childDirection;
+	//	thirdCheckPos = secondCheckPos + childDirection;
+	//}
+	//else {
+	//	firstCheckPos = nowPlayerPos + rightDirection - childDirection;
+	//	secondCheckPos = firstCheckPos + childDirection;
+	//	thirdCheckPos = secondCheckPos + childDirection;
+	//}
 
-	// 各探索座標の位置を取得
-	int firstChip = check_collision(firstCheckPos);
-	int secondChip = check_collision(secondCheckPos);
-	int thirdChip = check_collision(thirdCheckPos);
-	int finalChip = check_collision(nextChildPos);
-	int playerChip = check_collision(nowPlayerPos);
-	// 最初の探索点が壁だったら
-	if (firstChip == 2) {
-		player->set_rotate_type(RotateType::HitDiagonalFrontWall);
-		return false; // 衝突があれば回転する
-	}
 
-	if (secondChip == 0 && playerChip == 0) {
-		player->set_rotate_type(RotateType::NextTileIsHole);
-		return false; // 衝突があれば回転する
-	}
 
-	if (secondChip == 2) {
-		player->set_rotate_type(RotateType::HitSideWall);
-		return false; // 衝突があれば回転する
-	}
+	//// 各探索座標の位置を取得
+	//int firstChip = check_collision(firstCheckPos);
+	//int secondChip = check_collision(secondCheckPos);
+	//int thirdChip = check_collision(thirdCheckPos);
+	//int finalChip = check_collision(nextChildPos);
+	//int playerChip = check_collision(nowPlayerPos);
+	//// 最初の探索点が壁だったら
+	//if (firstChip == 2) {
+	//	player->set_rotate_type(RotateType::HitDiagonalFrontWall);
+	//	return false; // 衝突があれば回転する
+	//}
 
-	if (thirdChip == 2) {
-		player->set_rotate_type(RotateType::HitDiagonalBackWall);
-		return false; // 衝突があれば回転する
-	}
+	//if (secondChip == 0 && playerChip == 0) {
+	//	player->set_rotate_type(RotateType::NextTileIsHole);
+	//	return false; // 衝突があれば回転する
+	//}
 
-	if (finalChip == 0 && playerChip == 0) {
-		player->set_rotate_type(RotateType::BackTileIsHole);
-		return false; // 衝突があれば回転しない
-	}
+	//if (secondChip == 2) {
+	//	player->set_rotate_type(RotateType::HitSideWall);
+	//	return false; // 衝突があれば回転する
+	//}
 
-	if (finalChip == 2) {
-		player->set_rotate_type(RotateType::HitBackWall);
-		return false; // 衝突があれば回転しない
-	}
+	//if (thirdChip == 2) {
+	//	player->set_rotate_type(RotateType::HitDiagonalBackWall);
+	//	return false; // 衝突があれば回転する
+	//}
 
-	player->set_rotate_type(RotateType::Normal);
-	return true; // 衝突がなければ回転を続行
+	//if (finalChip == 0 && playerChip == 0) {
+	//	player->set_rotate_type(RotateType::BackTileIsHole);
+	//	return false; // 衝突があれば回転しない
+	//}
+
+	//if (finalChip == 2) {
+	//	player->set_rotate_type(RotateType::HitBackWall);
+	//	return false; // 衝突があれば回転しない
+	//}
+
+	//player->set_rotate_type(RotateType::Normal);
+	//return true; // 衝突がなければ回転を続行
 }
 
 void MapchipHandler::check_fall_conditions(Player* player, Child* child) {

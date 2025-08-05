@@ -53,10 +53,10 @@ void PlayerManager::initialize(Reference<const LevelLoader> level, MapchipField*
 	mapchipHandler->initialize(mapchipField_);
 
 	child = std::make_unique<Child>();
-	child->initialize(*level.ptr(), mapchipHandler.get());
+	child->initialize(*level.ptr(), mapchipField_);
 
 	player = std::make_unique<Player>();
-	player->initialize(*level.ptr(), mapchipHandler.get());
+	player->initialize(*level.ptr(), mapchipField_);
 	player->set_child(child.get());
 
 	if (player) {
@@ -364,32 +364,34 @@ void PlayerManager::handle_input() {
 			inputTimer = InputDowntime;
 			//player->set = directions[i];
 			Vector3 nextPosition = player->get_translate() + directions[i];
+			player->set_move_direction(directions[i]);
+			player->change_state("RotateCheck");
 
-			// 回転中の衝突チェック
-			if (mapchipHandler->can_player_rotate(player.get(), child.get(), directions[i])) {
-				set_rotate_parameters(directions[i]);
-			}
-			else {
-				set_rotate_failed_parameters(directions[i]);
+			//// 回転中の衝突チェック
+			//if (mapchipHandler->can_player_rotate(player.get(), child.get(), directions[i])) {
+			//	set_rotate_parameters(directions[i]);
+			//}
+			//else {
+			//	set_rotate_failed_parameters(directions[i]);
 
-			}
+			//}
 
-			// MapchipHandlerに移動可能かを問い合わせ
-			if (mapchipHandler->can_player_move_to(player.get(), child.get(), directions[i])) {
-				// 成功時のパラメータ設定
-				set_move_parameters(directions[i]);
-			}
-			else {
-				set_move_failed_parameters(directions[i]);
+			//// MapchipHandlerに移動可能かを問い合わせ
+			//if (mapchipHandler->can_player_move_to(player.get(), child.get(), directions[i])) {
+			//	// 成功時のパラメータ設定
+			//	set_move_parameters(directions[i]);
+			//}
+			//else {
+			//	set_move_failed_parameters(directions[i]);
 
-				// チュートリアル
-				if (tutorialManager_->get_tutorial_step() == TutorialManager::TutorialStep::CannotProceedIfFall) {
-					tutorialManager_->set_is_tutorial(true);
-				}
-			}
+			//	// チュートリアル
+			//	if (tutorialManager_->get_tutorial_step() == TutorialManager::TutorialStep::CannotProceedIfFall) {
+			//		tutorialManager_->set_is_tutorial(true);
+			//	}
+			//}
 
-			// いろいろと判定が完了したらプレイヤーの状態を回転にする
-			player->set_state(PlayerState::Rotating);
+			//// いろいろと判定が完了したらプレイヤーの状態を回転にする
+			//player->set_state(PlayerState::Rotating);
 			break;
 		}
 	}
@@ -807,543 +809,543 @@ void PlayerManager::set_move_failed_parameters(const Vector3& direction) {
 }
 
 void PlayerManager::set_rotate_parameters(const Vector3& direction) {
-	Vector3 midDir;
+	//Vector3 midDir;
 
-	switch (player->get_rotate_type()) {
-	case RotateType::Rotate90_Normal:
-		player->set_start_rotation(player->get_rotation());
-		player->set_target_rotation(Quaternion::FromToRotation({ 0.0f, 0.0f, -1.0f }, direction));
-		player->set_rotate_timer(0.0f);
-		player->set_rotate_duration(rotateDuration_);
-		player->set_rotating(true);
-		player->set_start_position(player->get_translate());
-		break;
-	case RotateType::None:
-		player->set_start_rotation(player->get_rotation());
-		player->set_target_rotation(Quaternion::FromToRotation({ 0.0f, 0.0f, -1.0f }, direction));
-		player->set_rotate_timer(0.0f);
-		player->set_rotate_duration(0.01f);
-		player->set_rotating(true);
-		player->set_start_position(player->get_translate());
-		break;
-	case RotateType::Normal:
-		player->set_start_rotation(player->get_rotation());
-		player->set_target_rotation(Quaternion::FromToRotation({ 0.0f, 0.0f, -1.0f }, direction));
-		player->set_rotate_timer(0.0f);
-		player->set_rotate_duration(rotateDuration_);
-		player->set_rotating(true);
-		player->set_start_position(player->get_translate());
+	//switch (player->get_rotate_type()) {
+	//case RotateType::Rotate90_Normal:
+	//	player->set_start_rotation(player->get_rotation());
+	//	player->set_target_rotation(Quaternion::FromToRotation({ 0.0f, 0.0f, -1.0f }, direction));
+	//	player->set_rotate_timer(0.0f);
+	//	player->set_rotate_duration(rotateDuration_);
+	//	player->set_rotating(true);
+	//	player->set_start_position(player->get_translate());
+	//	break;
+	//case RotateType::None:
+	//	player->set_start_rotation(player->get_rotation());
+	//	player->set_target_rotation(Quaternion::FromToRotation({ 0.0f, 0.0f, -1.0f }, direction));
+	//	player->set_rotate_timer(0.0f);
+	//	player->set_rotate_duration(0.01f);
+	//	player->set_rotating(true);
+	//	player->set_start_position(player->get_translate());
+	//	break;
+	//case RotateType::Normal:
+	//	player->set_start_rotation(player->get_rotation());
+	//	player->set_target_rotation(Quaternion::FromToRotation({ 0.0f, 0.0f, -1.0f }, direction));
+	//	player->set_rotate_timer(0.0f);
+	//	player->set_rotate_duration(rotateDuration_);
+	//	player->set_rotating(true);
+	//	player->set_start_position(player->get_translate());
 
-		if (player->get_how_rotation() == RotationDirection::Left) {
-			midDir = GameUtility::rotate_direction_90_left(direction);
-			player->set_mid_rotation(Quaternion::FromToRotation({ 0.0f, 0.0f, -1.0f }, midDir));
-		}
-		else if (player->get_how_rotation() == RotationDirection::Right) {
-			midDir = GameUtility::rotate_direction_90_right(direction);
-			player->set_mid_rotation(Quaternion::FromToRotation({ 0.0f, 0.0f, -1.0f }, midDir));
-		}
+	//	if (player->get_how_rotation() == RotationDirection::Left) {
+	//		midDir = GameUtility::rotate_direction_90_left(direction);
+	//		player->set_mid_rotation(Quaternion::FromToRotation({ 0.0f, 0.0f, -1.0f }, midDir));
+	//	}
+	//	else if (player->get_how_rotation() == RotationDirection::Right) {
+	//		midDir = GameUtility::rotate_direction_90_right(direction);
+	//		player->set_mid_rotation(Quaternion::FromToRotation({ 0.0f, 0.0f, -1.0f }, midDir));
+	//	}
 
-		break;
-	}
+	//	break;
+	//}
 }
 
 void PlayerManager::set_rotate_failed_parameters(const Vector3& direction) {
-	Vector3 childDirection;
-	if (std::round(child->get_translate().x) == 1.0f) {
-		childDirection = GameUtility::rotate_direction_90_left(direction);
-	}
-	else if (std::round(child->get_translate().x) == -1.0f) {
-		childDirection = GameUtility::rotate_direction_90_right(direction);
-	}
-	else {
-		childDirection = direction;
-	}
-
-	// 現在のプレイヤーの位置
-	Vector3 nowPlayerPos = player->get_translate();
-	// 今の子供の位置
-	Vector3 nowChildPos = nowPlayerPos + child->get_translate() * player->get_rotation();
-	// 移動予定の位置
-	Vector3 nextChildPos = nowPlayerPos + childDirection;
-	// 一回転しない場合の経由点
-	Vector3 midChildPos = nowChildPos + childDirection;
-
-	// プレイヤーの向いている方向
-	//Vector3 playerDirection = direction;
-	// 左方向
-	Vector3 leftDirection = GameUtility::rotate_direction_90_left(childDirection);
-	// 右方向
-	Vector3 rightDirection = GameUtility::rotate_direction_90_right(childDirection);
-	// 左斜め方向を計算
-	Vector3 leftDiagonalDirection = (childDirection + leftDirection).normalize_safe();
-	// 右斜め方向を計算
-	Vector3 rightDiagonalDirection = (childDirection + rightDirection).normalize_safe();
-	// プレイヤーと子が向かい合ってるときの斜め方向
-	Vector3 childDiagonalDirection = (childDirection + player->get_previous_direction()).normalize_safe();
-
-	// 回転角の定義
-	const float ANGLE_15 = 15.0f * (3.14f / 180.0f);
-	const float ANGLE_40 = 40.0f * (3.14f / 180.0f);
-	const float ANGLE_70 = 70.0f * (3.14f / 180.0f);
-	const float ANGLE_135 = 135.0f * (3.14f / 180.0f);
-	const float ANGLE_160 = 160.0f * (3.14f / 180.0f);
-
-	// クォータニオンの作成
-	Quaternion rotate15Left = Quaternion::AngleAxis({ 0.0f, 1.0f, 0.0f }, ANGLE_15);
-	Quaternion rotate15Right = Quaternion::AngleAxis({ 0.0f, 1.0f, 0.0f }, -ANGLE_15);
-	Quaternion rotate40Left = Quaternion::AngleAxis({ 0.0f, 1.0f, 0.0f }, ANGLE_40);
-	Quaternion rotate40Right = Quaternion::AngleAxis({ 0.0f, 1.0f, 0.0f }, -ANGLE_40);
-	Quaternion rotate70Left = Quaternion::AngleAxis({ 0.0f, 1.0f, 0.0f }, ANGLE_70);
-	Quaternion rotate70Right = Quaternion::AngleAxis({ 0.0f, 1.0f, 0.0f }, -ANGLE_70);
-	Quaternion rotate135Left = Quaternion::AngleAxis({ 0.0f, 1.0f, 0.0f }, ANGLE_135);
-	Quaternion rotate135Right = Quaternion::AngleAxis({ 0.0f, 1.0f, 0.0f }, -ANGLE_135);
-	Quaternion rotate160Left = Quaternion::AngleAxis({ 0.0f, 1.0f, 0.0f }, ANGLE_160);
-	Quaternion rotate160Right = Quaternion::AngleAxis({ 0.0f, 1.0f, 0.0f }, -ANGLE_160);
-
-	// 回転失敗時の基本設定
-	player->set_start_rotation(player->get_rotation());
-	player->set_target_rotation(player->get_rotation());
-	player->set_rotate_timer(0.0f);
-	player->set_rotate_duration(rotateDuration_);
-	player->set_rotating(true);
-	player->set_moving(false);
-
-	switch (player->get_rotate_type()) {
-	case RotateType::None:
-		player->set_target_rotation(Quaternion::FromToRotation({ 0.0f, 0.0f, -1.0f }, direction));
-		player->set_rotate_duration(0.01f);
-		break;
-	case RotateType::Rotate90_HitObstacleDiagonalFront:
-		// 壁にぶつかる移動をセットしておく
-		player->set_move_type(MoveType::HitRock);
-
-		player->set_how_rotation(RotationDirection::Reverce);
-
-		if (std::round(child->get_translate().x) == 1.0f) {
-			Vector3 playerForward = Vector3(0.0f, 0.0f, -1.0f) * player->get_rotation();
-
-			if (playerForward.x > 0) {
-				if (childDirection.z > 0) {
-					player->set_mid_rotation(rotate15Right * player->get_rotation());
-				}
-				else {
-					player->set_mid_rotation(rotate15Left * player->get_rotation()); // ok
-				}
-			}
-			else if (playerForward.x < 0) {
-				if (childDirection.z > 0) {
-					player->set_mid_rotation(rotate15Right * player->get_rotation());
-				}
-				else {
-					player->set_mid_rotation(rotate15Left * player->get_rotation()); // ok
-				}
-			}
-
-			if (playerForward.z > 0) {
-				if (childDirection.x > 0) {
-					player->set_mid_rotation(rotate15Right * player->get_rotation());
-				}
-				else {
-					player->set_mid_rotation(rotate15Left * player->get_rotation()); // ok
-				}
-			}
-			else if (playerForward.z < 0) {
-				if (childDirection.x > 0) {
-					player->set_mid_rotation(rotate15Right * player->get_rotation());
-				}
-				else {
-					player->set_mid_rotation(rotate15Left * player->get_rotation());
-				}
-			}
-		}
-		else if (std::round(child->get_translate().x) == -1.0f) {
-			Vector3 playerForward = Vector3(0.0f, 0.0f, -1.0f) * player->get_rotation();
-
-			if (playerForward.x > 0) {
-				if (childDirection.z > 0) {
-					player->set_mid_rotation(rotate15Left * player->get_rotation());
-				}
-				else {
-					player->set_mid_rotation(rotate15Right * player->get_rotation());
-				}
-			}
-			else if (playerForward.x < 0) {
-				if (childDirection.z > 0) {
-					player->set_mid_rotation(rotate15Left * player->get_rotation());
-				}
-				else {
-					player->set_mid_rotation(rotate15Right * player->get_rotation()); // ok
-				}
-			}
-
-			if (playerForward.z > 0) {
-				if (childDirection.x > 0) {
-					player->set_mid_rotation(rotate15Left * player->get_rotation());
-				}
-				else {
-					player->set_mid_rotation(rotate15Right * player->get_rotation()); // ok
-				}
-			}
-			else if (playerForward.z < 0) {
-				if (childDirection.x > 0) {
-					player->set_mid_rotation(rotate15Left * player->get_rotation());
-				}
-				else {
-					player->set_mid_rotation(rotate15Right * player->get_rotation()); // ok
-				}
-			}
-		}
-		else {
-			Vector3 playerForward = Vector3(0.0f, 0.0f, -1.0f) * player->get_rotation();
-
-			if (playerForward.x > 0) {
-				if (childDirection.z > 0) {
-					player->set_mid_rotation(rotate15Right * player->get_rotation());
-				}
-				else {
-					player->set_mid_rotation(rotate15Left * player->get_rotation());
-				}
-			}
-			else if (playerForward.x < 0) {
-				if (childDirection.z > 0) {
-					player->set_mid_rotation(rotate15Left * player->get_rotation());
-				}
-				else {
-					player->set_mid_rotation(rotate15Right * player->get_rotation());
-				}
-			}
-
-			if (playerForward.z > 0) {
-				if (childDirection.x > 0) {
-					player->set_mid_rotation(rotate15Left * player->get_rotation());
-				}
-				else {
-					player->set_mid_rotation(rotate15Right * player->get_rotation());
-				}
-			}
-			else if (playerForward.z < 0) {
-				if (childDirection.x > 0) {
-					player->set_mid_rotation(rotate15Right * player->get_rotation());
-				}
-				else {
-					player->set_mid_rotation(rotate15Left * player->get_rotation());
-				}
-			}
-		}
-		break;
-
-	case RotateType::Rotate90_HitObstacleNextPosition:
-		// 壁にぶつかる移動をセットしておく
-		player->set_move_type(MoveType::HitRock);
-		player->set_how_rotation(RotationDirection::Reverce);
-
-		if (std::round(child->get_translate().x) == 1.0f) {
-			Vector3 playerForward = Vector3(0.0f, 0.0f, -1.0f) * player->get_rotation();
-
-			if (playerForward.x > 0) {
-				if (childDirection.z > 0) {
-					player->set_mid_rotation(rotate70Right * player->get_rotation());
-				}
-				else {
-					player->set_mid_rotation(rotate70Left * player->get_rotation());
-				}
-			}
-			else if (playerForward.x < 0) {
-				if (childDirection.z > 0) {
-					player->set_mid_rotation(rotate70Right * player->get_rotation());
-				}
-				else {
-					player->set_mid_rotation(rotate70Left * player->get_rotation());
-				}
-			}
-
-			if (playerForward.z > 0) {
-				if (childDirection.x > 0) {
-					player->set_mid_rotation(rotate70Right * player->get_rotation());
-				}
-				else {
-					player->set_mid_rotation(rotate70Left * player->get_rotation());
-				}
-			}
-			else if (playerForward.z < 0) {
-				if (childDirection.x > 0) {
-					player->set_mid_rotation(rotate70Right * player->get_rotation());
-				}
-				else {
-					player->set_mid_rotation(rotate70Left * player->get_rotation());
-				}
-			}
-		}
-		else if (std::round(child->get_translate().x) == -1.0f) {
-			Vector3 playerForward = Vector3(0.0f, 0.0f, -1.0f) * player->get_rotation();
-
-			if (playerForward.x > 0) {
-				if (childDirection.z > 0) {
-					player->set_mid_rotation(rotate70Left * player->get_rotation());
-				}
-				else {
-					player->set_mid_rotation(rotate70Right * player->get_rotation());
-				}
-			}
-			else if (playerForward.x < 0) {
-				if (childDirection.z > 0) {
-					player->set_mid_rotation(rotate70Left * player->get_rotation());
-				}
-				else {
-					player->set_mid_rotation(rotate70Right * player->get_rotation());
-				}
-			}
-
-			if (playerForward.z > 0) {
-				if (childDirection.x > 0) {
-					player->set_mid_rotation(rotate70Left * player->get_rotation());
-				}
-				else {
-					player->set_mid_rotation(rotate70Right * player->get_rotation());
-				}
-			}
-			else if (playerForward.z < 0) {
-				if (childDirection.x > 0) {
-					player->set_mid_rotation(rotate70Left * player->get_rotation());
-				}
-				else {
-					player->set_mid_rotation(rotate70Right * player->get_rotation());
-				}
-			}
-		}
-		else {
-			Vector3 playerForward = Vector3(0.0f, 0.0f, -1.0f) * player->get_rotation();
-
-			if (playerForward.x > 0) {
-				if (childDirection.z > 0) {
-					player->set_mid_rotation(rotate70Right * player->get_rotation());
-				}
-				else {
-					player->set_mid_rotation(rotate70Left * player->get_rotation());
-				}
-			}
-			else if (playerForward.x < 0) {
-				if (childDirection.z > 0) {
-					player->set_mid_rotation(rotate70Left * player->get_rotation());
-				}
-				else {
-					player->set_mid_rotation(rotate70Right * player->get_rotation());
-				}
-			}
-
-			if (playerForward.z > 0) {
-				if (childDirection.x > 0) {
-					player->set_mid_rotation(rotate70Left * player->get_rotation());
-				}
-				else {
-					player->set_mid_rotation(rotate70Right * player->get_rotation());
-				}
-			}
-			else if (playerForward.z < 0) {
-				if (childDirection.x > 0) {
-					player->set_mid_rotation(rotate70Right * player->get_rotation());
-				}
-				else {
-					player->set_mid_rotation(rotate70Left * player->get_rotation());
-				}
-			}
-		}
-
-		break;
-	case RotateType::Rotate90_NextPositionIsHole:
-		// 穴に落下する時の移動をセットしておく
-		player->set_move_type(MoveType::FallIntoHole);
-		player->set_how_rotation(RotationDirection::Reverce);
-
-		if (std::round(child->get_translate().x) == 1.0f) {
-			Vector3 playerForward = Vector3(0.0f, 0.0f, -1.0f) * player->get_rotation();
-
-			if (playerForward.x > 0) {
-				if (childDirection.z > 0) {
-					player->set_mid_rotation(rotate70Right * player->get_rotation());
-				}
-				else {
-					player->set_mid_rotation(rotate70Left * player->get_rotation());
-				}
-			}
-			else if (playerForward.x < 0) {
-				if (childDirection.z > 0) {
-					player->set_mid_rotation(rotate70Right * player->get_rotation());
-				}
-				else {
-					player->set_mid_rotation(rotate70Left * player->get_rotation());
-				}
-			}
-
-			if (playerForward.z > 0) {
-				if (childDirection.x > 0) {
-					player->set_mid_rotation(rotate70Right * player->get_rotation());
-				}
-				else {
-					player->set_mid_rotation(rotate70Left * player->get_rotation());
-				}
-			}
-			else if (playerForward.z < 0) {
-				if (childDirection.x > 0) {
-					player->set_mid_rotation(rotate70Right * player->get_rotation());
-				}
-				else {
-					player->set_mid_rotation(rotate70Left * player->get_rotation());
-				}
-			}
-		}
-		else if (std::round(child->get_translate().x) == -1.0f) {
-			Vector3 playerForward = Vector3(0.0f, 0.0f, -1.0f) * player->get_rotation();
-
-			if (playerForward.x > 0) {
-				if (childDirection.z > 0) {
-					player->set_mid_rotation(rotate70Left * player->get_rotation());
-				}
-				else {
-					player->set_mid_rotation(rotate70Right * player->get_rotation());
-				}
-			}
-			else if (playerForward.x < 0) {
-				if (childDirection.z > 0) {
-					player->set_mid_rotation(rotate70Left * player->get_rotation());
-				}
-				else {
-					player->set_mid_rotation(rotate70Right * player->get_rotation());
-				}
-			}
-
-			if (playerForward.z > 0) {
-				if (childDirection.x > 0) {
-					player->set_mid_rotation(rotate70Left * player->get_rotation());
-				}
-				else {
-					player->set_mid_rotation(rotate70Right * player->get_rotation());
-				}
-			}
-			else if (playerForward.z < 0) {
-				if (childDirection.x > 0) {
-					player->set_mid_rotation(rotate70Left * player->get_rotation());
-				}
-				else {
-					player->set_mid_rotation(rotate70Right * player->get_rotation());
-				}
-			}
-		}
-		else {
-			Vector3 playerForward = Vector3(0.0f, 0.0f, -1.0f) * player->get_rotation();
-
-			if (playerForward.x > 0) {
-				if (childDirection.z > 0) {
-					player->set_mid_rotation(rotate70Right * player->get_rotation());
-				}
-				else {
-					player->set_mid_rotation(rotate70Left * player->get_rotation());
-				}
-			}
-			else if (playerForward.x < 0) {
-				if (childDirection.z > 0) {
-					player->set_mid_rotation(rotate70Left * player->get_rotation());
-				}
-				else {
-					player->set_mid_rotation(rotate70Right * player->get_rotation());
-				}
-			}
-
-			if (playerForward.z > 0) {
-				if (childDirection.x > 0) {
-					player->set_mid_rotation(rotate70Left * player->get_rotation());
-				}
-				else {
-					player->set_mid_rotation(rotate70Right * player->get_rotation());
-				}
-			}
-			else if (playerForward.z < 0) {
-				if (childDirection.x > 0) {
-					player->set_mid_rotation(rotate70Right * player->get_rotation());
-				}
-				else {
-					player->set_mid_rotation(rotate70Left * player->get_rotation());
-				}
-			}
-		}
-
-		break;
-	case RotateType::HitDiagonalFrontWall:
-		// 壁にぶつかる移動をセットしておく
-		player->set_move_type(MoveType::HitRock);
-
-		if (player->get_how_rotation() == RotationDirection::Left) {
-			player->set_mid_rotation(rotate15Left * player->get_rotation());
-		}
-		else if (player->get_how_rotation() == RotationDirection::Right) {
-			player->set_mid_rotation(rotate15Right * player->get_rotation());
-		}
-		break;
-
-	case RotateType::HitSideWall:
-		// 壁にぶつかる移動をセットしておく
-		player->set_move_type(MoveType::HitRock);
-
-		if (player->get_how_rotation() == RotationDirection::Left) {
-			player->set_mid_rotation(rotate70Left * player->get_rotation());
-		}
-		else if (player->get_how_rotation() == RotationDirection::Right) {
-			player->set_mid_rotation(rotate70Right * player->get_rotation());
-		}
-		break;
-	case RotateType::NextTileIsHole:
-		// 穴に落下する時の移動をセットしておく
-		player->set_move_type(MoveType::FallIntoHole);
-
-		if (player->get_how_rotation() == RotationDirection::Left) {
-			player->set_mid_rotation(rotate70Left * player->get_rotation());
-		}
-		else if (player->get_how_rotation() == RotationDirection::Right) {
-			player->set_mid_rotation(rotate70Right * player->get_rotation());
-		}
-		break;
-	case RotateType::HitDiagonalBackWall:
-		// 壁にぶつかる移動をセットしておく
-		player->set_move_type(MoveType::HitRock);
-
-		if (player->get_how_rotation() == RotationDirection::Left) {
-			player->set_mid_rotation(rotate135Left * player->get_rotation());
-		}
-		else if (player->get_how_rotation() == RotationDirection::Right) {
-			player->set_mid_rotation(rotate135Right * player->get_rotation());
-		}
-		break;
-	case RotateType::HitBackWall:
-		// 壁にぶつかる移動をセットしておく
-		player->set_move_type(MoveType::HitRock);
-
-		if (player->get_how_rotation() == RotationDirection::Left) {
-			player->set_mid_rotation(rotate160Left * player->get_rotation());
-		}
-		else if (player->get_how_rotation() == RotationDirection::Right) {
-			player->set_mid_rotation(rotate160Right * player->get_rotation());
-		}
-		else {
-			player->set_how_rotation(RotationDirection::Reverce);
-			player->set_mid_rotation(rotate160Right * player->get_rotation());
-		}
-		break;
-	case RotateType::BackTileIsHole:
-		// 穴に落下する時の移動をセットしておく
-		player->set_move_type(MoveType::FallIntoHole);
-
-		if (player->get_how_rotation() == RotationDirection::Left) {
-			player->set_mid_rotation(rotate160Left * player->get_rotation());
-		}
-		else if (player->get_how_rotation() == RotationDirection::Right) {
-			player->set_mid_rotation(rotate160Right * player->get_rotation());
-		}
-		else {
-			player->set_how_rotation(RotationDirection::Reverce);
-			player->set_mid_rotation(rotate160Right * player->get_rotation());
-		}
-		break;
-	}
-
-	return;
+//	Vector3 childDirection;
+//	if (std::round(child->get_translate().x) == 1.0f) {
+//		childDirection = GameUtility::rotate_direction_90_left(direction);
+//	}
+//	else if (std::round(child->get_translate().x) == -1.0f) {
+//		childDirection = GameUtility::rotate_direction_90_right(direction);
+//	}
+//	else {
+//		childDirection = direction;
+//	}
+//
+//	// 現在のプレイヤーの位置
+//	Vector3 nowPlayerPos = player->get_translate();
+//	// 今の子供の位置
+//	Vector3 nowChildPos = nowPlayerPos + child->get_translate() * player->get_rotation();
+//	// 移動予定の位置
+//	Vector3 nextChildPos = nowPlayerPos + childDirection;
+//	// 一回転しない場合の経由点
+//	Vector3 midChildPos = nowChildPos + childDirection;
+//
+//	// プレイヤーの向いている方向
+//	//Vector3 playerDirection = direction;
+//	// 左方向
+//	Vector3 leftDirection = GameUtility::rotate_direction_90_left(childDirection);
+//	// 右方向
+//	Vector3 rightDirection = GameUtility::rotate_direction_90_right(childDirection);
+//	// 左斜め方向を計算
+//	Vector3 leftDiagonalDirection = (childDirection + leftDirection).normalize_safe();
+//	// 右斜め方向を計算
+//	Vector3 rightDiagonalDirection = (childDirection + rightDirection).normalize_safe();
+//	// プレイヤーと子が向かい合ってるときの斜め方向
+//	Vector3 childDiagonalDirection = (childDirection + player->get_previous_direction()).normalize_safe();
+//
+//	// 回転角の定義
+//	const float ANGLE_15 = 15.0f * (3.14f / 180.0f);
+//	const float ANGLE_40 = 40.0f * (3.14f / 180.0f);
+//	const float ANGLE_70 = 70.0f * (3.14f / 180.0f);
+//	const float ANGLE_135 = 135.0f * (3.14f / 180.0f);
+//	const float ANGLE_160 = 160.0f * (3.14f / 180.0f);
+//
+//	// クォータニオンの作成
+//	Quaternion rotate15Left = Quaternion::AngleAxis({ 0.0f, 1.0f, 0.0f }, ANGLE_15);
+//	Quaternion rotate15Right = Quaternion::AngleAxis({ 0.0f, 1.0f, 0.0f }, -ANGLE_15);
+//	Quaternion rotate40Left = Quaternion::AngleAxis({ 0.0f, 1.0f, 0.0f }, ANGLE_40);
+//	Quaternion rotate40Right = Quaternion::AngleAxis({ 0.0f, 1.0f, 0.0f }, -ANGLE_40);
+//	Quaternion rotate70Left = Quaternion::AngleAxis({ 0.0f, 1.0f, 0.0f }, ANGLE_70);
+//	Quaternion rotate70Right = Quaternion::AngleAxis({ 0.0f, 1.0f, 0.0f }, -ANGLE_70);
+//	Quaternion rotate135Left = Quaternion::AngleAxis({ 0.0f, 1.0f, 0.0f }, ANGLE_135);
+//	Quaternion rotate135Right = Quaternion::AngleAxis({ 0.0f, 1.0f, 0.0f }, -ANGLE_135);
+//	Quaternion rotate160Left = Quaternion::AngleAxis({ 0.0f, 1.0f, 0.0f }, ANGLE_160);
+//	Quaternion rotate160Right = Quaternion::AngleAxis({ 0.0f, 1.0f, 0.0f }, -ANGLE_160);
+//
+//	// 回転失敗時の基本設定
+//	player->set_start_rotation(player->get_rotation());
+//	player->set_target_rotation(player->get_rotation());
+//	player->set_rotate_timer(0.0f);
+//	player->set_rotate_duration(rotateDuration_);
+//	player->set_rotating(true);
+//	player->set_moving(false);
+//
+//	switch (player->get_rotate_type()) {
+//	case RotateType::None:
+//		player->set_target_rotation(Quaternion::FromToRotation({ 0.0f, 0.0f, -1.0f }, direction));
+//		player->set_rotate_duration(0.01f);
+//		break;
+//	case RotateType::Rotate90_HitObstacleDiagonalFront:
+//		// 壁にぶつかる移動をセットしておく
+//		player->set_move_type(MoveType::HitRock);
+//
+//		player->set_how_rotation(RotationDirection::Reverce);
+//
+//		if (std::round(child->get_translate().x) == 1.0f) {
+//			Vector3 playerForward = Vector3(0.0f, 0.0f, -1.0f) * player->get_rotation();
+//
+//			if (playerForward.x > 0) {
+//				if (childDirection.z > 0) {
+//					player->set_mid_rotation(rotate15Right * player->get_rotation());
+//				}
+//				else {
+//					player->set_mid_rotation(rotate15Left * player->get_rotation()); // ok
+//				}
+//			}
+//			else if (playerForward.x < 0) {
+//				if (childDirection.z > 0) {
+//					player->set_mid_rotation(rotate15Right * player->get_rotation());
+//				}
+//				else {
+//					player->set_mid_rotation(rotate15Left * player->get_rotation()); // ok
+//				}
+//			}
+//
+//			if (playerForward.z > 0) {
+//				if (childDirection.x > 0) {
+//					player->set_mid_rotation(rotate15Right * player->get_rotation());
+//				}
+//				else {
+//					player->set_mid_rotation(rotate15Left * player->get_rotation()); // ok
+//				}
+//			}
+//			else if (playerForward.z < 0) {
+//				if (childDirection.x > 0) {
+//					player->set_mid_rotation(rotate15Right * player->get_rotation());
+//				}
+//				else {
+//					player->set_mid_rotation(rotate15Left * player->get_rotation());
+//				}
+//			}
+//		}
+//		else if (std::round(child->get_translate().x) == -1.0f) {
+//			Vector3 playerForward = Vector3(0.0f, 0.0f, -1.0f) * player->get_rotation();
+//
+//			if (playerForward.x > 0) {
+//				if (childDirection.z > 0) {
+//					player->set_mid_rotation(rotate15Left * player->get_rotation());
+//				}
+//				else {
+//					player->set_mid_rotation(rotate15Right * player->get_rotation());
+//				}
+//			}
+//			else if (playerForward.x < 0) {
+//				if (childDirection.z > 0) {
+//					player->set_mid_rotation(rotate15Left * player->get_rotation());
+//				}
+//				else {
+//					player->set_mid_rotation(rotate15Right * player->get_rotation()); // ok
+//				}
+//			}
+//
+//			if (playerForward.z > 0) {
+//				if (childDirection.x > 0) {
+//					player->set_mid_rotation(rotate15Left * player->get_rotation());
+//				}
+//				else {
+//					player->set_mid_rotation(rotate15Right * player->get_rotation()); // ok
+//				}
+//			}
+//			else if (playerForward.z < 0) {
+//				if (childDirection.x > 0) {
+//					player->set_mid_rotation(rotate15Left * player->get_rotation());
+//				}
+//				else {
+//					player->set_mid_rotation(rotate15Right * player->get_rotation()); // ok
+//				}
+//			}
+//		}
+//		else {
+//			Vector3 playerForward = Vector3(0.0f, 0.0f, -1.0f) * player->get_rotation();
+//
+//			if (playerForward.x > 0) {
+//				if (childDirection.z > 0) {
+//					player->set_mid_rotation(rotate15Right * player->get_rotation());
+//				}
+//				else {
+//					player->set_mid_rotation(rotate15Left * player->get_rotation());
+//				}
+//			}
+//			else if (playerForward.x < 0) {
+//				if (childDirection.z > 0) {
+//					player->set_mid_rotation(rotate15Left * player->get_rotation());
+//				}
+//				else {
+//					player->set_mid_rotation(rotate15Right * player->get_rotation());
+//				}
+//			}
+//
+//			if (playerForward.z > 0) {
+//				if (childDirection.x > 0) {
+//					player->set_mid_rotation(rotate15Left * player->get_rotation());
+//				}
+//				else {
+//					player->set_mid_rotation(rotate15Right * player->get_rotation());
+//				}
+//			}
+//			else if (playerForward.z < 0) {
+//				if (childDirection.x > 0) {
+//					player->set_mid_rotation(rotate15Right * player->get_rotation());
+//				}
+//				else {
+//					player->set_mid_rotation(rotate15Left * player->get_rotation());
+//				}
+//			}
+//		}
+//		break;
+//
+//	case RotateType::Rotate90_HitObstacleNextPosition:
+//		// 壁にぶつかる移動をセットしておく
+//		player->set_move_type(MoveType::HitRock);
+//		player->set_how_rotation(RotationDirection::Reverce);
+//
+//		if (std::round(child->get_translate().x) == 1.0f) {
+//			Vector3 playerForward = Vector3(0.0f, 0.0f, -1.0f) * player->get_rotation();
+//
+//			if (playerForward.x > 0) {
+//				if (childDirection.z > 0) {
+//					player->set_mid_rotation(rotate70Right * player->get_rotation());
+//				}
+//				else {
+//					player->set_mid_rotation(rotate70Left * player->get_rotation());
+//				}
+//			}
+//			else if (playerForward.x < 0) {
+//				if (childDirection.z > 0) {
+//					player->set_mid_rotation(rotate70Right * player->get_rotation());
+//				}
+//				else {
+//					player->set_mid_rotation(rotate70Left * player->get_rotation());
+//				}
+//			}
+//
+//			if (playerForward.z > 0) {
+//				if (childDirection.x > 0) {
+//					player->set_mid_rotation(rotate70Right * player->get_rotation());
+//				}
+//				else {
+//					player->set_mid_rotation(rotate70Left * player->get_rotation());
+//				}
+//			}
+//			else if (playerForward.z < 0) {
+//				if (childDirection.x > 0) {
+//					player->set_mid_rotation(rotate70Right * player->get_rotation());
+//				}
+//				else {
+//					player->set_mid_rotation(rotate70Left * player->get_rotation());
+//				}
+//			}
+//		}
+//		else if (std::round(child->get_translate().x) == -1.0f) {
+//			Vector3 playerForward = Vector3(0.0f, 0.0f, -1.0f) * player->get_rotation();
+//
+//			if (playerForward.x > 0) {
+//				if (childDirection.z > 0) {
+//					player->set_mid_rotation(rotate70Left * player->get_rotation());
+//				}
+//				else {
+//					player->set_mid_rotation(rotate70Right * player->get_rotation());
+//				}
+//			}
+//			else if (playerForward.x < 0) {
+//				if (childDirection.z > 0) {
+//					player->set_mid_rotation(rotate70Left * player->get_rotation());
+//				}
+//				else {
+//					player->set_mid_rotation(rotate70Right * player->get_rotation());
+//				}
+//			}
+//
+//			if (playerForward.z > 0) {
+//				if (childDirection.x > 0) {
+//					player->set_mid_rotation(rotate70Left * player->get_rotation());
+//				}
+//				else {
+//					player->set_mid_rotation(rotate70Right * player->get_rotation());
+//				}
+//			}
+//			else if (playerForward.z < 0) {
+//				if (childDirection.x > 0) {
+//					player->set_mid_rotation(rotate70Left * player->get_rotation());
+//				}
+//				else {
+//					player->set_mid_rotation(rotate70Right * player->get_rotation());
+//				}
+//			}
+//		}
+//		else {
+//			Vector3 playerForward = Vector3(0.0f, 0.0f, -1.0f) * player->get_rotation();
+//
+//			if (playerForward.x > 0) {
+//				if (childDirection.z > 0) {
+//					player->set_mid_rotation(rotate70Right * player->get_rotation());
+//				}
+//				else {
+//					player->set_mid_rotation(rotate70Left * player->get_rotation());
+//				}
+//			}
+//			else if (playerForward.x < 0) {
+//				if (childDirection.z > 0) {
+//					player->set_mid_rotation(rotate70Left * player->get_rotation());
+//				}
+//				else {
+//					player->set_mid_rotation(rotate70Right * player->get_rotation());
+//				}
+//			}
+//
+//			if (playerForward.z > 0) {
+//				if (childDirection.x > 0) {
+//					player->set_mid_rotation(rotate70Left * player->get_rotation());
+//				}
+//				else {
+//					player->set_mid_rotation(rotate70Right * player->get_rotation());
+//				}
+//			}
+//			else if (playerForward.z < 0) {
+//				if (childDirection.x > 0) {
+//					player->set_mid_rotation(rotate70Right * player->get_rotation());
+//				}
+//				else {
+//					player->set_mid_rotation(rotate70Left * player->get_rotation());
+//				}
+//			}
+//		}
+//
+//		break;
+//	case RotateType::Rotate90_NextPositionIsHole:
+//		// 穴に落下する時の移動をセットしておく
+//		player->set_move_type(MoveType::FallIntoHole);
+//		player->set_how_rotation(RotationDirection::Reverce);
+//
+//		if (std::round(child->get_translate().x) == 1.0f) {
+//			Vector3 playerForward = Vector3(0.0f, 0.0f, -1.0f) * player->get_rotation();
+//
+//			if (playerForward.x > 0) {
+//				if (childDirection.z > 0) {
+//					player->set_mid_rotation(rotate70Right * player->get_rotation());
+//				}
+//				else {
+//					player->set_mid_rotation(rotate70Left * player->get_rotation());
+//				}
+//			}
+//			else if (playerForward.x < 0) {
+//				if (childDirection.z > 0) {
+//					player->set_mid_rotation(rotate70Right * player->get_rotation());
+//				}
+//				else {
+//					player->set_mid_rotation(rotate70Left * player->get_rotation());
+//				}
+//			}
+//
+//			if (playerForward.z > 0) {
+//				if (childDirection.x > 0) {
+//					player->set_mid_rotation(rotate70Right * player->get_rotation());
+//				}
+//				else {
+//					player->set_mid_rotation(rotate70Left * player->get_rotation());
+//				}
+//			}
+//			else if (playerForward.z < 0) {
+//				if (childDirection.x > 0) {
+//					player->set_mid_rotation(rotate70Right * player->get_rotation());
+//				}
+//				else {
+//					player->set_mid_rotation(rotate70Left * player->get_rotation());
+//				}
+//			}
+//		}
+//		else if (std::round(child->get_translate().x) == -1.0f) {
+//			Vector3 playerForward = Vector3(0.0f, 0.0f, -1.0f) * player->get_rotation();
+//
+//			if (playerForward.x > 0) {
+//				if (childDirection.z > 0) {
+//					player->set_mid_rotation(rotate70Left * player->get_rotation());
+//				}
+//				else {
+//					player->set_mid_rotation(rotate70Right * player->get_rotation());
+//				}
+//			}
+//			else if (playerForward.x < 0) {
+//				if (childDirection.z > 0) {
+//					player->set_mid_rotation(rotate70Left * player->get_rotation());
+//				}
+//				else {
+//					player->set_mid_rotation(rotate70Right * player->get_rotation());
+//				}
+//			}
+//
+//			if (playerForward.z > 0) {
+//				if (childDirection.x > 0) {
+//					player->set_mid_rotation(rotate70Left * player->get_rotation());
+//				}
+//				else {
+//					player->set_mid_rotation(rotate70Right * player->get_rotation());
+//				}
+//			}
+//			else if (playerForward.z < 0) {
+//				if (childDirection.x > 0) {
+//					player->set_mid_rotation(rotate70Left * player->get_rotation());
+//				}
+//				else {
+//					player->set_mid_rotation(rotate70Right * player->get_rotation());
+//				}
+//			}
+//		}
+//		else {
+//			Vector3 playerForward = Vector3(0.0f, 0.0f, -1.0f) * player->get_rotation();
+//
+//			if (playerForward.x > 0) {
+//				if (childDirection.z > 0) {
+//					player->set_mid_rotation(rotate70Right * player->get_rotation());
+//				}
+//				else {
+//					player->set_mid_rotation(rotate70Left * player->get_rotation());
+//				}
+//			}
+//			else if (playerForward.x < 0) {
+//				if (childDirection.z > 0) {
+//					player->set_mid_rotation(rotate70Left * player->get_rotation());
+//				}
+//				else {
+//					player->set_mid_rotation(rotate70Right * player->get_rotation());
+//				}
+//			}
+//
+//			if (playerForward.z > 0) {
+//				if (childDirection.x > 0) {
+//					player->set_mid_rotation(rotate70Left * player->get_rotation());
+//				}
+//				else {
+//					player->set_mid_rotation(rotate70Right * player->get_rotation());
+//				}
+//			}
+//			else if (playerForward.z < 0) {
+//				if (childDirection.x > 0) {
+//					player->set_mid_rotation(rotate70Right * player->get_rotation());
+//				}
+//				else {
+//					player->set_mid_rotation(rotate70Left * player->get_rotation());
+//				}
+//			}
+//		}
+//
+//		break;
+//	case RotateType::HitDiagonalFrontWall:
+//		// 壁にぶつかる移動をセットしておく
+//		player->set_move_type(MoveType::HitRock);
+//
+//		if (player->get_how_rotation() == RotationDirection::Left) {
+//			player->set_mid_rotation(rotate15Left * player->get_rotation());
+//		}
+//		else if (player->get_how_rotation() == RotationDirection::Right) {
+//			player->set_mid_rotation(rotate15Right * player->get_rotation());
+//		}
+//		break;
+//
+//	case RotateType::HitSideWall:
+//		// 壁にぶつかる移動をセットしておく
+//		player->set_move_type(MoveType::HitRock);
+//
+//		if (player->get_how_rotation() == RotationDirection::Left) {
+//			player->set_mid_rotation(rotate70Left * player->get_rotation());
+//		}
+//		else if (player->get_how_rotation() == RotationDirection::Right) {
+//			player->set_mid_rotation(rotate70Right * player->get_rotation());
+//		}
+//		break;
+//	case RotateType::NextTileIsHole:
+//		// 穴に落下する時の移動をセットしておく
+//		player->set_move_type(MoveType::FallIntoHole);
+//
+//		if (player->get_how_rotation() == RotationDirection::Left) {
+//			player->set_mid_rotation(rotate70Left * player->get_rotation());
+//		}
+//		else if (player->get_how_rotation() == RotationDirection::Right) {
+//			player->set_mid_rotation(rotate70Right * player->get_rotation());
+//		}
+//		break;
+//	case RotateType::HitDiagonalBackWall:
+//		// 壁にぶつかる移動をセットしておく
+//		player->set_move_type(MoveType::HitRock);
+//
+//		if (player->get_how_rotation() == RotationDirection::Left) {
+//			player->set_mid_rotation(rotate135Left * player->get_rotation());
+//		}
+//		else if (player->get_how_rotation() == RotationDirection::Right) {
+//			player->set_mid_rotation(rotate135Right * player->get_rotation());
+//		}
+//		break;
+//	case RotateType::HitBackWall:
+//		// 壁にぶつかる移動をセットしておく
+//		player->set_move_type(MoveType::HitRock);
+//
+//		if (player->get_how_rotation() == RotationDirection::Left) {
+//			player->set_mid_rotation(rotate160Left * player->get_rotation());
+//		}
+//		else if (player->get_how_rotation() == RotationDirection::Right) {
+//			player->set_mid_rotation(rotate160Right * player->get_rotation());
+//		}
+//		else {
+//			player->set_how_rotation(RotationDirection::Reverce);
+//			player->set_mid_rotation(rotate160Right * player->get_rotation());
+//		}
+//		break;
+//	case RotateType::BackTileIsHole:
+//		// 穴に落下する時の移動をセットしておく
+//		player->set_move_type(MoveType::FallIntoHole);
+//
+//		if (player->get_how_rotation() == RotationDirection::Left) {
+//			player->set_mid_rotation(rotate160Left * player->get_rotation());
+//		}
+//		else if (player->get_how_rotation() == RotationDirection::Right) {
+//			player->set_mid_rotation(rotate160Right * player->get_rotation());
+//		}
+//		else {
+//			player->set_how_rotation(RotationDirection::Reverce);
+//			player->set_mid_rotation(rotate160Right * player->get_rotation());
+//		}
+//		break;
+//	}
+//
+//	return;
 }
