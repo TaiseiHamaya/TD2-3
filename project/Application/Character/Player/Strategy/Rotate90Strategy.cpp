@@ -114,7 +114,7 @@ bool Rotate90Strategy::CanRotate(Player& player, const Vector3& childDirection) 
 		Vector3 midDir = player.get_translate() - midChildPos;
 		midDir += player.get_translate();
 
-		midRotation = Quaternion::EulerDegree(;
+		midRotation = Quaternion::EulerDegree(midDir);
 
 		// ここで回転をセット
 		player.set_start_rotation(startRotation);
