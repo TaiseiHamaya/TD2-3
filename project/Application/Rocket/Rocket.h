@@ -1,12 +1,16 @@
 #pragma once
-#include "Engine/Assets/Audio/AudioPlayer.h"
-#include "Engine/Runtime/Clock/WorldClock.h"
-#include <Engine/Module/World/Particle/ParticleEmitterInstance.h>
+
 #include <memory>
 
+#include <Engine/Assets/Audio/AudioPlayer.h>
+#include <Engine/Module/World/Particle/ParticleEmitterInstance.h>
+
+#include <Library/Math/Vector3.h>
+#include <Library/Utility/Template/Reference.h>
 
 class SkinningMeshInstance;
-#include <Library/Math/Vector3.h>
+class SkinningMeshDrawManager;
+
 class Rocket
 {
 public:
@@ -14,6 +18,9 @@ public:
 	~Rocket();
 
 	void init();
+
+	void setup(Reference<SkinningMeshDrawManager> drawManger);
+
 	void update(int state);
 	void begin();
 	void update_affine();

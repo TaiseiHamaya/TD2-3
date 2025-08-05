@@ -112,7 +112,7 @@ void FailedUI::debugUpdate() {
 #endif
 
 void FailedUI::write_to_executor(Reference<SpriteDrawExecutor> executor) const {
-	executor->write_to_buffer(alignmentTex);
+	//executor->write_to_buffer(alignmentTex);
 	for (int i = 0; i < 7; i++) {
 		executor->write_to_buffer(letterTex[i]);
 	}

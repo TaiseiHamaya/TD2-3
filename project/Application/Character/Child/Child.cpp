@@ -1,12 +1,18 @@
 #include "Child.h"
 
+Child::Child() {
+	object_ = std::make_unique<SkinningMeshInstance>();
+	flusteredEffect_ = std::make_unique<SkinningMeshInstance>();
+}
+
 void Child::initialize(const LevelLoader& level, MapchipHandler* mapchipHandler)
 {
-	object_ = std::make_unique<SkinningMeshInstance>();
+	object_->reparent(nullptr);
 	object_->reset_animated_mesh("ChiledKoala.gltf", "Standby", true);
 	object_->get_transform().set_translate(level.get_child_position());
+	object_->set_active(true);
+	object_->set_draw(true);
 
-	flusteredEffect_ = std::make_unique<SkinningMeshInstance>();
 	flusteredEffect_->reset_animated_mesh("FlusteredEffect.gltf", "Standby", true);
 	flusteredEffect_->set_active(false);
 
@@ -58,6 +64,7 @@ void Child::update()
 }
 
 void Child::update_affine() {
+	object_->update_animation();
 	object_->update_affine();
 	flusteredEffect_->update_affine();
 }

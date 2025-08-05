@@ -15,9 +15,8 @@
 #include <imgui.h>
 #endif
 
-void TutorialManager::initialize(uint32_t stage) {
+TutorialManager::TutorialManager() {
 	tutorialFrame_ = eps::CreateUnique<SpriteInstance>("Frame.png");
-	tutorialFrame_->set_active(false);
 	switch (Configuration::GetLanguage()) {
 	case Configuration::Language::Japanese:
 		tutorialText_ = eps::CreateUnique<SpriteInstance>("TutorialText.png");
@@ -26,16 +25,20 @@ void TutorialManager::initialize(uint32_t stage) {
 		tutorialText_ = eps::CreateUnique<SpriteInstance>("TutorialText_EN.png");
 		break;
 	}
+	tutorialImage_ = eps::CreateUnique<SpriteInstance>("TutorialImage.png");
+	Abutton_ = eps::CreateUnique<SpriteInstance>("Abutton.png");
+}
+
+void TutorialManager::initialize(uint32_t stage) {
+	tutorialFrame_->set_active(false);
 	tutorialText_->get_transform().set_translate({ 80.0f, 120.0f });
 	tutorialText_->get_transform().set_scale({ 1.0f, 0.1f });
 	tutorialText_->get_material().uvTransform.set_scale({ 1.0f, 0.09f });
 	tutorialText_->set_active(false);
-	tutorialImage_ = eps::CreateUnique<SpriteInstance>("TutorialImage.png");
 	tutorialImage_->get_transform().set_translate({ -40.0f, 200.0f });
 	tutorialImage_->get_transform().set_scale({ 1.3f, 0.13f });
 	tutorialImage_->get_material().uvTransform.set_scale({ 1.0f, 0.095f });
 	tutorialImage_->set_active(false);
-	Abutton_ = eps::CreateUnique<SpriteInstance>("Abutton.png");
 	Abutton_->get_transform().set_translate({ 1080.0f, 60.0f });
 	Abutton_->set_active(false);
 

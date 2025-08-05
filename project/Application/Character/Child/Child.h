@@ -12,6 +12,9 @@
 
 class Child : public CharacterBase {
 public:
+	Child();
+
+public:
 	void initialize(const LevelLoader& level, MapchipHandler* mapchipHandler) override;
 	void finalize() override;
 	void update() override;

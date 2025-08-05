@@ -76,7 +76,7 @@ void ClearUI::update() {
 }
 
 void ClearUI::write_to_executor(Reference<SpriteDrawExecutor> executor) const {
-	executor->write_to_buffer(alignmentTex);
+	//executor->write_to_buffer(alignmentTex);
 	for (int i = 0; i < 6; i++) {
 		executor->write_to_buffer(letterTex[i]);
 	}

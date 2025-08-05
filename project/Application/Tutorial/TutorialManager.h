@@ -13,6 +13,9 @@ class SpriteDrawExecutor;
 class TutorialManager
 {
 public:
+	TutorialManager();
+
+public:
 	void initialize(uint32_t stage);
 	void update();
 

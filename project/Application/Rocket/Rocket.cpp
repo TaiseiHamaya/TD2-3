@@ -1,11 +1,11 @@
 #include "Rocket.h"
 
+#include "Engine/Runtime/Clock/WorldClock.h"
 #include <Engine/Assets/Animation/NodeAnimation/NodeAnimationPlayer.h>
 #include <Engine/Module/World/Mesh/SkinningMeshInstance.h>
+#include <Engine/Module/DrawExecutor/Mesh/SkinningMeshDrawManager.h>
 
 Rocket::Rocket(const Vector3& pos) {
-
-
 	animatedMeshInstance = std::make_unique<SkinningMeshInstance>("GoalObj.gltf", "Standby", false);
 	gushingEmitter = std::make_unique<ParticleEmitterInstance>("gushing.json", 128);
 	explosionEmitter = std::make_unique<ParticleEmitterInstance>("explosion.json", 128);
@@ -25,7 +25,7 @@ Rocket::Rocket(const Vector3& pos) {
 	}
 }
 
-Rocket::~Rocket() {}
+Rocket::~Rocket() = default;
 
 void Rocket::init() {
 	animatedMeshInstance->get_animation()->reset_animation("Standby");
@@ -39,6 +39,10 @@ void Rocket::init() {
 	spwanParticle2 = false;
 	particleSpawnTime = 0;
 	explosionSpawnTime = 0;
+}
+
+void Rocket::setup(Reference<SkinningMeshDrawManager> drawManger) {
+	drawManger->register_instance(animatedMeshInstance);
 }
 
 void Rocket::update(int state) {
@@ -58,6 +62,7 @@ void Rocket::update(int state) {
 
 	particleUpdate();
 	animatedMeshInstance->update();
+	animatedMeshInstance->update_animation();
 }
 
 void Rocket::begin() {

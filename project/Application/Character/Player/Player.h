@@ -14,6 +14,9 @@ class SkinningMeshDrawManager;
 
 class Player : public CharacterBase {
 public:
+	Player();
+
+public:
 	void initialize(const LevelLoader& level, MapchipHandler* mapchipHandler) override;
 	void setup(Reference<SkinningMeshDrawManager> drawManager);
 	void finalize() override;

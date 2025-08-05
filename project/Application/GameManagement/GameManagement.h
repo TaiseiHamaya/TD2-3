@@ -18,6 +18,7 @@ public:
 	~GameManagement();
 
 	void init();
+
 	void begin();
 	void update();
 	void debug_update();
@@ -25,6 +26,8 @@ public:
 	void write_to_executor(Reference<SpriteDrawExecutor> executor) const;
 
 	void resultKeyInput();
+
+	void on_reset();
 
 private:
 	void selectFunc();

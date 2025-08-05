@@ -17,6 +17,9 @@ class SkinningMeshDrawManager;
 
 class PlayerManager {
 public:
+	PlayerManager();
+
+public:
 	void initialize(Reference<const LevelLoader> level, MapchipField* mapchipField, const Vector3& goalPosition, bool isResetLogger = true);
 	void setup(Reference<SkinningMeshDrawManager> executor);
 	void finalize();

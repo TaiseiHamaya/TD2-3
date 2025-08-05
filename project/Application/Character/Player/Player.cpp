@@ -5,13 +5,24 @@
 #include <Engine/Assets/Animation/NodeAnimation/NodeAnimationPlayer.h>
 #include <Engine/Module/DrawExecutor/Mesh/SkinningMeshDrawManager.h>
 
-void Player::initialize(const LevelLoader& level, MapchipHandler* mapchipHandler) {
+Player::Player() {
 	object_ = std::make_unique<SkinningMeshInstance>();
+	exclamation_ = std::make_unique<SkinningMeshInstance>();
+	flusteredEffect_ = std::make_unique<SkinningMeshInstance>();
+
+	moveAudio = std::make_unique<AudioPlayer>();
+	unmovable = std::make_unique<AudioPlayer>();
+	fall = std::make_unique<AudioPlayer>();
+	iceMove = std::make_unique<AudioPlayer>();
+	rotatAudio = std::make_unique<AudioPlayer>();
+}
+
+void Player::initialize(const LevelLoader& level, MapchipHandler* mapchipHandler) {
 	object_->reset_animated_mesh("ParentKoala.gltf", "Standby", true);
 	object_->get_transform().set_translate(level.get_player_position());
+	object_->set_active(true);
 
 	// ビックリマークの生成
-	exclamation_ = std::make_unique<SkinningMeshInstance>();
 	exclamation_->reset_animated_mesh("exclamation.gltf", "Standby", false);
 
 	auto& objMat = object_->get_materials();
@@ -20,21 +31,14 @@ void Player::initialize(const LevelLoader& level, MapchipHandler* mapchipHandler
 	}
 	mapchipHandler_ = mapchipHandler;
 
-	flusteredEffect_ = std::make_unique<SkinningMeshInstance>();
 	flusteredEffect_->reset_animated_mesh("FlusteredEffect.gltf", "Standby", true);
 	flusteredEffect_->set_active(false);
 
 	//音関連
-
-	moveAudio = std::make_unique<AudioPlayer>();
 	moveAudio->initialize("move.wav");
-	unmovable = std::make_unique<AudioPlayer>();
 	unmovable->initialize("unmovable.wav");
-	fall = std::make_unique<AudioPlayer>();
 	fall->initialize("fall.wav");
-	iceMove = std::make_unique<AudioPlayer>();
 	iceMove->initialize("iceMove.wav");
-	rotatAudio = std::make_unique<AudioPlayer>();
 	rotatAudio->initialize("rotate.wav");
 
 	fallSoundFlag = false;
@@ -116,6 +120,7 @@ void Player::update() {
 }
 
 void Player::update_affine() {
+	object_->update_animation();
 	object_->update_affine();
 	exclamation_->update_affine();
 	flusteredEffect_->update_affine();

@@ -72,16 +72,6 @@ void GameManagement::init() {
 		toSelectKoara = std::make_unique<SpriteInstance>("KoaraFace.png", Vector2(0.5f, 0.5f));
 		toSelectKoara->get_transform().set_translate({ 640.0f, -360.0f });
 	}
-	goSelect->get_transform().set_scale({ 0.5f,1.0f });
-	goSelect->get_material().uvTransform.set_scale({ 0.5f,1.0f });
-	goSelect->get_transform().set_translate({ 789,247 });
-
-	nextUI->get_transform().set_scale({ 0.5f,1.0f });
-	nextUI->get_material().uvTransform.set_scale({ 0.5f,1.0f });
-	nextUI->get_transform().set_translate({ 789,247 });
-
-	retryUI->get_transform().set_scale({ 0.5f,1.0f });
-	retryUI->get_material().uvTransform.set_scale({ 0.5f,1.0f });
 
 	selectFrame = std::make_unique<SpriteInstance>("SelectFrame.png", Vector2(0.5f, 0.5f));
 
@@ -93,34 +83,11 @@ void GameManagement::init() {
 		undoRetryUI = std::make_unique<SpriteInstance>("undoRetry_EN.png", Vector2(0.5f, 0.5f));
 		break;
 	}
-	undoRetryUI->get_transform().set_scale({ 0.5f,1.0f });
-	undoRetryUI->get_material().uvTransform.set_scale({ 0.5f,1.0f });
-	undoRetryUI->get_transform().set_translate({ 789,169 });
 
 	failedUI = std::make_unique<FailedUI>();
 	clearUI = std::make_unique<ClearUI>();
 
-	decision->initialize("decision.wav");
-	operation->initialize("operation.wav");
-	clearAudio->initialize("clearSound.wav");
-	failedAudio->initialize("failedSound.wav");
-	resultSoundFlag = false;
-	clearFlag = false;
-	failedFlag = false;
-
-	resetAudio->initialize("reset.wav");
-	backTitle->initialize("backAudio.wav");
-
-	undoAudio->initialize("undo.wav");
-
-	SelectInputTime = 0.2f;
-	selectInputTimer = SelectInputTime;
-
-	goSelect->set_active(false);
-	nextUI->set_active(false);
-	retryUI->set_active(false);
-	selectFrame->set_active(false);
-	undoRetryUI->set_active(false);
+	on_reset();
 }
 
 void GameManagement::begin() {
@@ -265,6 +232,44 @@ void GameManagement::resultKeyInput() {
 		isUndoRestart = true;
 		undoAudio->restart();
 	}
+}
+
+void GameManagement::on_reset() {
+	goSelect->get_transform().set_scale({ 0.5f,1.0f });
+	goSelect->get_material().uvTransform.set_scale({ 0.5f,1.0f });
+	goSelect->get_transform().set_translate({ 789,247 });
+
+	nextUI->get_transform().set_scale({ 0.5f,1.0f });
+	nextUI->get_material().uvTransform.set_scale({ 0.5f,1.0f });
+	nextUI->get_transform().set_translate({ 789,247 });
+
+	retryUI->get_transform().set_scale({ 0.5f,1.0f });
+	retryUI->get_material().uvTransform.set_scale({ 0.5f,1.0f });
+	undoRetryUI->get_transform().set_scale({ 0.5f,1.0f });
+	undoRetryUI->get_material().uvTransform.set_scale({ 0.5f,1.0f });
+	undoRetryUI->get_transform().set_translate({ 789,169 });
+
+	decision->initialize("decision.wav");
+	operation->initialize("operation.wav");
+	clearAudio->initialize("clearSound.wav");
+	failedAudio->initialize("failedSound.wav");
+	resultSoundFlag = false;
+	clearFlag = false;
+	failedFlag = false;
+
+	resetAudio->initialize("reset.wav");
+	backTitle->initialize("backAudio.wav");
+
+	undoAudio->initialize("undo.wav");
+
+	SelectInputTime = 0.2f;
+	selectInputTimer = SelectInputTime;
+
+	goSelect->set_active(false);
+	nextUI->set_active(false);
+	retryUI->set_active(false);
+	selectFrame->set_active(false);
+	undoRetryUI->set_active(false);
 }
 
 void GameManagement::selectFunc() {

@@ -13,6 +13,19 @@
 #include <Application/Utility/GameUtility.h>
 
 
+PlayerManager::PlayerManager() {
+	child = std::make_unique<Child>();
+	player = std::make_unique<Player>();
+	dustEmitter = eps::CreateUnique<ParticleEmitterInstance>("dust.json", 128);
+	iceDustEmitter = eps::CreateUnique<ParticleEmitterInstance>("iceDust.json", 128);
+	catchEffect_ = std::make_unique<SkinningMeshInstance>();
+	releaseEffect_ = std::make_unique<SkinningMeshInstance>();
+	mapchipHandler = std::make_unique<MapchipHandler>();
+	holdAudio = std::make_unique<AudioPlayer>();
+	releaseAudio = std::make_unique<AudioPlayer>();
+	undoAudio = std::make_unique<AudioPlayer>();
+}
+
 void PlayerManager::initialize(Reference<const LevelLoader> level, MapchipField* mapchipField, const Vector3& goalPosition, bool isResetLogger) {
 	if (isResetLogger) {
 		moveLogger = std::make_unique<MoveLogger>();
@@ -26,17 +39,13 @@ void PlayerManager::initialize(Reference<const LevelLoader> level, MapchipField*
 
 	mapchipField_ = mapchipField;
 
-	catchEffect_ = std::make_unique<SkinningMeshInstance>();
 	catchEffect_->reset_animated_mesh("CatchEffect.gltf", "Standby", false);
 	catchEffect_->set_active(false);
 	catchEffect_->get_transform().set_quaternion({ 0.0f, 0.5f, 0.0f, 0.5f });
 
-	releaseEffect_ = std::make_unique<SkinningMeshInstance>();
 	releaseEffect_->reset_animated_mesh("ReleaseEffect.gltf", "Standby", false);
 	releaseEffect_->set_active(false);
 	releaseEffect_->get_transform().set_quaternion({ 0.0f, 0.5f, 0.0f, 0.5f });
-
-
 
 	auto& catchMat = catchEffect_->get_materials();
 	auto& releaseMat = releaseEffect_->get_materials();
@@ -47,16 +56,10 @@ void PlayerManager::initialize(Reference<const LevelLoader> level, MapchipField*
 		release.lightingType = LighingType::None;
 	}
 
-	dustEmitter = eps::CreateUnique<ParticleEmitterInstance>("dust.json", 128);
-	iceDustEmitter = eps::CreateUnique<ParticleEmitterInstance>("iceDust.json", 128);
-
-	mapchipHandler = std::make_unique<MapchipHandler>();
 	mapchipHandler->initialize(mapchipField_);
 
-	child = std::make_unique<Child>();
 	child->initialize(*level.ptr(), mapchipHandler.get());
 
-	player = std::make_unique<Player>();
 	player->initialize(*level.ptr(), mapchipHandler.get());
 	player->set_child(child.get());
 
@@ -73,11 +76,8 @@ void PlayerManager::initialize(Reference<const LevelLoader> level, MapchipField*
 	InputDowntime = 0.4f;
 
 	//音関連
-	holdAudio = std::make_unique<AudioPlayer>();
 	holdAudio->initialize("hold.wav");
-	releaseAudio = std::make_unique<AudioPlayer>();
 	releaseAudio->initialize("release.wav");
-	undoAudio = std::make_unique<AudioPlayer>();
 	undoAudio->initialize("undo.wav");
 }
 
@@ -95,6 +95,9 @@ void PlayerManager::finalize() {
 
 void PlayerManager::update() {
 	inputTimer -= WorldClock::DeltaSeconds();
+
+	catchEffect_->update_animation();
+	releaseEffect_->update_animation();
 
 	isStackMovement = false;
 	// それぞれ落下処理はゲームオーバー時でも動くようにする

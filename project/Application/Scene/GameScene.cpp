@@ -289,10 +289,12 @@ void GameScene::initialize() {
 
 	// ---------------------- DrawManager ----------------------
 	staticMeshDrawManager = std::make_unique<StaticMeshDrawManager>();
+	staticMeshDrawManager->initialize(1);
 	staticMeshDrawManager->make_instancing(0, "RordObj.obj", 256);
 	staticMeshDrawManager->make_instancing(0, "WallObj.obj", 256);
 	staticMeshDrawManager->make_instancing(0, "IceObj.obj", 256);
 	skinningMeshDrawManager = std::make_unique<SkinningMeshDrawManager>();
+	skinningMeshDrawManager->initialize(1);
 	skinningMeshDrawManager->make_instancing(0, "ParentKoala.gltf", 1);
 	skinningMeshDrawManager->make_instancing(0, "ChiledKoala.gltf", 1);
 	skinningMeshDrawManager->make_instancing(0, "CatchEffect.gltf", 1);
@@ -316,9 +318,6 @@ void GameScene::initialize() {
 	gameUI = std::make_unique<GameSceneUI>();
 	gameUI->initialize(currentLevel);
 
-	playerManager->setup(skinningMeshDrawManager);
-	fieldObjs->setup(staticMeshDrawManager);
-
 	tutorialManager->set_game_management(managementUI.get());
 
 	bgm = std::make_unique<AudioPlayer>();
@@ -330,6 +329,10 @@ void GameScene::initialize() {
 	background = std::make_unique<BackGround>();
 	rocketObj = std::make_unique<Rocket>(fieldObjs->GetGoalPos());
 	Input::SetDeadZone(0.6f);
+
+	playerManager->setup(skinningMeshDrawManager);
+	fieldObjs->setup(staticMeshDrawManager);
+	rocketObj->setup(skinningMeshDrawManager);
 
 	luminanceExtractionNode->set_param(0.67f, CColor3::WHITE);
 	gaussianBlurNode2->set_parameters(1.0f, 30.48f, 8);
@@ -393,6 +396,7 @@ void GameScene::begin_rendering() {
 	rocketObj->update_affine();
 	
 	// Transfer draw manager/executor
+	camera3D->transfer();
 	skinningMeshDrawManager->transfer();
 	staticMeshDrawManager->transfer();
 	directionalLightingExecutor->write_to_buffer(directionalLight);
