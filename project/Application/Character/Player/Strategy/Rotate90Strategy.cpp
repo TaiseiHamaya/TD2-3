@@ -73,7 +73,7 @@ bool Rotate90Strategy::CanRotate(Player& player, const Vector3& childDirection) 
 	// 経由点を一つずつ設定していく
 	reversePath[0] = nowChildPos - childDirection;
 	reversePath[1] = nowPlayerPos - childDirection;
-	reversePath[2] = reversePath[1] - reversePath[0];
+	reversePath[2] = reversePath[1] + (reversePath[1] - reversePath[0]);
 	reversePath[2].y = 1.0f;
 	reversePath[3] = reversePath[2] + childDirection;
 	reversePath[4] = reversePath[3] + childDirection;
