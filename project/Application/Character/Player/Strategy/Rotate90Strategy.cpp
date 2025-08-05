@@ -34,8 +34,12 @@ bool Rotate90Strategy::CanRotate(Player& player, const Vector3& childDirection) 
 
 	// 現在のプレイヤーの位置
 	Vector3 nowPlayerPos = player.get_translate();
+	// 今の子供のトランスレート
+	Vector3 childTranslate = player.get_child()->get_translate();
+	// プレイヤーの更新
+	Quaternion playerRotate = player.get_rotation();
 	// 今の子供の位置
-	Vector3 nowChildPos = nowPlayerPos + player.get_child()->get_translate() * player.get_rotation();
+	Vector3 nowChildPos = nowPlayerPos + childTranslate * playerRotate;
 	// 移動予定の位置
 	Vector3 nextChildPos = nowPlayerPos + childDirection;
 	// 一回転しない場合の経由点
@@ -64,14 +68,16 @@ bool Rotate90Strategy::CanRotate(Player& player, const Vector3& childDirection) 
 
 	// 逆回転の経由点
 	std::vector<Vector3> reversePath;
-	reversePath.resize(5);
+	reversePath.resize(6);
 
 	// 経由点を一つずつ設定していく
 	reversePath[0] = nowChildPos - childDirection;
 	reversePath[1] = nowPlayerPos - childDirection;
 	reversePath[2] = reversePath[1] - reversePath[0];
+	reversePath[2].y = 1.0f;
 	reversePath[3] = reversePath[2] + childDirection;
 	reversePath[4] = reversePath[3] + childDirection;
+	reversePath[5] = nextChildPos;
 
 	bool reversePathClear = true;
 	for (const auto& pos : reversePath) {
@@ -138,12 +144,12 @@ bool Rotate90Strategy::CanRotate(Player& player, const Vector3& childDirection) 
 	}
 	rotationAxis = { 0.0f, 1.0f, 0.0f };
 	if (blockedMid) {
-		const float rotateAngle = 15.0f * (std::numbers::pi_v<float> / 180.0f);
+		const float rotateAngle = 345.0f * (std::numbers::pi_v<float> / 180.0f);
 		// 15度だけ回したクォータニオン
 		stepRotation = Quaternion::AngleAxis(rotationAxis, rotateAngle);
 	}
 	else {
-		const float rotateAngle = 60.0f * (std::numbers::pi_v<float> / 180.0f);
+		const float rotateAngle = 300.0f * (std::numbers::pi_v<float> / 180.0f);
 		// 15度だけ回したクォータニオン
 		stepRotation = Quaternion::AngleAxis(rotationAxis, rotateAngle);
 	}
