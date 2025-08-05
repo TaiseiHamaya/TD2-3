@@ -56,6 +56,10 @@ public:
 	/// <returns></returns>
 	bool is_active() const { return isActive; };
 
+	void set_priority(u32 priority_) noexcept;
+
+	u32 key_id() const noexcept;
+
 	//void update();
 
 #ifdef _DEBUG
@@ -65,7 +69,7 @@ public:
 protected:
 	bool isActive{ true };
 
-	float priority{ 0.0f };
+	u32 priority{ 0 };
 
 	Transform2D transform;
 

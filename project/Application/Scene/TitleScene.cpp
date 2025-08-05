@@ -186,8 +186,12 @@ void TitleScene::initialize() {
 	skinningMeshDrawManager->initialize(1);
 	skinningMeshDrawManager->make_instancing(0, "ParentKoala.gltf", 1);
 	skinningMeshDrawManager->make_instancing(0, "ChiledKoala.gltf", 1);
-	spriteDrawExecutor = std::make_unique<SpriteDrawExecutor>();
-	spriteDrawExecutor->reinitialize(256);
+
+	spriteDrawExecutors.resize(2);
+	spriteDrawExecutors[0] = std::make_unique<SpriteDrawExecutor>();
+	spriteDrawExecutors[0]->reinitialize(1);
+	spriteDrawExecutors[1] = std::make_unique<SpriteDrawExecutor>();
+	spriteDrawExecutors[1]->reinitialize(100);
 
 	directionalLightingExecutor = std::make_unique<DirectionalLightingExecutor>();
 	directionalLightingExecutor->reinitialize(1);
@@ -224,7 +228,6 @@ void TitleScene::initialize() {
 	gaussianBlurNode8->set_parameters(1.0f, 30.48f, 8);
 	gaussianBlurNode16->set_parameters(1.0f, 30.48f, 8);
 	bloomNode->set_param(0.247f);
-
 }
 
 void TitleScene::popped() {}
@@ -320,15 +323,17 @@ void TitleScene::update() {
 }
 
 void TitleScene::begin_rendering() {
-	spriteDrawExecutor->begin();
+	for(auto& executor : spriteDrawExecutors) {
+		executor->begin();
+	}
 	directionalLightingExecutor->begin();
 
-	spriteDrawExecutor->write_to_buffer(startUi[(int)GameValue::UiType.get_type() + 2 * (size_t)Configuration::GetLanguage()]);
-	spriteDrawExecutor->write_to_buffer(titleLogo);
+	spriteDrawExecutors[1]->write_to_buffer(startUi[(int)GameValue::UiType.get_type() + 2 * (size_t)Configuration::GetLanguage()]);
+	spriteDrawExecutors[1]->write_to_buffer(titleLogo);
 	if (transition->get_material().color.alpha > 0.0f) {
-		spriteDrawExecutor->write_to_buffer(transition);
+		spriteDrawExecutors[0]->write_to_buffer(transition);
 	}
-	spriteDrawExecutor->write_to_buffer(languageSelection);
+	spriteDrawExecutors[1]->write_to_buffer(languageSelection);
 
 	camera3D->update_affine();
 	directionalLight->update_affine();
@@ -357,7 +362,8 @@ void TitleScene::draw() const {
 
 	// Sprite
 	renderPath->next();
-	spriteDrawExecutor->draw_command();
+	spriteDrawExecutors[1]->draw_command();
+	spriteDrawExecutors[0]->draw_command();
 
 	renderPath->next();
 	luminanceExtractionNode->draw();

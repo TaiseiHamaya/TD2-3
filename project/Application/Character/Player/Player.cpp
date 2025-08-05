@@ -24,6 +24,7 @@ void Player::initialize(const LevelLoader& level, MapchipHandler* mapchipHandler
 
 	// ビックリマークの生成
 	exclamation_->reset_animated_mesh("exclamation.gltf", "Standby", false);
+	exclamation_->set_active(false);
 
 	auto& objMat = object_->get_materials();
 	for (auto& mat : objMat) {
@@ -32,7 +33,7 @@ void Player::initialize(const LevelLoader& level, MapchipHandler* mapchipHandler
 	mapchipHandler_ = mapchipHandler;
 
 	flusteredEffect_->reset_animated_mesh("FlusteredEffect.gltf", "Standby", true);
-	flusteredEffect_->set_active(false);
+	flusteredEffect_->get_animation()->set_time_force(1000);
 
 	//音関連
 	moveAudio->initialize("move.wav");
@@ -49,7 +50,7 @@ void Player::initialize(const LevelLoader& level, MapchipHandler* mapchipHandler
 void Player::setup(Reference<SkinningMeshDrawManager> drawManager) {
 	drawManager->register_instance(object_);
 	drawManager->register_instance(exclamation_);
-	drawManager->register_instance(flusteredEffect_);
+	//drawManager->register_instance(flusteredEffect_);
 }
 
 void Player::finalize() {}
@@ -103,14 +104,14 @@ void Player::update() {
 	flusteredEffect_->update();
 
 	if (isMoving && !preIsMoving) {
-		object_->get_animation()->reset_animation("Walk");
+		object_->reset_animation("Walk", true);
 	}
 	else if (!isMoving && preIsMoving) {
 		if (is_out_ground()) {
-			object_->get_animation()->reset_animation("Flustered");
+			object_->reset_animation("Flustered", true);
 		}
 		else {
-			object_->get_animation()->reset_animation("Standby");
+			object_->reset_animation("Standby", true);
 		}
 	}
 	object_->update();
@@ -122,8 +123,10 @@ void Player::update() {
 void Player::update_affine() {
 	object_->update_animation();
 	object_->update_affine();
+	exclamation_->update_animation();
 	exclamation_->update_affine();
 	flusteredEffect_->update_affine();
+	flusteredEffect_->update_animation();
 }
 
 void Player::on_undo(Vector3 position, Quaternion rotation, bool setParent) {

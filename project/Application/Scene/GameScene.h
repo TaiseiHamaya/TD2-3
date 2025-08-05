@@ -96,7 +96,7 @@ private:
 	std::unique_ptr<SkinningMeshDrawManager> skinningMeshDrawManager;
 	std::unique_ptr<StaticMeshDrawManager> staticMeshDrawManager;
 	std::unique_ptr<SpriteDrawExecutor> bgSpriteDrawExecutor;
-	std::unique_ptr<SpriteDrawExecutor> spriteDrawExecutor;
+	std::vector<std::unique_ptr<SpriteDrawExecutor>> spriteDrawExecutors;
 	std::unique_ptr<DirectionalLightingExecutor> directionalLightingExecutor;
 
 	// プレイヤーの生成

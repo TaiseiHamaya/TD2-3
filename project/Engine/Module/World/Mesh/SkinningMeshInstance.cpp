@@ -73,6 +73,11 @@ void SkinningMeshInstance::reset_animated_mesh(const std::string& meshName_, con
 	create_skeleton();
 }
 
+void SkinningMeshInstance::reset_animation(const std::string& animationName, bool isLoop) {
+	nodeAnimation->reset_animation(keyID + '-' + animationName);
+	nodeAnimation->set_loop(isLoop);
+}
+
 void SkinningMeshInstance::reset_animation(const std::string& fileName, const std::string& animationName, bool isLoop) {
 	nodeAnimation->reset_animation(fileName + '-' + animationName);
 	nodeAnimation->set_loop(isLoop);

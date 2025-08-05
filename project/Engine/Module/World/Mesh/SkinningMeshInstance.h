@@ -41,7 +41,8 @@ public:
 
 public:
 	void reset_animated_mesh(const std::string& meshName, const std::string& animationName = "", bool isLoop = false);
-	void reset_animation(const std::string& fileName, const std::string& animationName = "", bool isLoop = false);
+	void reset_animation(const std::string& animationName, bool isLoop = false);
+	void reset_animation(const std::string& fileName, const std::string& animationName, bool isLoop = false);
 	NodeAnimationPlayer* const get_animation();
 	const std::vector<SkeletonSpaceInstance>& joints() const { return jointInstances; }
 	bool is_draw() const override;

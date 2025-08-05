@@ -469,12 +469,12 @@ void MapchipHandler::check_fall_conditions(Player* player, Child* child) {
 
 	if (prePlayerChip != player->is_out_ground()) {
 		if (player->is_out_ground()) {
-			player->get_object()->get_animation()->reset_animation("Flustered");
+			player->get_object()->reset_animation("Flustered");
 			player->get_object()->get_animation()->set_loop(true);
 			player->set_animation_info(PlayerAnimation::Flustered);
 		}
 		else {
-			player->get_object()->get_animation()->reset_animation("Standby");
+			player->get_object()->reset_animation("Standby");
 			player->get_object()->get_animation()->set_loop(true);
 			player->set_animation_info(PlayerAnimation::Normal);
 		}
@@ -483,12 +483,12 @@ void MapchipHandler::check_fall_conditions(Player* player, Child* child) {
 	if (player->is_parent()) {
 		if (preChildChip != child->is_out_ground()) {
 			if (child->is_out_ground()) {
-				child->get_object()->get_animation()->reset_animation("Flustered");
+				child->get_object()->reset_animation("Flustered");
 				child->get_object()->get_animation()->set_loop(true);
 				child->set_animation_info(ChildAnimation::Flustered);
 			}
 			else {
-				child->get_object()->get_animation()->reset_animation("Hold");
+				child->get_object()->reset_animation("Hold");
 				child->get_object()->get_animation()->set_time_force(1000);
 				child->get_object()->get_animation()->set_loop(false);
 				child->set_animation_info(ChildAnimation::Normal);

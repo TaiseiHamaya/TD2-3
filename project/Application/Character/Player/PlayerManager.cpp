@@ -138,7 +138,7 @@ void PlayerManager::update() {
 	// 子が放すアニメーションが終わったタイミングでスタンバイをセットしなおす
 	if (isRerease && child->get_object()->get_animation()->is_end()) {
 		isRerease = false;
-		child->get_object()->get_animation()->reset_animation("Standby");
+		child->get_object()->reset_animation("Standby");
 		child->get_object()->get_animation()->set_loop(true);
 	}
 
@@ -209,7 +209,7 @@ void PlayerManager::update() {
 		gameManagement_->SetFailedSelect(1);
 		emplace_log(player->move_start_position(), player->start_rotation());
 		child->get_object()->reparent(nullptr);
-		child->get_object()->get_animation()->reset_animation("Relese");
+		child->get_object()->reset_animation("Relese");
 		child->get_object()->get_animation()->restart();
 		child->get_object()->update_affine();
 		initialPoint = child->get_object()->world_position();
@@ -554,10 +554,9 @@ void PlayerManager::attach_child_to_player(Player* player, Child* child) {
 	child->get_object()->reparent(player->get_object());
 	child->get_object()->look_at(*player->get_object());
 	player->set_parent(true);
-	NodeAnimationPlayer* anim = child->get_object()->get_animation();
-	anim->reset_animation("Hold");
-	anim->set_loop(false);
-	anim->restart();
+	SkinningMeshInstance* anim = child->get_object();
+	anim->reset_animation("Hold", false);
+	anim->get_animation()->restart();
 }
 
 void PlayerManager::detach_child_from_player(Player* player, Child* child) {
@@ -578,21 +577,18 @@ void PlayerManager::detach_child_from_player(Player* player, Child* child) {
 	// 親子付けフラグをオフにする
 	player->set_parent(false);
 	// アニメーションをセット
-	NodeAnimationPlayer* anim = child->get_object()->get_animation();
+	SkinningMeshInstance* anim = child->get_object();
 	if (!child->is_out_ground()) {
 		anim->reset_animation("Relese");
-		anim->set_loop(false);
-		anim->restart();
+		anim->get_animation()->restart();
 		isRerease = true;
 	}
 	else {
-		anim->reset_animation("Falling");
-		anim->set_loop(true);
-		anim->restart();
+		anim->reset_animation("Falling", true);
+		anim->get_animation()->restart();
 	}
 	if (player->is_out_ground()) {
-		player->get_object()->get_animation()->reset_animation("Falling");
-		player->get_object()->get_animation()->set_loop(true);
+		player->get_object()->reset_animation("Falling", true);
 		player->get_object()->get_animation()->restart();
 	}
 }
@@ -668,32 +664,32 @@ void PlayerManager::undo() {
 		// 親
 		// 足元が地面
 		if (isPlayerOnGround) {
-			playerAnimation->reset_animation("Standby");
+			playerMesh->reset_animation("Standby");
 			playerAnimation->set_loop(true);
 		}
 		else {
-			playerAnimation->reset_animation("Flustered");
+			playerMesh->reset_animation("Flustered");
 			playerAnimation->set_loop(true);
 
 		}
 		// 子
 		// 足元が地面
 		if (isChildOnGround) {
-			childAnimation->reset_animation("Hold");
+			childMesh->reset_animation("Hold");
 			childAnimation->set_time_force(1000);
 			childAnimation->set_loop(false);
 		}
 		else {
-			childAnimation->reset_animation("Flustered");
+			childMesh->reset_animation("Flustered");
 			childAnimation->set_time_force(1000);
 			childAnimation->set_loop(true);
 		}
 	}
 	// 非くっつき状態
 	else {
-		playerAnimation->reset_animation("Standby");
+		playerMesh->reset_animation("Standby");
 		playerAnimation->set_loop(true);
-		childAnimation->reset_animation("Standby");
+		childMesh->reset_animation("Standby");
 		childAnimation->set_loop(true);
 	}
 }

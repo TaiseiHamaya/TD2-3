@@ -109,21 +109,46 @@ void SelectScene::initialize() {
 		break;
 	}
 	startUi[0]->get_transform().set_translate({ 640.0f,90 });
+	startUi[0]->set_priority(2);
 	startUi[1]->get_transform().set_translate({ 640.0f,90 });
+	startUi[1]->set_priority(2);
 	selectUi = eps::CreateUnique<SpriteInstance>("StageSelectUI.png", Vector2{ 0.5f, 0.5f });
 	selectUi->get_transform().set_translate({ 640.0f,650.0f });
+	selectUi->set_priority(2);
 	numberUi = eps::CreateUnique<SpriteInstance>("number.png", Vector2{ 0.5f, 0.5f });
 	numberUi->get_transform().set_scale({ 0.1f,1.0f });
-	numberUi->get_material().uvTransform.set_scale({0.1f,1.0f});
+	numberUi->get_material().uvTransform.set_scale({ 0.1f,1.0f });
+	numberUi->set_priority(2);
 	numberUi10 = eps::CreateUnique<SpriteInstance>("number.png", Vector2{ 0.5f, 0.5f });
 	numberUi10->get_transform().set_translate({ 640.0f - 96 / 2,360.0f });
 	numberUi10->get_transform().set_scale({ 0.1f,1.0f });
 	numberUi10->get_material().uvTransform.set_scale({ 0.1f,1.0f });
+	numberUi10->set_priority(2);
 	if (selectIndex < 10) {
 		numberUi10->set_active(false);
 	}
 	obSprite = std::make_unique<SpriteInstance>("obi.png");
+	obSprite->set_priority(3);
 	transition = eps::CreateUnique<SpriteInstance>("black.png");
+
+	backTitleSprite[0] = std::make_unique<SpriteInstance>("ESCkeyController.png");
+	backTitleSprite[0]->get_transform().set_scale({ 0.5f, 1.0f });
+	backTitleSprite[0]->get_material().uvTransform.set_scale({ 0.5f, 1.0f });
+	backTitleSprite[0]->get_transform().set_translate({ 1141,30 });
+	backTitleSprite[0]->set_priority(2);
+	backTitleSprite[1] = std::make_unique<SpriteInstance>("ESCkey.png");
+	backTitleSprite[1]->get_transform().set_scale({ 0.5f, 1.0f });
+	backTitleSprite[1]->get_material().uvTransform.set_scale({ 0.5f, 1.0f });
+	backTitleSprite[1]->get_transform().set_translate({ 1141,30 });
+	backTitleSprite[1]->set_priority(2);
+
+	fromGameBack = std::make_unique<SpriteInstance>("ResetBack.png", Vector2(0.5f, 0.5f));
+	fromGameBack->get_transform().set_translate({ 640.0f, -360.0f });
+	fromGameBack->set_priority(1);
+
+	fromGameKoara = std::make_unique<SpriteInstance>("KoaraFace.png", Vector2(0.5f, 0.5f));
+	fromGameKoara->get_transform().set_translate({ 640.0f, -360.0f });
+	fromGameBack->set_priority(0);
 
 	LevelLoader loader{ selectIndex };
 
@@ -233,8 +258,15 @@ void SelectScene::initialize() {
 	skinningMeshDrawManager->make_instancing(0, "ChiledKoala.gltf", 1);
 	bgSpriteDrawExecutor = std::make_unique<SpriteDrawExecutor>();
 	bgSpriteDrawExecutor->reinitialize(16);
-	spriteDrawExecutor = std::make_unique<SpriteDrawExecutor>();
-	spriteDrawExecutor->reinitialize(256);
+	spriteDrawExecutors.resize(4);
+	spriteDrawExecutors[0] = std::make_unique<SpriteDrawExecutor>();
+	spriteDrawExecutors[0]->reinitialize(2);
+	spriteDrawExecutors[1] = std::make_unique<SpriteDrawExecutor>();
+	spriteDrawExecutors[1]->reinitialize(1);
+	spriteDrawExecutors[2] = std::make_unique<SpriteDrawExecutor>();
+	spriteDrawExecutors[2]->reinitialize(256);
+	spriteDrawExecutors[2] = std::make_unique<SpriteDrawExecutor>();
+	spriteDrawExecutors[2]->reinitialize(16);
 
 	directionalLightingExecutor = std::make_unique<DirectionalLightingExecutor>();
 	directionalLightingExecutor->reinitialize(1);
@@ -256,23 +288,6 @@ void SelectScene::initialize() {
 	backTitle = std::make_unique<AudioPlayer>();
 	backTitle->initialize("backAudio.wav");
 	backTitle->set_volume(GameValue::SelectBgmVolume);
-
-	backTitleSprite[0] = std::make_unique<SpriteInstance>("ESCkeyController.png");
-	backTitleSprite[0]->get_transform().set_scale({ 0.5f, 1.0f });
-	backTitleSprite[0]->get_material().uvTransform.set_scale({ 0.5f, 1.0f });
-	backTitleSprite[0]->get_transform().set_translate({ 1141,30 });
-	backTitleSprite[1] = std::make_unique<SpriteInstance>("ESCkey.png");
-	backTitleSprite[1]->get_transform().set_scale({ 0.5f, 1.0f });
-	backTitleSprite[1]->get_material().uvTransform.set_scale({ 0.5f, 1.0f });
-	backTitleSprite[1]->get_transform().set_translate({ 1141,30 });
-
-	//if (!toSelectBack) {
-	fromGameBack = std::make_unique<SpriteInstance>("ResetBack.png", Vector2(0.5f, 0.5f));
-	fromGameBack->get_transform().set_translate({ 640.0f, -360.0f });
-	//}
-	//if (!fromGameKoara) {
-	fromGameKoara = std::make_unique<SpriteInstance>("KoaraFace.png", Vector2(0.5f, 0.5f));
-	fromGameKoara->get_transform().set_translate({ 640.0f, -360.0f });
 	//}
 
 	// 入力遅延時間
@@ -358,7 +373,9 @@ void SelectScene::update() {
 void SelectScene::begin_rendering() {
 	directionalLightingExecutor->begin();
 	bgSpriteDrawExecutor->begin();
-	spriteDrawExecutor->begin();
+	for (auto& executor : spriteDrawExecutors) {
+		executor->begin();
+	}
 
 	camera3D->update_affine();
 	fieldRotation->update_affine();
@@ -376,15 +393,15 @@ void SelectScene::begin_rendering() {
 	skinningMeshDrawManager->transfer();
 	directionalLightingExecutor->write_to_buffer(directionalLight);
 
-	spriteDrawExecutor->write_to_buffer(numberUi);
-	spriteDrawExecutor->write_to_buffer(numberUi10);
-	spriteDrawExecutor->write_to_buffer(selectUi);
-	spriteDrawExecutor->write_to_buffer(startUi[(int)GameValue::UiType.get_type()]);
-	spriteDrawExecutor->write_to_buffer(obSprite);
-	spriteDrawExecutor->write_to_buffer(transition);
-	spriteDrawExecutor->write_to_buffer(backTitleSprite[(int)GameValue::UiType.get_type()]);
-	spriteDrawExecutor->write_to_buffer(fromGameBack);
-	spriteDrawExecutor->write_to_buffer(fromGameKoara);
+	spriteDrawExecutors[0]->write_to_buffer(transition);
+	spriteDrawExecutors[0]->write_to_buffer(fromGameBack);
+	spriteDrawExecutors[1]->write_to_buffer(fromGameKoara);
+	spriteDrawExecutors[2]->write_to_buffer(numberUi);
+	spriteDrawExecutors[2]->write_to_buffer(numberUi10);
+	spriteDrawExecutors[2]->write_to_buffer(selectUi);
+	spriteDrawExecutors[2]->write_to_buffer(startUi[(int)GameValue::UiType.get_type()]);
+	spriteDrawExecutors[2]->write_to_buffer(backTitleSprite[(int)GameValue::UiType.get_type()]);
+	spriteDrawExecutors[3]->write_to_buffer(obSprite);
 	background->write_to_executor(bgSpriteDrawExecutor);
 }
 
@@ -415,7 +432,9 @@ void SelectScene::draw() const {
 
 	renderPath->next();
 	// 前景スプライト
-	spriteDrawExecutor->draw_command();
+	for (auto& executor : spriteDrawExecutors | std::views::reverse) {
+		executor->draw_command();
+	}
 
 	renderPath->next();
 	luminanceExtractionNode->draw();

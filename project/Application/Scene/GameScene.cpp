@@ -305,8 +305,22 @@ void GameScene::initialize() {
 	skinningMeshDrawManager->make_instancing(0, "GoalObj.gltf", 1);
 	bgSpriteDrawExecutor = std::make_unique<SpriteDrawExecutor>();
 	bgSpriteDrawExecutor->reinitialize(16);
-	spriteDrawExecutor = std::make_unique<SpriteDrawExecutor>();
-	spriteDrawExecutor->reinitialize(256);
+
+	spriteDrawExecutors.resize(6);
+
+	spriteDrawExecutors[0] = std::make_unique<SpriteDrawExecutor>();
+	spriteDrawExecutors[1] = std::make_unique<SpriteDrawExecutor>();
+	spriteDrawExecutors[2] = std::make_unique<SpriteDrawExecutor>();
+	spriteDrawExecutors[3] = std::make_unique<SpriteDrawExecutor>();
+	spriteDrawExecutors[4] = std::make_unique<SpriteDrawExecutor>();
+	spriteDrawExecutors[5] = std::make_unique<SpriteDrawExecutor>();
+
+	spriteDrawExecutors[0]->reinitialize(256);
+	spriteDrawExecutors[1]->reinitialize(256);
+	spriteDrawExecutors[2]->reinitialize(256);
+	spriteDrawExecutors[3]->reinitialize(256);
+	spriteDrawExecutors[4]->reinitialize(256);
+	spriteDrawExecutors[5]->reinitialize(256);
 
 	directionalLightingExecutor = std::make_unique<DirectionalLightingExecutor>();
 	directionalLightingExecutor->reinitialize(1);
@@ -403,13 +417,19 @@ void GameScene::begin_rendering() {
 
 	// 2D
 	bgSpriteDrawExecutor->begin();
-	spriteDrawExecutor->begin();
+	for(auto& executor : spriteDrawExecutors) {
+		executor->begin();
+	}
+
 	// Transfer
 	background->write_to_executor(bgSpriteDrawExecutor);
+
+	spriteDrawExecutor->write_to_buffer(transition);
+	
+	tutorialManager->write_to_executor(spriteDrawExecutor);
+	
 	managementUI->write_to_executor(spriteDrawExecutor);
 	gameUI->write_to_executor(spriteDrawExecutor);
-	spriteDrawExecutor->write_to_buffer(transition);
-	tutorialManager->write_to_executor(spriteDrawExecutor);
 }
 
 void GameScene::late_update() {
@@ -486,8 +506,9 @@ void GameScene::late_update() {
 			// リセット処理をここで呼び出す
 			if (managementUI->is_restart()) {
 				sceneState = TransitionState::In;
+				tutorialManager->initialize(currentLevel);
 				fieldObjs->initialize(levelLoader);
-				playerManager->initialize(levelLoader, fieldObjs.get(), fieldObjs->GetGoalPos());
+				playerManager->initialize(levelLoader, fieldObjs.get(), fieldObjs->GetGoalPos(), false);
 				managementUI->init();
 				rocketObj->init();
 				transitionTimer = WorldClock::DeltaSeconds();
@@ -532,7 +553,9 @@ void GameScene::draw() const {
 
 	// 前景スプライト
 	renderPath->next();
-	spriteDrawExecutor->draw_command();
+	for(const auto& executor : spriteDrawExecutors) {
+		executor->draw_command();
+	}
 
 	renderPath->next();
 	luminanceExtractionNode->draw();

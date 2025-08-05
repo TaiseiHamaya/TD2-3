@@ -54,7 +54,7 @@ Matrix4x4 SpriteInstance::create_local_matrix() const noexcept {
 }
 
 Matrix4x4 SpriteInstance::create_world_matrix() const noexcept {
-	return transform.get_matrix4x4_transform() * Transform3D::MakeTranslateMatrix(0, 0, priority);
+	return transform.get_matrix4x4_transform();
 }
 
 //void SpriteInstance::draw() const {
@@ -67,6 +67,14 @@ Matrix4x4 SpriteInstance::create_world_matrix() const noexcept {
 //	//commandList->SetGraphicsRootDescriptorTable(2, texture->handle()); // Texture
 //	//commandList->DrawIndexedInstanced(indexes->index_size(), 1, 0, 0, 0); // 描画コマンド
 //}
+
+void SpriteInstance::set_priority(u32 priority_) noexcept {
+	priority = priority_;
+}
+
+u32 SpriteInstance::key_id() const noexcept {
+	return priority;
+}
 
 #ifdef DEBUG_FEATURES_ENABLE
 void SpriteInstance::debug_gui() {
