@@ -307,7 +307,7 @@ void GameScene::initialize() {
 	bgSpriteDrawExecutor = std::make_unique<SpriteDrawExecutor>();
 	bgSpriteDrawExecutor->reinitialize(16);
 
-	spriteDrawExecutors.resize(7);
+	spriteDrawExecutors.resize(8);
 
 	spriteDrawExecutors[0] = std::make_unique<SpriteDrawExecutor>();
 	spriteDrawExecutors[1] = std::make_unique<SpriteDrawExecutor>();
@@ -316,14 +316,16 @@ void GameScene::initialize() {
 	spriteDrawExecutors[4] = std::make_unique<SpriteDrawExecutor>();
 	spriteDrawExecutors[5] = std::make_unique<SpriteDrawExecutor>();
 	spriteDrawExecutors[6] = std::make_unique<SpriteDrawExecutor>();
+	spriteDrawExecutors[7] = std::make_unique<SpriteDrawExecutor>();
 
-	spriteDrawExecutors[0]->reinitialize(256);
-	spriteDrawExecutors[1]->reinitialize(256);
-	spriteDrawExecutors[2]->reinitialize(256);
+	spriteDrawExecutors[0]->reinitialize(1);
+	spriteDrawExecutors[1]->reinitialize(2);
+	spriteDrawExecutors[2]->reinitialize(2);
 	spriteDrawExecutors[3]->reinitialize(256);
 	spriteDrawExecutors[4]->reinitialize(256);
 	spriteDrawExecutors[5]->reinitialize(256);
 	spriteDrawExecutors[6]->reinitialize(256);
+	spriteDrawExecutors[7]->reinitialize(256);
 
 	directionalLightingExecutor = std::make_unique<DirectionalLightingExecutor>();
 	directionalLightingExecutor->reinitialize(1);
@@ -430,10 +432,10 @@ void GameScene::begin_rendering() {
 
 	spriteDrawExecutors[0]->write_to_buffer(transition);
 	
-	tutorialManager->write_to_executor(spriteDrawExecutors[2], spriteDrawExecutors[3], spriteDrawExecutors[4]);
+	tutorialManager->write_to_executor(spriteDrawExecutors[3], spriteDrawExecutors[4], spriteDrawExecutors[5]);
 	
-	managementUI->write_to_executor(spriteDrawExecutors[0], spriteDrawExecutors[1], spriteDrawExecutors[5], spriteDrawExecutors[6]);
-	gameUI->write_to_executor(spriteDrawExecutors[6]);
+	managementUI->write_to_executor(spriteDrawExecutors[1], spriteDrawExecutors[2], spriteDrawExecutors[6], spriteDrawExecutors[7]);
+	gameUI->write_to_executor(spriteDrawExecutors[7]);
 }
 
 void GameScene::late_update() {

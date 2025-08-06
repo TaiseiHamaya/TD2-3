@@ -246,29 +246,37 @@ void SelectScene::initialize() {
 		luminanceExtractionNode, gaussianBlurNode2, gaussianBlurNode4, gaussianBlurNode8, gaussianBlurNode16, margeTextureNode, bloomNode });
 
 	// ---------------------- DrawManager ----------------------
+	// StaticMesh
 	staticMeshDrawManager = std::make_unique<StaticMeshDrawManager>();
 	staticMeshDrawManager->initialize(1);
 	staticMeshDrawManager->make_instancing(0, "RordObj.obj", 256);
 	staticMeshDrawManager->make_instancing(0, "WallObj.obj", 256);
 	staticMeshDrawManager->make_instancing(0, "IceObj.obj", 256);
 	staticMeshDrawManager->make_instancing(0, "GoalObjStatic.obj", 1);
+
+	// SkinningMesh
 	skinningMeshDrawManager = std::make_unique<SkinningMeshDrawManager>();
 	skinningMeshDrawManager->initialize(1);
 	skinningMeshDrawManager->make_instancing(0, "ParentKoala.gltf", 1);
 	skinningMeshDrawManager->make_instancing(0, "ChiledKoala.gltf", 1);
 	skinningMeshDrawManager->make_instancing(0, "GoalObj.gltf", 1);
+
+	// スプライト
 	bgSpriteDrawExecutor = std::make_unique<SpriteDrawExecutor>();
 	bgSpriteDrawExecutor->reinitialize(16);
-	spriteDrawExecutors.resize(4);
+	spriteDrawExecutors.resize(5);
 	spriteDrawExecutors[0] = std::make_unique<SpriteDrawExecutor>();
-	spriteDrawExecutors[0]->reinitialize(2);
+	spriteDrawExecutors[0]->reinitialize(1);
 	spriteDrawExecutors[1] = std::make_unique<SpriteDrawExecutor>();
 	spriteDrawExecutors[1]->reinitialize(1);
 	spriteDrawExecutors[2] = std::make_unique<SpriteDrawExecutor>();
-	spriteDrawExecutors[2]->reinitialize(256);
+	spriteDrawExecutors[2]->reinitialize(1);
 	spriteDrawExecutors[3] = std::make_unique<SpriteDrawExecutor>();
-	spriteDrawExecutors[3]->reinitialize(16);
+	spriteDrawExecutors[3]->reinitialize(256);
+	spriteDrawExecutors[4] = std::make_unique<SpriteDrawExecutor>();
+	spriteDrawExecutors[4]->reinitialize(16);
 
+	// ライト
 	directionalLightingExecutor = std::make_unique<DirectionalLightingExecutor>();
 	directionalLightingExecutor->reinitialize(1);
 
@@ -396,14 +404,14 @@ void SelectScene::begin_rendering() {
 	directionalLightingExecutor->write_to_buffer(directionalLight);
 
 	spriteDrawExecutors[0]->write_to_buffer(transition);
-	spriteDrawExecutors[0]->write_to_buffer(fromGameBack);
 	spriteDrawExecutors[1]->write_to_buffer(fromGameKoara);
-	spriteDrawExecutors[2]->write_to_buffer(numberUi);
-	spriteDrawExecutors[2]->write_to_buffer(numberUi10);
-	spriteDrawExecutors[2]->write_to_buffer(selectUi);
-	spriteDrawExecutors[2]->write_to_buffer(startUi[(int)GameValue::UiType.get_type()]);
-	spriteDrawExecutors[2]->write_to_buffer(backTitleSprite[(int)GameValue::UiType.get_type()]);
-	spriteDrawExecutors[3]->write_to_buffer(obSprite);
+	spriteDrawExecutors[2]->write_to_buffer(fromGameBack);
+	spriteDrawExecutors[3]->write_to_buffer(numberUi);
+	spriteDrawExecutors[3]->write_to_buffer(numberUi10);
+	spriteDrawExecutors[3]->write_to_buffer(selectUi);
+	spriteDrawExecutors[3]->write_to_buffer(startUi[(int)GameValue::UiType.get_type()]);
+	spriteDrawExecutors[3]->write_to_buffer(backTitleSprite[(int)GameValue::UiType.get_type()]);
+	spriteDrawExecutors[4]->write_to_buffer(obSprite);
 	background->write_to_executor(bgSpriteDrawExecutor);
 }
 
