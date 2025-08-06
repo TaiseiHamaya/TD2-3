@@ -33,8 +33,16 @@ void MapchipField::initialize(Reference<const LevelLoader> level) {
 	if (field.size() < rowSize) {
 		field.resize(rowSize);
 	}
-	for (uint32_t row = 0; row < rowSize; ++row) {
+	// リセット
+	for (auto& row : field) {
+		for (auto& elem : row) {
+			elem.mesh->set_draw(false);
+			elem.type = 0;
+			elem.isZeroGravity = false;
+		}
+	}
 
+	for (uint32_t row = 0; row < rowSize; ++row) {
 		columnSize = (uint32_t)fieldLevel[row].size();
 		if (field[row].size() < columnSize) {
 			field[row].resize(columnSize);
