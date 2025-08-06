@@ -46,8 +46,8 @@ float4 main(PixelShaderInput input) : SV_TARGET0 {
 	
 	float weight = saturate(length(difference));
 	
-	if (weight > 0.0005f) {
-		return float4(0.0f, 0.0f, 0.0f, 1.0f);
+	if (weight > 0.00008f) {
+		return float4(0.21223075f, 0.0030352f, 0.283148f, 1.0f);
 	}
 	else {
 		return gTexture.Sample(gLinearSampler, input.texcoord);
