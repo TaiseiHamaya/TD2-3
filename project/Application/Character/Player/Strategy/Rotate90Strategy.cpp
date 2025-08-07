@@ -112,12 +112,19 @@ bool Rotate90Strategy::CanRotate(Player& player, const Vector3& childDirection) 
 		Quaternion midRotation = Quaternion::Slerp(startRotation, endRotation, 2.0f);
 
 		Vector3 playerPos = player.get_translate();
-		Vector3 midDir = Vector3::Normalize(playerPos - midChildPos);
-		Vector3 playerDir = Vector3::Normalize(player.get_move_direction());
+		Vector3 midDir = Vector3::Normalize(midChildPos - playerPos);
+	
+		Vector3 playerDir = player.get_previous_direction();
 
-
-		midRotation = Quaternion::LookForward(playerPos + midDir);
+		if (std::round(player.get_child()->get_translate().x == 1.0f)) {
+			midDir = GameUtility::rotate_direction_90_right(midDir);
+		}
+		else if (std::round(player.get_child()->get_translate().x) == -1.0f){
+			midDir = GameUtility::rotate_direction_90_left(midDir);
+		}
 		
+		//midRotation = Quaternion::LookForward(reversePath[2]);
+		midRotation = Quaternion::LookForward(midDir);
 		
 		// ここで回転をセット
 		player.set_start_rotation(startRotation);
