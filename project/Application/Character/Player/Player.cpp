@@ -208,66 +208,66 @@ void Player::fall_update() {
 }
 
 void Player::move_update() {
-	if (moveType != MoveType::Normal &&
-		moveType != MoveType::ParentCarriesChild &&
-		moveType != MoveType::ChildCarriesParent &&
-		moveType != MoveType::SlidingOnIce/* &&
-		moveType != MoveType::MoveOnChild*/) {
-		playerState = PlayerState::MoveFailed;
-		return;
-	}
+	//if (moveType != MoveType::Normal &&
+	//	moveType != MoveType::ParentCarriesChild &&
+	//	moveType != MoveType::ChildCarriesParent &&
+	//	moveType != MoveType::SlidingOnIce/* &&
+	//	moveType != MoveType::MoveOnChild*/) {
+	//	playerState = PlayerState::MoveFailed;
+	//	return;
+	//}
 
-	//isMoving = true;
+	////isMoving = true;
 
-	//移動時の音。moveTimerが加算される前に処理して一回だけ鳴らす
-	if (moveTimer <= 0) {
-		//氷と通常床で音を変える
-		if (moveType == MoveType::SlidingOnIce) {
-			iceMove->restart();
-		}
-		else {
-			moveAudio->restart();
-		}
-	}
-	// 移動中なら補間処理を実行
-	moveTimer += WorldClock::DeltaSeconds();
+	////移動時の音。moveTimerが加算される前に処理して一回だけ鳴らす
+	//if (moveTimer <= 0) {
+	//	//氷と通常床で音を変える
+	//	if (moveType == MoveType::SlidingOnIce) {
+	//		iceMove->restart();
+	//	}
+	//	else {
+	//		moveAudio->restart();
+	//	}
+	//}
+	//// 移動中なら補間処理を実行
+	//moveTimer += WorldClock::DeltaSeconds();
 
-	// 現在の位置を補間
-	Vector3 position = Vector3::Lerp(object_->get_transform().get_translate(), targetPosition, moveTimer / moveDuration);
-	object_->get_transform().set_translate(position);
+	//// 現在の位置を補間
+	//Vector3 position = Vector3::Lerp(object_->get_transform().get_translate(), targetPosition, moveTimer / moveDuration);
+	//object_->get_transform().set_translate(position);
 
-	// 移動中なら補間処理を実行
-	if (moveType == MoveType::SlidingOnIce) {
-		if (moveTimer >= moveDuration - (moveDuration * 0.30f)) {
-			// 移動完了
-			moveTimer = moveDuration;
-			isMoving = false;
-			isMoved = true;
-			isMove = true;
-			isOnIce = false;//この処理がupdate序盤にあると、床→氷に移動する時に音がならなかったので、ここに移動してる
-			isStackMovement = true;
-			playerState = PlayerState::Idle;
-			object_->get_transform().set_translate(targetPosition);
-			return;
-		}
-	}
-	else {
-		if (moveTimer >= moveDuration) {
-			// 移動完了
-			moveTimer = moveDuration;
-			isMoving = false;
-			isMove = true;
-			isMoved = true;
-			isMoving = false;
-			isOnIce = false;//この処理がupdate序盤にあると、床→氷に移動する時に音がならなかったので、ここに移動してる
-			isStackMovement = true;
-			playerState = PlayerState::Idle;
-			object_->get_transform().set_translate(targetPosition);
-			return;
-		}
-	}
+	//// 移動中なら補間処理を実行
+	//if (moveType == MoveType::SlidingOnIce) {
+	//	if (moveTimer >= moveDuration - (moveDuration * 0.30f)) {
+	//		// 移動完了
+	//		moveTimer = moveDuration;
+	//		isMoving = false;
+	//		isMoved = true;
+	//		isMove = true;
+	//		isOnIce = false;//この処理がupdate序盤にあると、床→氷に移動する時に音がならなかったので、ここに移動してる
+	//		isStackMovement = true;
+	//		playerState = PlayerState::Idle;
+	//		object_->get_transform().set_translate(targetPosition);
+	//		return;
+	//	}
+	//}
+	//else {
+	//	if (moveTimer >= moveDuration) {
+	//		// 移動完了
+	//		moveTimer = moveDuration;
+	//		isMoving = false;
+	//		isMove = true;
+	//		isMoved = true;
+	//		isMoving = false;
+	//		isOnIce = false;//この処理がupdate序盤にあると、床→氷に移動する時に音がならなかったので、ここに移動してる
+	//		isStackMovement = true;
+	//		playerState = PlayerState::Idle;
+	//		object_->get_transform().set_translate(targetPosition);
+	//		return;
+	//	}
+	//}
 
-	return;
+	//return;
 }
 
 void Player::rotate_update() {
@@ -326,40 +326,40 @@ void Player::rotate_update() {
 }
 
 void Player::wall_move() {
-	//if (!isWallMoveing) { return; }//壁に向かって移動していない時は早期リターン
-	wallMoveTimer += WorldClock::DeltaSeconds();
+	////if (!isWallMoveing) { return; }//壁に向かって移動していない時は早期リターン
+	//wallMoveTimer += WorldClock::DeltaSeconds();
 
-	Vector3 newPos = { 0,1,0 };
+	//Vector3 newPos = { 0,1,0 };
 
-	//時間の半分はスタート位置から壁に向かって移動
-	//多分正確に半分を計測できる訳じゃないから微妙に戻りすぎる説ある
-	if (wallMoveTimer <= wallMoveDuration * 0.5f) {
-		newPos = Vector3::Lerp(wallStartPosition, wallTargetPosition, wallMoveTimer / (wallMoveDuration * 0.5f));
-	}
-	else {
-		newPos = Vector3::Lerp(wallTargetPosition, wallStartPosition, wallMoveTimer / (wallMoveDuration * 0.5f));
-	}
+	////時間の半分はスタート位置から壁に向かって移動
+	////多分正確に半分を計測できる訳じゃないから微妙に戻りすぎる説ある
+	//if (wallMoveTimer <= wallMoveDuration * 0.5f) {
+	//	newPos = Vector3::Lerp(wallStartPosition, wallTargetPosition, wallMoveTimer / (wallMoveDuration * 0.5f));
+	//}
+	//else {
+	//	newPos = Vector3::Lerp(wallTargetPosition, wallStartPosition, wallMoveTimer / (wallMoveDuration * 0.5f));
+	//}
 
-	if (wallMoveTimer >= wallMoveDuration * 0.5f) {
-		if (!unmovableFlag) {
-			unmovable->restart();
-			unmovableFlag = true;
-		}
-	}
+	//if (wallMoveTimer >= wallMoveDuration * 0.5f) {
+	//	if (!unmovableFlag) {
+	//		unmovable->restart();
+	//		unmovableFlag = true;
+	//	}
+	//}
 
-	if (wallMoveTimer >= wallMoveDuration) {
-		wallMoveTimer = wallMoveDuration;
-		isWallMoveing = false;
-		newPos = wallStartPosition;
-		playerState = PlayerState::Idle;
-		if (moveType == MoveType::MoveOnChild) {
-			isMove = true;
-		}
+	//if (wallMoveTimer >= wallMoveDuration) {
+	//	wallMoveTimer = wallMoveDuration;
+	//	isWallMoveing = false;
+	//	newPos = wallStartPosition;
+	//	playerState = PlayerState::Idle;
+	//	if (moveType == MoveType::MoveOnChild) {
+	//		isMove = true;
+	//	}
 
-		moveType = MoveType::Normal;
-		unmovableFlag = false;
-	}
-	object_->get_transform().set_translate(newPos);
+	//	moveType = MoveType::Normal;
+	//	unmovableFlag = false;
+	//}
+	//object_->get_transform().set_translate(newPos);
 }
 
 void Player::rotate_failed_update() {

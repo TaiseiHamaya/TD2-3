@@ -121,6 +121,9 @@ public: // アクセッサ
 	ExclamationData& exclamation_data() { return exclamationData_; }
 	const ExclamationData& exclamation_data() const { return exclamationData_; }
 
+	AudioPlayer* get_unmovable_audio() { return unmovable.get(); }
+	bool get_unmovable_flag() const { return unmovableFlag; }
+	void set_unmovable_flag(bool flag) { unmovableFlag = flag; }
 #ifdef _DEBUG
 	void debug_update();
 #endif

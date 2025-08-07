@@ -22,10 +22,10 @@ void PlayerStateMoveFailed::Update(Player& player) {
 	}
 
 	if (wallMoveTimer >= player.get_wall_duration() * 0.5f) {
-		//if (!unmovableFlag) {
-		//	unmovable->restart();
-		//	unmovableFlag = true;
-		//}
+		if (!player.get_unmovable_flag()) {
+			player.get_unmovable_audio()->restart();
+			player.set_unmovable_flag(true);
+		}
 	}
 
 	if (wallMoveTimer >= player.get_wall_duration()) {
@@ -46,5 +46,5 @@ void PlayerStateMoveFailed::Exit(Player& player) {
 	}
 
 	player.set_move_type(MoveType::Normal);
-	//unmovableFlag = false;
+	player.set_unmovable_flag(false);
 }

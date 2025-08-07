@@ -51,9 +51,14 @@ void PlayerStateRotateFailed::Update(Player& player) {
 			float t = totalProgress / 0.5f; // 正規化した進行度
 			currentRotation = Quaternion::Slerp(player.get_start_rotation(), player.get_mid_rotation(), t);
 			if (totalProgress >= 0.40f && exclamationProgress <= 0.3f) {
+				// ビックリマークの起動
 				player.exclamation_data().isActive = true;
-				//unmovable->restart();
 				player.exclamation_data().exclamation_->get_animation()->restart();
+				// 音の再生
+				if (!player.get_unmovable_flag()) {
+					player.get_unmovable_audio()->restart();
+					player.set_unmovable_flag(true);
+				}
 			}
 		}
 		else if (!player.exclamation_data().isActive) { // 待機が終わっていたら再開
@@ -72,7 +77,7 @@ void PlayerStateRotateFailed::Update(Player& player) {
 
 void PlayerStateRotateFailed::Exit(Player& player) {
 
-
+	player.set_unmovable_flag(false);
 	player.set_rotating(false);
 	// 最後に目標地点の座標を入れておく
 	player.set_rotation(player.get_target_rotation());
