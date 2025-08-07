@@ -1,11 +1,16 @@
 #pragma once
 
-#include <memory>
 #include <Engine/Module/World/Particle/ParticleEmitterInstance.h>
+
 #include <Library/Math/Vector3.h>
+#include <Library/Utility/Template/Reference.h>
+
+#include <memory>
 
 class SpriteInstance;
-class AnimatedMeshInstance;
+class SkinningMeshInstance;
+class SkinningMeshDrawManager;
+class SpriteDrawExecutor;
 
 class BackGround
 {
@@ -13,11 +18,12 @@ public:
 	BackGround();
 	~BackGround();
 
+	void setup(Reference<SkinningMeshDrawManager> manager);
 	void update();
 	void debugUpdate();
-	void begin_rendering();
-	void draw();
-	void animeDraw();
+
+	void write_to_executor(Reference<SpriteDrawExecutor> executor) const;
+
 	void drawParticle();
 	void rocketUpdate();
 public:
@@ -31,7 +37,7 @@ private:
 	float scrollSpeed2 = 0.01f;
 	float curScroll{ 0 };
 	float curScroll2{ 0 };
-	std::unique_ptr<AnimatedMeshInstance> animatedMeshInstance;
+	std::unique_ptr<SkinningMeshInstance> animatedMeshInstance;
 
 	Vector3 rocektStartPos = {-11.4f,-22.f,11.8f};
 	Vector3 rocketEndPos = {11.4f,7.6f,11.8f};

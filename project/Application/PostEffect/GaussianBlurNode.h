@@ -2,10 +2,8 @@
 
 #include <Engine/Module/Render/RenderNode/SingleRenderTargetNode.h>
 
-//#include <Engine/GraphicsAPI/DirectX/DxResource/ConstantBuffer/ConstantBuffer.h>
-//#include <Engine/GraphicsAPI/DirectX/DxResource/TextureResource/RenderTexture.h>
-
-#include <Engine/Rendering/DirectX/DirectXResourceObject/ConstantBuffer/ConstantBuffer.h>
+#include <Engine/GraphicsAPI/DirectX/DxResource/ConstantBuffer/ConstantBuffer.h>
+#include <Engine/GraphicsAPI/DirectX/DxResource/TextureResource/RenderTexture.h>
 
 class GaussianBlurNode : public SingleRenderTargetNode {
 public:
@@ -34,10 +32,10 @@ public:
 
 	void draw() const;
 
-	void set_base_texture(D3D12_GPU_DESCRIPTOR_HANDLE textureGPUHandle);
+	void set_base_texture(Reference<RenderTexture> baseTexture_);
 
 public:
-	void set_parameters(float dispersion, float length, uint32_t sampleCount);
+	void set_parameters(r32 dispersion, r32 length, uint32_t sampleCount);
 
 private:
 	void create_pipeline_state();
@@ -48,7 +46,7 @@ public:
 #endif // DEBUG_FEATURES_ENABLE
 
 private:
-	D3D12_GPU_DESCRIPTOR_HANDLE textureGPUHandle;
+	Reference<RenderTexture> baseTexture;
 
 	ConstantBuffer<GaussianBlurInfo> blurInfo;
 };

@@ -1,32 +1,33 @@
 #include "TitleScene.h"
 
-#include "Engine/Module/Render/RenderNode/2D/Sprite/SpriteNode.h"
-#include "Engine/Resources/Audio/AudioManager.h"
-#include <Engine/Application/EngineSettings.h>
-#include <Engine/Module/Render/RenderNode/Forward/Object3DNode/Object3DNode.h>
-#include <Engine/Module/Render/RenderNode/Forward/SkinningMesh/SkinningMeshNode.h>
+#include <Engine/Assets/Animation/NodeAnimation/NodeAnimationLibrary.h>
+#include <Engine/Assets/Animation/Skeleton/SkeletonLibrary.h>
+#include <Engine/Assets/Audio/AudioLibrary.h>
+#include <Engine/Assets/Audio/AudioManager.h>
+#include <Engine/Assets/PolygonMesh/PolygonMeshLibrary.h>
+#include <Engine/Assets/Shader/ShaderLibrary.h>
+#include <Engine/Assets/Texture/TextureLibrary.h>
+#include <Engine/GraphicsAPI/DirectX/DxSwapChain/DxSwapChain.h>
+#include <Engine/Module/Render/RenderNode/2D/Sprite/SpriteNode.h>
+#include <Engine/Module/Render/RenderNode/Forward/Mesh/SkinningMeshNodeForward.h>
+#include <Engine/Module/Render/RenderNode/Forward/Mesh/StaticMeshNodeForward.h>
 #include <Engine/Module/Render/RenderTargetGroup/SingleRenderTarget.h>
 #include <Engine/Module/World/Camera/Camera2D.h>
+#include <Engine/Module/World/Mesh/SkinningMeshInstance.h>
 #include <Engine/Module/World/Sprite/SpriteInstance.h>
-#include <Engine/Rendering/DirectX/DirectXResourceObject/OffscreenRender/OffscreenRender.h>
-#include <Engine/Rendering/DirectX/DirectXSwapChain/DirectXSwapChain.h>
-#include <Engine/Resources/PolygonMesh/PolygonMeshManager.h>
-#include <Engine/Resources/Texture/TextureManager.h>
+#include <Engine/Runtime/Clock/WorldClock.h>
 #include <Engine/Runtime/Input/Input.h>
 #include <Engine/Runtime/Scene/SceneManager.h>
-#include <Engine/Utility/Tools/SmartPointer.h>
 
 #include "Application/GameValue.h"
 #include "Application/Scene/SelectScene.h"
-
-#include <Engine/Module/World/AnimatedMesh/AnimatedMeshInstance.h>
-#include <Engine/Resources/Animation/NodeAnimation/NodeAnimationManager.h>
-#include <Engine/Resources/Animation/Skeleton/SkeletonManager.h>
 
 #include "Application/PostEffect/BloomNode.h"
 #include "Application/PostEffect/GaussianBlurNode.h"
 #include "Application/PostEffect/LuminanceExtractionNode.h"
 #include "Application/PostEffect/MargeTextureNode.h"
+
+#include <Library/Utility/Tools/SmartPointer.h>
 
 #include <utility>
 
@@ -37,28 +38,48 @@ TitleScene::TitleScene() {}
 TitleScene::~TitleScene() {}
 
 void TitleScene::load() {
-	TextureManager::RegisterLoadQue("./GameResources/Texture/UI/start.png");
-	TextureManager::RegisterLoadQue("./GameResources/Texture/UI/StartController.png");
-	TextureManager::RegisterLoadQue("./GameResources/Texture/UI/start_EN.png");
-	TextureManager::RegisterLoadQue("./GameResources/Texture/UI/StartController_EN.png");
-	TextureManager::RegisterLoadQue("./GameResources/Texture/black.png");
-	TextureManager::RegisterLoadQue("./GameResources/Texture/TitleLogo.png");
-	TextureManager::RegisterLoadQue("./GameResources/Texture/UI/ChangeLanguage.png");
-	AudioManager::RegisterLoadQue("./GameResources/Audio/BGM/TitleBGM.wav");
+	TextureLibrary::RegisterLoadQue("./GameResources/Texture/UI/start.png");
+	TextureLibrary::RegisterLoadQue("./GameResources/Texture/UI/StartController.png");
+	TextureLibrary::RegisterLoadQue("./GameResources/Texture/UI/start_EN.png");
+	TextureLibrary::RegisterLoadQue("./GameResources/Texture/UI/StartController_EN.png");
+	TextureLibrary::RegisterLoadQue("./GameResources/Texture/black.png");
+	TextureLibrary::RegisterLoadQue("./GameResources/Texture/TitleLogo.png");
+	TextureLibrary::RegisterLoadQue("./GameResources/Texture/UI/ChangeLanguage.png");
+	AudioLibrary::RegisterLoadQue("./GameResources/Audio/BGM/TitleBGM.wav");
 
-	PolygonMeshManager::RegisterLoadQue("./GameResources/Models/ParentKoala/ParentKoala.gltf");
-	PolygonMeshManager::RegisterLoadQue("./GameResources/Models/ChiledKoala/ChiledKoala.gltf");
-	SkeletonManager::RegisterLoadQue("./GameResources/Models/ParentKoala/ParentKoala.gltf");
-	SkeletonManager::RegisterLoadQue("./GameResources/Models/ChiledKoala/ChiledKoala.gltf");
-	NodeAnimationManager::RegisterLoadQue("./GameResources/Models/ParentKoala/ParentKoala.gltf");
-	NodeAnimationManager::RegisterLoadQue("./GameResources/Models/ChiledKoala/ChiledKoala.gltf");
+	PolygonMeshLibrary::RegisterLoadQue("./GameResources/Models/ParentKoala/ParentKoala.gltf");
+	PolygonMeshLibrary::RegisterLoadQue("./GameResources/Models/ChiledKoala/ChiledKoala.gltf");
+	SkeletonLibrary::RegisterLoadQue("./GameResources/Models/ParentKoala/ParentKoala.gltf");
+	SkeletonLibrary::RegisterLoadQue("./GameResources/Models/ChiledKoala/ChiledKoala.gltf");
+	NodeAnimationLibrary::RegisterLoadQue("./GameResources/Models/ParentKoala/ParentKoala.gltf");
+	NodeAnimationLibrary::RegisterLoadQue("./GameResources/Models/ChiledKoala/ChiledKoala.gltf");
 
-	AudioManager::RegisterLoadQue("./GameResources/Audio/gameStart.wav");
-	AudioManager::RegisterLoadQue("./GameResources/Audio/move.wav");
-	AudioManager::RegisterLoadQue("./GameResources/Audio/SelectFaild.wav");
+	AudioLibrary::RegisterLoadQue("./GameResources/Audio/gameStart.wav");
+	AudioLibrary::RegisterLoadQue("./GameResources/Audio/move.wav");
+	AudioLibrary::RegisterLoadQue("./GameResources/Audio/SelectFaild.wav");
+
+	ShaderLibrary::RegisterLoadQue("./EngineResources/HLSL/Forward/Mesh/StaticMeshForward.VS.hlsl");
+	ShaderLibrary::RegisterLoadQue("./EngineResources/HLSL/Forward/Mesh/SkinningMeshForward.VS.hlsl");
+	ShaderLibrary::RegisterLoadQue("./EngineResources/HLSL/Forward/Forward.PS.hlsl");
+	ShaderLibrary::RegisterLoadQue("./EngineResources/HLSL/Forward/ForwardAlpha.PS.hlsl");
+	ShaderLibrary::RegisterLoadQue("./EngineResources/HLSL/Posteffect/Outline/Outline.PS.hlsl");
+	ShaderLibrary::RegisterLoadQue("./EngineResources/HLSL/FullscreenShader.VS.hlsl");
+	ShaderLibrary::RegisterLoadQue("./EngineResources/HLSL/Sprite/Sprite.VS.hlsl");
+	ShaderLibrary::RegisterLoadQue("./EngineResources/HLSL/Sprite/Sprite.PS.hlsl");
+	ShaderLibrary::RegisterLoadQue("./EngineResources/HLSL/Forward/Particle/ParticleMesh/ParticleMesh.VS.hlsl");
+	ShaderLibrary::RegisterLoadQue("./EngineResources/HLSL/Forward/Particle/ParticleMesh/ParticleMesh.PS.hlsl");
+	ShaderLibrary::RegisterLoadQue("./EngineResources/HLSL/Misc/PrimitiveGeometry/PrimitiveGeometry.VS.hlsl");
+	ShaderLibrary::RegisterLoadQue("./EngineResources/HLSL/Misc/PrimitiveGeometry/PrimitiveGeometry.PS.hlsl");
+
+	ShaderLibrary::RegisterLoadQue("./GameResources/HLSL/Bloom.PS.hlsl");
+	ShaderLibrary::RegisterLoadQue("./GameResources/HLSL/GaussianBlur.PS.hlsl");
+	ShaderLibrary::RegisterLoadQue("./GameResources/HLSL/LuminanceExtraction.PS.hlsl");
+	ShaderLibrary::RegisterLoadQue("./GameResources/HLSL/MargeTexture4.PS.hlsl");
 }
 
 void TitleScene::initialize() {
+	DxSwapChain::SetClearColor(CColor4::BLACK);
+
 	Camera2D::Initialize();
 
 	camera3D = std::make_unique<Camera3D>();
@@ -82,90 +103,98 @@ void TitleScene::initialize() {
 	languageSelection = eps::CreateUnique<SpriteInstance>("ChangeLanguage.png", Vector2{ 0.0f, 0.0f });
 	languageSelection->get_transform().set_translate({ 30.0f, 30.0f });
 	languageSelection->get_transform().set_scale({ 0.5f, 1.0f });
-	languageSelection->get_uv_transform().set_scale({ 0.5f, 1.0f });
+	languageSelection->get_material().uvTransform.set_scale({ 0.5f, 1.0f });
 
-	std::shared_ptr<SingleRenderTarget> sceneOut;
-	sceneOut = std::make_shared<SingleRenderTarget>();
-	sceneOut->initialize();
+	renderTextures.resize(7);
+	renderTextures[0].initialize(DXGI_FORMAT_R8G8B8A8_UNORM_SRGB); // シーンアウト
+	renderTextures[1].initialize(DXGI_FORMAT_R8G8B8A8_UNORM_SRGB); // 輝度抽出
+	renderTextures[2].initialize(DXGI_FORMAT_R8G8B8A8_UNORM_SRGB, EngineSettings::CLIENT_WIDTH / 2, EngineSettings::CLIENT_HEIGHT / 2); // ダウンサンプリング 1/2
+	renderTextures[3].initialize(DXGI_FORMAT_R8G8B8A8_UNORM_SRGB, EngineSettings::CLIENT_WIDTH / 4, EngineSettings::CLIENT_HEIGHT / 4); // ダウンサンプリング 1/4
+	renderTextures[4].initialize(DXGI_FORMAT_R8G8B8A8_UNORM_SRGB, EngineSettings::CLIENT_WIDTH / 8, EngineSettings::CLIENT_HEIGHT / 8); // ダウンサンプリング 1/8
+	renderTextures[5].initialize(DXGI_FORMAT_R8G8B8A8_UNORM_SRGB, EngineSettings::CLIENT_WIDTH / 16, EngineSettings::CLIENT_HEIGHT / 16); // ダウンサンプリング 1/16
+	renderTextures[6].initialize(DXGI_FORMAT_R8G8B8A8_UNORM_SRGB); // ダウンサンプリングを合成
 
-	std::shared_ptr<SingleRenderTarget> downSampled2;
-	downSampled2 = std::make_shared<SingleRenderTarget>();
-	downSampled2->initialize(EngineSettings::CLIENT_WIDTH / 2, EngineSettings::CLIENT_HEIGHT / 2);
-	std::shared_ptr<SingleRenderTarget> downSampled4;
-	downSampled4 = std::make_shared<SingleRenderTarget>();
-	downSampled4->initialize(EngineSettings::CLIENT_WIDTH / 4, EngineSettings::CLIENT_HEIGHT / 4);
-	std::shared_ptr<SingleRenderTarget> downSampled8;
-	downSampled8 = std::make_shared<SingleRenderTarget>();
-	downSampled8->initialize(EngineSettings::CLIENT_WIDTH / 8, EngineSettings::CLIENT_HEIGHT / 8);
-	std::shared_ptr<SingleRenderTarget> downSampled16;
-	downSampled16 = std::make_shared<SingleRenderTarget>();
-	downSampled16->initialize(EngineSettings::CLIENT_WIDTH / 16, EngineSettings::CLIENT_HEIGHT / 16);
-
+	baseRenderTexture.initialize(renderTextures[0]);
+	luminanceRenderTexture.initialize(renderTextures[1]);
+	downSampleRenderTexture2.initialize(renderTextures[2]);
+	downSampleRenderTexture4.initialize(renderTextures[3]);
+	downSampleRenderTexture8.initialize(renderTextures[4]);
+	downSampleRenderTexture16.initialize(renderTextures[5]);
+	bloomBaseRenderTexture.initialize(renderTextures[6]);
 
 	// Node&Path
-	std::shared_ptr<Object3DNode> object3dNode;
-	object3dNode = std::make_unique<Object3DNode>();
+	std::shared_ptr<StaticMeshNodeForward> object3dNode;
+	object3dNode = std::make_unique<StaticMeshNodeForward>();
 	object3dNode->initialize();
-	object3dNode->set_config(RenderNodeConfig::ContinueDrawBefore | RenderNodeConfig::ContinueUseDpehtBefore);
-	object3dNode->set_render_target(sceneOut);
+	object3dNode->set_render_target(baseRenderTexture);
 
-	std::shared_ptr<SkinningMeshNode> skinningMeshNode;
-	skinningMeshNode = std::make_unique<SkinningMeshNode>();
+	std::shared_ptr<SkinningMeshNodeForward> skinningMeshNode;
+	skinningMeshNode = std::make_unique<SkinningMeshNodeForward>();
 	skinningMeshNode->initialize();
-	skinningMeshNode->set_config(RenderNodeConfig::ContinueDrawAfter | RenderNodeConfig::ContinueDrawBefore | RenderNodeConfig::ContinueUseDpehtAfter);
-	skinningMeshNode->set_render_target(sceneOut);
+	skinningMeshNode->set_config(RenderNodeConfig::NoClearDepth | RenderNodeConfig::NoClearRenderTarget);
+	skinningMeshNode->set_render_target(baseRenderTexture);
 
 	std::shared_ptr<SpriteNode> spriteNode;
 	spriteNode = std::make_unique<SpriteNode>();
 	spriteNode->initialize();
-	spriteNode->set_config(RenderNodeConfig::ContinueDrawAfter);
-	spriteNode->set_render_target(sceneOut);
+	spriteNode->set_config(RenderNodeConfig::NoClearRenderTarget);
+	spriteNode->set_render_target(baseRenderTexture);
 
 	luminanceExtractionNode = eps::CreateShared<LuminanceExtractionNode>();
 	luminanceExtractionNode->initialize();
-	luminanceExtractionNode->set_render_target();
-	luminanceExtractionNode->set_texture_resource(sceneOut->offscreen_render().texture_gpu_handle());
+	luminanceExtractionNode->set_render_target(luminanceRenderTexture);
+	luminanceExtractionNode->set_texture_resource(renderTextures[0]);
 
 	gaussianBlurNode2 = eps::CreateShared<GaussianBlurNode>();
 	gaussianBlurNode2->initialize();
-	gaussianBlurNode2->set_render_target(downSampled2);
-	gaussianBlurNode2->set_base_texture(luminanceExtractionNode->result_stv_handle());
+	gaussianBlurNode2->set_render_target(downSampleRenderTexture2);
+	gaussianBlurNode2->set_base_texture(renderTextures[1]);
 
 	gaussianBlurNode4 = eps::CreateShared<GaussianBlurNode>();
 	gaussianBlurNode4->initialize();
-	gaussianBlurNode4->set_render_target(downSampled4);
-	gaussianBlurNode4->set_base_texture(gaussianBlurNode2->result_stv_handle());
+	gaussianBlurNode4->set_render_target(downSampleRenderTexture4);
+	gaussianBlurNode4->set_base_texture(renderTextures[2]);
 
 	gaussianBlurNode8 = eps::CreateShared<GaussianBlurNode>();
 	gaussianBlurNode8->initialize();
-	gaussianBlurNode8->set_render_target(downSampled8);
-	gaussianBlurNode8->set_base_texture(gaussianBlurNode4->result_stv_handle());
+	gaussianBlurNode8->set_render_target(downSampleRenderTexture8);
+	gaussianBlurNode8->set_base_texture(renderTextures[3]);
 
 	gaussianBlurNode16 = eps::CreateShared<GaussianBlurNode>();
 	gaussianBlurNode16->initialize();
-	gaussianBlurNode16->set_render_target(downSampled16);
-	gaussianBlurNode16->set_base_texture(gaussianBlurNode8->result_stv_handle());
+	gaussianBlurNode16->set_render_target(downSampleRenderTexture16);
+	gaussianBlurNode16->set_base_texture(renderTextures[4]);
 
 	margeTextureNode = eps::CreateShared<MargeTextureNode>();
 	margeTextureNode->initialize();
-	margeTextureNode->set_render_target();
-	margeTextureNode->set_texture_resources(
-		{
-			gaussianBlurNode2->result_stv_handle(),
-			gaussianBlurNode4->result_stv_handle(),
-			gaussianBlurNode8->result_stv_handle(),
-			gaussianBlurNode16->result_stv_handle()
-		});
+	margeTextureNode->set_render_target(bloomBaseRenderTexture);
+	margeTextureNode->set_texture_resources({ renderTextures[2] ,renderTextures[3] ,renderTextures[4], renderTextures[5] });
 
 	bloomNode = eps::CreateShared<BloomNode>();
 	bloomNode->initialize();
-	bloomNode->set_render_target_SC(DirectXSwapChain::GetRenderTarget());
-	bloomNode->set_base_texture(sceneOut->offscreen_render().texture_gpu_handle());
-	bloomNode->set_blur_texture(margeTextureNode->result_stv_handle());
+	bloomNode->set_render_target_SC();
+	bloomNode->set_base_texture(renderTextures[0]);
+	bloomNode->set_blur_texture(renderTextures[6]);
 
 	renderPath = eps::CreateUnique<RenderPath>();
 	renderPath->initialize({ object3dNode,skinningMeshNode,spriteNode,
 		luminanceExtractionNode, gaussianBlurNode2, gaussianBlurNode4, gaussianBlurNode8, gaussianBlurNode16, margeTextureNode, bloomNode });
+
+	// ---------------------- DrawManager ----------------------
+	staticMeshDrawManager = std::make_unique<StaticMeshDrawManager>();
+	skinningMeshDrawManager = std::make_unique<SkinningMeshDrawManager>();
+	skinningMeshDrawManager->initialize(1);
+	skinningMeshDrawManager->make_instancing(0, "ParentKoala.gltf", 1);
+	skinningMeshDrawManager->make_instancing(0, "ChiledKoala.gltf", 1);
+
+	spriteDrawExecutors.resize(2);
+	spriteDrawExecutors[0] = std::make_unique<SpriteDrawExecutor>();
+	spriteDrawExecutors[0]->reinitialize(1);
+	spriteDrawExecutors[1] = std::make_unique<SpriteDrawExecutor>();
+	spriteDrawExecutors[1]->reinitialize(100);
+
+	directionalLightingExecutor = std::make_unique<DirectionalLightingExecutor>();
+	directionalLightingExecutor->reinitialize(1);
 
 	bgm = std::make_unique<AudioPlayer>();
 	bgm->initialize("TitleBGM.wav");
@@ -173,11 +202,11 @@ void TitleScene::initialize() {
 	bgm->set_volume(GameValue::TitleBgmVolume);
 	bgm->play();
 
-	parentObj = std::make_unique<AnimatedMeshInstance>("ParentKoala.gltf", "Hello", true);
+	parentObj = std::make_unique<SkinningMeshInstance>("ParentKoala.gltf", "Hello", true);
 	parentObj->get_transform().set_translate({ 0.6f,-0.8f,3.7f });
 	parentObj->get_transform().set_quaternion(Quaternion::EulerDegree(0.f, 0.f, 10.f));
 
-	chiledObj = std::make_unique<AnimatedMeshInstance>("ChiledKoala.gltf", "Hello", true);
+	chiledObj = std::make_unique<SkinningMeshInstance>("ChiledKoala.gltf", "Hello", true);
 	easeT = 0;
 	movePos = { -7.f,-0.5f,14.4f };
 
@@ -190,13 +219,15 @@ void TitleScene::initialize() {
 	selectSeFailed->initialize("SelectFaild.wav");
 	selectSeFailed->set_volume(0.2f);
 
-	luminanceExtractionNode->set_param(0.67f, CColor3::WHITE);
-	gaussianBlurNode2->set_parameters(1.0f, 30.48f, 8);
-	gaussianBlurNode4->set_parameters(1.0f, 30.48f, 8);
-	gaussianBlurNode8->set_parameters(1.0f, 30.48f, 8);
-	gaussianBlurNode16->set_parameters(1.0f, 30.48f, 8);
-	bloomNode->set_param(0.247f);
+	skinningMeshDrawManager->register_instance(parentObj);
+	skinningMeshDrawManager->register_instance(chiledObj);
 
+	luminanceExtractionNode->set_param(0.72f, CColor3::WHITE);
+	gaussianBlurNode2->set_parameters(1.0f, 24.61f, 8);
+	gaussianBlurNode4->set_parameters(1.0f, 24.61f, 8);
+	gaussianBlurNode8->set_parameters(1.0f, 24.61f, 8);
+	gaussianBlurNode16->set_parameters(1.0f, 24.61f, 8);
+	bloomNode->set_param(0.12f);
 }
 
 void TitleScene::popped() {}
@@ -251,7 +282,7 @@ void TitleScene::update() {
 
 			}
 			Configuration::SetLanguage(Configuration::Language::English);
-			languageSelection->get_uv_transform().set_translate({ 0.5f, 0.0f });
+			languageSelection->get_material().uvTransform.set_translate({ 0.5f, 0.0f });
 			languageSelectTimer = 0.7f;
 		}
 		else if (Input::IsPressKey(KeyID::Left) || Input::IsPressPad(PadID::Left) || stickLx <= -0.5f) {
@@ -264,7 +295,7 @@ void TitleScene::update() {
 				selectSeFailed->restart();
 			}
 			Configuration::SetLanguage(Configuration::Language::Japanese);
-			languageSelection->get_uv_transform().set_translate({ 0.0f, 0.0f });
+			languageSelection->get_material().uvTransform.set_translate({ 0.0f, 0.0f });
 			languageSelectTimer = 0.7f;
 		}
 	}
@@ -287,21 +318,33 @@ void TitleScene::update() {
 	if (easeT > totalEaseT) { easeT = 0.f; }
 	chiledObj->get_transform().set_translate(movePos);
 	chiledObj->update();
+	parentObj->update_animation();
+	chiledObj->update_animation();
 }
 
 void TitleScene::begin_rendering() {
-	startUi[0]->begin_rendering();
-	startUi[1]->begin_rendering();
-	startUi[2]->begin_rendering();
-	startUi[3]->begin_rendering();
-	titleLogo->begin_rendering();
-	transition->begin_rendering();
-	languageSelection->begin_rendering();
+	for(auto& executor : spriteDrawExecutors) {
+		executor->begin();
+	}
+	directionalLightingExecutor->begin();
 
-	camera3D->update_matrix();
-	directionalLight->begin_rendering();
-	parentObj->begin_rendering();
-	chiledObj->begin_rendering();
+	spriteDrawExecutors[1]->write_to_buffer(startUi[(int)GameValue::UiType.get_type() + 2 * (size_t)Configuration::GetLanguage()]);
+	spriteDrawExecutors[1]->write_to_buffer(titleLogo);
+	if (transition->get_material().color.alpha > 0.0f) {
+		spriteDrawExecutors[0]->write_to_buffer(transition);
+	}
+	spriteDrawExecutors[1]->write_to_buffer(languageSelection);
+
+	camera3D->update_affine();
+	directionalLight->update_affine();
+	parentObj->update_affine();
+	chiledObj->update_affine();
+
+	camera3D->transfer();
+
+	skinningMeshDrawManager->transfer();
+
+	directionalLightingExecutor->write_to_buffer(directionalLight);
 }
 
 void TitleScene::late_update() {}
@@ -309,23 +352,18 @@ void TitleScene::late_update() {}
 void TitleScene::draw() const {
 	// Mesh
 	renderPath->begin();
-	camera3D->register_world_projection(1);
-	camera3D->register_world_lighting(4);
-	directionalLight->register_world(5);
 
 	// SkinningMesh
 	renderPath->next();
-	camera3D->register_world_projection(1);
+	camera3D->register_world_projection(2);
 	camera3D->register_world_lighting(5);
-	directionalLight->register_world(6);
-	parentObj->draw();
-	chiledObj->draw();
+	directionalLightingExecutor->set_command(6);
+	skinningMeshDrawManager->draw_layer(0);
+
 	// Sprite
 	renderPath->next();
-	startUi[(int)GameValue::UiType.get_type() + 2 * (size_t)Configuration::GetLanguage()]->draw();
-	languageSelection->draw();
-	titleLogo->draw();
-	transition->draw();
+	spriteDrawExecutors[1]->draw_command();
+	spriteDrawExecutors[0]->draw_command();
 
 	renderPath->next();
 	luminanceExtractionNode->draw();
@@ -348,7 +386,7 @@ void TitleScene::draw() const {
 void TitleScene::in_update() {
 	transitionTimer += WorldClock::DeltaSeconds();
 	float parametric = transitionTimer / 0.5f;
-	transition->get_color().alpha = 1 - std::min(1.f, parametric);
+	transition->get_material().color.alpha = 1 - std::min(1.f, parametric);
 	if (parametric >= 1.0f) {
 		sceneState = TransitionState::Main;
 	}
@@ -367,14 +405,22 @@ void TitleScene::default_update() {
 void TitleScene::out_update() {
 	transitionTimer += WorldClock::DeltaSeconds();
 	float parametric = transitionTimer / 0.5f;
-	transition->get_color().alpha = parametric;
+	transition->get_material().color.alpha = parametric;
 	bgm->set_volume((1 - parametric) * 0.2f);
 }
 
 #ifdef _DEBUG
 void TitleScene::debug_update() {
-	ImGui::Begin("parent");
-	chiledObj->debug_gui();
+	//ImGui::Begin("parent");
+	//chiledObj->debug_gui();
+	//ImGui::End();
+
+	ImGui::Begin("Light");
+	directionalLight->debug_gui();
+	ImGui::End();
+
+	ImGui::Begin("Camera");
+	camera3D->debug_gui();
 	ImGui::End();
 
 	ImGui::Begin("PostEffect");

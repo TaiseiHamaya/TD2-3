@@ -1,31 +1,34 @@
 #include "GameScene.h"
 
+//#include <Engine/Rendering/DirectX/DirectXResourceObject/DepthStencil/DepthStencil.h>
+//#include <Engine/Rendering/DirectX/DirectXResourceObject/OffscreenRender/OffscreenRender.h>
+//#include <Engine/Rendering/DirectX/DirectXSwapChain/DirectXSwapChain.h>
+#include <Engine/Assets/Animation/NodeAnimation/NodeAnimationLibrary.h>
+#include <Engine/Assets/Animation/Skeleton/SkeletonLibrary.h>
+#include <Engine/Assets/Audio/AudioLibrary.h>
+#include <Engine/Assets/Audio/AudioManager.h>
+#include <Engine/Assets/PolygonMesh/PolygonMeshLibrary.h>
+#include <Engine/Assets/Texture/TextureLibrary.h>
+#include <Engine/GraphicsAPI/RenderingSystemValues.h>
 #include <Engine/Module/Render/RenderNode/2D/Sprite/SpriteNode.h>
-#include <Engine/Module/Render/RenderNode/Forward/Object3DNode/Object3DNode.h>
+#include <Engine/Module/Render/RenderNode/Forward/Mesh/SkinningMeshNodeForward.h>
+#include <Engine/Module/Render/RenderNode/Forward/Mesh/StaticMeshNodeForward.h>
 #include <Engine/Module/Render/RenderNode/Forward/Particle/ParticleMeshNode/ParticleMeshNode.h>
-#include <Engine/Module/Render/RenderNode/Forward/SkinningMesh/SkinningMeshNode.h>
+#include <Engine/Module/Render/RenderNode/Posteffect/Outline/OutlineNode.h>
 #include <Engine/Module/Render/RenderPath/RenderPath.h>
 #include <Engine/Module/Render/RenderTargetGroup/SingleRenderTarget.h>
 #include <Engine/Module/World/Camera/Camera2D.h>
 #include <Engine/Module/World/Camera/Camera3D.h>
 #include <Engine/Module/World/Sprite/SpriteInstance.h>
-#include <Engine/Rendering/DirectX/DirectXResourceObject/DepthStencil/DepthStencil.h>
-#include <Engine/Rendering/DirectX/DirectXResourceObject/OffscreenRender/OffscreenRender.h>
-#include <Engine/Rendering/DirectX/DirectXSwapChain/DirectXSwapChain.h>
-#include <Engine/Resources/Animation/NodeAnimation/NodeAnimationManager.h>
-#include <Engine/Resources/Animation/Skeleton/SkeletonManager.h>
-#include <Engine/Resources/Audio/AudioManager.h>
-#include <Engine/Resources/PolygonMesh/PolygonMeshManager.h>
-#include <Engine/Resources/Texture/TextureManager.h>
+#include <Engine/Runtime/Clock/WorldClock.h>
 #include <Engine/Runtime/Scene/SceneManager.h>
-#include <Engine/Runtime/WorldClock/WorldClock.h>
-#include <Engine/Utility/Tools/SmartPointer.h>
 
 #include "Application/GameValue.h"
+#include "Application/LevelLoader/LevelLoader.h"
 #include "Application/Scene/SelectScene.h"
 #include "Application/Scene/TitleScene.h"
 
-#include "Application/LevelLoader/LevelLoader.h"
+#include <Library/Utility/Tools/SmartPointer.h>
 
 #include "Application/PostEffect/BloomNode.h"
 #include "Application/PostEffect/GaussianBlurNode.h"
@@ -35,7 +38,7 @@
 #ifdef _DEBUG
 #include "Engine/Module/Render/RenderNode/Debug/PrimitiveLine/PrimitiveLineNode.h"
 #endif // _DEBUG
-
+	
 GameScene::GameScene() : GameScene(1) {}
 
 GameScene::GameScene(int32_t level) :
@@ -47,104 +50,104 @@ GameScene::~GameScene() = default;
 
 void GameScene::load() {
 	//PolygonMeshManager::RegisterLoadQue("./EngineResources/Models/Primitive/Sphere.obj");
-	PolygonMeshManager::RegisterLoadQue("./GameResources/Models/ParentKoala/ParentKoala.gltf");
-	PolygonMeshManager::RegisterLoadQue("./GameResources/Models/ChiledKoala/ChiledKoala.gltf");
-	PolygonMeshManager::RegisterLoadQue("./GameResources/Models/CatchEffect/CatchEffect.gltf");
-	PolygonMeshManager::RegisterLoadQue("./GameResources/Models/ReleaseEffect/ReleaseEffect.gltf");
-	PolygonMeshManager::RegisterLoadQue("./GameResources/Models/exclamation/exclamation.gltf");
-	PolygonMeshManager::RegisterLoadQue("./GameResources/Models/FlusteredEffect/FlusteredEffect.gltf");
-	SkeletonManager::RegisterLoadQue("./GameResources/Models/ParentKoala/ParentKoala.gltf");
-	SkeletonManager::RegisterLoadQue("./GameResources/Models/ChiledKoala/ChiledKoala.gltf");
-	SkeletonManager::RegisterLoadQue("./GameResources/Models/CatchEffect/CatchEffect.gltf");
-	SkeletonManager::RegisterLoadQue("./GameResources/Models/ReleaseEffect/ReleaseEffect.gltf");
-	SkeletonManager::RegisterLoadQue("./GameResources/Models/exclamation/exclamation.gltf");
-	SkeletonManager::RegisterLoadQue("./GameResources/Models/FlusteredEffect/FlusteredEffect.gltf");
-	NodeAnimationManager::RegisterLoadQue("./GameResources/Models/ParentKoala/ParentKoala.gltf");
-	NodeAnimationManager::RegisterLoadQue("./GameResources/Models/ChiledKoala/ChiledKoala.gltf");
-	NodeAnimationManager::RegisterLoadQue("./GameResources/Models/CatchEffect/CatchEffect.gltf");
-	NodeAnimationManager::RegisterLoadQue("./GameResources/Models/ReleaseEffect/ReleaseEffect.gltf");
-	NodeAnimationManager::RegisterLoadQue("./GameResources/Models/exclamation/exclamation.gltf");
-	NodeAnimationManager::RegisterLoadQue("./GameResources/Models/FlusteredEffect/FlusteredEffect.gltf");
-	TextureManager::RegisterLoadQue("./GameResources/Texture/ClearTex.png");
-	TextureManager::RegisterLoadQue("./GameResources/Texture/FailedTex.png");
+	PolygonMeshLibrary::RegisterLoadQue("./GameResources/Models/ParentKoala/ParentKoala.gltf");
+	PolygonMeshLibrary::RegisterLoadQue("./GameResources/Models/ChiledKoala/ChiledKoala.gltf");
+	PolygonMeshLibrary::RegisterLoadQue("./GameResources/Models/CatchEffect/CatchEffect.gltf");
+	PolygonMeshLibrary::RegisterLoadQue("./GameResources/Models/ReleaseEffect/ReleaseEffect.gltf");
+	PolygonMeshLibrary::RegisterLoadQue("./GameResources/Models/exclamation/exclamation.gltf");
+	PolygonMeshLibrary::RegisterLoadQue("./GameResources/Models/FlusteredEffect/FlusteredEffect.gltf");
+	SkeletonLibrary::RegisterLoadQue("./GameResources/Models/ParentKoala/ParentKoala.gltf");
+	SkeletonLibrary::RegisterLoadQue("./GameResources/Models/ChiledKoala/ChiledKoala.gltf");
+	SkeletonLibrary::RegisterLoadQue("./GameResources/Models/CatchEffect/CatchEffect.gltf");
+	SkeletonLibrary::RegisterLoadQue("./GameResources/Models/ReleaseEffect/ReleaseEffect.gltf");
+	SkeletonLibrary::RegisterLoadQue("./GameResources/Models/exclamation/exclamation.gltf");
+	SkeletonLibrary::RegisterLoadQue("./GameResources/Models/FlusteredEffect/FlusteredEffect.gltf");
+	NodeAnimationLibrary::RegisterLoadQue("./GameResources/Models/ParentKoala/ParentKoala.gltf");
+	NodeAnimationLibrary::RegisterLoadQue("./GameResources/Models/ChiledKoala/ChiledKoala.gltf");
+	NodeAnimationLibrary::RegisterLoadQue("./GameResources/Models/CatchEffect/CatchEffect.gltf");
+	NodeAnimationLibrary::RegisterLoadQue("./GameResources/Models/ReleaseEffect/ReleaseEffect.gltf");
+	NodeAnimationLibrary::RegisterLoadQue("./GameResources/Models/exclamation/exclamation.gltf");
+	NodeAnimationLibrary::RegisterLoadQue("./GameResources/Models/FlusteredEffect/FlusteredEffect.gltf");
+	TextureLibrary::RegisterLoadQue("./GameResources/Texture/ClearTex.png");
+	TextureLibrary::RegisterLoadQue("./GameResources/Texture/FailedTex.png");
 
-	PolygonMeshManager::RegisterLoadQue("./GameResources/Models/GoalObj/GoalObj.gltf");
-	SkeletonManager::RegisterLoadQue("./GameResources/Models/GoalObj/GoalObj.gltf");
-	NodeAnimationManager::RegisterLoadQue("./GameResources/Models/GoalObj/GoalObj.gltf");
+	PolygonMeshLibrary::RegisterLoadQue("./GameResources/Models/GoalObj/GoalObj.gltf");
+	SkeletonLibrary::RegisterLoadQue("./GameResources/Models/GoalObj/GoalObj.gltf");
+	NodeAnimationLibrary::RegisterLoadQue("./GameResources/Models/GoalObj/GoalObj.gltf");
 
 
-	TextureManager::RegisterLoadQue("./GameResources/Texture/UI/Wkey.png");
-	TextureManager::RegisterLoadQue("./GameResources/Texture/UI/Akey.png");
-	TextureManager::RegisterLoadQue("./GameResources/Texture/UI/Skey.png");
-	TextureManager::RegisterLoadQue("./GameResources/Texture/UI/Dkey.png");
-	TextureManager::RegisterLoadQue("./GameResources/Texture/UI/ResetUI.png");
-	TextureManager::RegisterLoadQue("./GameResources/Texture/UI/ESCkey.png");
-	TextureManager::RegisterLoadQue("./GameResources/Texture/UI/ReleseUI.png");
-	TextureManager::RegisterLoadQue("./GameResources/Texture/UI/ReleseUI_EN.png");
+	TextureLibrary::RegisterLoadQue("./GameResources/Texture/UI/Wkey.png");
+	TextureLibrary::RegisterLoadQue("./GameResources/Texture/UI/Akey.png");
+	TextureLibrary::RegisterLoadQue("./GameResources/Texture/UI/Skey.png");
+	TextureLibrary::RegisterLoadQue("./GameResources/Texture/UI/Dkey.png");
+	TextureLibrary::RegisterLoadQue("./GameResources/Texture/UI/ESCkey.png");
+	TextureLibrary::RegisterLoadQue("./GameResources/Texture/UI/ReleseUI.png");
+	TextureLibrary::RegisterLoadQue("./GameResources/Texture/UI/ReleseUI_EN.png");
 
-	TextureManager::RegisterLoadQue("./GameResources/Texture/UI/ResetUIController.png");
-	TextureManager::RegisterLoadQue("./GameResources/Texture/UI/ESCkeyController.png");
-	TextureManager::RegisterLoadQue("./GameResources/Texture/UI/UndoController.png");
-	TextureManager::RegisterLoadQue("./GameResources/Texture/UI/ReleseUIController.png");
-	TextureManager::RegisterLoadQue("./GameResources/Texture/UI/ReleseUIController_EN.png");
-	TextureManager::RegisterLoadQue("./GameResources/Texture/UI/NoneButton.png");
+	TextureLibrary::RegisterLoadQue("./GameResources/Texture/UI/ResetUI.png");
+	TextureLibrary::RegisterLoadQue("./GameResources/Texture/UI/ResetUIController.png");
+	TextureLibrary::RegisterLoadQue("./GameResources/Texture/UI/ESCkeyController.png");
+	TextureLibrary::RegisterLoadQue("./GameResources/Texture/UI/UndoController.png");
+	TextureLibrary::RegisterLoadQue("./GameResources/Texture/UI/ReleseUIController.png");
+	TextureLibrary::RegisterLoadQue("./GameResources/Texture/UI/ReleseUIController_EN.png");
+	TextureLibrary::RegisterLoadQue("./GameResources/Texture/UI/NoneButton.png");
 
-	TextureManager::RegisterLoadQue("./GameResources/Texture/UI/Tutorial1.png");
-	TextureManager::RegisterLoadQue("./GameResources/Texture/UI/Next.png");
-	TextureManager::RegisterLoadQue("./GameResources/Texture/UI/Next_EN.png");
-	TextureManager::RegisterLoadQue("./GameResources/Texture/UI/Retry.png");
-	TextureManager::RegisterLoadQue("./GameResources/Texture/UI/Retry_EN.png");
-	TextureManager::RegisterLoadQue("./GameResources/Texture/UI/SelectFrame.png");
-	TextureManager::RegisterLoadQue("./GameResources/Texture/UI/FailedUI_1.png");
-	TextureManager::RegisterLoadQue("./GameResources/Texture/UI/FailedUI_1_EN.png");
-	TextureManager::RegisterLoadQue("./GameResources/Texture/UI/undoRetry.png");
-	TextureManager::RegisterLoadQue("./GameResources/Texture/UI/undoRetry_EN.png");
-	TextureManager::RegisterLoadQue("./GameResources/Texture/UI/GoSelect.png");
-	TextureManager::RegisterLoadQue("./GameResources/Texture/UI/GoSelect_EN.png");
-	TextureManager::RegisterLoadQue("./GameResources/Texture/UI/Undo.png");
-	TextureManager::RegisterLoadQue("./GameResources/Texture/UI/smallNumber.png");
-	TextureManager::RegisterLoadQue("./GameResources/Texture/UI/stageFrame.png");
-	TextureManager::RegisterLoadQue("./GameResources/Texture/backGround.png");
-	TextureManager::RegisterLoadQue("./GameResources/Texture/backGround2.png");
-	TextureManager::RegisterLoadQue("./GameResources/Texture/Failed/Failed.png");
-	TextureManager::RegisterLoadQue("./GameResources/Texture/Failed/F.png");
-	TextureManager::RegisterLoadQue("./GameResources/Texture/Failed/a.png");
-	TextureManager::RegisterLoadQue("./GameResources/Texture/Failed/i.png");
-	TextureManager::RegisterLoadQue("./GameResources/Texture/Failed/l.png");
-	TextureManager::RegisterLoadQue("./GameResources/Texture/Failed/e.png");
-	TextureManager::RegisterLoadQue("./GameResources/Texture/Failed/d.png");
-	TextureManager::RegisterLoadQue("./GameResources/Texture/Failed/ten.png");
-	TextureManager::RegisterLoadQue("./GameResources/Texture/Clear/Clear.png");
-	TextureManager::RegisterLoadQue("./GameResources/Texture/Clear/C.png");
-	TextureManager::RegisterLoadQue("./GameResources/Texture/Clear/L.png");
-	TextureManager::RegisterLoadQue("./GameResources/Texture/Clear/E.png");
-	TextureManager::RegisterLoadQue("./GameResources/Texture/Clear/A.png");
-	TextureManager::RegisterLoadQue("./GameResources/Texture/Clear/R.png");
-	TextureManager::RegisterLoadQue("./GameResources/Texture/Clear/!.png");
-	TextureManager::RegisterLoadQue("./GameResources/Texture/Tutorial/Frame.png");
-	TextureManager::RegisterLoadQue("./GameResources/Texture/Tutorial/TutorialText.png");
-	TextureManager::RegisterLoadQue("./GameResources/Texture/Tutorial/TutorialText_EN.png");
-	TextureManager::RegisterLoadQue("./GameResources/Texture/Tutorial/TutorialImage.png");
+	TextureLibrary::RegisterLoadQue("./GameResources/Texture/UI/Tutorial1.png");
+	TextureLibrary::RegisterLoadQue("./GameResources/Texture/UI/Next.png");
+	TextureLibrary::RegisterLoadQue("./GameResources/Texture/UI/Next_EN.png");
+	TextureLibrary::RegisterLoadQue("./GameResources/Texture/UI/Retry.png");
+	TextureLibrary::RegisterLoadQue("./GameResources/Texture/UI/Retry_EN.png");
+	TextureLibrary::RegisterLoadQue("./GameResources/Texture/UI/SelectFrame.png");
+	TextureLibrary::RegisterLoadQue("./GameResources/Texture/UI/FailedUI_1.png");
+	TextureLibrary::RegisterLoadQue("./GameResources/Texture/UI/FailedUI_1_EN.png");
+	TextureLibrary::RegisterLoadQue("./GameResources/Texture/UI/undoRetry.png");
+	TextureLibrary::RegisterLoadQue("./GameResources/Texture/UI/undoRetry_EN.png");
+	TextureLibrary::RegisterLoadQue("./GameResources/Texture/UI/GoSelect.png");
+	TextureLibrary::RegisterLoadQue("./GameResources/Texture/UI/GoSelect_EN.png");
+	TextureLibrary::RegisterLoadQue("./GameResources/Texture/UI/Undo.png");
+	TextureLibrary::RegisterLoadQue("./GameResources/Texture/UI/smallNumber.png");
+	TextureLibrary::RegisterLoadQue("./GameResources/Texture/UI/stageFrame.png");
+	TextureLibrary::RegisterLoadQue("./GameResources/Texture/backGround.png");
+	TextureLibrary::RegisterLoadQue("./GameResources/Texture/backGround2.png");
+	TextureLibrary::RegisterLoadQue("./GameResources/Texture/Failed/Failed.png");
+	TextureLibrary::RegisterLoadQue("./GameResources/Texture/Failed/F.png");
+	TextureLibrary::RegisterLoadQue("./GameResources/Texture/Failed/a.png");
+	TextureLibrary::RegisterLoadQue("./GameResources/Texture/Failed/i.png");
+	TextureLibrary::RegisterLoadQue("./GameResources/Texture/Failed/l.png");
+	TextureLibrary::RegisterLoadQue("./GameResources/Texture/Failed/e.png");
+	TextureLibrary::RegisterLoadQue("./GameResources/Texture/Failed/d.png");
+	TextureLibrary::RegisterLoadQue("./GameResources/Texture/Failed/ten.png");
+	TextureLibrary::RegisterLoadQue("./GameResources/Texture/Clear/Clear.png");
+	TextureLibrary::RegisterLoadQue("./GameResources/Texture/Clear/C.png");
+	TextureLibrary::RegisterLoadQue("./GameResources/Texture/Clear/L.png");
+	TextureLibrary::RegisterLoadQue("./GameResources/Texture/Clear/E.png");
+	TextureLibrary::RegisterLoadQue("./GameResources/Texture/Clear/A.png");
+	TextureLibrary::RegisterLoadQue("./GameResources/Texture/Clear/R.png");
+	TextureLibrary::RegisterLoadQue("./GameResources/Texture/Clear/!.png");
+	TextureLibrary::RegisterLoadQue("./GameResources/Texture/Tutorial/Frame.png");
+	TextureLibrary::RegisterLoadQue("./GameResources/Texture/Tutorial/TutorialText.png");
+	TextureLibrary::RegisterLoadQue("./GameResources/Texture/Tutorial/TutorialText_EN.png");
+	TextureLibrary::RegisterLoadQue("./GameResources/Texture/Tutorial/TutorialImage.png");
 
-	TextureManager::RegisterLoadQue("./GameResources/Texture/UI/Abutton.png");
+	TextureLibrary::RegisterLoadQue("./GameResources/Texture/UI/Abutton.png");
 
-	AudioManager::RegisterLoadQue("./GameResources/Audio/move.wav");
-	AudioManager::RegisterLoadQue("./GameResources/Audio/hold.wav");
-	AudioManager::RegisterLoadQue("./GameResources/Audio/release.wav");
-	AudioManager::RegisterLoadQue("./GameResources/Audio/fall.wav");
-	AudioManager::RegisterLoadQue("./GameResources/Audio/unmovable.wav");
-	AudioManager::RegisterLoadQue("./GameResources/Audio/iceMove.wav");
-	AudioManager::RegisterLoadQue("./GameResources/Audio/decision.wav");
-	AudioManager::RegisterLoadQue("./GameResources/Audio/operation.wav");
-	AudioManager::RegisterLoadQue("./GameResources/Audio/clearSound.wav");
-	AudioManager::RegisterLoadQue("./GameResources/Audio/failedSound.wav");
-	AudioManager::RegisterLoadQue("./GameResources/Audio/rotate.wav");
-	AudioManager::RegisterLoadQue("./GameResources/Audio/undo.wav");
-	AudioManager::RegisterLoadQue("./GameResources/Audio/explosion.wav");
-	AudioManager::RegisterLoadQue("./GameResources/Audio/gushing.wav");
-	AudioManager::RegisterLoadQue("./GameResources/Audio/reset.wav");
-	AudioManager::RegisterLoadQue("./GameResources/Audio/backAudio.wav");
-	AudioManager::RegisterLoadQue("./GameResources/Audio/BGM/Game.wav");
+	AudioLibrary::RegisterLoadQue("./GameResources/Audio/move.wav");
+	AudioLibrary::RegisterLoadQue("./GameResources/Audio/hold.wav");
+	AudioLibrary::RegisterLoadQue("./GameResources/Audio/release.wav");
+	AudioLibrary::RegisterLoadQue("./GameResources/Audio/fall.wav");
+	AudioLibrary::RegisterLoadQue("./GameResources/Audio/unmovable.wav");
+	AudioLibrary::RegisterLoadQue("./GameResources/Audio/iceMove.wav");
+	AudioLibrary::RegisterLoadQue("./GameResources/Audio/decision.wav");
+	AudioLibrary::RegisterLoadQue("./GameResources/Audio/operation.wav");
+	AudioLibrary::RegisterLoadQue("./GameResources/Audio/clearSound.wav");
+	AudioLibrary::RegisterLoadQue("./GameResources/Audio/failedSound.wav");
+	AudioLibrary::RegisterLoadQue("./GameResources/Audio/rotate.wav");
+	AudioLibrary::RegisterLoadQue("./GameResources/Audio/undo.wav");
+	AudioLibrary::RegisterLoadQue("./GameResources/Audio/explosion.wav");
+	AudioLibrary::RegisterLoadQue("./GameResources/Audio/gushing.wav");
+	AudioLibrary::RegisterLoadQue("./GameResources/Audio/reset.wav");
+	AudioLibrary::RegisterLoadQue("./GameResources/Audio/backAudio.wav");
+	AudioLibrary::RegisterLoadQue("./GameResources/Audio/BGM/Game.wav");
 
 }
 
@@ -175,114 +178,96 @@ void GameScene::initialize() {
 
 	directionalLight = eps::CreateUnique<DirectionalLightInstance>();
 
-	std::shared_ptr<SingleRenderTarget> meshRT;
-	meshRT = std::make_shared<SingleRenderTarget>();
-	meshRT->initialize();
-
-	std::shared_ptr<SingleRenderTarget> sceneOut;
-	sceneOut = std::make_shared<SingleRenderTarget>();
-	sceneOut->initialize();
-
-	std::shared_ptr<SingleRenderTarget> downSampled2;
-	downSampled2 = std::make_shared<SingleRenderTarget>();
-	downSampled2->initialize(EngineSettings::CLIENT_WIDTH / 2, EngineSettings::CLIENT_HEIGHT / 2);
-	std::shared_ptr<SingleRenderTarget> downSampled4;
-	downSampled4 = std::make_shared<SingleRenderTarget>();
-	downSampled4->initialize(EngineSettings::CLIENT_WIDTH / 4, EngineSettings::CLIENT_HEIGHT / 4);
-	std::shared_ptr<SingleRenderTarget> downSampled8;
-	downSampled8 = std::make_shared<SingleRenderTarget>();
-	downSampled8->initialize(EngineSettings::CLIENT_WIDTH / 8, EngineSettings::CLIENT_HEIGHT / 8);
-	std::shared_ptr<SingleRenderTarget> downSampled16;
-	downSampled16 = std::make_shared<SingleRenderTarget>();
-	downSampled16->initialize(EngineSettings::CLIENT_WIDTH / 16, EngineSettings::CLIENT_HEIGHT / 16);
-
 	Particle::lookAtDefault = camera3D.get();
+
+	renderTextures.resize(8);
+	renderTextures[0].initialize(DXGI_FORMAT_R8G8B8A8_UNORM_SRGB); // アウトライン前
+	renderTextures[1].initialize(DXGI_FORMAT_R8G8B8A8_UNORM_SRGB); // シーンアウト
+	renderTextures[2].initialize(DXGI_FORMAT_R8G8B8A8_UNORM_SRGB); // 輝度抽出
+	renderTextures[3].initialize(DXGI_FORMAT_R8G8B8A8_UNORM_SRGB, EngineSettings::CLIENT_WIDTH / 2, EngineSettings::CLIENT_HEIGHT / 2); // ダウンサンプリング 1/2
+	renderTextures[4].initialize(DXGI_FORMAT_R8G8B8A8_UNORM_SRGB, EngineSettings::CLIENT_WIDTH / 4, EngineSettings::CLIENT_HEIGHT / 4); // ダウンサンプリング 1/4
+	renderTextures[5].initialize(DXGI_FORMAT_R8G8B8A8_UNORM_SRGB, EngineSettings::CLIENT_WIDTH / 8, EngineSettings::CLIENT_HEIGHT / 8); // ダウンサンプリング 1/8
+	renderTextures[6].initialize(DXGI_FORMAT_R8G8B8A8_UNORM_SRGB, EngineSettings::CLIENT_WIDTH / 16, EngineSettings::CLIENT_HEIGHT / 16); // ダウンサンプリング 1/16
+	renderTextures[7].initialize(DXGI_FORMAT_R8G8B8A8_UNORM_SRGB); // ダウンサンプリングを合成
+
+	meshRT.initialize(renderTextures[0]);
+	baseRenderTexture.initialize(renderTextures[1]);
+	luminanceRenderTexture.initialize(renderTextures[2]);
+	downSampleRenderTexture2.initialize(renderTextures[3]);
+	downSampleRenderTexture4.initialize(renderTextures[4]);
+	downSampleRenderTexture8.initialize(renderTextures[5]);
+	downSampleRenderTexture16.initialize(renderTextures[6]);
+	bloomBaseRenderTexture.initialize(renderTextures[7]);
 
 	std::shared_ptr<SpriteNode> bgSpriteNode;
 	bgSpriteNode = std::make_unique<SpriteNode>();
 	bgSpriteNode->initialize();
-	bgSpriteNode->set_config(
-		RenderNodeConfig::ContinueDrawBefore
-	);
 	bgSpriteNode->set_render_target(meshRT);
 
-	std::shared_ptr<Object3DNode> object3dNode;
-	object3dNode = std::make_unique<Object3DNode>();
+	std::shared_ptr<StaticMeshNodeForward> object3dNode;
+	object3dNode = std::make_unique<StaticMeshNodeForward>();
 	object3dNode->initialize();
-	object3dNode->set_config(RenderNodeConfig::ContinueDrawAfter | RenderNodeConfig::ContinueDrawBefore | RenderNodeConfig::ContinueUseDpehtBefore);
+	object3dNode->set_config(RenderNodeConfig::NoClearRenderTarget);
 	object3dNode->set_render_target(meshRT);
 
-	std::shared_ptr<SkinningMeshNode> skinningMeshNode;
-	skinningMeshNode = std::make_unique<SkinningMeshNode>();
+	std::shared_ptr<SkinningMeshNodeForward> skinningMeshNode;
+	skinningMeshNode = std::make_unique<SkinningMeshNodeForward>();
 	skinningMeshNode->initialize();
-	skinningMeshNode->set_config(RenderNodeConfig::ContinueDrawAfter | RenderNodeConfig::ContinueUseDpehtAfter);
+	skinningMeshNode->set_config(RenderNodeConfig::NoClearRenderTarget | RenderNodeConfig::NoClearDepth);
 	skinningMeshNode->set_render_target(meshRT);
 
 	outlineNode = std::make_shared<OutlineNode>();
 	outlineNode->initialize();
-	outlineNode->set_config(RenderNodeConfig::ContinueDrawBefore);
-	outlineNode->set_depth_resource(DepthStencilValue::depthStencil->texture_gpu_handle());
-	outlineNode->set_texture_resource(meshRT->offscreen_render().texture_gpu_handle());
-	outlineNode->set_render_target(sceneOut);
+	outlineNode->set_shader_texture(renderTextures[0], RenderingSystemValues::GetDepthStencilTexture());
+	outlineNode->set_render_target(baseRenderTexture);
 
 	std::shared_ptr<ParticleMeshNode> particleMeshNode;
 	particleMeshNode = std::make_unique<ParticleMeshNode>();
 	particleMeshNode->initialize();
-	//particleBillboardNode->set_config(RenderNodeConfig::ContinueDrawAfter | RenderNodeConfig::ContinueUseDpehtBefore);
-	particleMeshNode->set_config(RenderNodeConfig::ContinueDrawAfter | RenderNodeConfig::NoClearDepth);
-	//particleBillboardNode->set_render_target(renderTarget);s
-	particleMeshNode->set_render_target(sceneOut);
+	particleMeshNode->set_config(RenderNodeConfig::NoClearRenderTarget | RenderNodeConfig::NoClearDepth);
+	particleMeshNode->set_render_target(baseRenderTexture);
 
 	std::shared_ptr<SpriteNode> spriteNode;
 	spriteNode = std::make_unique<SpriteNode>();
 	spriteNode->initialize();
-	spriteNode->set_config(
-		RenderNodeConfig::NoClearRenderTarget
-	);
-	spriteNode->set_render_target(sceneOut);
+	spriteNode->set_config(RenderNodeConfig::NoClearRenderTarget);
+	spriteNode->set_render_target(baseRenderTexture);
 
 	luminanceExtractionNode = eps::CreateShared<LuminanceExtractionNode>();
 	luminanceExtractionNode->initialize();
-	luminanceExtractionNode->set_render_target();
-	luminanceExtractionNode->set_texture_resource(sceneOut->offscreen_render().texture_gpu_handle());
+	luminanceExtractionNode->set_render_target(luminanceRenderTexture);
+	luminanceExtractionNode->set_texture_resource(renderTextures[1]);
 
 	gaussianBlurNode2 = eps::CreateShared<GaussianBlurNode>();
 	gaussianBlurNode2->initialize();
-	gaussianBlurNode2->set_render_target(downSampled2);
-	gaussianBlurNode2->set_base_texture(luminanceExtractionNode->result_stv_handle());
+	gaussianBlurNode2->set_render_target(downSampleRenderTexture2);
+	gaussianBlurNode2->set_base_texture(renderTextures[2]);
 
 	gaussianBlurNode4 = eps::CreateShared<GaussianBlurNode>();
 	gaussianBlurNode4->initialize();
-	gaussianBlurNode4->set_render_target(downSampled4);
-	gaussianBlurNode4->set_base_texture(gaussianBlurNode2->result_stv_handle());
+	gaussianBlurNode4->set_render_target(downSampleRenderTexture4);
+	gaussianBlurNode4->set_base_texture(renderTextures[3]);
 
 	gaussianBlurNode8 = eps::CreateShared<GaussianBlurNode>();
 	gaussianBlurNode8->initialize();
-	gaussianBlurNode8->set_render_target(downSampled8);
-	gaussianBlurNode8->set_base_texture(gaussianBlurNode4->result_stv_handle());
+	gaussianBlurNode8->set_render_target(downSampleRenderTexture8);
+	gaussianBlurNode8->set_base_texture(renderTextures[4]);
 
 	gaussianBlurNode16 = eps::CreateShared<GaussianBlurNode>();
 	gaussianBlurNode16->initialize();
-	gaussianBlurNode16->set_render_target(downSampled16);
-	gaussianBlurNode16->set_base_texture(gaussianBlurNode8->result_stv_handle());
+	gaussianBlurNode16->set_render_target(downSampleRenderTexture16);
+	gaussianBlurNode16->set_base_texture(renderTextures[5]);
 
 	margeTextureNode = eps::CreateShared<MargeTextureNode>();
 	margeTextureNode->initialize();
-	margeTextureNode->set_render_target();
-	margeTextureNode->set_texture_resources(
-		{ 
-			gaussianBlurNode2->result_stv_handle(),
-			gaussianBlurNode4->result_stv_handle(),
-			gaussianBlurNode8->result_stv_handle(),
-			gaussianBlurNode16->result_stv_handle()
-		});
+	margeTextureNode->set_render_target(bloomBaseRenderTexture);
+	margeTextureNode->set_texture_resources({ renderTextures[3] ,renderTextures[4] ,renderTextures[5], renderTextures[6] });
 
 	bloomNode = eps::CreateShared<BloomNode>();
 	bloomNode->initialize();
-	bloomNode->set_render_target_SC(DirectXSwapChain::GetRenderTarget());
-	bloomNode->set_base_texture(sceneOut->offscreen_render().texture_gpu_handle());
-	bloomNode->set_blur_texture(margeTextureNode->result_stv_handle());
-	//bloomNode->set_config();
+	bloomNode->set_render_target_SC();
+	bloomNode->set_base_texture(renderTextures[1]);
+	bloomNode->set_blur_texture(renderTextures[7]);
 
 #ifdef _DEBUG
 	std::shared_ptr<PrimitiveLineNode> primitiveLineNode;
@@ -297,11 +282,53 @@ void GameScene::initialize() {
 #ifdef _DEBUG
 	renderPath->initialize({ bgSpriteNode,object3dNode,skinningMeshNode,outlineNode,particleMeshNode,spriteNode,
 		luminanceExtractionNode, gaussianBlurNode2, gaussianBlurNode4, gaussianBlurNode8, gaussianBlurNode16, margeTextureNode, bloomNode,
-		primitiveLineNode });
+	primitiveLineNode });
 #else
 	renderPath->initialize({ bgSpriteNode,object3dNode,skinningMeshNode,outlineNode,particleMeshNode,spriteNode,
 		luminanceExtractionNode, gaussianBlurNode2, gaussianBlurNode4, gaussianBlurNode8, gaussianBlurNode16, margeTextureNode, bloomNode });
 #endif // _DEBUG
+
+	// ---------------------- DrawManager ----------------------
+	staticMeshDrawManager = std::make_unique<StaticMeshDrawManager>();
+	staticMeshDrawManager->initialize(1);
+	staticMeshDrawManager->make_instancing(0, "RordObj.obj", 256);
+	staticMeshDrawManager->make_instancing(0, "WallObj.obj", 256);
+	staticMeshDrawManager->make_instancing(0, "IceObj.obj", 256);
+	skinningMeshDrawManager = std::make_unique<SkinningMeshDrawManager>();
+	skinningMeshDrawManager->initialize(1);
+	skinningMeshDrawManager->make_instancing(0, "ParentKoala.gltf", 1);
+	skinningMeshDrawManager->make_instancing(0, "ChiledKoala.gltf", 1);
+	skinningMeshDrawManager->make_instancing(0, "CatchEffect.gltf", 1);
+	skinningMeshDrawManager->make_instancing(0, "exclamation.gltf", 1);
+	skinningMeshDrawManager->make_instancing(0, "FlusteredEffect.gltf", 1);
+	skinningMeshDrawManager->make_instancing(0, "ReleaseEffect.gltf", 1);
+	skinningMeshDrawManager->make_instancing(0, "CatchEffect.gltf", 1);
+	skinningMeshDrawManager->make_instancing(0, "GoalObj.gltf", 2);
+	bgSpriteDrawExecutor = std::make_unique<SpriteDrawExecutor>();
+	bgSpriteDrawExecutor->reinitialize(16);
+
+	spriteDrawExecutors.resize(8);
+
+	spriteDrawExecutors[0] = std::make_unique<SpriteDrawExecutor>();
+	spriteDrawExecutors[1] = std::make_unique<SpriteDrawExecutor>();
+	spriteDrawExecutors[2] = std::make_unique<SpriteDrawExecutor>();
+	spriteDrawExecutors[3] = std::make_unique<SpriteDrawExecutor>();
+	spriteDrawExecutors[4] = std::make_unique<SpriteDrawExecutor>();
+	spriteDrawExecutors[5] = std::make_unique<SpriteDrawExecutor>();
+	spriteDrawExecutors[6] = std::make_unique<SpriteDrawExecutor>();
+	spriteDrawExecutors[7] = std::make_unique<SpriteDrawExecutor>();
+
+	spriteDrawExecutors[0]->reinitialize(1);
+	spriteDrawExecutors[1]->reinitialize(2);
+	spriteDrawExecutors[2]->reinitialize(2);
+	spriteDrawExecutors[3]->reinitialize(256);
+	spriteDrawExecutors[4]->reinitialize(256);
+	spriteDrawExecutors[5]->reinitialize(256);
+	spriteDrawExecutors[6]->reinitialize(256);
+	spriteDrawExecutors[7]->reinitialize(256);
+
+	directionalLightingExecutor = std::make_unique<DirectionalLightingExecutor>();
+	directionalLightingExecutor->reinitialize(1);
 
 	managementUI = std::make_unique<GameManagement>();
 	playerManager->set_game_management(managementUI.get());
@@ -322,12 +349,17 @@ void GameScene::initialize() {
 	rocketObj = std::make_unique<Rocket>(fieldObjs->GetGoalPos());
 	Input::SetDeadZone(0.6f);
 
-	luminanceExtractionNode->set_param(0.67f, CColor3::WHITE);
-	gaussianBlurNode2->set_parameters(1.0f, 30.48f, 8);
-	gaussianBlurNode4->set_parameters(1.0f, 30.48f, 8);
-	gaussianBlurNode8->set_parameters(1.0f, 30.48f, 8);
-	gaussianBlurNode16->set_parameters(1.0f, 30.48f, 8);
-	bloomNode->set_param(0.247f);
+	playerManager->setup(skinningMeshDrawManager);
+	fieldObjs->setup(staticMeshDrawManager);
+	rocketObj->setup(skinningMeshDrawManager);
+	background->setup(skinningMeshDrawManager);
+
+	luminanceExtractionNode->set_param(0.72f, CColor3::WHITE);
+	gaussianBlurNode2->set_parameters(1.0f, 24.61f, 8);
+	gaussianBlurNode4->set_parameters(1.0f, 24.61f, 8);
+	gaussianBlurNode8->set_parameters(1.0f, 24.61f, 8);
+	gaussianBlurNode16->set_parameters(1.0f, 24.61f, 8);
+	bloomNode->set_param(0.12f);
 }
 
 void GameScene::popped() {}
@@ -376,18 +408,34 @@ void GameScene::update() {
 }
 
 void GameScene::begin_rendering() {
-	playerManager->begin_rendering();
-	fieldObjs->begin_rendering();
+	// Update affine
+	directionalLight->update_affine();
+	camera3D->update_affine();
+	playerManager->update_affine();
+	fieldObjs->update_affine();
+	rocketObj->update_affine();
+	
+	// Transfer draw manager/executor
+	camera3D->transfer();
+	skinningMeshDrawManager->transfer();
+	staticMeshDrawManager->transfer();
+	directionalLightingExecutor->write_to_buffer(directionalLight);
 
-	camera3D->update_matrix();
-	directionalLight->begin_rendering();
-	managementUI->begin_rendering();
-	gameUI->begin_rendering();
-	background->begin_rendering();
-	rocketObj->begin_rendering();
+	// 2D
+	bgSpriteDrawExecutor->begin();
+	for(auto& executor : spriteDrawExecutors) {
+		executor->begin();
+	}
 
-	transition->begin_rendering();
-	tutorialManager->begin_rendering();
+	// Transfer
+	background->write_to_executor(bgSpriteDrawExecutor);
+
+	spriteDrawExecutors[0]->write_to_buffer(transition);
+	
+	tutorialManager->write_to_executor(spriteDrawExecutors[3], spriteDrawExecutors[4], spriteDrawExecutors[5]);
+	
+	managementUI->write_to_executor(spriteDrawExecutors[1], spriteDrawExecutors[2], spriteDrawExecutors[6], spriteDrawExecutors[7]);
+	gameUI->write_to_executor(spriteDrawExecutors[7]);
 }
 
 void GameScene::late_update() {
@@ -440,7 +488,7 @@ void GameScene::late_update() {
 	{
 		transitionTimer += WorldClock::DeltaSeconds();
 		float parametric = std::min(1.0f, transitionTimer / sceneChangeTime);
-		transition->get_color().alpha = 1 - parametric;
+		transition->get_material().color.alpha = 1 - parametric;
 		if (parametric >= 1.0f) {
 			sceneState = TransitionState::Main;
 		}
@@ -456,7 +504,7 @@ void GameScene::late_update() {
 	{
 		transitionTimer += WorldClock::DeltaSeconds();
 		float parametric = std::min(1.0f, transitionTimer / sceneChangeTime);
-		transition->get_color().alpha = parametric;
+		transition->get_material().color.alpha = parametric;
 		if (!managementUI->is_restart()) {
 			bgm->set_volume((1 - parametric) * 0.1f);
 		}
@@ -464,8 +512,9 @@ void GameScene::late_update() {
 			// リセット処理をここで呼び出す
 			if (managementUI->is_restart()) {
 				sceneState = TransitionState::In;
+				tutorialManager->initialize(currentLevel);
 				fieldObjs->initialize(levelLoader);
-				playerManager->initialize(levelLoader, fieldObjs.get(), fieldObjs->GetGoalPos());
+				playerManager->initialize(levelLoader, fieldObjs.get(), fieldObjs->GetGoalPos(), false);
 				managementUI->init();
 				rocketObj->init();
 				transitionTimer = WorldClock::DeltaSeconds();
@@ -480,28 +529,24 @@ void GameScene::late_update() {
 void GameScene::draw() const {
 	// 背景スプライト
 	renderPath->begin();
-	background->draw();
+	bgSpriteDrawExecutor->draw_command();
 
 	// StaticMesh
 	renderPath->next();
-	camera3D->register_world_projection(1);
-	camera3D->register_world_lighting(4);
-	directionalLight->register_world(5);
+	camera3D->register_world_projection(2);
+	camera3D->register_world_lighting(3);
+	directionalLightingExecutor->set_command(4);
+	staticMeshDrawManager->draw_layer(0);
 
-	fieldObjs->draw();
-
-#ifdef _DEBUG
-	camera3D->debug_draw_axis();
-#endif // _DEBUG
+	//fieldObjs->draw();
 
 	// SkinningMesh
 	renderPath->next();
-	camera3D->register_world_projection(1);
+	camera3D->register_world_projection(2);
 	camera3D->register_world_lighting(5);
-	directionalLight->register_world(6);
-	playerManager->draw();
-	rocketObj->draw();
-	background->animeDraw();
+	directionalLightingExecutor->set_command(6);
+	skinningMeshDrawManager->draw_layer(0);
+
 	// Outline
 	renderPath->next();
 	outlineNode->draw();
@@ -515,16 +560,12 @@ void GameScene::draw() const {
 
 	// 前景スプライト
 	renderPath->next();
-	gameUI->darw();
-	tutorialManager->draw();
-	managementUI->darw();
-	playerManager->draw_sprite();
-	transition->draw();
+	for(const auto& executor : spriteDrawExecutors | std::views::reverse) {
+		executor->draw_command();
+	}
 
-	// Bloom
 	renderPath->next();
 	luminanceExtractionNode->draw();
-
 	renderPath->next();
 	gaussianBlurNode2->draw();
 	renderPath->next();
@@ -564,7 +605,7 @@ void GameScene::debug_update() {
 	ImGui::Begin("WorldClock");
 	WorldClock::DebugGui();
 	ImGui::End();
-	rocketObj->debug_update();
+	//rocketObj->debug_update();
 	background->debugUpdate();
 	//ImGui::Begin("OutlineNode");
 	//outlineNode->

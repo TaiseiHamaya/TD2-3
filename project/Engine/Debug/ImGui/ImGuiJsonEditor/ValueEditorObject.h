@@ -128,7 +128,7 @@ private:
 // debug_gui()関数があるクラス
 template<typename T>
 concept HasDebugGui = requires(T t, const char* tag) {
-	{ t.debug_gui(tag) } -> std::same_as<void>;
+	{ t.debug_gui(tag) } -> std::convertible_to<void>;
 };
 
 template<typename T>

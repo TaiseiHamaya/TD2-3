@@ -3,25 +3,36 @@
 #include "Engine/Runtime/Scene/BaseScene.h"
 
 #include <memory>
+#include <vector>
 
-#include "Application/GameSprite/BackGround.h"
-#include <Application/Mapchip/MapchipField.h>
+#include <Engine/Assets/Audio/AudioPlayer.h>
+#include <Engine/GraphicsAPI/DirectX/DxResource/TextureResource/RenderTexture.h>
+#include <Engine/Module/DrawExecutor/2D/SpriteDrawExecutor.h>
+#include <Engine/Module/DrawExecutor/LightingExecutor/DirectionalLightingExecutor.h>
+#include <Engine/Module/DrawExecutor/Mesh/SkinningMeshDrawManager.h>
+#include <Engine/Module/DrawExecutor/Mesh/StaticMeshDrawManager.h>
+#include <Engine/Module/Render/RenderNode/Posteffect/Outline/OutlineNode.h>
 #include <Engine/Module/Render/RenderPath/RenderPath.h>
+#include <Engine/Module/Render/RenderTargetGroup/SingleRenderTarget.h>
 #include <Engine/Module/World/Camera/Camera3D.h>
 #include <Engine/Module/World/Light/DirectionalLight/DirectionalLightInstance.h>
-#include <Engine/Resources/Audio/AudioPlayer.h>
+
+#include "Application/GameSprite/BackGround.h"
+#include <Application/GameSprite/BackGround.h>
+#include <Application/Mapchip/MapchipField.h>
 
 #include "Application/PostEffect/GaussianBlurNode.h"
-#include "Engine/Module/Render/RenderNode/Posteffect/Outline/OutlineNode.h"
 
 class LuminanceExtractionNode;
 class MargeTextureNode;
 class BloomNode;
 class GaussianBlurNode;
 
-class MeshInstance;
+class StaticMeshInstance;
+class SkinningMeshInstance;
 class AnimatedMeshInstance;
 class SpriteInstance;
+class SingleRenderTarget;
 
 class SelectScene : public BaseScene {
 private:
@@ -76,9 +87,17 @@ private:
 	std::unique_ptr<SpriteInstance>fromGameKoara;
 
 	std::unique_ptr<RenderPath> renderPath;
+	std::vector<RenderTexture> renderTextures;
+	SingleRenderTarget meshRT;
+	SingleRenderTarget baseRenderTexture;
+	SingleRenderTarget luminanceRenderTexture;
+	SingleRenderTarget downSampleRenderTexture2;
+	SingleRenderTarget downSampleRenderTexture4;
+	SingleRenderTarget downSampleRenderTexture8;
+	SingleRenderTarget downSampleRenderTexture16;
+	SingleRenderTarget bloomBaseRenderTexture;
 
 	std::shared_ptr<OutlineNode> outlineNode;
-
 	std::shared_ptr<LuminanceExtractionNode> luminanceExtractionNode;
 	std::shared_ptr<GaussianBlurNode> gaussianBlurNode2;
 	std::shared_ptr<GaussianBlurNode> gaussianBlurNode4;
@@ -87,12 +106,19 @@ private:
 	std::shared_ptr<MargeTextureNode> margeTextureNode;
 	std::shared_ptr<BloomNode> bloomNode;
 
+	std::unique_ptr<SkinningMeshDrawManager> skinningMeshDrawManager;
+	std::unique_ptr<StaticMeshDrawManager> staticMeshDrawManager;
+	std::unique_ptr<SpriteDrawExecutor> bgSpriteDrawExecutor;
+	std::vector<std::unique_ptr<SpriteDrawExecutor>> spriteDrawExecutors;
+	std::unique_ptr<DirectionalLightingExecutor> directionalLightingExecutor;
+
+
 	std::unique_ptr<Camera3D> camera3D;
 	std::unique_ptr<DirectionalLightInstance> directionalLight;
 
-	std::unique_ptr<AnimatedMeshInstance> parentKoala;
-	std::unique_ptr<AnimatedMeshInstance> childKoala;
-	std::unique_ptr<MeshInstance> goalMesh;
+	std::unique_ptr<SkinningMeshInstance> parentKoala;
+	std::unique_ptr<SkinningMeshInstance> childKoala;
+	std::unique_ptr<StaticMeshInstance> goalMesh;
 
 	int32_t selectIndex;
 	std::unique_ptr<SpriteInstance> selectUi;

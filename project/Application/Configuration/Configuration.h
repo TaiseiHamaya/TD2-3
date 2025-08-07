@@ -1,9 +1,9 @@
 #pragma once
 
-#include <Engine/Utility/Template/SingletonInterface.h>
+#include <Library/Utility/Template/SingletonInterface.h>
 
 class Configuration final : SingletonInterface<Configuration> {
-	__SINGLETON_INTERFACE(Configuration)
+	__CLASS_SINGLETON_INTERFACE(Configuration)
 
 public:
 	enum class Language : bool {

@@ -1,10 +1,10 @@
 #include "GrayscaleNode.h"
 
-#include "Engine/Rendering/DirectX/DirectXCommand/DirectXCommand.h"
-#include "Engine/Rendering/DirectX/PipelineState/PipelineState.h"
-#include "Engine/Rendering/DirectX/PipelineState/PSOBuilder/PSOBuilder.h"
+#include "Engine/GraphicsAPI/DirectX/DxCommand/DxCommand.h"
+#include "Engine/GraphicsAPI/DirectX/DxPipelineState/DxPipelineState.h"
+#include "Engine/GraphicsAPI/DirectX/DxPipelineState/PSOBuilder/PSOBuilder.h"
 
-#ifdef _DEBUG
+#ifdef DEBUG_FEATURES_ENABLE
 #include <imgui.h>
 #endif // _DEBUG
 
@@ -19,7 +19,7 @@ void GrayscaleNode::initialize() {
 }
 
 void GrayscaleNode::draw() {
-	auto&& command = DirectXCommand::GetCommandList();
+	auto&& command = DxCommand::GetCommandList();
 	command->SetGraphicsRootDescriptorTable(1, textureGPUHandle);
 	command->SetGraphicsRootConstantBufferView(0, isGray.get_resource()->GetGPUVirtualAddress());
 	command->DrawInstanced(3, 1, 0, 0);
@@ -38,25 +38,20 @@ void GrayscaleNode::create_pipeline_state() {
 		0
 	);
 
-	ShaderBuilder shaderManager;
-	shaderManager.initialize(
-		"EngineResources/HLSL/FullscreenShader.hlsl",
-		"EngineResources/HLSL/Posteffect/Grayscale/Grayscale.PS.hlsl"
-	);
-
 	std::unique_ptr<PSOBuilder> psoBuilder = std::make_unique<PSOBuilder>();
 	psoBuilder->blendstate();
 	psoBuilder->rasterizerstate();
 	psoBuilder->rootsignature(rootSignatureBuilder.build());
-	psoBuilder->shaders(shaderManager);
+	psoBuilder->shaders(ShaderType::Vertex, "FullscreenShader.VS.hlsl");
+	psoBuilder->shaders(ShaderType::Pixel, "Grayscale.PS.hlsl");
 	psoBuilder->primitivetopologytype();
 	psoBuilder->rendertarget();
 
-	pipelineState = std::make_unique<PipelineState>();
+	pipelineState = std::make_unique<DxPipelineState>();
 	pipelineState->initialize(psoBuilder->get_rootsignature(), psoBuilder->build());
 }
 
-#ifdef _DEBUG
+#ifdef DEBUG_FEATURES_ENABLE
 void GrayscaleNode::debug_gui() {
 	ImGui::Checkbox("IsGray", reinterpret_cast<bool*>(isGray.get_data()));
 }

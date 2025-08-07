@@ -1,22 +1,30 @@
 #include "ParticleEmitterInstance.h"
 
-#include <Engine/Runtime/WorldClock/WorldClock.h>
-#include "Engine/Utility/Tools/RandomEngine.h"
-
-#include "DrawSystem/ParticleDrawSystemRect.h"
-#include "DrawSystem/ParticleDrawSystemMesh.h"
-
-#include "Engine/Resources/PolygonMesh/PolygonMeshManager.h"
-#include "Engine/Resources/Texture/TextureManager.h"
-
 #include <Library/Math/Definition.h>
+#include <Library/Utility/Tools/RandomEngine.h>
 
-ParticleEmitterInstance::ParticleEmitterInstance(std::filesystem::path jsonFile, uint32_t MaxParticle) :
+#include "./DrawSystem/ParticleDrawSystemMesh.h"
+#include "./DrawSystem/ParticleDrawSystemRect.h"
+#include "Engine/Assets/PolygonMesh/PolygonMeshLibrary.h"
+#include "Engine/Assets/Texture/TextureAsset.h"
+#include "Engine/Assets/Texture/TextureLibrary.h"
+
+ParticleEmitterInstance::ParticleEmitterInstance(std::filesystem::path jsonFile, u32 MaxParticle) :
 	WorldInstance(),
 	numMaxParticle(MaxParticle),
 	jsonResource("Particle" / jsonFile) {
-	drawType = static_cast<ParticleDrawType>(jsonResource.try_emplace<int>("DrawType"));
-	useResourceName = jsonResource.try_emplace<std::string>("useResourceName");
+	timer.set(0);
+	drawType = static_cast<ParticleDrawType>(jsonResource.try_emplace<i32>("DrawType"));
+	switch (drawType) {
+	case ParticleDrawType::Mesh:
+		useResourceName = jsonResource.try_emplace<std::string>("useResourceName");
+		break;
+	case ParticleDrawType::Rect:
+		useResourceName = TextureLibrary::GetTexture(jsonResource.try_emplace<std::string>("useResourceName"));
+		break;
+	default:
+		break;
+	}
 	switch (drawType) {
 	case ParticleDrawType::Mesh:
 		drawSystemData = std::monostate();
@@ -33,7 +41,7 @@ ParticleEmitterInstance::ParticleEmitterInstance(std::filesystem::path jsonFile,
 		break;
 	}
 	jsonResource.register_value(__JSON_RESOURCE_REGISTER(isLoop));
-	jsonResource.register_value(__JSON_RESOURCE_REGISTER(isParentThis));
+	jsonResource.register_value(__JSON_RESOURCE_REGISTER(isParentEmitter));
 	jsonResource.register_value(__JSON_RESOURCE_REGISTER(duration));
 	jsonResource.register_value(__JSON_RESOURCE_REGISTER(emission));
 	jsonResource.register_value(__JSON_RESOURCE_REGISTER(particleInit));
@@ -42,7 +50,15 @@ ParticleEmitterInstance::ParticleEmitterInstance(std::filesystem::path jsonFile,
 }
 
 void ParticleEmitterInstance::update() {
-	timer += WorldClock::DeltaSeconds();
+	if (!isActive) {
+		return;
+	}
+
+	timer.ahead();
+	if (timer > emission.delay) {
+		cycleTimer.ahead();
+	}
+
 	if (isLoop && is_end()) {
 		restart();
 	}
@@ -61,18 +77,16 @@ void ParticleEmitterInstance::update() {
 		return false;
 	});
 	// 生成
-	if (is_active() && !is_end()) {
+	if (!is_end()) {
 		emit();
 	}
 }
 
-void ParticleEmitterInstance::begin_rendering() {
-	update_affine();
-	if (!drawSystem) {
+void ParticleEmitterInstance::transfer() {
+	if (!isActive || !drawSystem || is_end_all()) {
 		return;
 	}
-	for (uint32_t index = 0; std::unique_ptr<Particle>&particle : particles) {
-		particle->update_affine();
+	for (u32 index = 0; std::unique_ptr<Particle>& particle : particles) {
 		drawSystem->write_to_buffer(
 			index,
 			particle->world_affine().to_matrix(),
@@ -84,7 +98,7 @@ void ParticleEmitterInstance::begin_rendering() {
 }
 
 void ParticleEmitterInstance::draw() const {
-	if (!isActive || !drawSystem) {
+	if (!isActive || !drawSystem || is_end_all()) {
 		return;
 	}
 
@@ -92,12 +106,15 @@ void ParticleEmitterInstance::draw() const {
 }
 
 void ParticleEmitterInstance::restart() {
-	timer = 0;
+	timer.set(0);
+	cycleTimer.set(0);
+	emittedCycle = 0;
 }
 
 void ParticleEmitterInstance::emit() {
-	uint32_t numEmits = emission.Count;
-	for (uint32_t i = 0; i < numEmits; ++i) {
+	cycleTimer.set(0);
+	++emittedCycle;
+	for (u32 i = 0; i < emission.count; ++i) {
 		size_t numParticle = particles.size();
 		if (numParticle < numMaxParticle) {
 			emit_once();
@@ -106,7 +123,7 @@ void ParticleEmitterInstance::emit() {
 }
 
 void ParticleEmitterInstance::end_force() {
-	timer = duration;
+	timer.set(duration);
 }
 
 void ParticleEmitterInstance::emit_once() {
@@ -119,10 +136,10 @@ void ParticleEmitterInstance::emit_once() {
 	case Emission::Shape::ShapeType::Sphere:
 	{
 		const auto& data = std::get<ParticleEmitterInstance::Emission::Shape::Sphere>(emission.shape.data);
-		float cos = -2.0f * RandomEngine::Random01MOD() + 1.0f;
-		float sin = std::sqrt(1.0f - cos * cos);
-		float phi = PI2 * RandomEngine::Random01MOD();
-		float radius = std::cbrt(RandomEngine::Random01MOD()) * data.radius;
+		r32 cos = -2.0f * RandomEngine::Random01MOD() + 1.0f;
+		r32 sin = std::sqrt(1.0f - cos * cos);
+		r32 phi = PI2 * RandomEngine::Random01MOD();
+		r32 radius = std::cbrt(RandomEngine::Random01MOD()) * data.radius;
 		offset = { sin * std::cos(phi), sin * std::sin(phi), cos };
 		offset *= radius;
 		break;
@@ -130,11 +147,11 @@ void ParticleEmitterInstance::emit_once() {
 	case Emission::Shape::ShapeType::Cone:
 	{
 		const auto& data = std::get<ParticleEmitterInstance::Emission::Shape::Cone>(emission.shape.data);
-		float maxCos = std::cos(data.angle);
-		float cos = maxCos + (1 - maxCos) * RandomEngine::Random01MOD();
-		float sin = std::sqrt(1.0f - cos * cos);
-		float phi = PI2 * RandomEngine::Random01MOD();
-		float radius = std::cbrt(RandomEngine::Random01MOD()) * data.radius;
+		r32 maxCos = std::cos(data.angle);
+		r32 cos = maxCos + (1 - maxCos) * RandomEngine::Random01MOD();
+		r32 sin = std::sqrt(1.0f - cos * cos);
+		r32 phi = PI2 * RandomEngine::Random01MOD();
+		r32 radius = std::cbrt(RandomEngine::Random01MOD()) * data.radius;
 		Vector3 base = { sin * std::cos(phi), sin * std::sin(phi), cos };
 		Quaternion rotation1 = Quaternion::FromToRotation(CVector3::FORWARD, base);
 		Quaternion rotation2 = Quaternion::FromToRotation(CVector3::FORWARD, data.direction);
@@ -156,7 +173,7 @@ void ParticleEmitterInstance::emit_once() {
 		break;
 	}
 	// 方向
-	float speed = std::lerp(particleInit.speed.min, particleInit.speed.max, RandomEngine::Random01Closed());
+	r32 speed = std::lerp(particleInit.speed.min, particleInit.speed.max, RandomEngine::Random01Closed());
 	Vector3 direction;
 	switch (particleInit.direction.mode) {
 	case ParticleInit::Direction::Mode::Constant:
@@ -171,8 +188,8 @@ void ParticleEmitterInstance::emit_once() {
 	case ParticleInit::Direction::Mode::AngleRange:
 	{
 		const auto& data = std::get<ParticleEmitterInstance::ParticleInit::Direction::AngleRange>(particleInit.direction.data);
-		float angle = std::lerp(0.0f, data.angle, RandomEngine::Random01Closed());
-		float phi = std::lerp(0.0f, PI2, RandomEngine::Random01Closed());
+		r32 angle = std::lerp(0.0f, data.angle, RandomEngine::Random01Closed());
+		r32 phi = std::lerp(0.0f, PI2, RandomEngine::Random01Closed());
 		direction = data.baseDirection *
 			Quaternion::AngleAxis(CVector3::UP, phi) * Quaternion::AngleAxis(CVector3::FORWARD, angle);
 	}
@@ -181,7 +198,7 @@ void ParticleEmitterInstance::emit_once() {
 		break;
 	}
 	// 回転
-	std::variant<Particle::Constant, std::monostate, Particle::Random> rotation{ std::monostate{} };
+	std::variant<Particle::Constant, std::monostate, Particle::Random, Particle::LookAtAngle> rotation{ std::monostate{} };
 	switch (particleInit.rotation.mode) {
 	case Particle::RotationType::Constant:
 	{
@@ -192,13 +209,24 @@ void ParticleEmitterInstance::emit_once() {
 	case Particle::RotationType::Velocity:
 	case Particle::RotationType::LookAt:
 		break;
+	case Particle::RotationType::LookAtAngle:
+	{
+		const auto& data = std::get<ParticleInit::Rotation::LookAtAngle>(particleInit.rotation.data);
+		r32 temp = std::lerp(data.angleParSec.min, data.angleParSec.max, RandomEngine::Random01Closed());
+		if (data.isRandomDirection && RandomEngine::Random01Bit<bool>()) {
+			temp *= -1;
+		}
+		rotation = Particle::LookAtAngle{
+			.angleParSec = temp
+		};
+	}
+	break;
 	case Particle::RotationType::Random:
 	{
 		const auto& data = std::get<ParticleInit::Rotation::Random>(particleInit.rotation.data);
-		float cos = -2.0f * RandomEngine::Random01MOD() + 1.0f;
-		float sin = std::sqrt(1.0f - cos * cos);
-		float phi = PI2 * RandomEngine::Random01MOD();
-		float radius = std::pow(RandomEngine::Random01MOD(), 1.0f / 3.0f);
+		r32 cos = -2.0f * RandomEngine::Random01MOD() + 1.0f;
+		r32 sin = std::sqrt(1.0f - cos * cos);
+		r32 phi = PI2 * RandomEngine::Random01MOD();
 		Vector3 axis = { sin * std::cos(phi), sin * std::sin(phi), cos };
 		rotation = Particle::Random{
 			.axis = axis.normalize_safe(),
@@ -213,7 +241,7 @@ void ParticleEmitterInstance::emit_once() {
 	// 生成
 	auto& newParticle = particles.emplace_back(
 		std::make_unique<Particle>(
-			world_position() + offset,
+			isParentEmitter ? offset : world_position() + offset,
 			std::lerp(particleInit.lifetime.min, particleInit.lifetime.max, RandomEngine::Random01Closed()),
 			direction * speed,
 			Vector3::LerpElement(particleInit.acceleration.min, particleInit.acceleration.max,
@@ -229,7 +257,7 @@ void ParticleEmitterInstance::emit_once() {
 			particleInit.rotation.mode, rotation
 		)
 	);
-	if (isParentThis) {
+	if (isParentEmitter) {
 		newParticle->reparent(this, false);
 	}
 }
@@ -246,11 +274,15 @@ void ParticleEmitterInstance::create_draw_system() {
 	drawSystem.reset();
 	switch (drawType) {
 	case ParticleDrawType::Mesh:
-		drawSystem = std::make_unique<ParticleDrawSystemMesh>(useResourceName);
+	{
+		auto& val = std::get<0>(useResourceName);
+		drawSystem = std::make_unique<ParticleDrawSystemMesh>(val);
 		break;
+	}
 	case ParticleDrawType::Rect:
 	{
-		auto rectSystem = std::make_unique<ParticleDrawSystemRect>(useResourceName);
+		auto& val = std::get<1>(useResourceName);
+		auto rectSystem = std::make_unique<ParticleDrawSystemRect>(val);
 		const auto& data = std::get<Rect>(drawSystemData);
 		rectSystem->create_rect(data.rect, data.pivot);
 		drawSystem = std::move(rectSystem);
@@ -262,61 +294,72 @@ void ParticleEmitterInstance::create_draw_system() {
 	drawSystem->create_buffers(numMaxParticle);
 }
 
-#ifdef _DEBUG
-#include <imgui.h>
-void ParticleEmitterInstance::debug_gui() {
-	if (ImGui::CollapsingHeader("Emitter")) {
-		WorldInstance::debug_gui();
-	}
-	if (ImGui::CollapsingHeader("Particles")) {
-		ImGui::Text("Now/Max : %d/%d", particles.size(), numMaxParticle);
-	}
-	ImGui::Text("DrawType");
-	if (ImGui::RadioButton("Mesh", drawType == ParticleDrawType::Mesh)) {
-		drawType = ParticleDrawType::Mesh;
-		drawSystemData = std::monostate();
-	}
-	ImGui::SameLine();
-	if (ImGui::RadioButton("Rect", drawType == ParticleDrawType::Rect)) {
-		drawType = ParticleDrawType::Rect;
-		drawSystemData = Rect{};
-	}
-	ImGui::Text("Draw use : %s", useResourceName.c_str());
-	switch (drawType) {
-	case ParticleDrawType::Mesh:
-		PolygonMeshManager::MeshListGui(useResourceName);
-		break;
-	case ParticleDrawType::Rect:
-	{
-		TextureManager::TextureListGui(useResourceName);
-		auto& data = std::get<Rect>(drawSystemData);
+#ifdef DEBUG_FEATURES_ENABLE
+//#include <imgui.h>
+//void ParticleEmitterInstance::debug_gui() {
+//	if (ImGui::CollapsingHeader("Emitter")) {
+//		WorldInstance::debug_gui();
+//	}
+//	if (ImGui::CollapsingHeader("Particles")) {
+//		ImGui::Text("Now/Max : %d/%d", particles.size(), numMaxParticle);
+//	}
+//	ImGui::Text("DrawType");
+//	if (ImGui::RadioButton("Mesh", drawType == ParticleDrawType::Mesh)) {
+//		drawType = ParticleDrawType::Mesh;
+//		drawSystemData = std::monostate();
+//		useResourceName = "";
+//	}
+//	ImGui::SameLine();
+//	if (ImGui::RadioButton("Rect", drawType == ParticleDrawType::Rect)) {
+//		drawType = ParticleDrawType::Rect;
+//		drawSystemData = Rect{};
+//		useResourceName = TextureLibrary::GetTexture("");
+//	}
+//	std::string_view resourceName;
+//	switch (drawType) {
+//	case ParticleDrawType::Mesh:
+//	{
+//		auto& val = std::get<0>(useResourceName);
+//		resourceName = val;
+//		ImGui::Text("Draw use : %s", val.c_str());
+//		PolygonMeshLibrary::MeshListGui(val);
+//		break;
+//
+//	}
+//	case ParticleDrawType::Rect:
+//	{
+//		auto& val = std::get<1>(useResourceName);
+//		resourceName = val->name();
+//		ImGui::Text("Draw use : %s", resourceName.data());
+//		TextureLibrary::TextureListGui(val);
+//		auto& data = std::get<Rect>(drawSystemData);
+//
+//		ImGui::DragFloat2("Size", &data.rect.x, 0.1f, 0.0f, 1e10f);
+//		ImGui::DragFloat2("Pivot", &data.pivot.x, 0.01f);
+//		break;
+//	}
+//	default:
+//		break;
+//	}
+//	if (ImGui::Button("Apply")) {
+//		create_draw_system();
+//	}
+//	ImGui::Separator();
+//	jsonResource.editor_gui();
+//	if (ImGui::Button("Save")) {
+//		jsonResource.write("DrawType", drawType);
+//		jsonResource.write("useResourceName", resourceName);
+//		if (drawType == ParticleDrawType::Rect) {
+//			const auto& data = std::get<Rect>(drawSystemData);
+//			jsonResource.write("Size", data.rect);
+//			jsonResource.write("Pivot", data.pivot);
+//		}
+//		jsonResource.save();
+//	}
+//}
 
-		ImGui::DragFloat2("Size", &data.rect.x, 0.1f, 0.0f, 1e10f);
-		ImGui::DragFloat2("Pivot", &data.pivot.x, 0.01f);
-		break;
-	}
-	default:
-		break;
-	}
-	if (ImGui::Button("Apply")) {
-		create_draw_system();
-	}
-	ImGui::Separator();
-	jsonResource.show_imgui();
-	if (ImGui::Button("Save")) {
-		jsonResource.write("DrawType", drawType);
-		jsonResource.write("useResourceName", useResourceName);
-		if (drawType == ParticleDrawType::Rect) {
-			const auto& data = std::get<Rect>(drawSystemData);
-			jsonResource.write("Size", data.rect);
-			jsonResource.write("Pivot", data.pivot);
-		}
-		jsonResource.save();
-	}
-}
-
-void ParticleEmitterInstance::ParticleInit::debug_gui(const char* tag) {
-	constexpr float FLOAT_MAX = std::numeric_limits<float>::max();
+void ParticleEmitterInstance::ParticleInit::debug_gui(string_literal tag) {
+	constexpr r32 FLOAT_MAX = std::numeric_limits<r32>::max();
 	if (ImGui::TreeNode(tag)) {
 		ImGui::DragFloatRange2("Lifetime", &lifetime.min, &lifetime.max, 0.01f, 0.0f, FLOAT_MAX);
 		ImGui::DragFloatRange2("Speed", &speed.min, &speed.max, 0.1f, 0.0f, FLOAT_MAX);
@@ -383,6 +426,11 @@ void ParticleEmitterInstance::ParticleInit::debug_gui(const char* tag) {
 				rotation.data = std::monostate();
 			}
 			ImGui::SameLine();
+			if (ImGui::RadioButton("LookAtAngle", rotation.mode == Particle::RotationType::LookAtAngle)) {
+				rotation.mode = Particle::RotationType::LookAtAngle;
+				rotation.data = Rotation::LookAtAngle();
+			}
+			ImGui::SameLine();
 			if (ImGui::RadioButton("Random", rotation.mode == Particle::RotationType::Random)) {
 				rotation.mode = Particle::RotationType::Random;
 				rotation.data = Rotation::Random();
@@ -398,6 +446,13 @@ void ParticleEmitterInstance::ParticleInit::debug_gui(const char* tag) {
 			case Particle::RotationType::Velocity:
 			case Particle::RotationType::LookAt:
 				break;
+			case Particle::RotationType::LookAtAngle:
+			{
+				auto& data = std::get<ParticleEmitterInstance::ParticleInit::Rotation::LookAtAngle>(rotation.data);
+				ImGui::DragFloatRange2("AngleParSec", &data.angleParSec.min, &data.angleParSec.max, 0.01f);
+				ImGui::Checkbox("IsRandomDirection", &data.isRandomDirection);
+				break;
+			}
 			case Particle::RotationType::Random:
 			{
 				auto& data = std::get<ParticleEmitterInstance::ParticleInit::Rotation::Random>(rotation.data);
@@ -417,7 +472,7 @@ void ParticleEmitterInstance::ParticleInit::debug_gui(const char* tag) {
 	}
 }
 
-void ParticleEmitterInstance::ParticleFinal::debug_gui(const char* tag) {
+void ParticleEmitterInstance::ParticleFinal::debug_gui(string_literal tag) {
 	if (ImGui::TreeNode(tag)) {
 		ImGui::DragFloat3("SizeMin", &size.min.x, 0.1f);
 		ImGui::DragFloat3("SizeMax", &size.max.x, 0.1f);
@@ -428,13 +483,13 @@ void ParticleEmitterInstance::ParticleFinal::debug_gui(const char* tag) {
 	}
 }
 
-void ParticleEmitterInstance::Emission::debug_gui(const char* tag) {
-	constexpr float FLOAT_MAX = std::numeric_limits<float>::max();
+void ParticleEmitterInstance::Emission::debug_gui(string_literal tag) {
+	constexpr r32 FLOAT_MAX = std::numeric_limits<r32>::max();
 	if (ImGui::TreeNode(tag)) {
-		ImGui::DragFloat("Time", &Time, 0.1f, 0.0f, FLOAT_MAX);
-		ImGui::InputScalar("Count", ImGuiDataType_U32, &Count);
-		ImGui::InputScalar("Cycles", ImGuiDataType_U32, &Cycles);
-		ImGui::DragFloat("Interval", &Interval, 0.1f, 0.0f, FLOAT_MAX);
+		ImGui::DragFloat("Delay", &delay, 0.1f, 0.0f, FLOAT_MAX);
+		ImGui::InputScalar("Count", ImGuiDataType_U32, &count);
+		ImGui::InputScalar("Cycles", ImGuiDataType_U32, &cycles);
+		ImGui::DragFloat("Interval", &interval, 0.1f, 0.0f, FLOAT_MAX);
 		ImGui::Separator();
 		if (ImGui::TreeNode("Shape")) {
 			if (ImGui::RadioButton("Point", shape.shapeType == Shape::ShapeType::Point)) {

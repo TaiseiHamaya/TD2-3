@@ -5,27 +5,28 @@
 
 #include <Engine/Runtime/Input/Input.h>
 
-#include <Engine/Utility/Tools/ConstructorMacro.h>
 #include <Library/Math/Vector3.h>
+#include <Library/Utility/Tools/ConstructorMacro.h>
 
-class MeshInstance;
+class StaticMeshInstance;
 class WorldInstance;
 
 template<typename T>
 class Reference;
 
 class LevelLoader;
+class StaticMeshDrawManager;
 
 class MapchipField {
 private:
 	struct Field {
-		std::unique_ptr<MeshInstance> mesh;
+		std::unique_ptr<StaticMeshInstance> mesh;
 		uint32_t type;
 		bool isZeroGravity;
 
 		Field();
 		~Field() = default;
-		__NON_COPYABLE_CLASS(Field)
+		__CLASS_NON_COPYABLE(Field)
 	};
 
 public:
@@ -34,9 +35,9 @@ public:
 
 public:
 	void initialize(Reference<const LevelLoader> level);
+	void setup(Reference<StaticMeshDrawManager> executor);
 	void update();
-	void begin_rendering();
-	void draw();
+	void update_affine();
 
 public:
 	uint32_t row() const { return rowSize; }
@@ -46,7 +47,7 @@ public:
 public:
 	//アクセッサ
 	int getElement(float x, float y);
-	const Vector3 &GetGoalPos() { return goalPos; }
+	const Vector3& GetGoalPos() { return goalPos; }
 private:
 
 	uint32_t rowSize;
