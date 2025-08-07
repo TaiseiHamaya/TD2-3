@@ -310,12 +310,12 @@ void SelectScene::initialize() {
 	staticMeshDrawManager->register_instance(goalMesh);
 	background->setup(skinningMeshDrawManager);
 
-	luminanceExtractionNode->set_param(0.67f, CColor3::WHITE);
-	gaussianBlurNode2->set_parameters(1.0f, 16.17f, 8);
-	gaussianBlurNode4->set_parameters(1.0f, 16.17f, 8);
-	gaussianBlurNode8->set_parameters(1.0f, 16.17f, 8);
-	gaussianBlurNode16->set_parameters(1.0f, 16.17f, 8);
-	bloomNode->set_param(0.247f);
+	luminanceExtractionNode->set_param(0.72f, CColor3::WHITE);
+	gaussianBlurNode2->set_parameters(1.0f, 24.61f, 8);
+	gaussianBlurNode4->set_parameters(1.0f, 24.61f, 8);
+	gaussianBlurNode8->set_parameters(1.0f, 24.61f, 8);
+	gaussianBlurNode16->set_parameters(1.0f, 24.61f, 8);
+	bloomNode->set_param(0.12f);
 }
 
 void SelectScene::popped() {

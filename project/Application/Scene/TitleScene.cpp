@@ -222,12 +222,12 @@ void TitleScene::initialize() {
 	skinningMeshDrawManager->register_instance(parentObj);
 	skinningMeshDrawManager->register_instance(chiledObj);
 
-	luminanceExtractionNode->set_param(0.67f, CColor3::WHITE);
-	gaussianBlurNode2->set_parameters(1.0f, 30.48f, 8);
-	gaussianBlurNode4->set_parameters(1.0f, 30.48f, 8);
-	gaussianBlurNode8->set_parameters(1.0f, 30.48f, 8);
-	gaussianBlurNode16->set_parameters(1.0f, 30.48f, 8);
-	bloomNode->set_param(0.247f);
+	luminanceExtractionNode->set_param(0.72f, CColor3::WHITE);
+	gaussianBlurNode2->set_parameters(1.0f, 24.61f, 8);
+	gaussianBlurNode4->set_parameters(1.0f, 24.61f, 8);
+	gaussianBlurNode8->set_parameters(1.0f, 24.61f, 8);
+	gaussianBlurNode16->set_parameters(1.0f, 24.61f, 8);
+	bloomNode->set_param(0.12f);
 }
 
 void TitleScene::popped() {}
