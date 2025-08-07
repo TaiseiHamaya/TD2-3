@@ -50,7 +50,7 @@ void PlayerStateRotateFailed::Update(Player& player) {
 			// 前半区間（start → mid）
 			float t = totalProgress / 0.5f; // 正規化した進行度
 			currentRotation = Quaternion::Slerp(player.get_start_rotation(), player.get_mid_rotation(), t);
-			if (totalProgress >= 0.45f && exclamationProgress <= 0.3f) {
+			if (totalProgress >= 0.40f && exclamationProgress <= 0.3f) {
 				player.exclamation_data().isActive = true;
 				//unmovable->restart();
 				player.exclamation_data().exclamation_->get_animation()->restart();
