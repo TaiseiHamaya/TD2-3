@@ -127,15 +127,6 @@ public: // アクセッサ
 #ifdef _DEBUG
 	void debug_update();
 #endif
-private:
-
-
-	void move_update();
-	void rotate_update();
-	void wall_move();
-	void rotate_failed_update();
-
-
 
 private:
 	// ステートの設定

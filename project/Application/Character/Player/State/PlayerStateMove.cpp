@@ -57,6 +57,6 @@ void PlayerStateMove::Exit(Player& player) {
 	//isMoved = true;
 	player.set_on_ice(false);
 	player.set_stack_movement(true);
-	player.set_state(PlayerState::Idle);
+
 	player.set_translate(player.get_target_pos());
 }

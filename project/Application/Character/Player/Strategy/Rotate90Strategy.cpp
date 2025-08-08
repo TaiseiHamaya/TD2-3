@@ -108,7 +108,7 @@ bool Rotate90Strategy::CanRotate(Player& player, const Vector3& childDirection) 
 
 		Vector3 midDir = Vector3::Normalize(midChildPos - player.get_translate());
 
-		if (std::round(player.get_child()->get_translate().x == 1.0f)) {
+		if (std::round(player.get_child()->get_translate().x) == 1.0f) {
 			midDir = GameUtility::rotate_direction_90_right(midDir);
 		}
 		else if (std::round(player.get_child()->get_translate().x) == -1.0f){
@@ -175,38 +175,7 @@ bool Rotate90Strategy::CanRotate(Player& player, const Vector3& childDirection) 
 
 	Quaternion midRotation = Quaternion::LookForward(midDir);
 
-	//if (std::round(player.get_move_direction().x == 1.0f) || std::round(player.get_move_direction().z == 1.0f)) {
-	//	
-	//		const float rotateAngle = 15.0f * (std::numbers::pi_v<float> / 180.0f);
-	//		// 15度だけ回したクォータニオン
-	//		stepRotation = Quaternion::AngleAxis(rotationAxis, rotateAngle);
-	//	}
-	//	else {
-	//		const float rotateAngle = 60.0f * (std::numbers::pi_v<float> / 180.0f);
-	//		// 15度だけ回したクォータニオン
-	//		stepRotation = Quaternion::AngleAxis(rotationAxis, rotateAngle);
-	//	}
-	//}
-	//else if (std::round(player.get_move_direction().x == -1.0f) || std::round(player.get_move_direction().z == -1.0f)) {
-	//	if (blockedMid) {
-	//		const float rotateAngle = 345.0f * (std::numbers::pi_v<float> / 180.0f);
-	//		// 15度だけ回したクォータニオン
-	//		stepRotation = Quaternion::AngleAxis(rotationAxis, rotateAngle);
-	//	}
-	//	else {
-	//		const float rotateAngle = 300.0f * (std::numbers::pi_v<float> / 180.0f);
-	//		// 15度だけ回したクォータニオン
-	//		stepRotation = Quaternion::AngleAxis(rotationAxis, rotateAngle);
-	//	}
-	//}
-
-	// 中間回転 = startRotation に stepRotation をかけたもの
-	//Quaternion midRotation = stepRotation * player.get_rotation();
-
 	player.set_mid_rotation(midRotation);
-
-	// midRotateをぶつかる向きに合わせて設定（例：最短回転側でぶつかった壁の向き）
-	//player.set_mid_rotation(Quaternion::FromToRotation({ 0, 0, -1 }, childDirection));
 
 	player.change_state("RotateFailed");
 	return false;
