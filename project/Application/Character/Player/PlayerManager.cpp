@@ -196,10 +196,10 @@ void PlayerManager::update() {
 	else if (stageSituation == 2) {
 		gameManagement_->SetFailedFlag(true);
 		gameManagement_->SetFailedSelect(1);
-		//Vector3 playerPos = player->move_start_position();
-		//Quaternion playerRot = player->start_rotation();
+		Vector3 playerPos = player->move_start_position();
+		Quaternion playerRot = player->start_rotation();
 
-		//emplace_log(playerPos, playerRot);
+		emplace_log(playerPos, playerRot);
 		child->get_object()->reparent(nullptr);
 		child->get_object()->get_animation()->reset_animation("Relese");
 		child->get_object()->get_animation()->restart();
