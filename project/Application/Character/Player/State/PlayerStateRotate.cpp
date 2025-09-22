@@ -31,6 +31,7 @@ void PlayerStateRotate::Update(Player& player) {
 	if (rotateTimer >= rotateDuration) {
 		//playerState = PlayerState::Moving;
 		player.change_state("MoveCheck");
+		player.set_rotation(player.get_target_rotation());
 		//isRotating = false;
 		return;
 	}
@@ -74,5 +75,7 @@ void PlayerStateRotate::Exit(Player& player) {
 	player.set_rotate_type(RotateType::None);
 	player.set_rotating(false);
 
-	player.set_rotation(player.get_target_rotation());
+	//player.set_stack_movement(true);
+
+
 }

@@ -44,6 +44,7 @@ void PlayerStateMove::Update(Player& player) {
 	else {
 		if (moveTimer >= player.get_move_duration()) {
 			player.change_state("Idle");
+			player.set_translate(player.get_target_pos());
 			return;
 		}
 	}
@@ -58,5 +59,5 @@ void PlayerStateMove::Exit(Player& player) {
 	player.set_on_ice(false);
 	player.set_stack_movement(true);
 
-	player.set_translate(player.get_target_pos());
+
 }

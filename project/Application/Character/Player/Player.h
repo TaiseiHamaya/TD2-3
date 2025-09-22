@@ -92,7 +92,9 @@ public: // アクセッサ
 	bool is_falled()const { return isFalled; }
 
 	bool is_stack_movement() const { return isStackMovement; }
+
 	void set_stack_movement(bool flag) { isStackMovement = flag; }
+
 	void on_undo(Vector3 position, Quaternion direction, bool isParent);
 	Vector3 move_start_position() const { return moveStartPosition; }
 	void set_start_position(const Vector3& pos) { moveStartPosition = pos; }
