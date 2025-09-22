@@ -454,7 +454,7 @@ void PlayerManager::manage_parent_child_relationship() {
 		}
 		// 子をプレイヤーから切り離す処理
 		if (Input::IsTriggerKey(KeyID::Space) || Input::IsTriggerPad(PadID::A)) {
-			emplace_log(player->get_translate(), player->get_rotation());
+			emplace_log(player->get_translate(), player->get_start_rotation());
 			detach_child_from_player(player.get(), child.get());
 		}
 

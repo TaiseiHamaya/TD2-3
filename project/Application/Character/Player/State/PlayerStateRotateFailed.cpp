@@ -8,6 +8,7 @@ void PlayerStateRotateFailed::Enter(Player& player) {
 	player.exclamation_data().timer = 0.0f;
 	rotateTimer = 0.0f;
 	player.set_rotating(true);
+	player.set_start_rotation(player.get_rotation());
 	// 移動の方向を戻しておく
 	player.set_move_direction(player.get_previous_direction());
 	player.set_state(PlayerState::RotationFailed);

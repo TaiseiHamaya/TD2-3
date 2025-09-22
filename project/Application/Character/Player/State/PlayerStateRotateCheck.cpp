@@ -29,6 +29,7 @@ void PlayerStateRotateCheck::Enter(Player& player) {
 		strategy_ = std::make_unique<Rotate180Strategy>();
 	}
 	else {
+		player.set_start_rotation(player.get_rotation());
 		player.change_state("MoveCheck");
 	}
 }
@@ -36,12 +37,8 @@ void PlayerStateRotateCheck::Enter(Player& player) {
 void PlayerStateRotateCheck::Update(Player& player) {
 	if (!strategy_) return;
 
-	if (strategy_->CanRotate(player, childDirection)) {
-		// 成功時の状態遷移
-		//player.change_state("Rotate");
-	}
-	else {
-		// 失敗 → Idle に戻るとか
+	if (!strategy_->CanRotate(player, childDirection)) {
+		// 失敗
 		player.change_state("RotateFailed");
 	}
 }
