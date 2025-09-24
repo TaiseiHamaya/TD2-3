@@ -61,9 +61,6 @@ private:
 	void set_move_parameters(const Vector3& direction);
 	void set_move_failed_parameters(const Vector3& direction);
 
-	void set_rotate_parameters(const Vector3& direction);
-	void set_rotate_failed_parameters(const Vector3& direction);
-
 private:
 	std::unique_ptr<Player> player;
 	std::unique_ptr<Child> child;

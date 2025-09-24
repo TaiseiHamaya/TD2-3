@@ -15,10 +15,12 @@ public:
 	Child();
 
 public:
-	void initialize(const LevelLoader& level, MapchipHandler* mapchipHandler) override;
-	void finalize() override;
-	void update() override;
-	void update_affine() override;
+    void initialize(const LevelLoader& level, MapchipField* mapchipField) override;
+    void finalize() override;
+    void update() override;
+    void begin_rendering() override;
+    void draw() const override;
+
 
 	void set_parent(StaticMeshInstance* parent) { object_->reparent(parent);  }
 	void unset_parent() { object_->reparent(nullptr); }

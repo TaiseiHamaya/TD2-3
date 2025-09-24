@@ -5,7 +5,7 @@ Child::Child() {
 	flusteredEffect_ = std::make_unique<SkinningMeshInstance>();
 }
 
-void Child::initialize(const LevelLoader& level, MapchipHandler* mapchipHandler)
+void Child::initialize(const LevelLoader& level, MapchipField* mapchipField)
 {
 	object_->reparent(nullptr);
 	object_->reset_animated_mesh("ChiledKoala.gltf", "Standby", true);
@@ -23,8 +23,6 @@ void Child::initialize(const LevelLoader& level, MapchipHandler* mapchipHandler)
 		mat.lightingType = LighingType::None;
 	}
 	//音関連
-
-	
 }
 
 void Child::finalize()
