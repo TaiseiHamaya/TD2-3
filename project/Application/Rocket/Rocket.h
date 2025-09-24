@@ -1,12 +1,16 @@
 #pragma once
+
 #include <memory>
-#include "Engine/Resources/Audio/AudioPlayer.h"
+
+#include <Engine/Assets/Audio/AudioPlayer.h>
 #include <Engine/Module/World/Particle/ParticleEmitterInstance.h>
-#include "Engine/Runtime/WorldClock/WorldClock.h"
 
-
-class AnimatedMeshInstance;
 #include <Library/Math/Vector3.h>
+#include <Library/Utility/Template/Reference.h>
+
+class SkinningMeshInstance;
+class SkinningMeshDrawManager;
+
 class Rocket
 {
 public:
@@ -14,18 +18,21 @@ public:
 	~Rocket();
 
 	void init();
-	void update(int state) ;
+
+	void setup(Reference<SkinningMeshDrawManager> drawManger);
+
+	void update(int state);
 	void begin();
-	void begin_rendering() ;
-	void debug_update() ;
-	void draw();
+	void update_affine();
+	//void debug_update();
+
 	void draw_particle();
 
 	void isClear();
 	void isFailed();
 	void particleUpdate();
 private:
-	std::unique_ptr<AnimatedMeshInstance> animatedMeshInstance;
+	std::unique_ptr<SkinningMeshInstance> animatedMeshInstance;
 	bool isResult;
 	// パーティクルの召還
 	std::unique_ptr<ParticleEmitterInstance> gushingEmitter;
@@ -33,7 +40,7 @@ private:
 
 	bool isFailedFlag;
 	float particleSpawnTime;
-	
+
 	float explosionSpawnTime;
 	bool spwanParticle;
 	bool spwanParticle2;

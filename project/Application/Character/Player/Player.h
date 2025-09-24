@@ -1,24 +1,32 @@
 #pragma once
 #include "Application/Character/CharacterBase.h"
-#include "Engine/Runtime/WorldClock/WorldClock.h"
-#include <Application/Mapchip/MapchipHandler.h>
+#include "Application/Character/Child/Child.h"
+#include "Application/Mapchip/MapchipHandler.h"
 #include "CharacterStates.h"
-#include "Engine/Resources/Audio/AudioPlayer.h"
+
+#include <Engine/Assets/Audio/AudioPlayer.h>
 #include <Engine/Module/World/Particle/ParticleEmitterInstance.h>
+#include <Engine/Runtime/Clock/WorldClock.h>
+
 #include <memory>
 #include "Application/Character/Child/Child.h"
 #include "Application/Character/Player/State/PlayerStateBase.h"
 
+class SkinningMeshDrawManager;
 
 class Player : public CharacterBase {
 public:
+	Player();
+
+public:
 	void initialize(const LevelLoader& level, MapchipField* mapchipField) override;
+	void setup(Reference<SkinningMeshDrawManager> drawManager);
+
 	void finalize() override;
 	void update() override;
 	void fall_update();
 
-	void begin_rendering() override;
-	void draw() const override;
+	void update_affine() override;
 
 	// 状態の切り替え
 	void change_state(const std::string& stateName);
@@ -147,12 +155,13 @@ private:
 	PlayerAnimation playerAnimation = PlayerAnimation::Normal;
 
 	MapchipField* mapchipField_;
-	Child* child_; // 子オブジェクト
 
 
-
+	Child* child_; // 子オブジェクトへの参照
+	// 回転失敗時エフェクト
+	std::unique_ptr<SkinningMeshInstance> exclamation_;
 	// 焦るときエフェクト
-	std::unique_ptr<AnimatedMeshInstance> flusteredEffect_;
+	std::unique_ptr<SkinningMeshInstance> flusteredEffect_;
 
 
 	ExclamationData exclamationData_;

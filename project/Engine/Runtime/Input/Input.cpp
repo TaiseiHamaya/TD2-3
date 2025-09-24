@@ -232,7 +232,7 @@ void Input::create_direct_input() {
 
 	// 作成
 	result = DirectInput8Create(
-		WinApp::GetWindowHandle(),
+		WinApp::GetInstanceHandle(),
 		DIRECTINPUT_VERSION,
 		IID_IDirectInput8,
 		reinterpret_cast<void**>(directInput.GetAddressOf()),

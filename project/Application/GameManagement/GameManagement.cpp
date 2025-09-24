@@ -6,10 +6,12 @@
 
 #include <Application/Configuration/Configuration.h>
 
+#include <Library/Utility/Tools/SmartPointer.h>
+
+#include <Engine/Module/DrawExecutor/2D/SpriteDrawExecutor.h>
 #include <Engine/Module/World/Sprite/SpriteInstance.h>
+#include <Engine/Runtime/Clock/WorldClock.h>
 #include <Engine/Runtime/Input/Input.h>
-#include <Engine/Runtime/WorldClock/WorldClock.h>
-#include <Engine/Utility/Tools/SmartPointer.h>
 
 #include <Application/Configuration/Configuration.h>
 
@@ -70,16 +72,6 @@ void GameManagement::init() {
 		toSelectKoara = std::make_unique<SpriteInstance>("KoaraFace.png", Vector2(0.5f, 0.5f));
 		toSelectKoara->get_transform().set_translate({ 640.0f, -360.0f });
 	}
-	goSelect->get_transform().set_scale({ 0.5f,1.0f });
-	goSelect->get_uv_transform().set_scale({ 0.5f,1.0f });
-	goSelect->get_transform().set_translate({ 789,247 });
-
-	nextUI->get_transform().set_scale({ 0.5f,1.0f });
-	nextUI->get_uv_transform().set_scale({ 0.5f,1.0f });
-	nextUI->get_transform().set_translate({ 789,247 });
-
-	retryUI->get_transform().set_scale({ 0.5f,1.0f });
-	retryUI->get_uv_transform().set_scale({ 0.5f,1.0f });
 
 	selectFrame = std::make_unique<SpriteInstance>("SelectFrame.png", Vector2(0.5f, 0.5f));
 
@@ -91,28 +83,11 @@ void GameManagement::init() {
 		undoRetryUI = std::make_unique<SpriteInstance>("undoRetry_EN.png", Vector2(0.5f, 0.5f));
 		break;
 	}
-	undoRetryUI->get_transform().set_scale({ 0.5f,1.0f });
-	undoRetryUI->get_uv_transform().set_scale({ 0.5f,1.0f });
-	undoRetryUI->get_transform().set_translate({ 789,169 });
 
 	failedUI = std::make_unique<FailedUI>();
 	clearUI = std::make_unique<ClearUI>();
 
-	decision->initialize("decision.wav");
-	operation->initialize("operation.wav");
-	clearAudio->initialize("clearSound.wav");
-	failedAudio->initialize("failedSound.wav");
-	resultSoundFlag = false;
-	clearFlag = false;
-	failedFlag = false;
-
-	resetAudio->initialize("reset.wav");
-	backTitle->initialize("backAudio.wav");
-
-	undoAudio->initialize("undo.wav");
-
-	SelectInputTime = 0.2f;
-	selectInputTimer = SelectInputTime;
+	on_reset();
 }
 
 void GameManagement::begin() {
@@ -188,6 +163,28 @@ void GameManagement::update() {
 		canOperation = clearUI->GetCanOperation();
 	}
 
+	if (clearFlag) {
+		if (clearUI->GetUiVisible()) {
+			if (curLevel >= maxLevel) {
+				goSelect->set_active(true);
+			}
+			else {
+				nextUI->set_active(true);
+
+			}
+			retryUI->set_active(true);
+			selectFrame->set_active(true);
+		}
+
+	}
+	else if (failedFlag) {
+		if (failedUI->GetUiVisible()) {
+			retryUI->set_active(true);
+			selectFrame->set_active(true);
+			undoRetryUI->set_active(true);
+		}
+
+	}
 }
 #ifdef _DEBUG
 
@@ -205,52 +202,24 @@ void GameManagement::debug_update() {
 	resetKoara->debug_gui();
 	ImGui::End();
 }
+
 #endif
-void GameManagement::begin_rendering() {
-	//clearSprite->begin_rendering();
-	failedUI->begin_rendering();
-	clearUI->begin_rendering();
-	nextUI->begin_rendering();
-	retryUI->begin_rendering();
-	selectFrame->begin_rendering();
-	undoRetryUI->begin_rendering();
-	goSelect->begin_rendering();
-	resetBack->begin_rendering();
-	resetKoara->begin_rendering();
-	toSelectBack->begin_rendering();
-	toSelectKoara->begin_rendering();
-}
 
-void GameManagement::darw() {
-	if (clearFlag) {
-		clearUI->draw();
+void GameManagement::write_to_executor(Reference<SpriteDrawExecutor> executor0, Reference<SpriteDrawExecutor> executor1, Reference<SpriteDrawExecutor> executor2, Reference<SpriteDrawExecutor> executor3) const {
+	failedUI->write_to_executor(executor2);
+	clearUI->write_to_executor(executor2);
 
-		if (clearUI->GetUiVisible()) {
-			if (curLevel >= maxLevel) {
-				goSelect->draw();
-			}
-			else {
-				nextUI->draw();
+	executor3->write_to_buffer(nextUI);
+	executor3->write_to_buffer(retryUI);
+	executor3->write_to_buffer(selectFrame);
+	executor3->write_to_buffer(undoRetryUI);
+	executor3->write_to_buffer(goSelect);
 
-			}
-			retryUI->draw();
-			selectFrame->draw();
-		}
+	executor1->write_to_buffer(toSelectBack);
+	executor0->write_to_buffer(toSelectKoara);
 
-	}
-	else if (failedFlag) {
-		failedUI->draw();
-		if (failedUI->GetUiVisible()) {
-			retryUI->draw();
-			selectFrame->draw();
-			undoRetryUI->draw();
-		}
-
-	}
-	resetBack->draw();
-	resetKoara->draw();
-	toSelectBack->draw();
-	toSelectKoara->draw();
+	executor1->write_to_buffer(resetBack);
+	executor0->write_to_buffer(resetKoara);
 }
 
 void GameManagement::resultKeyInput() {
@@ -265,6 +234,44 @@ void GameManagement::resultKeyInput() {
 		isUndoRestart = true;
 		undoAudio->restart();
 	}
+}
+
+void GameManagement::on_reset() {
+	goSelect->get_transform().set_scale({ 0.5f,1.0f });
+	goSelect->get_material().uvTransform.set_scale({ 0.5f,1.0f });
+	goSelect->get_transform().set_translate({ 789,247 });
+
+	nextUI->get_transform().set_scale({ 0.5f,1.0f });
+	nextUI->get_material().uvTransform.set_scale({ 0.5f,1.0f });
+	nextUI->get_transform().set_translate({ 789,247 });
+
+	retryUI->get_transform().set_scale({ 0.5f,1.0f });
+	retryUI->get_material().uvTransform.set_scale({ 0.5f,1.0f });
+	undoRetryUI->get_transform().set_scale({ 0.5f,1.0f });
+	undoRetryUI->get_material().uvTransform.set_scale({ 0.5f,1.0f });
+	undoRetryUI->get_transform().set_translate({ 789,169 });
+
+	decision->initialize("decision.wav");
+	operation->initialize("operation.wav");
+	clearAudio->initialize("clearSound.wav");
+	failedAudio->initialize("failedSound.wav");
+	resultSoundFlag = false;
+	clearFlag = false;
+	failedFlag = false;
+
+	resetAudio->initialize("reset.wav");
+	backTitle->initialize("backAudio.wav");
+
+	undoAudio->initialize("undo.wav");
+
+	SelectInputTime = 0.2f;
+	selectInputTimer = SelectInputTime;
+
+	goSelect->set_active(false);
+	nextUI->set_active(false);
+	retryUI->set_active(false);
+	selectFrame->set_active(false);
+	undoRetryUI->set_active(false);
 }
 
 void GameManagement::selectFunc() {
@@ -297,19 +304,19 @@ void GameManagement::selectFunc() {
 	}
 
 	if (selectIndex == 0) {
-		retryUI->get_uv_transform().set_translate_x(0);
-		nextUI->get_uv_transform().set_translate_x(0.5f);
-		goSelect->get_uv_transform().set_translate_x(0.5f);
-		undoRetryUI->get_uv_transform().set_translate_x(0.5f);
+		retryUI->get_material().uvTransform.set_translate_x(0);
+		nextUI->get_material().uvTransform.set_translate_x(0.5f);
+		goSelect->get_material().uvTransform.set_translate_x(0.5f);
+		undoRetryUI->get_material().uvTransform.set_translate_x(0.5f);
 
 
 		selectFrame->get_transform().set_translate(retryUI->get_transform().get_translate());
 	}
 	else {
-		retryUI->get_uv_transform().set_translate_x(0.5f);
-		nextUI->get_uv_transform().set_translate_x(0);
-		goSelect->get_uv_transform().set_translate_x(0);
-		undoRetryUI->get_uv_transform().set_translate_x(0);
+		retryUI->get_material().uvTransform.set_translate_x(0.5f);
+		nextUI->get_material().uvTransform.set_translate_x(0);
+		goSelect->get_material().uvTransform.set_translate_x(0);
+		undoRetryUI->get_material().uvTransform.set_translate_x(0);
 
 		//選択中のUIの位置にフレームを移動
 		if (clearFlag) {

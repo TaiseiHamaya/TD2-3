@@ -3,7 +3,6 @@
 #include "Library/Math/Hierarchy.h"
 
 BaseCollider::BaseCollider() {
-	hierarchy.initialize(world_affine());
 	groupName = nullptr;
 }
 

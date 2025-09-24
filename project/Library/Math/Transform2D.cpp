@@ -2,8 +2,8 @@
 
 #include <cmath>
 
-#include "Library/Math/VectorConverter.h"
-#include "Library/Math/Transform3D.h"
+#include "VectorConverter.h"
+#include "Transform3D.h"
 
 Transform2D::Transform2D() noexcept {
 	scale = { 1, 1 };
@@ -11,13 +11,13 @@ Transform2D::Transform2D() noexcept {
 	translate = { 0, 0 };
 }
 
-Transform2D::Transform2D(const Vector2& scale_, float rotate_, const Vector2& translate_) noexcept {
+Transform2D::Transform2D(const Vector2& scale_, r32 rotate_, const Vector2& translate_) noexcept {
 	scale = scale_;
 	set_rotate(rotate_);
 	translate = translate_;
 }
 
-Transform2D::Transform2D(Vector2&& scale_, float rotate_, Vector2&& translate_) noexcept {
+Transform2D::Transform2D(Vector2&& scale_, r32 rotate_, Vector2&& translate_) noexcept {
 	scale = std::move(scale_);
 	set_rotate(rotate_);
 	translate = std::move(translate_);
@@ -27,7 +27,7 @@ void Transform2D::set_scale(const Vector2& scale_) noexcept {
 	scale = scale_;
 }
 
-void Transform2D::set_rotate(float rotate_) noexcept {
+void Transform2D::set_rotate(r32 rotate_) noexcept {
 	rotate = rotate_;
 }
 
@@ -35,11 +35,11 @@ void Transform2D::set_translate(const Vector2& translate_) noexcept {
 	translate = translate_;
 }
 
-void Transform2D::set_translate_x(float x) noexcept {
+void Transform2D::set_translate_x(r32 x) noexcept {
 	translate.x = x;
 }
 
-void Transform2D::set_translate_y(float y) noexcept {
+void Transform2D::set_translate_y(r32 y) noexcept {
 	translate.y = y;
 }
 
@@ -59,11 +59,23 @@ const Vector2& Transform2D::get_scale() const noexcept {
 	return scale;
 }
 
-const float& Transform2D::get_rotate() const noexcept {
+const r32& Transform2D::get_rotate() const noexcept {
 	return rotate;
 }
 
 const Vector2& Transform2D::get_translate() const noexcept {
+	return translate;
+}
+
+Vector2& Transform2D::get_scale() noexcept {
+	return scale;
+}
+
+r32& Transform2D::get_rotate() noexcept {
+	return rotate;
+}
+
+Vector2& Transform2D::get_translate() noexcept {
 	return translate;
 }
 
@@ -78,41 +90,45 @@ void Transform2D::copy(const Transform2D& copy) noexcept {
 }
 
 
-#ifdef _DEBUG
+#ifdef DEBUG_FEATURES_ENABLE
 #include <imgui.h>
 #include <format>
 
-void Transform2D::debug_gui(const char* tag) {
+void Transform2D::debug_gui(string_literal tag) {
 	ImGui::SetNextItemOpen(true, ImGuiCond_Once);
 	if (ImGui::TreeNode(std::format("{}##{:}", tag, (void*)this).c_str())) {
-		if (ImGui::Button("ResetScale")) {
+		if (ImGui::Button("\ue5d5##Scale")) {
 			scale = CVector2::BASIS;
 		}
 		ImGui::SameLine();
-		if (ImGui::Button("ResetRotate")) {
+		ImGui::SetNextItemWidth(150);
+		ImGui::DragFloat2("Scale", &scale.x, 0.01f);
+		if (ImGui::Button("\ue5d5##Rotate")) {
 			rotate = 0;
 		}
 		ImGui::SameLine();
-		if (ImGui::Button("ResetTranslate")) {
+		ImGui::SetNextItemWidth(150);
+		ImGui::DragFloat("Rotate", &rotate, 0.02f);
+		if (ImGui::Button("\ue5d5##Translate")) {
 			translate = CVector2::ZERO;
 		}
-		ImGui::DragFloat2("Scale", &scale.x, 0.01f);
-		ImGui::DragFloat("Rotate", &rotate, 0.02f);
+		ImGui::SameLine();
+		ImGui::SetNextItemWidth(150);
 		ImGui::DragFloat2("Translate", &translate.x, 0.1f);
 		ImGui::TreePop();
 	}
 }
 #endif // _DEBUG
 
-Matrix3x3 Transform2D::MakeRotateMatrix(const float theta) noexcept {
+Matrix3x3 Transform2D::MakeRotateMatrix(const r32 theta) noexcept {
 	return MakeRotateMatrix(std::sin(theta), std::cos(theta));
 }
 
-Matrix3x3 Transform2D::MakeAffineMatrix(const Vector2& scale, const float theta, const Vector2& translate) noexcept {
+Matrix3x3 Transform2D::MakeAffineMatrix(const Vector2& scale, const r32 theta, const Vector2& translate) noexcept {
 	return MakeAffineMatrix(scale, std::sin(theta), std::cos(theta), translate);
 }
 
-constexpr Matrix3x3 Transform2D::MakeAffineMatrix(const Vector2& scale, const float sinTheta, const float cosTheta, const Vector2& translate) noexcept {
+constexpr Matrix3x3 Transform2D::MakeAffineMatrix(const Vector2& scale, const r32 sinTheta, const r32 cosTheta, const Vector2& translate) noexcept {
 	return { {
 		{ scale.x * cosTheta, scale.x * sinTheta, 0 },
 		{ -scale.y * sinTheta, scale.y * cosTheta, 0 },

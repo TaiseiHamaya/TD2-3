@@ -2,15 +2,15 @@
 
 #include <cmath>
 
-#include "Library/Math/VectorConverter.h"
+#include <Library/Math/VectorConverter.h>
 
 #include "Engine/Application/EngineSettings.h"
-#include "Engine/Rendering/DirectX/DirectXCommand/DirectXCommand.h"
+#include "Engine/GraphicsAPI/DirectX/DxCommand/DxCommand.h"
 
-#ifdef _DEBUG
+#ifdef DEBUG_FEATURES_ENABLE
 #include <imgui.h>
 #include <Engine/Runtime/Input/Input.h>
-#include <Engine/Resources/PrimitiveGeometry/PrimitiveGeometryManager.h>
+#include <Engine/Assets/PrimitiveGeometry/PrimitiveGeometryLibrary.h>
 #endif // _DEBUG
 
 void Camera3D::initialize() {
@@ -20,78 +20,90 @@ void Camera3D::initialize() {
 		0.1f, 1000
 	);
 
-#ifdef _DEBUG
+#ifdef DEBUG_FEATURES_ENABLE
 	isValidDebugCamera = false;
 	useDebugCameraLighting = false;
+	debugCameraCenter = std::make_unique<StaticMeshInstance>("CameraAxis.obj");
+	debugCameraCenter->get_materials()[0].lightingType = LighingType::None;
 	debugCamera = std::make_unique<WorldInstance>();
-	debugCameraCenter = std::make_unique<MeshInstance>("CameraAxis.obj");
-	//debugCameraCenter->begin_rendering();
-	debugCamera->reparent(*debugCameraCenter);
-	frustumExecutor = std::make_unique<PrimitiveLineDrawExecutor>("Frustum", 1);
+	debugCamera->reparent(debugCameraCenter);
+	frustumExecutor =
+		std::make_unique<PrimitiveGeometryDrawExecutor>(
+			PrimitiveGeometryLibrary::GetPrimitiveGeometry("Frustum"), 1
+		);
 #endif // _DEBUG
 
-	update_matrix();
+	update_affine();
 }
 
-void Camera3D::update_matrix() {
+void Camera3D::update_affine() {
+	if (!isActive) {
+		return;
+	}
 	// カメラそのもののMatrix更新
 	WorldInstance::update_affine();
-#ifdef _DEBUG
-	if (isValidDebugCamera) {
-		// デバッグ表示に使用するモデルのWorldMatrixの更新
-		debugCameraCenter->begin_rendering();
-		debugCamera->update_affine();
-		// ViewMatrixの更新
-		debugViewAffine = debugCamera->world_affine().inverse_fast();
-	}
-#endif // _DEBUG
+
+#ifdef DEBUG_FEATURES_ENABLE
+	debugCameraCenter->update_affine();
+	debugCamera->update_affine();
+#endif // DEBUG_FEATURES_ENABLE
 
 	// カメラ位置をもとにViewMatrixを更新
 	make_view_matrix();
 	make_perspectivefov_matrix();
+}
 
-
-#ifdef _DEBUG
+void Camera3D::transfer() {
+#ifdef DEBUG_FEATURES_ENABLE
 	// 外部参照用Matrix
-	vpMatrix = viewAffine.to_matrix() * perspectiveFovMatrix;
+	vpMatrix = viewAffine.to_matrix() * projectionMatrix;
 	// 描画用
 	if (isValidDebugCamera) {
-		vpBuffers.get_data()->viewProjection = debugViewAffine.to_matrix() * perspectiveFovMatrix;
-	}
-	else {
-		vpBuffers.get_data()->viewProjection = vpMatrix;
+		// デバッグ表示に使用するモデルのWorldMatrixの更新
+		// ViewMatrixの更新
+		debugViewAffine = debugCamera->world_affine().inverse_fast();
 	}
 
 	if (isValidDebugCamera && useDebugCameraLighting) {
+		lightingBuffer.get_data()->viewInv = debugViewAffine.inverse_fast().to_matrix();
+		lightingBuffer.get_data()->position = debugCamera->world_position();
+		lightingBuffer.get_data()->projInv = projectionMatrix.inverse();
+	}
+	else {
+		lightingBuffer.get_data()->viewInv = viewAffine.inverse_fast().to_matrix();
+		lightingBuffer.get_data()->position = world_position();
+		lightingBuffer.get_data()->projInv = projectionMatrix.inverse();
+	}
+
+	if (isValidDebugCamera) {
 		vpBuffers.get_data()->view = debugViewAffine.to_matrix();
-		worldPosition.get_data()->viewInv = debugViewAffine.inverse_fast().to_matrix();
-		worldPosition.get_data()->position = debugCamera->world_position();
+		vpBuffers.get_data()->viewProjection = debugViewAffine.to_matrix() * projectionMatrix;
 	}
 	else {
 		vpBuffers.get_data()->view = viewAffine.to_matrix();
-		worldPosition.get_data()->viewInv = viewAffine.inverse_fast().to_matrix();
-		worldPosition.get_data()->position = world_position();
+		vpBuffers.get_data()->viewProjection = vpMatrix;
 	}
 #else
 	// リリースビルド時は参照用と描画用が必ず同じになるのでこの実装
 	vpBuffers.get_data()->view = viewAffine.to_matrix();
-	vpBuffers.get_data()->viewProjection = viewAffine.to_matrix() * perspectiveFovMatrix;
-	worldPosition.get_data()->viewInv = viewAffine.inverse_fast().to_matrix();
-	worldPosition.get_data()->position = world_position();
+	vpBuffers.get_data()->viewProjection = viewAffine.to_matrix() * projectionMatrix;
+	lightingBuffer.get_data()->viewInv = viewAffine.inverse_fast().to_matrix();
+	lightingBuffer.get_data()->position = world_position();
+	lightingBuffer.get_data()->projInv = projectionMatrix.inverse();
 #endif // _DEBUG
 }
 
-void Camera3D::register_world_projection(uint32_t index) {
-	auto& commandList = DirectXCommand::GetCommandList();
+void Camera3D::register_world_projection(u32 index) const {
+	auto& commandList = DxCommand::GetCommandList();
 	commandList->SetGraphicsRootConstantBufferView(
 		index, vpBuffers.get_resource()->GetGPUVirtualAddress()
 	);
 }
 
-void Camera3D::register_world_lighting(uint32_t index) {
-	auto& commandList = DirectXCommand::GetCommandList();
+void Camera3D::register_world_lighting(u32 index) const {
+	auto& commandList = DxCommand::GetCommandList();
 	commandList->SetGraphicsRootConstantBufferView(
-		index, worldPosition.get_resource()->GetGPUVirtualAddress()
+		index, lightingBuffer.get_resource()->GetGPUVirtualAddress()
 	);
 }
 
@@ -99,7 +111,7 @@ void Camera3D::set_transform(const Transform3D& transform_) noexcept {
 	transform.copy(transform_);
 }
 
-void Camera3D::set_perspective_fov_info(float fovY_, float aspectRatio_, float nearClip_, float farClip_) noexcept {
+void Camera3D::set_perspective_fov_info(r32 fovY_, r32 aspectRatio_, r32 nearClip_, r32 farClip_) noexcept {
 	fovY = fovY_;
 	aspectRatio = aspectRatio_;
 	nearClip = nearClip_;
@@ -107,11 +119,19 @@ void Camera3D::set_perspective_fov_info(float fovY_, float aspectRatio_, float n
 }
 
 const Matrix4x4& Camera3D::vp_matrix() const {
-#ifdef _DEBUG
+#ifdef DEBUG_FEATURES_ENABLE
 	return vpMatrix;
 #else
 	return vpBuffers.get_data()->viewProjection;
 #endif // _DEBUG
+}
+
+const Affine& Camera3D::view_affine() const {
+	return viewAffine;
+}
+
+const Matrix4x4& Camera3D::proj_matrix() const {
+	return projectionMatrix;
 }
 
 void Camera3D::make_view_matrix() {
@@ -119,8 +139,8 @@ void Camera3D::make_view_matrix() {
 }
 
 void Camera3D::make_perspectivefov_matrix() {
-	float cot = 1 / std::tan(fovY / 2);
-	perspectiveFovMatrix = {
+	r32 cot = 1 / std::tan(fovY / 2);
+	projectionMatrix = {
 		{{ cot / aspectRatio, 0, 0, 0 },
 		{ 0, cot, 0, 0 },
 		{ 0, 0, farClip / (farClip - nearClip), 1 },
@@ -128,7 +148,7 @@ void Camera3D::make_perspectivefov_matrix() {
 	};
 }
 
-Matrix4x4 Camera3D::MakeViewportMatrix(const Vector2& origin, const Vector2& size, float minDepth, float maxDepth) {
+Matrix4x4 Camera3D::MakeViewportMatrix(const Vector2& origin, const Vector2& size, r32 minDepth, r32 maxDepth) {
 	return {
 		{{ size.x / 2, 0, 0, 0 },
 		{ 0, -size.y / 2, 0, 0 },
@@ -137,7 +157,7 @@ Matrix4x4 Camera3D::MakeViewportMatrix(const Vector2& origin, const Vector2& siz
 	};
 }
 
-#ifdef _DEBUG
+#ifdef DEBUG_FEATURES_ENABLE
 
 #include <string>
 #include <source_location>
@@ -147,23 +167,17 @@ using namespace std::literals::string_literals;
 void Camera3D::debug_gui() {
 	transform.debug_gui();
 
-	//if (ImGui::Button("SaveJson")) {
-	//	constexpr const char* fileName = "Camera3D";
-	//	JsonResource output{ "WorldInstance/"s + fileName + ".json"};
-	//	to_json(output);
-	//	output.save();
-	//}
+	debug_camera();
 
 	ImGui::Separator();
 	ImGui::Checkbox("DebugCamera", &isValidDebugCamera);
 	if (isValidDebugCamera) {
 		ImGui::Checkbox("UseDebugCameraLighting", &useDebugCameraLighting);
 
-		ImGui::DragFloat("Offset", &offset.z, 0.1f, -std::numeric_limits<float>::infinity(), 0.0f);
+		ImGui::DragFloat("Offset", &offset.z, 0.1f, -std::numeric_limits<r32>::infinity(), 0.0f);
 		debugCameraCenter->get_transform().debug_gui();
 		debugCamera->get_transform().debug_gui();
 	}
-	debug_camera();
 }
 
 void Camera3D::debug_camera() {
@@ -174,7 +188,7 @@ void Camera3D::debug_camera() {
 		Vector2 mouseDelta = Input::MouseDelta();
 
 		// 注視距離設定
-		float wheel = static_cast<float>(Input::WheelDelta());
+		r32 wheel = static_cast<r32>(Input::WheelDelta());
 		offset.z = std::min(offset.z + wheel, 0.0f);
 
 		// 左クリック(回転)
@@ -201,25 +215,37 @@ void Camera3D::debug_camera() {
 	}
 	// 位置更新
 	debugCamera->get_transform().set_translate(offset * debugCamera->get_transform().get_quaternion());
+
+
+	if (isValidDebugCamera && offset.z < -0.001) {
+		debugCameraCenter->set_draw(true);
+	}
+	else {
+		debugCameraCenter->set_draw(false);
+	}
 }
 
-void Camera3D::debug_draw_axis() const {
-	if (isValidDebugCamera) {
-		if (offset.z < -0.001) {
-			debugCameraCenter->draw();
-		}
-	}
+void Camera3D::debug_draw_axis() {
 }
 
 void Camera3D::debug_draw_frustum() const {
 	if (isValidDebugCamera && frustumExecutor) {
-		frustumExecutor->write_to_buffer(0, world_affine().to_matrix());
-		frustumExecutor->draw_command(1);
+		frustumExecutor->begin();
+		frustumExecutor->write_to_buffer(world_affine().to_matrix());
+		frustumExecutor->draw_command();
 	}
 }
 
 const Matrix4x4& Camera3D::vp_matrix_debug() const {
 	return vpBuffers.get_data()->viewProjection;
+}
+
+const Affine& Camera3D::debug_view_affine() const {
+	return debugViewAffine;
+}
+
+const Matrix4x4& Camera3D::debug_proj_matrix() const {
+	return projectionMatrix;
 }
 
 #endif // _DEBUG

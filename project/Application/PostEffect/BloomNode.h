@@ -2,7 +2,8 @@
 
 #include <Engine/Module/Render/RenderNode/SingleRenderTargetNode.h>
 
-#include <Engine/Rendering/DirectX/DirectXResourceObject/ConstantBuffer/ConstantBuffer.h>
+#include <Engine/GraphicsAPI/DirectX/DxResource/ConstantBuffer/ConstantBuffer.h>
+#include <Engine/GraphicsAPI/DirectX/DxResource/TextureResource/RenderTexture.h>
 
 class BloomNode : public SingleRenderTargetNode {
 public:
@@ -24,22 +25,22 @@ public:
 
 	void draw() const;
 
-	void set_base_texture(D3D12_GPU_DESCRIPTOR_HANDLE baseTexture);
-	void set_blur_texture(D3D12_GPU_DESCRIPTOR_HANDLE blurTexture);
+	void set_base_texture(Reference<RenderTexture> baseTexture);
+	void set_blur_texture(Reference<RenderTexture> blurTexture);
 
 	void set_param(float weight);
 
 private:
 	void create_pipeline_state();
 
-#ifdef _DEBUG
+#ifdef DEBUG_FEATURES_ENABLE
 public:
 	void debug_gui();
 #endif // DEBUG_FEATURES_ENABLE
 
 private:
-	D3D12_GPU_DESCRIPTOR_HANDLE baseTexture;
-	D3D12_GPU_DESCRIPTOR_HANDLE blurTexture;
+	Reference<RenderTexture> baseTexture;
+	Reference<RenderTexture> blurTexture;
 
 	struct BloomInfo {
 		float weight;

@@ -5,22 +5,29 @@
 #include "./MoveLogger/MoveLogger.h"
 #include "Application/Character/Child/Child.h"
 #include "Application/Character/Player/Player.h"
-#include "Application/Mapchip/MapchipHandler.h"
 #include "Application/GameManagement/GameManagement.h"
-#include "Engine/Resources/Audio/AudioPlayer.h"
-#include "Engine/Module/World/Sprite/SpriteInstance.h"
+#include "Application/Mapchip/MapchipHandler.h"
 #include "Application/Tutorial/TutorialManager.h"
+
+#include "Engine/Assets/Audio/AudioPlayer.h"
+#include "Engine/Module/World/Sprite/SpriteInstance.h"
+
+class StaticMeshDrawManager;
+class SkinningMeshDrawManager;
 
 class PlayerManager {
 public:
+	PlayerManager();
+
+public:
 	void initialize(Reference<const LevelLoader> level, MapchipField* mapchipField, const Vector3& goalPosition, bool isResetLogger = true);
+	void setup(Reference<SkinningMeshDrawManager> executor);
 	void finalize();
 	void update();
+	void update_affine();
 	void handle_input();
-	void begin_rendering();
-	void draw() const;
+
 	void draw_particle() const;
-	void draw_sprite() const;
 
 	PlayerState get_player_state() { return player->get_state(); }
 
@@ -59,8 +66,8 @@ private:
 	std::unique_ptr<Child> child;
 	std::unique_ptr<MapchipHandler> mapchipHandler;
 	std::unique_ptr<MoveLogger> moveLogger;
-	std::unique_ptr<AnimatedMeshInstance> catchEffect_;
-	std::unique_ptr<AnimatedMeshInstance> releaseEffect_;
+	std::unique_ptr<SkinningMeshInstance> catchEffect_;
+	std::unique_ptr<SkinningMeshInstance> releaseEffect_;
 
 
 	// パーティクルの召還

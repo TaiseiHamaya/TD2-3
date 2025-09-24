@@ -1,15 +1,20 @@
 #include "Child.h"
 
-#include <Engine/Resources/Animation/NodeAnimation/NodeAnimationPlayer.h>
-#include "Engine/Rendering/DirectX/DirectXResourceObject/ConstantBuffer/Material/Material.h"
+Child::Child() {
+	object_ = std::make_unique<SkinningMeshInstance>();
+	flusteredEffect_ = std::make_unique<SkinningMeshInstance>();
+}
 
 void Child::initialize(const LevelLoader& level, MapchipField* mapchipField)
 {
-	object_ = std::make_unique<AnimatedMeshInstance>();
+	object_->reparent(nullptr);
 	object_->reset_animated_mesh("ChiledKoala.gltf", "Standby", true);
+	object_->get_transform().set_scale(CVector3::ONE);
 	object_->get_transform().set_translate(level.get_child_position());
+	object_->set_active(true);
+	object_->set_draw(true);
+	object_->update_affine();
 
-	flusteredEffect_ = std::make_unique<AnimatedMeshInstance>();
 	flusteredEffect_->reset_animated_mesh("FlusteredEffect.gltf", "Standby", true);
 	flusteredEffect_->set_active(false);
 
@@ -58,16 +63,10 @@ void Child::update()
 	object_->update();
 }
 
-void Child::begin_rendering()
-{
-	object_->begin_rendering();
-	flusteredEffect_->begin_rendering();
-}
-
-void Child::draw() const
-{
-	object_->draw();
-	//flusteredEffect_->draw();
+void Child::update_affine() {
+	object_->update_animation();
+	object_->update_affine();
+	flusteredEffect_->update_affine();
 }
 
 void Child::on_undo(Vector3 position, Vector3 lookat) {
@@ -78,8 +77,8 @@ void Child::on_undo(Vector3 position, Vector3 lookat) {
 #ifdef _DEBUG
 void Child::debug_update()
 {
-	ImGui::Begin("Child");
-	object_->debug_gui();
-	ImGui::End();
+	//ImGui::Begin("Child");
+	//object_->debug_gui();
+	//ImGui::End();
 }
 #endif // _DEBUG

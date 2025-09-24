@@ -1,29 +1,29 @@
 #include "SelectScene.h"
 
 #include <Library/Math/Definition.h>
+#include <Library/Utility/Tools/Easing.h>
 
-#include <Engine/Application/EngineSettings.h>
+//#include <Engine/Rendering/DirectX/DirectXResourceObject/DepthStencil/DepthStencil.h>
+//#include <Engine/Rendering/DirectX/DirectXResourceObject/OffscreenRender/OffscreenRender.h>
+//#include <Engine/Rendering/DirectX/DirectXSwapChain/DirectXSwapChain.h>
+#include <Engine/Assets/Animation/NodeAnimation/NodeAnimationLibrary.h>
+#include <Engine/Assets/Animation/Skeleton/SkeletonLibrary.h>
+#include <Engine/Assets/Audio/AudioLibrary.h>
+#include <Engine/Assets/Audio/AudioManager.h>
+#include <Engine/Assets/PolygonMesh/PolygonMeshLibrary.h>
+#include <Engine/Assets/Texture/TextureLibrary.h>
+#include <Engine/GraphicsAPI/RenderingSystemValues.h>
 #include <Engine/Module/Render/RenderNode/2D/Sprite/SpriteNode.h>
-#include <Engine/Module/Render/RenderNode/Forward/Object3DNode/Object3DNode.h>
-#include <Engine/Module/Render/RenderNode/Forward/SkinningMesh/SkinningMeshNode.h>
+#include <Engine/Module/Render/RenderNode/Forward/Mesh/SkinningMeshNodeForward.h>
+#include <Engine/Module/Render/RenderNode/Forward/Mesh/StaticMeshNodeForward.h>
 #include <Engine/Module/Render/RenderTargetGroup/SingleRenderTarget.h>
-#include <Engine/Module/Render/RenderTargetGroup/SingleRenderTarget.h>
-#include <Engine/Module/World/AnimatedMesh/AnimatedMeshInstance.h>
 #include <Engine/Module/World/Camera/Camera2D.h>
-#include <Engine/Module/World/Mesh/MeshInstance.h> 
+#include <Engine/Module/World/Mesh/SkinningMeshInstance.h>
+#include <Engine/Module/World/Mesh/StaticMeshInstance.h> 
 #include <Engine/Module/World/Sprite/SpriteInstance.h>
-#include <Engine/Rendering/DirectX/DirectXResourceObject/DepthStencil/DepthStencil.h>
-#include <Engine/Rendering/DirectX/DirectXResourceObject/OffscreenRender/OffscreenRender.h>
-#include <Engine/Rendering/DirectX/DirectXResourceObject/OffscreenRender/OffscreenRender.h>
-#include <Engine/Rendering/DirectX/DirectXSwapChain/DirectXSwapChain.h>
-#include <Engine/Resources/Animation/NodeAnimation/NodeAnimationManager.h>
-#include <Engine/Resources/Animation/Skeleton/SkeletonManager.h>
-#include <Engine/Resources/Audio/AudioManager.h>
-#include <Engine/Resources/PolygonMesh/PolygonMeshManager.h>
-#include <Engine/Resources/Texture/TextureManager.h>
 #include <Engine/Runtime/Input/Input.h>
 #include <Engine/Runtime/Scene/SceneManager.h>
-#include <Engine/Utility/Tools/SmartPointer.h>
+#include <Library/Utility/Tools/SmartPointer.h>
 
 #include "Application/Scene/TitleScene.h"
 
@@ -47,40 +47,40 @@ SelectScene::SelectScene(int32_t selectLevel, bool isFromGame) :
 SelectScene::~SelectScene() = default;
 
 void SelectScene::load() {
-	PolygonMeshManager::RegisterLoadQue("./GameResources/Models/ParentKoala/ParentKoala.gltf");
-	PolygonMeshManager::RegisterLoadQue("./GameResources/Models/ChiledKoala/ChiledKoala.gltf");
-	SkeletonManager::RegisterLoadQue("./GameResources/Models/ParentKoala/ParentKoala.gltf");
-	SkeletonManager::RegisterLoadQue("./GameResources/Models/ChiledKoala/ChiledKoala.gltf");
-	NodeAnimationManager::RegisterLoadQue("./GameResources/Models/ParentKoala/ParentKoala.gltf");
-	NodeAnimationManager::RegisterLoadQue("./GameResources/Models/ChiledKoala/ChiledKoala.gltf");
-	PolygonMeshManager::RegisterLoadQue("./GameResources/Models/RordObj/RordObj.obj");
-	PolygonMeshManager::RegisterLoadQue("./GameResources/Models/WallObj/WallObj.obj");
-	PolygonMeshManager::RegisterLoadQue("./GameResources/Models/GoalObj/GoalObj.obj");
-	PolygonMeshManager::RegisterLoadQue("./GameResources/Models/IceObj/IceObj.obj");
-	PolygonMeshManager::RegisterLoadQue("./GameResources/Models/GoalObj/GoalObjStatic.obj");
+	PolygonMeshLibrary::RegisterLoadQue("./GameResources/Models/ParentKoala/ParentKoala.gltf");
+	PolygonMeshLibrary::RegisterLoadQue("./GameResources/Models/ChiledKoala/ChiledKoala.gltf");
+	SkeletonLibrary::RegisterLoadQue("./GameResources/Models/ParentKoala/ParentKoala.gltf");
+	SkeletonLibrary::RegisterLoadQue("./GameResources/Models/ChiledKoala/ChiledKoala.gltf");
+	NodeAnimationLibrary::RegisterLoadQue("./GameResources/Models/ParentKoala/ParentKoala.gltf");
+	NodeAnimationLibrary::RegisterLoadQue("./GameResources/Models/ChiledKoala/ChiledKoala.gltf");
+	PolygonMeshLibrary::RegisterLoadQue("./GameResources/Models/RordObj/RordObj.obj");
+	PolygonMeshLibrary::RegisterLoadQue("./GameResources/Models/WallObj/WallObj.obj");
+	PolygonMeshLibrary::RegisterLoadQue("./GameResources/Models/GoalObj/GoalObj.obj");
+	PolygonMeshLibrary::RegisterLoadQue("./GameResources/Models/IceObj/IceObj.obj");
+	PolygonMeshLibrary::RegisterLoadQue("./GameResources/Models/GoalObj/GoalObjStatic.obj");
 
-	TextureManager::RegisterLoadQue("./GameResources/Texture/UI/StageSelectUI.png");
-	TextureManager::RegisterLoadQue("./GameResources/Texture/UI/StartController.png");
-	TextureManager::RegisterLoadQue("./GameResources/Texture/UI/ESCkeyController.png");
-	TextureManager::RegisterLoadQue("./GameResources/Texture/UI/start.png");
-	TextureManager::RegisterLoadQue("./GameResources/Texture/UI/number.png");
-	TextureManager::RegisterLoadQue("./GameResources/Texture/UI/KoaraFace.png");
-	TextureManager::RegisterLoadQue("./GameResources/Texture/UI/ResetBack.png");
-	TextureManager::RegisterLoadQue("./GameResources/Texture/obi.png");
+	TextureLibrary::RegisterLoadQue("./GameResources/Texture/UI/StageSelectUI.png");
+	TextureLibrary::RegisterLoadQue("./GameResources/Texture/UI/StartController.png");
+	TextureLibrary::RegisterLoadQue("./GameResources/Texture/UI/ESCkeyController.png");
+	TextureLibrary::RegisterLoadQue("./GameResources/Texture/UI/start.png");
+	TextureLibrary::RegisterLoadQue("./GameResources/Texture/UI/number.png");
+	TextureLibrary::RegisterLoadQue("./GameResources/Texture/UI/KoaraFace.png");
+	TextureLibrary::RegisterLoadQue("./GameResources/Texture/UI/ResetBack.png");
+	TextureLibrary::RegisterLoadQue("./GameResources/Texture/obi.png");
 
-	AudioManager::RegisterLoadQue("./GameResources/Audio/BGM/Title.wav");
-	TextureManager::RegisterLoadQue("./GameResources/Texture/backGround.png");
-	TextureManager::RegisterLoadQue("./GameResources/Texture/backGround2.png");
-	AudioManager::RegisterLoadQue("./GameResources/Audio/BGM/SelectBGM.wav");
+	AudioLibrary::RegisterLoadQue("./GameResources/Audio/BGM/Title.wav");
+	TextureLibrary::RegisterLoadQue("./GameResources/Texture/backGround.png");
+	TextureLibrary::RegisterLoadQue("./GameResources/Texture/backGround2.png");
+	AudioLibrary::RegisterLoadQue("./GameResources/Audio/BGM/SelectBGM.wav");
 
-	AudioManager::RegisterLoadQue("./GameResources/Audio/change.wav");
-	AudioManager::RegisterLoadQue("./GameResources/Audio/stageStart.wav");
-	AudioManager::RegisterLoadQue("./GameResources/Audio/backAudio.wav");
-	TextureManager::RegisterLoadQue("./GameResources/Texture/UI/ESCkey.png");
+	AudioLibrary::RegisterLoadQue("./GameResources/Audio/change.wav");
+	AudioLibrary::RegisterLoadQue("./GameResources/Audio/stageStart.wav");
+	AudioLibrary::RegisterLoadQue("./GameResources/Audio/backAudio.wav");
+	TextureLibrary::RegisterLoadQue("./GameResources/Texture/UI/ESCkey.png");
 
-	PolygonMeshManager::RegisterLoadQue("./GameResources/Models/GoalObj/GoalObj.gltf");
-	SkeletonManager::RegisterLoadQue("./GameResources/Models/GoalObj/GoalObj.gltf");
-	NodeAnimationManager::RegisterLoadQue("./GameResources/Models/GoalObj/GoalObj.gltf");
+	PolygonMeshLibrary::RegisterLoadQue("./GameResources/Models/GoalObj/GoalObj.gltf");
+	SkeletonLibrary::RegisterLoadQue("./GameResources/Models/GoalObj/GoalObj.gltf");
+	NodeAnimationLibrary::RegisterLoadQue("./GameResources/Models/GoalObj/GoalObj.gltf");
 
 }
 
@@ -94,9 +94,9 @@ void SelectScene::initialize() {
 
 	directionalLight = eps::CreateUnique<DirectionalLightInstance>();
 
-	goalMesh = eps::CreateUnique<MeshInstance>("GoalObjStatic.obj");
-	parentKoala = eps::CreateUnique<AnimatedMeshInstance>("ParentKoala.gltf", "Standby", true);
-	childKoala = eps::CreateUnique<AnimatedMeshInstance>("ChiledKoala.gltf", "Standby", true);
+	goalMesh = eps::CreateUnique<StaticMeshInstance>("GoalObjStatic.obj");
+	parentKoala = eps::CreateUnique<SkinningMeshInstance>("ParentKoala.gltf", "Standby", true);
+	childKoala = eps::CreateUnique<SkinningMeshInstance>("ChiledKoala.gltf", "Standby", true);
 
 	switch (Configuration::GetLanguage()) {
 	case Configuration::Language::Japanese:
@@ -109,21 +109,46 @@ void SelectScene::initialize() {
 		break;
 	}
 	startUi[0]->get_transform().set_translate({ 640.0f,90 });
+	startUi[0]->set_priority(2);
 	startUi[1]->get_transform().set_translate({ 640.0f,90 });
+	startUi[1]->set_priority(2);
 	selectUi = eps::CreateUnique<SpriteInstance>("StageSelectUI.png", Vector2{ 0.5f, 0.5f });
 	selectUi->get_transform().set_translate({ 640.0f,650.0f });
+	selectUi->set_priority(2);
 	numberUi = eps::CreateUnique<SpriteInstance>("number.png", Vector2{ 0.5f, 0.5f });
 	numberUi->get_transform().set_scale({ 0.1f,1.0f });
-	numberUi->get_uv_transform().set_scale({ 0.1f,1.0f });
+	numberUi->get_material().uvTransform.set_scale({ 0.1f,1.0f });
+	numberUi->set_priority(2);
 	numberUi10 = eps::CreateUnique<SpriteInstance>("number.png", Vector2{ 0.5f, 0.5f });
 	numberUi10->get_transform().set_translate({ 640.0f - 96 / 2,360.0f });
 	numberUi10->get_transform().set_scale({ 0.1f,1.0f });
-	numberUi10->get_uv_transform().set_scale({ 0.1f,1.0f });
+	numberUi10->get_material().uvTransform.set_scale({ 0.1f,1.0f });
+	numberUi10->set_priority(2);
 	if (selectIndex < 10) {
 		numberUi10->set_active(false);
 	}
 	obSprite = std::make_unique<SpriteInstance>("obi.png");
+	obSprite->set_priority(3);
 	transition = eps::CreateUnique<SpriteInstance>("black.png");
+
+	backTitleSprite[0] = std::make_unique<SpriteInstance>("ESCkeyController.png");
+	backTitleSprite[0]->get_transform().set_scale({ 0.5f, 1.0f });
+	backTitleSprite[0]->get_material().uvTransform.set_scale({ 0.5f, 1.0f });
+	backTitleSprite[0]->get_transform().set_translate({ 1141,30 });
+	backTitleSprite[0]->set_priority(2);
+	backTitleSprite[1] = std::make_unique<SpriteInstance>("ESCkey.png");
+	backTitleSprite[1]->get_transform().set_scale({ 0.5f, 1.0f });
+	backTitleSprite[1]->get_material().uvTransform.set_scale({ 0.5f, 1.0f });
+	backTitleSprite[1]->get_transform().set_translate({ 1141,30 });
+	backTitleSprite[1]->set_priority(2);
+
+	fromGameBack = std::make_unique<SpriteInstance>("ResetBack.png", Vector2(0.5f, 0.5f));
+	fromGameBack->get_transform().set_translate({ 640.0f, -360.0f });
+	fromGameBack->set_priority(1);
+
+	fromGameKoara = std::make_unique<SpriteInstance>("KoaraFace.png", Vector2(0.5f, 0.5f));
+	fromGameKoara->get_transform().set_translate({ 640.0f, -360.0f });
+	fromGameBack->set_priority(0);
 
 	LevelLoader loader{ selectIndex };
 
@@ -131,110 +156,129 @@ void SelectScene::initialize() {
 
 	fieldRotation = std::make_unique<WorldInstance>();
 
-	crate_field_view();
+	Particle::lookAtDefault = camera3D.get();
 
-	std::shared_ptr<SingleRenderTarget> meshRT;
-	meshRT = std::make_shared<SingleRenderTarget>();
-	meshRT->initialize();
+	renderTextures.resize(8);
+	renderTextures[0].initialize(DXGI_FORMAT_R8G8B8A8_UNORM_SRGB); // アウトライン前
+	renderTextures[1].initialize(DXGI_FORMAT_R8G8B8A8_UNORM_SRGB); // シーンアウト
+	renderTextures[2].initialize(DXGI_FORMAT_R8G8B8A8_UNORM_SRGB); // 輝度抽出
+	renderTextures[3].initialize(DXGI_FORMAT_R8G8B8A8_UNORM_SRGB, EngineSettings::CLIENT_WIDTH / 2, EngineSettings::CLIENT_HEIGHT / 2); // ダウンサンプリング 1/2
+	renderTextures[4].initialize(DXGI_FORMAT_R8G8B8A8_UNORM_SRGB, EngineSettings::CLIENT_WIDTH / 4, EngineSettings::CLIENT_HEIGHT / 4); // ダウンサンプリング 1/4
+	renderTextures[5].initialize(DXGI_FORMAT_R8G8B8A8_UNORM_SRGB, EngineSettings::CLIENT_WIDTH / 8, EngineSettings::CLIENT_HEIGHT / 8); // ダウンサンプリング 1/8
+	renderTextures[6].initialize(DXGI_FORMAT_R8G8B8A8_UNORM_SRGB, EngineSettings::CLIENT_WIDTH / 16, EngineSettings::CLIENT_HEIGHT / 16); // ダウンサンプリング 1/16
+	renderTextures[7].initialize(DXGI_FORMAT_R8G8B8A8_UNORM_SRGB); // ダウンサンプリングを合成
 
-	std::shared_ptr<SingleRenderTarget> sceneOut;
-	sceneOut = std::make_shared<SingleRenderTarget>();
-	sceneOut->initialize();
-
-	std::shared_ptr<SingleRenderTarget> downSampled2;
-	downSampled2 = std::make_shared<SingleRenderTarget>();
-	downSampled2->initialize(EngineSettings::CLIENT_WIDTH / 2, EngineSettings::CLIENT_HEIGHT / 2);
-	std::shared_ptr<SingleRenderTarget> downSampled4;
-	downSampled4 = std::make_shared<SingleRenderTarget>();
-	downSampled4->initialize(EngineSettings::CLIENT_WIDTH / 4, EngineSettings::CLIENT_HEIGHT / 4);
-	std::shared_ptr<SingleRenderTarget> downSampled8;
-	downSampled8 = std::make_shared<SingleRenderTarget>();
-	downSampled8->initialize(EngineSettings::CLIENT_WIDTH / 8, EngineSettings::CLIENT_HEIGHT / 8);
-	std::shared_ptr<SingleRenderTarget> downSampled16;
-	downSampled16 = std::make_shared<SingleRenderTarget>();
-	downSampled16->initialize(EngineSettings::CLIENT_WIDTH / 16, EngineSettings::CLIENT_HEIGHT / 16);
-
+	meshRT.initialize(renderTextures[0]);
+	baseRenderTexture.initialize(renderTextures[1]);
+	luminanceRenderTexture.initialize(renderTextures[2]);
+	downSampleRenderTexture2.initialize(renderTextures[3]);
+	downSampleRenderTexture4.initialize(renderTextures[4]);
+	downSampleRenderTexture8.initialize(renderTextures[5]);
+	downSampleRenderTexture16.initialize(renderTextures[6]);
+	bloomBaseRenderTexture.initialize(renderTextures[7]);
 
 	std::shared_ptr<SpriteNode> bgSpriteNode;
 	bgSpriteNode = std::make_unique<SpriteNode>();
 	bgSpriteNode->initialize();
-	bgSpriteNode->set_config(
-		RenderNodeConfig::ContinueDrawBefore
-	);
 	bgSpriteNode->set_render_target(meshRT);
 
-	std::shared_ptr<Object3DNode> object3dNode;
-	object3dNode = std::make_unique<Object3DNode>();
+	std::shared_ptr<StaticMeshNodeForward> object3dNode;
+	object3dNode = std::make_unique<StaticMeshNodeForward>();
 	object3dNode->initialize();
-	object3dNode->set_config(RenderNodeConfig::ContinueDrawAfter | RenderNodeConfig::ContinueDrawBefore | RenderNodeConfig::ContinueUseDpehtBefore);
+	object3dNode->set_config(RenderNodeConfig::NoClearRenderTarget);
 	object3dNode->set_render_target(meshRT);
 
-	std::shared_ptr<SkinningMeshNode> skinningMeshNode;
-	skinningMeshNode = std::make_unique<SkinningMeshNode>();
+	std::shared_ptr<SkinningMeshNodeForward> skinningMeshNode;
+	skinningMeshNode = std::make_unique<SkinningMeshNodeForward>();
 	skinningMeshNode->initialize();
-	skinningMeshNode->set_config(RenderNodeConfig::ContinueDrawAfter | RenderNodeConfig::ContinueUseDpehtAfter);
+	skinningMeshNode->set_config(RenderNodeConfig::NoClearRenderTarget | RenderNodeConfig::NoClearDepth);
 	skinningMeshNode->set_render_target(meshRT);
 
 	outlineNode = std::make_shared<OutlineNode>();
 	outlineNode->initialize();
-	outlineNode->set_render_target(sceneOut);
-	outlineNode->set_config(RenderNodeConfig::ContinueDrawBefore);
-	outlineNode->set_depth_resource(DepthStencilValue::depthStencil->texture_gpu_handle());
-	outlineNode->set_texture_resource(meshRT->offscreen_render().texture_gpu_handle());
+	outlineNode->set_shader_texture(renderTextures[0], RenderingSystemValues::GetDepthStencilTexture());
+	outlineNode->set_render_target(baseRenderTexture);
 
 	std::shared_ptr<SpriteNode> spriteNode;
 	spriteNode = std::make_unique<SpriteNode>();
 	spriteNode->initialize();
-	spriteNode->set_config(
-		RenderNodeConfig::NoClearRenderTarget | RenderNodeConfig::ContinueDrawAfter
-	);
-	spriteNode->set_render_target(sceneOut);
+	spriteNode->set_config(RenderNodeConfig::NoClearRenderTarget);
+	spriteNode->set_render_target(baseRenderTexture);
 
 	luminanceExtractionNode = eps::CreateShared<LuminanceExtractionNode>();
 	luminanceExtractionNode->initialize();
-	luminanceExtractionNode->set_render_target();
-	luminanceExtractionNode->set_texture_resource(sceneOut->offscreen_render().texture_gpu_handle());
+	luminanceExtractionNode->set_render_target(luminanceRenderTexture);
+	luminanceExtractionNode->set_texture_resource(renderTextures[1]);
 
 	gaussianBlurNode2 = eps::CreateShared<GaussianBlurNode>();
 	gaussianBlurNode2->initialize();
-	gaussianBlurNode2->set_render_target(downSampled2);
-	gaussianBlurNode2->set_base_texture(luminanceExtractionNode->result_stv_handle());
+	gaussianBlurNode2->set_render_target(downSampleRenderTexture2);
+	gaussianBlurNode2->set_base_texture(renderTextures[2]);
 
 	gaussianBlurNode4 = eps::CreateShared<GaussianBlurNode>();
 	gaussianBlurNode4->initialize();
-	gaussianBlurNode4->set_render_target(downSampled4);
-	gaussianBlurNode4->set_base_texture(gaussianBlurNode2->result_stv_handle());
+	gaussianBlurNode4->set_render_target(downSampleRenderTexture4);
+	gaussianBlurNode4->set_base_texture(renderTextures[3]);
 
 	gaussianBlurNode8 = eps::CreateShared<GaussianBlurNode>();
 	gaussianBlurNode8->initialize();
-	gaussianBlurNode8->set_render_target(downSampled8);
-	gaussianBlurNode8->set_base_texture(gaussianBlurNode4->result_stv_handle());
+	gaussianBlurNode8->set_render_target(downSampleRenderTexture8);
+	gaussianBlurNode8->set_base_texture(renderTextures[4]);
 
 	gaussianBlurNode16 = eps::CreateShared<GaussianBlurNode>();
 	gaussianBlurNode16->initialize();
-	gaussianBlurNode16->set_render_target(downSampled16);
-	gaussianBlurNode16->set_base_texture(gaussianBlurNode8->result_stv_handle());
+	gaussianBlurNode16->set_render_target(downSampleRenderTexture16);
+	gaussianBlurNode16->set_base_texture(renderTextures[5]);
 
 	margeTextureNode = eps::CreateShared<MargeTextureNode>();
 	margeTextureNode->initialize();
-	margeTextureNode->set_render_target();
-	margeTextureNode->set_texture_resources(
-		{
-			gaussianBlurNode2->result_stv_handle(),
-			gaussianBlurNode4->result_stv_handle(),
-			gaussianBlurNode8->result_stv_handle(),
-			gaussianBlurNode16->result_stv_handle()
-		});
+	margeTextureNode->set_render_target(bloomBaseRenderTexture);
+	margeTextureNode->set_texture_resources({ renderTextures[3] ,renderTextures[4] ,renderTextures[5], renderTextures[6] });
 
 	bloomNode = eps::CreateShared<BloomNode>();
 	bloomNode->initialize();
-	bloomNode->set_render_target_SC(DirectXSwapChain::GetRenderTarget());
-	bloomNode->set_base_texture(sceneOut->offscreen_render().texture_gpu_handle());
-	bloomNode->set_blur_texture(margeTextureNode->result_stv_handle());
+	bloomNode->set_render_target_SC();
+	bloomNode->set_base_texture(renderTextures[1]);
+	bloomNode->set_blur_texture(renderTextures[7]);
 
 	renderPath = eps::CreateUnique<RenderPath>();
 	renderPath->initialize({ bgSpriteNode,object3dNode,skinningMeshNode,outlineNode,spriteNode,
 		luminanceExtractionNode, gaussianBlurNode2, gaussianBlurNode4, gaussianBlurNode8, gaussianBlurNode16, margeTextureNode, bloomNode });
+
+	// ---------------------- DrawManager ----------------------
+	// StaticMesh
+	staticMeshDrawManager = std::make_unique<StaticMeshDrawManager>();
+	staticMeshDrawManager->initialize(1);
+	staticMeshDrawManager->make_instancing(0, "RordObj.obj", 256);
+	staticMeshDrawManager->make_instancing(0, "WallObj.obj", 256);
+	staticMeshDrawManager->make_instancing(0, "IceObj.obj", 256);
+	staticMeshDrawManager->make_instancing(0, "GoalObjStatic.obj", 1);
+
+	// SkinningMesh
+	skinningMeshDrawManager = std::make_unique<SkinningMeshDrawManager>();
+	skinningMeshDrawManager->initialize(1);
+	skinningMeshDrawManager->make_instancing(0, "ParentKoala.gltf", 1);
+	skinningMeshDrawManager->make_instancing(0, "ChiledKoala.gltf", 1);
+	skinningMeshDrawManager->make_instancing(0, "GoalObj.gltf", 1);
+
+	// スプライト
+	bgSpriteDrawExecutor = std::make_unique<SpriteDrawExecutor>();
+	bgSpriteDrawExecutor->reinitialize(16);
+	spriteDrawExecutors.resize(5);
+	spriteDrawExecutors[0] = std::make_unique<SpriteDrawExecutor>();
+	spriteDrawExecutors[0]->reinitialize(1);
+	spriteDrawExecutors[1] = std::make_unique<SpriteDrawExecutor>();
+	spriteDrawExecutors[1]->reinitialize(1);
+	spriteDrawExecutors[2] = std::make_unique<SpriteDrawExecutor>();
+	spriteDrawExecutors[2]->reinitialize(1);
+	spriteDrawExecutors[3] = std::make_unique<SpriteDrawExecutor>();
+	spriteDrawExecutors[3]->reinitialize(256);
+	spriteDrawExecutors[4] = std::make_unique<SpriteDrawExecutor>();
+	spriteDrawExecutors[4]->reinitialize(16);
+
+	// ライト
+	directionalLightingExecutor = std::make_unique<DirectionalLightingExecutor>();
+	directionalLightingExecutor->reinitialize(1);
 
 	bgm = std::make_unique<AudioPlayer>();
 	bgm->initialize("SelectBGM.wav");
@@ -253,35 +297,25 @@ void SelectScene::initialize() {
 	backTitle = std::make_unique<AudioPlayer>();
 	backTitle->initialize("backAudio.wav");
 	backTitle->set_volume(GameValue::SelectBgmVolume);
-
-	backTitleSprite[0] = std::make_unique<SpriteInstance>("ESCkeyController.png");
-	backTitleSprite[0]->get_transform().set_scale({ 0.5f, 1.0f });
-	backTitleSprite[0]->get_uv_transform().set_scale({ 0.5f, 1.0f });
-	backTitleSprite[0]->get_transform().set_translate({ 1141,30 });
-	backTitleSprite[1] = std::make_unique<SpriteInstance>("ESCkey.png");
-	backTitleSprite[1]->get_transform().set_scale({ 0.5f, 1.0f });
-	backTitleSprite[1]->get_uv_transform().set_scale({ 0.5f, 1.0f });
-	backTitleSprite[1]->get_transform().set_translate({ 1141,30 });
-
-	//if (!toSelectBack) {
-	fromGameBack = std::make_unique<SpriteInstance>("ResetBack.png", Vector2(0.5f, 0.5f));
-	fromGameBack->get_transform().set_translate({ 640.0f, -360.0f });
-	//}
-	//if (!fromGameKoara) {
-	fromGameKoara = std::make_unique<SpriteInstance>("KoaraFace.png", Vector2(0.5f, 0.5f));
-	fromGameKoara->get_transform().set_translate({ 640.0f, -360.0f });
 	//}
 
 	// 入力遅延時間
 	InputDowntime = 0.3f;
 	inputTimer = InputDowntime;
 
-	luminanceExtractionNode->set_param(0.67f, CColor3::WHITE);
-	gaussianBlurNode2->set_parameters(1.0f, 16.17f, 8);
-	gaussianBlurNode4->set_parameters(1.0f, 16.17f, 8);
-	gaussianBlurNode8->set_parameters(1.0f, 16.17f, 8);
-	gaussianBlurNode16->set_parameters(1.0f, 16.17f, 8);
-	bloomNode->set_param(0.247f);
+	crate_field_view();
+
+	skinningMeshDrawManager->register_instance(parentKoala);
+	skinningMeshDrawManager->register_instance(childKoala);
+	staticMeshDrawManager->register_instance(goalMesh);
+	background->setup(skinningMeshDrawManager);
+
+	luminanceExtractionNode->set_param(0.72f, CColor3::WHITE);
+	gaussianBlurNode2->set_parameters(1.0f, 24.61f, 8);
+	gaussianBlurNode4->set_parameters(1.0f, 24.61f, 8);
+	gaussianBlurNode8->set_parameters(1.0f, 24.61f, 8);
+	gaussianBlurNode16->set_parameters(1.0f, 24.61f, 8);
+	bloomNode->set_param(0.12f);
 }
 
 void SelectScene::popped() {
@@ -335,8 +369,8 @@ void SelectScene::update() {
 		numberUi10->set_active(false);
 	}
 
-	numberUi->get_uv_transform().set_translate_x(selectIndex * 0.1f);
-	numberUi10->get_uv_transform().set_translate_x((selectIndex / 10) * 0.1f);
+	numberUi->get_material().uvTransform.set_translate_x(selectIndex * 0.1f);
+	numberUi10->get_material().uvTransform.set_translate_x((selectIndex / 10) * 0.1f);
 
 	Quaternion rotation = fieldRotation->get_transform().get_quaternion();
 	fieldRotation->get_transform().set_quaternion(Quaternion::AngleAxis(CVector3::BASIS_Y, PI2 / 3 * WorldClock::DeltaSeconds()) * rotation);
@@ -347,25 +381,38 @@ void SelectScene::update() {
 }
 
 void SelectScene::begin_rendering() {
-	camera3D->update_matrix();
-	fieldRotation->update_affine();
-	field->begin_rendering();
-	goalMesh->begin_rendering();
-	parentKoala->begin_rendering();
-	childKoala->begin_rendering();
+	directionalLightingExecutor->begin();
+	bgSpriteDrawExecutor->begin();
+	for (auto& executor : spriteDrawExecutors) {
+		executor->begin();
+	}
 
-	numberUi->begin_rendering();
-	numberUi10->begin_rendering();
-	selectUi->begin_rendering();
-	startUi[0]->begin_rendering();
-	startUi[1]->begin_rendering();
-	obSprite->begin_rendering();
-	background->begin_rendering();
-	transition->begin_rendering();
-	backTitleSprite[0]->begin_rendering();
-	backTitleSprite[1]->begin_rendering();
-	fromGameBack->begin_rendering();
-	fromGameKoara->begin_rendering();
+	camera3D->update_affine();
+	fieldRotation->update_affine();
+	field->update_affine();
+	goalMesh->update_affine();
+	parentKoala->update_affine();
+	childKoala->update_affine();
+
+	parentKoala->update_animation();
+	childKoala->update_animation();
+
+	camera3D->transfer();
+
+	staticMeshDrawManager->transfer();
+	skinningMeshDrawManager->transfer();
+	directionalLightingExecutor->write_to_buffer(directionalLight);
+
+	spriteDrawExecutors[0]->write_to_buffer(transition);
+	spriteDrawExecutors[1]->write_to_buffer(fromGameKoara);
+	spriteDrawExecutors[2]->write_to_buffer(fromGameBack);
+	spriteDrawExecutors[3]->write_to_buffer(numberUi);
+	spriteDrawExecutors[3]->write_to_buffer(numberUi10);
+	spriteDrawExecutors[3]->write_to_buffer(selectUi);
+	spriteDrawExecutors[3]->write_to_buffer(startUi[(int)GameValue::UiType.get_type()]);
+	spriteDrawExecutors[3]->write_to_buffer(backTitleSprite[(int)GameValue::UiType.get_type()]);
+	spriteDrawExecutors[4]->write_to_buffer(obSprite);
+	background->write_to_executor(bgSpriteDrawExecutor);
 }
 
 void SelectScene::late_update() {
@@ -374,37 +421,30 @@ void SelectScene::late_update() {
 void SelectScene::draw() const {
 	renderPath->begin();
 	// 背景スプライト
-	background->draw();
+	bgSpriteDrawExecutor->draw_command();
+
 	renderPath->next();
 	// Mesh
-	camera3D->register_world_projection(1);
-	camera3D->register_world_lighting(4);
-	directionalLight->register_world(5);
-	field->draw();
-	goalMesh->draw();
+	camera3D->register_world_projection(2);
+	camera3D->register_world_lighting(3);
+	directionalLightingExecutor->set_command(4);
+	staticMeshDrawManager->draw_layer(0);
 
 	renderPath->next();
 	// SkinningMesh
-	camera3D->register_world_projection(1);
+	camera3D->register_world_projection(2);
 	camera3D->register_world_lighting(5);
-	directionalLight->register_world(6);
-	parentKoala->draw();
-	childKoala->draw();
-	//background->animeDraw();
+	directionalLightingExecutor->set_command(6);
+	skinningMeshDrawManager->draw_layer(0);
+
 	renderPath->next();
 	outlineNode->draw();
 
 	renderPath->next();
 	// 前景スプライト
-	obSprite->draw();
-	numberUi->draw();
-	numberUi10->draw();
-	selectUi->draw();
-	startUi[(int)GameValue::UiType.get_type()]->draw();
-	backTitleSprite[(int)GameValue::UiType.get_type()]->draw();
-	fromGameBack->draw();
-	fromGameKoara->draw();
-	transition->draw();
+	for (auto& executor : spriteDrawExecutors | std::views::reverse) {
+		executor->draw_command();
+	}
 
 	renderPath->next();
 	luminanceExtractionNode->draw();
@@ -455,6 +495,7 @@ void SelectScene::crate_field_view() {
 	childKoala->get_transform().set_quaternion(
 		Quaternion::AngleAxis(CVector3::BASIS_Y, PI) * rotation
 	);
+	field->setup(staticMeshDrawManager);
 }
 
 void SelectScene::default_update() {
@@ -463,10 +504,10 @@ void SelectScene::default_update() {
 	if (fadeEase >= 0) {
 		fadeEase -= WorldClock::DeltaSeconds();
 		float fadeRatio = std::max(0.f, fadeEase / 1.0f);
-		transition->get_color().alpha = fadeEase;
+		transition->get_material().color.alpha = fadeEase;
 	}
 
-	Vector2 stickL = Input::StickL().normalize_safe(1e-4f, CVector2::ZERO);
+	Vector2 stickL = Input::StickL().normalize_safe(CVector2::ZERO);
 	if (inputTimer <= 0.0f) {
 		if (Input::IsPressKey(KeyID::D) || Input::IsPressKey(KeyID::Right) ||
 			Input::IsPressPad(PadID::Right) || stickL.x > 0.5f) {
@@ -503,8 +544,8 @@ void SelectScene::default_update() {
 			eps::CreateUnique<TitleScene>(), 0.5f);
 		backTitle->play();
 
-		backTitleSprite[0]->get_uv_transform().set_translate_x(0.5f);
-		backTitleSprite[1]->get_uv_transform().set_translate_x(0.5f);
+		backTitleSprite[0]->get_material().uvTransform.set_translate_x(0.5f);
+		backTitleSprite[1]->get_material().uvTransform.set_translate_x(0.5f);
 	}
 	// 2桁表示
 	if (selectIndex >= 10) {
@@ -541,7 +582,7 @@ void SelectScene::out_update() {
 			Quaternion::AngleAxis(CVector3::BASIS_Y, -0.01f) * startRotation,
 			Easing::Out::Quad(parametric))
 	);
-	transition->get_color().alpha = fadeRatio;
+	transition->get_material().color.alpha = fadeRatio;
 	bgm->set_volume((1 - fadeEase) * 0.1f);
 }
 

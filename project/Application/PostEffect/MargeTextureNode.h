@@ -4,6 +4,8 @@
 
 #include <array>
 
+#include <Engine/GraphicsAPI/DirectX/DxResource/TextureResource/RenderTexture.h>
+
 class MargeTextureNode : public SingleRenderTargetNode {
 public:
 
@@ -17,11 +19,11 @@ public:
 
 	void draw() const;
 
-	void set_texture_resources(std::array<D3D12_GPU_DESCRIPTOR_HANDLE, 4> downSampledTextures_);
+	void set_texture_resources(std::array<Reference<RenderTexture>, 4> downSampledTextures_);
 
 private:
 	void create_pipeline_state();
 
 private:
-	std::array<D3D12_GPU_DESCRIPTOR_HANDLE, 4> downSampledTextures;
+	std::array<Reference<RenderTexture>, 4> downSampledTextures;
 };
