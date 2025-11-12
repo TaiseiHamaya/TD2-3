@@ -12,7 +12,7 @@ ParticleDrawSystemMesh::ParticleDrawSystemMesh(const std::string& meshName) {
 
 void ParticleDrawSystemMesh::draw_command(size_t InstanceCount) const {
 	auto& commandList = DxCommand::GetCommandList();
-	if (mesh) {
+	if (mesh && InstanceCount) {
 		commandList->IASetVertexBuffers(0, 1, &mesh->get_vbv(0));
 		commandList->IASetIndexBuffer(mesh->get_p_ibv(0));
 		commandList->SetGraphicsRootDescriptorTable(0, particleBuffer.get_handle_gpu());
