@@ -254,8 +254,9 @@ void Player::rotate_update() {
 	rotateTimer += WorldClock::DeltaSeconds();
 
 	if (rotateType != RotateType::Normal &&
-	rotateType != RotateType::Rotate90_Normal &&
-		rotateType != RotateType::None) {
+		rotateType != RotateType::Rotate90_Normal &&
+		rotateType != RotateType::None &&
+		rotateType != RotateType::Rotate90_Reverce) {
 		playerState = PlayerState::RotationFailed;
 		return;
 	}
