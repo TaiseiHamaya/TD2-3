@@ -815,6 +815,12 @@ void PlayerManager::set_rotate_parameters(const Vector3& direction) {
 		player->set_rotating(true);
 		player->set_start_position(player->get_translate());
 		break;
+	case RotateType::Rotate90_Reverce:
+		player->set_rotate_timer(0.0f);
+		player->set_rotate_duration(rotateDuration_);
+		player->set_rotating(true);
+		player->set_start_position(player->get_translate());
+		break;
 	case RotateType::None:
 		player->set_start_rotation(player->get_rotation());
 		player->set_target_rotation(Quaternion::FromToRotation({ 0.0f, 0.0f, -1.0f }, direction));
