@@ -28,7 +28,7 @@ void Player::initialize(const LevelLoader& level, MapchipHandler* mapchipHandler
 
 	// ビックリマークの生成
 	exclamation_->reset_animated_mesh("exclamation.gltf", "Standby", false);
-	exclamation_->set_active(false);
+	exclamation_->get_animation()->set_time_force(10000);
 
 	auto& objMat = object_->get_materials();
 	for (auto& mat : objMat) {
