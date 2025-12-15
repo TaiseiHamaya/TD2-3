@@ -23,6 +23,7 @@ enum class RotateType {
     None,                  // 回転なし
     Normal,                // 普通に回転成功
     Rotate90_Normal,       // 90度の回転が成功
+    Rotate90_Reverce,
 
     // 以降は失敗
     HitDiagonalFrontWall,   // 斜め前の壁にぶつかる

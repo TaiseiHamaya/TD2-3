@@ -318,42 +318,168 @@ bool MapchipHandler::can_player_rotate(Player* player, Child* child, const Vecto
 	// 一回転しない場合の経由点
 	Vector3 midChildPos = nowChildPos + childDirection;
 
-	// 回転が90度ならばそれ用の処理をする
+	//// 回転が90度ならばそれ用の処理をする
+	//if (GameUtility::IsRotation90Degrees(nowRotate, nextRotate)) {
+	//	// 斜め前方向に障害物
+	//	if (check_collision_wall(midChildPos)) {
+	//		player->set_moving(false);
+	//		// 回転失敗のフラグを立てておく
+	//		player->set_turn_success(false);
+	//		player->set_how_rotation(RotationDirection::Default);
+	//		player->set_rotate_type(RotateType::Rotate90_HitObstacleDiagonalFront);
+	//		return false;
+	//	}
+	//	// 移動先に障害物
+	//	if (check_collision_wall(nextChildPos)) {
+	//		player->set_moving(false);
+	//		// 回転失敗のフラグを立てておく
+	//		player->set_turn_success(false);
+	//		player->set_how_rotation(RotationDirection::Default);
+	//		player->set_rotate_type(RotateType::Rotate90_HitObstacleNextPosition);
+	//		return false;
+	//	}
+
+	//	// 回転後に穴に落ちる場合は回転させない
+	//	if (check_collision_hole(nowPlayerPos)) {
+	//		if (check_collision_hole(nextChildPos)) {
+	//			player->set_moving(false);
+	//			// 回転失敗のフラグを立てておく
+	//			player->set_turn_success(false);
+	//			player->set_how_rotation(RotationDirection::Default);
+	//			player->set_rotate_type(RotateType::Rotate90_NextPositionIsHole);
+	//			return false;
+	//		}
+	//	}
+
+	//	// ここまで来たら普通に回転できる
+	//	player->set_rotate_type(RotateType::Rotate90_Normal);
+	//	return true;
+	//}
+
+	/// 90度回転の逆回転をできるか判別する
 	if (GameUtility::IsRotation90Degrees(nowRotate, nextRotate)) {
-		// 斜め前方向に障害物
-		if (check_collision_wall(midChildPos)) {
-			player->set_moving(false);
-			// 回転失敗のフラグを立てておく
-			player->set_turn_success(false);
+		bool blockedMid = check_collision_wall(midChildPos);
+		bool blockedNext = check_collision_wall(nextChildPos);
+		bool holeInNext = check_collision_hole(nextChildPos);
+		bool holeInNow = check_collision_hole(nowPlayerPos);
+
+		bool shortestPathClear = !blockedMid && !blockedNext && (!holeInNext || !holeInNow);
+
+		if (shortestPathClear) {
 			player->set_how_rotation(RotationDirection::Default);
-			player->set_rotate_type(RotateType::Rotate90_HitObstacleDiagonalFront);
-			return false;
-		}
-		// 移動先に障害物
-		if (check_collision_wall(nextChildPos)) {
-			player->set_moving(false);
-			// 回転失敗のフラグを立てておく
-			player->set_turn_success(false);
-			player->set_how_rotation(RotationDirection::Default);
-			player->set_rotate_type(RotateType::Rotate90_HitObstacleNextPosition);
-			return false;
+			// ここまで来たら普通に回転できる
+			player->set_rotate_type(RotateType::Rotate90_Normal);
+			// 回転の始点と終点を設定
+			player->set_start_rotation(player->get_rotation());
+			player->set_target_rotation(Quaternion::FromToRotation({ 0.0f, 0.0f, -1.0f }, direction));
+
+			return true;
 		}
 
-		// 回転後に穴に落ちる場合は回転させない
-		if (check_collision_hole(nowPlayerPos)) {
-			if (check_collision_hole(nextChildPos)) {
-				player->set_moving(false);
-				// 回転失敗のフラグを立てておく
-				player->set_turn_success(false);
-				player->set_how_rotation(RotationDirection::Default);
-				player->set_rotate_type(RotateType::Rotate90_NextPositionIsHole);
-				return false;
+
+		// 逆回転の経由点
+		std::vector<Vector3> reversePath;
+		reversePath.resize(6);
+
+		// 経由点を一つずつ設定していく
+		reversePath[0] = nowChildPos - childDirection;
+		reversePath[1] = nowPlayerPos - childDirection;
+		reversePath[2] = reversePath[1] + (reversePath[1] - reversePath[0]);
+		reversePath[2].y = 1.0f;
+		reversePath[3] = reversePath[2] + childDirection;
+		reversePath[4] = reversePath[3] + childDirection;
+		reversePath[5] = nextChildPos;
+
+		bool reversePathClear = true;
+		for (const auto& pos : reversePath) {
+			if (check_collision_wall(pos)) {
+				reversePathClear = false;
+				break;
 			}
 		}
 
-		// ここまで来たら普通に回転できる
-		player->set_rotate_type(RotateType::Rotate90_Normal);
-		return true;
+		if (check_collision_hole(nowPlayerPos)) {
+			if (check_collision_hole(nextChildPos)) {
+				reversePathClear = false;
+			}
+			else if (check_collision_hole(reversePath[1])) {
+				reversePathClear = false;
+			}
+			else if (check_collision_hole(reversePath[3])) {
+				reversePathClear = false;
+			}
+
+		}
+
+		// 逆回転もOKなら270度回転扱いで成功
+		if (reversePathClear) {
+			Quaternion startRotation = player->get_rotation();
+			Quaternion endRotation = Quaternion::FromToRotation({ 0.0f, 0.0f, -1.0f }, direction);
+
+			Vector3 midDir = Vector3::Normalize(midChildPos - player->get_translate());
+
+			if (std::round(child->get_translate().x) == 1.0f) {
+				midDir = GameUtility::rotate_direction_90_right(midDir);
+			}
+			else if (std::round(child->get_translate().x) == -1.0f) {
+				midDir = GameUtility::rotate_direction_90_left(midDir);
+			}
+
+			Quaternion midRotation = Quaternion::LookForward(midDir);
+
+			// ここで回転をセット
+			player->set_start_rotation(startRotation);
+			player->set_target_rotation(endRotation);
+			player->set_mid_rotation(midRotation);
+
+			player->set_rotate_type(RotateType::Rotate90_Reverce);
+			player->set_how_rotation(RotationDirection::Reverce); // 逆回転用
+			return true;
+		}
+
+		// ここまで来たら回転失敗
+		player->set_rotate_type(RotateType::Rotate90_HitObstacleDiagonalFront);
+		player->set_how_rotation(RotationDirection::Default);
+		player->set_turn_success(false);
+
+		Quaternion startRotation = player->get_rotation();
+		Quaternion endRotation = startRotation;
+
+		player->set_start_rotation(startRotation);
+		player->set_target_rotation(endRotation);
+
+		// 回転軸を求める (start → target の回転軸)
+		Vector3 startForward = Vector3(0.0f, 0.0f, -1.0f) * startRotation;
+		Vector3 targetForward = Vector3(0.0f, 0.0f, -1.0f) * endRotation;
+
+		Vector3 rotationAxis = Vector3::Cross(startForward, targetForward).normalize_safe();
+
+		Quaternion stepRotation;
+
+		rotationAxis = { 0.0f, 1.0f, 0.0f };
+		Vector3 playerPos = player->get_translate();
+		Vector3 midDir{};
+
+		if (blockedMid) {
+			Vector3 childToRock = (nowChildPos - midChildPos) * 0.3f;
+			Vector3 playerToChild = playerPos - nowChildPos;
+			midDir = Vector3::Normalize(playerToChild + childToRock);
+		}
+		else {
+			midDir = Vector3::Normalize(playerPos - midChildPos);
+		}
+
+		if (std::round(child->get_translate().x) == 1.0f) {
+			midDir = GameUtility::rotate_direction_90_right(midDir);
+		}
+		else if (std::round(child->get_translate().x) == -1.0f) {
+			midDir = GameUtility::rotate_direction_90_left(midDir);
+		}
+
+		Quaternion midRotation = Quaternion::LookForward(midDir);
+
+		player->set_mid_rotation(midRotation);
+		return false;
 	}
 
 	// ここまで来たら180度回転なのでそれ用の回転の変数を用意
