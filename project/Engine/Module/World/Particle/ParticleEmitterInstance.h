@@ -1,19 +1,23 @@
 #pragma once
 
-#include "Engine/Module/World/WorldInstance/WorldInstance.h"
+#include "../WorldInstance/WorldInstance.h"
 
-#include <memory>
 #include <list>
+#include <memory>
 #include <variant>
 
-#include "Particle/Particle.h"
-#include "DrawSystem/BaseParticleDrawSystem.h"
+#include "./DrawSystem/BaseParticleDrawSystem.h"
+#include "./Particle/Particle.h"
+#include "Engine/Runtime/Clock/WorldTimer.h"
+#include "Engine/Assets/Json/JsonAsset.h"
 
 #define VECTOR3_SERIALIZER
 #define VECTOR2_SERIALIZER
 #define COLOR4_SERIALIZER
 #define QUATERNION_SERIALIZER
-#include "Engine/Resources/Json/JsonSerializer.h"
+#include "Engine/Assets/Json/JsonSerializer.h"
+
+class TextureAsset;
 
 class ParticleEmitterInstance : public WorldInstance {
 public:
@@ -24,8 +28,8 @@ public:
 	};
 
 	struct ParticleInit {
-		Randomize<float> lifetime;
-		Randomize<float> speed;
+		Randomize<r32> lifetime;
+		Randomize<r32> speed;
 		struct Direction {
 			enum class Mode {
 				Constant,
@@ -37,7 +41,7 @@ public:
 			};
 			struct AngleRange {
 				Vector3 baseDirection;
-				float angle;
+				r32 angle;
 			};
 			std::variant<Constant, std::monostate, AngleRange> data;
 		} direction;
@@ -49,28 +53,32 @@ public:
 				Vector3 radian;
 				Quaternion rotation;
 			};
-			struct Random {
-				Randomize<float> angularVelocity;
+			struct LookAtAngle {
+				Randomize<r32> angleParSec;
+				bool isRandomDirection;
 			};
-			std::variant<Constant, std::monostate, Random> data;
+			struct Random {
+				Randomize<r32> angularVelocity;
+			};
+			std::variant<Constant, std::monostate, Random, LookAtAngle> data;
 		} rotation;
 		Randomize<Color4> color;
 
-		void debug_gui(const char* tag);
+		void debug_gui(string_literal tag);
 	};
 
 	struct ParticleFinal {
 		Randomize<Vector3> size;
 		Randomize<Color4> color;
 
-		void debug_gui(const char* tag);
+		void debug_gui(string_literal tag);
 	};
 
 	struct Emission {
-		float Time;
-		uint32_t Count;
-		uint32_t Cycles;
-		float Interval;
+		r32 delay;
+		u32 count;
+		u32 cycles;
+		r32 interval;
 
 		struct Shape {
 			enum class ShapeType {
@@ -81,12 +89,12 @@ public:
 				//Circle,
 			} shapeType{ ShapeType::Point };
 			struct Sphere {
-				float radius;
+				r32 radius;
 			};
 			struct Cone {
-				float radius;
+				r32 radius;
 				Vector3 direction;
-				float angle;
+				r32 angle;
 			};
 			struct Box {
 				Vector3 size;
@@ -95,16 +103,16 @@ public:
 			std::variant<std::monostate, Sphere, Cone, Box> data;
 		} shape;
 
-		void debug_gui(const char* tag);
+		void debug_gui(string_literal tag);
 	};
 
 public: // Constructor/Destructor
-	ParticleEmitterInstance(std::filesystem::path jsonFile, uint32_t MaxParticle);
+	ParticleEmitterInstance(std::filesystem::path jsonFile, u32 MaxParticle);
 	virtual ~ParticleEmitterInstance() = default;
 
 public: // Member function
 	virtual void update();
-	virtual void begin_rendering();
+	virtual void transfer();
 	void draw() const;
 
 	virtual void on_emit(Particle* const particle) {};
@@ -126,19 +134,21 @@ private:
 
 public: // Getter/Setter
 
-#ifdef _DEBUG
-public:
-	void debug_gui();
-#endif // _DEBUG
+//#ifdef DEBUG_FEATURES_ENABLE
+//public:
+//	void debug_gui();
+//#endif // _DEBUG
 
 protected: // Member variable
-	float timer;
+	WorldTimer timer;
+	WorldTimer cycleTimer;
+	u32 emittedCycle{ 0 };
 	bool isLoop;
-	bool isParentThis;
-	float duration;
+	bool isParentEmitter;
+	r32 duration;
 
 	ParticleDrawType drawType;
-	std::string useResourceName;
+	std::variant<std::string, std::shared_ptr<const TextureAsset>> useResourceName;
 	struct Rect {
 		Vector2 rect;
 		Vector2 pivot;
@@ -149,10 +159,10 @@ protected: // Member variable
 	ParticleFinal particleFinal;
 	Emission emission;
 
-	JsonResource jsonResource;
+	JsonAsset jsonResource;
 
 private:
-	uint32_t numMaxParticle{ 0 };
+	u32 numMaxParticle{ 0 };
 	std::list<std::unique_ptr<Particle>> particles;
 	std::unique_ptr<BaseParticleDrawSystem> drawSystem;
 };
@@ -228,6 +238,15 @@ inline void adl_serializer<ParticleEmitterInstance::ParticleInit>::to_json(json&
 	case Particle::RotationType::Velocity:
 	case Particle::RotationType::LookAt:
 		break;
+	case Particle::RotationType::LookAtAngle:
+	{
+		auto& data = std::get<ParticleEmitterInstance::ParticleInit::Rotation::LookAtAngle>(rhs.rotation.data);
+		j["Rotation"]["Data"] = nlohmann::json::object();
+		j["Rotation"]["Data"]["AngleParSec"]["Min"] = data.angleParSec.min;
+		j["Rotation"]["Data"]["AngleParSec"]["Max"] = data.angleParSec.max;
+		j["Rotation"]["Data"]["IsRandomDirection"] = data.isRandomDirection;
+		break;
+	}
 	case Particle::RotationType::Random:
 	{
 		auto& data = std::get<ParticleEmitterInstance::ParticleInit::Rotation::Random>(rhs.rotation.data);
@@ -315,6 +334,15 @@ inline void adl_serializer<ParticleEmitterInstance::ParticleInit>::from_json(con
 			case Particle::RotationType::LookAt:
 				rhs.rotation.data = std::monostate();
 				break;
+			case Particle::RotationType::LookAtAngle:
+				rhs.rotation.data = ParticleEmitterInstance::ParticleInit::Rotation::LookAtAngle{
+					ParticleEmitterInstance::Randomize<r32>{
+					j["Rotation"]["Data"]["AngleParSec"]["Min"],
+					j["Rotation"]["Data"]["AngleParSec"]["Max"]
+				},
+				j["Rotation"]["Data"]["IsRandomDirection"]
+				};
+				break;
 			case Particle::RotationType::Random:
 			{
 				//auto& data = std::get<ParticleEmitterInstance::ParticleInit::Rotation::Random>(rhs.rotation.data);
@@ -368,10 +396,10 @@ inline void adl_serializer<ParticleEmitterInstance::ParticleFinal>::from_json(co
 }
 
 inline void adl_serializer<ParticleEmitterInstance::Emission>::to_json(json& j, const ParticleEmitterInstance::Emission& rhs) {
-	j["Time"] = rhs.Time;
-	j["Count"] = rhs.Count;
-	j["Cycles"] = rhs.Cycles;
-	j["Interval"] = rhs.Interval;
+	j["Delay"] = rhs.delay;
+	j["Count"] = rhs.count;
+	j["Cycles"] = rhs.cycles;
+	j["Interval"] = rhs.interval;
 	j["Shape"] = nlohmann::json::object();
 	j["Shape"]["Type"] = rhs.shape.shapeType;
 	j["Shape"]["Data"] = nlohmann::json::object();
@@ -405,17 +433,17 @@ inline void adl_serializer<ParticleEmitterInstance::Emission>::to_json(json& j, 
 }
 
 inline void adl_serializer<ParticleEmitterInstance::Emission>::from_json(const json& j, ParticleEmitterInstance::Emission& rhs) {
-	if (j.contains("Time")) {
-		rhs.Time = j["Time"];
+	if (j.contains("Delay")) {
+		rhs.delay = j["Delay"];
 	}
 	if (j.contains("Count")) {
-		rhs.Count = j["Count"];
+		rhs.count = j["Count"];
 	}
 	if (j.contains("Cycles")) {
-		rhs.Cycles = j["Cycles"];
+		rhs.cycles = j["Cycles"];
 	}
 	if (j.contains("Interval")) {
-		rhs.Interval = j["Interval"];
+		rhs.interval = j["Interval"];
 	}
 	if (j.contains("Shape")) {
 		if (j["Shape"].contains("Type")) {

@@ -1,8 +1,8 @@
 #pragma once
 
-#include "Library/Math/Matrix4x4.h"
-#include "Library/Math/Quaternion.h"
-#include "Library/Math/Vector3.h"
+#include "Matrix4x4.h"
+#include "Quaternion.h"
+#include "Vector3.h"
 
 class Transform3D final {
 public:
@@ -26,16 +26,19 @@ public:
 	void set_scale(const Vector3& scale_) noexcept;
 	void set_quaternion(const Quaternion& quaternion_) noexcept;
 	void set_translate(const Vector3& translate_) noexcept;
-	void set_translate_x(float x) noexcept;
-	void set_translate_y(float y) noexcept;
-	void set_translate_z(float z) noexcept;
+	void set_translate_x(r32 x) noexcept;
+	void set_translate_y(r32 y) noexcept;
+	void set_translate_z(r32 z) noexcept;
 
 	const Vector3& get_scale() const noexcept;
 	const Quaternion& get_quaternion() const noexcept;
 	const Vector3& get_translate() const noexcept;
+	Vector3& get_scale() noexcept;
+	Quaternion& get_quaternion() noexcept;
+	Vector3& get_translate() noexcept;
 
-#ifdef _DEBUG
-	void debug_gui(const char* tag = "Transform3D");
+#ifdef DEBUG_FEATURES_ENABLE
+	u32 debug_gui(string_literal tag = "Transform3D");
 	//void debug_axis(const Matrix4x4& debug_matrix) const;
 #endif // _DEBUG
 
@@ -56,21 +59,21 @@ public:// static関数
 	/// </summary>
 	/// <param name="theta">X軸回転</param>
 	/// <returns></returns>
-	static Matrix4x4 MakeRotateXMatrix(const float theta) noexcept;
+	static Matrix4x4 MakeRotateXMatrix(const r32 theta) noexcept;
 
 	/// <summary>
 	/// Y軸方向の回転行列を作成
 	/// </summary>
 	/// <param name="theta">Y軸回転</param>
 	/// <returns></returns>
-	static Matrix4x4 MakeRotateYMatrix(const float theta) noexcept;
+	static Matrix4x4 MakeRotateYMatrix(const r32 theta) noexcept;
 
 	/// <summary>
 	/// Y軸方向の回転行列を作成
 	/// </summary>
 	/// <param name="theta">Y軸回転</param>
 	/// <returns></returns>
-	static Matrix4x4 MakeRotateZMatrix(const float theta) noexcept;
+	static Matrix4x4 MakeRotateZMatrix(const r32 theta) noexcept;
 
 	/// <summary>
 	/// 回転行列を作成
@@ -79,7 +82,7 @@ public:// static関数
 	/// <param name="y">Y軸回転量</param>
 	/// <param name="z">Z軸回転量</param>
 	/// <returns></returns>
-	static Matrix4x4 MakeRotateMatrix(const float x, const float y, const float z) noexcept;
+	static Matrix4x4 MakeRotateMatrix(const r32 x, const r32 y, const r32 z) noexcept;
 	
 	static Matrix4x4 MakeRotateMatrix(const Vector3& rotate) noexcept;
 
@@ -90,7 +93,7 @@ public:// static関数
 	/// <param name="y">拡縮Y</param>
 	/// <param name="z">拡縮Z</param>
 	/// <returns></returns>
-	static constexpr Matrix4x4 MakeScaleMatrix(const float x, const float y, const float z) noexcept;
+	static constexpr Matrix4x4 MakeScaleMatrix(const r32 x, const r32 y, const r32 z) noexcept;
 
 	/// <summary>
 	/// 拡縮行列を作成
@@ -106,7 +109,7 @@ public:// static関数
 	/// <param name="y">移動Y</param>
 	/// <param name="z">移動Z</param>
 	/// <returns></returns>
-	static constexpr Matrix4x4 MakeTranslateMatrix(const float x, const float y, const float z) noexcept;
+	static constexpr Matrix4x4 MakeTranslateMatrix(const r32 x, const r32 y, const r32 z) noexcept;
 
 	/// <summary>
 	/// 平行移動行列を作成
@@ -145,7 +148,7 @@ public:// static関数
 	static Vector3 ExtractPosition(const Matrix4x4& matrix);
 };
 
-constexpr Matrix4x4 Transform3D::MakeScaleMatrix(const float x, const float y, const float z) noexcept {
+constexpr Matrix4x4 Transform3D::MakeScaleMatrix(const r32 x, const r32 y, const r32 z) noexcept {
 	return { {
 		{ x, 0, 0, 0 },
 		{ 0, y, 0, 0 },
@@ -158,7 +161,7 @@ constexpr Matrix4x4 Transform3D::MakeScaleMatrix(const Vector3& scale) noexcept 
 	return MakeScaleMatrix(scale.x, scale.y, scale.z);
 }
 
-constexpr Matrix4x4 Transform3D::MakeTranslateMatrix(const float x, const float y, const float z) noexcept {
+constexpr Matrix4x4 Transform3D::MakeTranslateMatrix(const r32 x, const r32 y, const r32 z) noexcept {
 	return { {
 		{ 1, 0, 0, 0 },
 		{ 0, 1, 0, 0 },

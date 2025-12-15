@@ -1,11 +1,11 @@
 #pragma once
+
 #include "Engine/Module/Render/RenderTargetGroup/BaseRenderTargetGroup.h"
 
 #include <array>
-#include <d3d12.h>
 
-#include "Engine/Rendering/RenderingSystemValues.h"
-#include "Engine/Rendering/DirectX/DirectXResourceObject/RenderTarget/RenderTarget.h"
+#include "Engine/GraphicsAPI/DirectX/DxResource/TextureResource/ScreenTexture.h"
+#include "Engine/GraphicsAPI/RenderingSystemValues.h"
 
 class SwapChainRenderTargetGroup final : public BaseRenderTargetGroup {
 public:
@@ -16,35 +16,23 @@ public:
 	/// <summary>
 	/// 初期化
 	/// </summary>
-	void initialize() override;
+	void initialize();
 
 	/// <summary>
 	/// resourceの設定
 	/// </summary>
 	/// <param name="resource_">設定するResource</param>
 	/// <param name="index">SwapChainIndex</param>
-	void set_resource(const Microsoft::WRL::ComPtr<ID3D12Resource>& resource_, std::uint32_t index);
-
-	const std::array<RenderTarget, RenderingSystemValues::NUM_BUFFERING>& get_render_targets() const;
-	std::array<RenderTarget, RenderingSystemValues::NUM_BUFFERING>& get_render_targets();
+	void set_resource(Reference<ScreenTexture>, u32 index);
 
 private:
-	/// <summary>
-	/// レンダーターゲットの設定
-	/// </summary>
-	void set_render_target(const std::shared_ptr<DepthStencil>& depthStencil) override;
+	void start_render_target(Reference<DepthStencilTexture> depthStencil) override;
 
 	/// <summary>
 	/// レンダーターゲットのクリア
 	/// </summary>
 	void clear_render_target() override;
 
-	/// <summary>
-	/// リソースバリアの状態を変更
-	/// </summary>
-	void change_render_target_state() override;
-
 private:
-	std::array<RenderTarget, RenderingSystemValues::NUM_BUFFERING> renderTargets;
-	std::array<D3D12_CPU_DESCRIPTOR_HANDLE, RenderingSystemValues::NUM_BUFFERING> renderTargetHandles{};
+	std::vector<Reference<ScreenTexture>> textures;
 };

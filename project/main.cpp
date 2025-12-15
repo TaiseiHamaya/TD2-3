@@ -4,15 +4,16 @@
 #include "Application/Scene/SelectScene.h"
 #include "Application/Scene/TitleScene.h"
 
-#include <Engine/Resources/Audio/AudioManager.h>
+#include <Engine/Assets/Audio/AudioManager.h>
 
 #include "Engine/Runtime/Scene/SceneManager.h"
-#include "TestCode/SceneDemo.h"
+
+#include <Engine/Application/EngineSettings.h>
 
 int WINAPI WinMain(HINSTANCE,HINSTANCE,LPSTR,int) {
 	WinApp::Initialize();
 
-	WorldClock::IsFixDeltaTime(true);
+	EngineSettings::IsFixDeltaTime = true;
 
 #ifdef _DEBUG
 	SceneManager::Initialize(std::make_unique<TitleScene>());

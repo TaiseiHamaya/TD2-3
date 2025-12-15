@@ -2,20 +2,19 @@
 
 #ifdef _DEBUG
 
-#include <Engine/Module/Render/RenderNode/Forward/Object3DNode/Object3DNode.h>
-#include <Engine/Rendering/DirectX/DirectXSwapChain/DirectXSwapChain.h>
+#include <Engine/Module/Render/RenderNode/Forward/Mesh/StaticMeshNodeForward.h>
 #include <Engine/Runtime/Input/Input.h>
 #include <Engine/Runtime/Scene/SceneManager.h>
-#include <Engine/Utility/Tools/SmartPointer.h>
+#include <Library/Utility/Tools/SmartPointer.h>
 
 #include "Application/Scene/GameScene.h"
 #include "Application/Scene/SelectScene.h"
 
 void DebugScene::initialize() {
-	std::shared_ptr<Object3DNode> object3dNode;
-	object3dNode = std::make_unique<Object3DNode>();
+	std::shared_ptr<StaticMeshNodeForward> object3dNode;
+	object3dNode = std::make_unique<StaticMeshNodeForward>();
 	object3dNode->initialize();
-	object3dNode->set_render_target_SC(DirectXSwapChain::GetRenderTarget());
+	object3dNode->set_render_target_SC();
 
 	renderPath = eps::CreateUnique<RenderPath>();
 	renderPath->initialize({ object3dNode });

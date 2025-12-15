@@ -1,13 +1,12 @@
 #pragma once
 
+#include <Library/Math/Transform2D.h>
+#include <Library/Utility/Template/Reference.h>
+
 #include <memory>
-#include "Engine/Debug/ImGui/ImGuiLoadManager/ImGuiLoadManager.h"
-#include "Library/Math/Transform2D.h"
-#include "Engine/Runtime/WorldClock/WorldClock.h"
-#include "Library/Math/Easing.h"
-#include <Engine/Runtime/Input/Input.h>
 
 class SpriteInstance;
+class SpriteDrawExecutor;
 
 class FailedUI
 {
@@ -18,8 +17,8 @@ public:
 	void init();
 	void update();
 	void debugUpdate();
-	void begin_rendering();
-	void draw();
+
+	void write_to_executor(Reference<SpriteDrawExecutor> executor) const;
 
 public:
 	void SetReasonIndex(int value) { reasonIndex = value; }

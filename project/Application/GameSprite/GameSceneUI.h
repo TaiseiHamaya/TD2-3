@@ -1,15 +1,15 @@
 #pragma once
 
 #include <memory>
-#include "Engine/Debug/ImGui/ImGuiLoadManager/ImGuiLoadManager.h"
-#include "Library/Math/Transform2D.h"
-#include "Engine/Runtime/WorldClock/WorldClock.h"
+
+#include <Library/Utility/Template/Reference.h>
+
+#include <Engine/Module/World/Sprite/SpriteInstance.h>
 
 enum class KeyID;
-class SpriteInstance;
+class SpriteDrawExecutor;
 
-
-class GameSceneUI{
+class GameSceneUI {
 public:
 	GameSceneUI();
 	~GameSceneUI();
@@ -17,8 +17,9 @@ public:
 	void initialize(int32_t level);
 	void update();
 	void debugUpdate();
-	void begin_rendering();
-	void darw();
+
+	void write_to_executor(Reference<SpriteDrawExecutor> executor) const;
+
 	void ReleseUIUpdate();
 
 public:
@@ -27,13 +28,15 @@ public:
 	void SetCurLevel(int value) { curLevel = value; }
 private:
 	void keyControl(int index);
+	void padControl(int index);
 	float OutBack(float t, float totaltime, float min, float max, float s);
 
 private:
 
 	static const  int uiIndex = 8;
 
-	std::array<std::unique_ptr<SpriteInstance>, uiIndex>wasdSprite;
+	std::array<std::array<std::unique_ptr<SpriteInstance>, uiIndex>, 2> controlSprite;
+	std::unique_ptr<SpriteInstance> noneButtonSprite;
 	//std::unique_ptr<SpriteInstance>wasdSprite[];
 	std::unique_ptr<SpriteInstance>tutorialUI;
 

@@ -1,18 +1,25 @@
 #pragma once
 
 #include <memory>
+#include <optional>
 #include <string>
 
-#include "Library/Math/Color4.h"
-#include "Library/Math/Matrix4x4.h"
-#include "Library/Math/Vector2.h"
+#include <Library/Math/Color4.h>
+#include <Library/Math/Matrix4x4.h>
+#include <Library/Math/Transform2D.h>
+#include <Library/Math/Vector2.h>
 
-#include "Engine/Rendering/DirectX/DirectXResourceObject/ConstantBuffer/ConstantBuffer.h"
-#include "Engine/Rendering/DirectX/DirectXResourceObject/VertexBuffer/VertexBuffer.h"
+class TextureAsset;
 
-class Texture;
-class Transform2D;
-class IndexBuffer;
+struct SpriteMaterial {
+	Color4 color;
+	std::optional<u32> textureIndex;
+	Transform2D uvTransform;
+
+#ifdef DEBUG_FEATURES_ENABLE
+	std::shared_ptr<const TextureAsset> texture;
+#endif
+};
 
 class SpriteInstance {
 public:
@@ -30,9 +37,12 @@ private:
 public:
 	const Transform2D& get_transform() const noexcept;
 	Transform2D& get_transform() noexcept;
-	const Transform2D& get_uv_transform() const noexcept;
-	Transform2D& get_uv_transform() noexcept;
-	Color4& get_color() const;
+
+	SpriteMaterial& get_material() noexcept;
+	const SpriteMaterial& get_material() const noexcept;
+
+	Matrix4x4 create_local_matrix() const noexcept;
+	Matrix4x4 create_world_matrix() const noexcept;
 
 	/// <summary>
 	/// アクティブフラグの設定
@@ -46,35 +56,25 @@ public:
 	/// <returns></returns>
 	bool is_active() const { return isActive; };
 
+	void set_priority(u32 priority_) noexcept;
+
+	u32 key_id() const noexcept;
+
 	//void update();
-	void begin_rendering() noexcept;
-	void draw() const;
 
 #ifdef _DEBUG
 	void debug_gui();
 #endif // _DEBUG
 
-private:
-	void create_local_vertices(const Vector2& pivot);
-
-private:
+protected:
 	bool isActive{ true };
 
-	std::unique_ptr<Object3DVertexBuffer> vertices;
-	std::unique_ptr<IndexBuffer> indexes;
-	std::shared_ptr<const Texture> texture;
+	u32 priority{ 0 };
 
-	struct SpriteMaterial {
-		Color4 color;
-		Matrix4x4 uvTransform;
-	};
+	Transform2D transform;
 
-	std::unique_ptr<ConstantBuffer<SpriteMaterial>> material;
-	std::unique_ptr<ConstantBuffer<Matrix4x4>> transformMatrix;
+	SpriteMaterial material;
 
-protected:
-	Color4& color;
-
-	std::unique_ptr<Transform2D> transform;
-	std::unique_ptr<Transform2D> uvTransform;
+	Vector2 pivot{ CVector2::ZERO };
+	Vector2 size{ CVector2::ONE };
 };

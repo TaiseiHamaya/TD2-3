@@ -4,6 +4,10 @@
 
 #include "../DeferredAdaptor.h"
 
+/// 既知の不具合一覧 
+/// ・ライト内にカメラがあった際に、正しくライティングされない。
+/// ・ライト位置に対して背面を向いている面でライティングされる場合がある。
+
 class PointLightingNode final : public SingleRenderTargetNode {
 public:
 	PointLightingNode();
@@ -15,15 +19,15 @@ public:
 	/// </summary>
 	void initialize() override;
 
-	void set_gbuffers(std::shared_ptr<DeferredAdaptor::GBuffersType> gBufferRT);
-
 	void preprocess() override;
+
+	void set_gbuffers(std::array<Reference<RenderTexture>, DeferredAdaptor::NUM_GBUFFER> gBufferTextures_);
 
 private:
 	void create_pipeline_state();
 
 private:
-	std::array<D3D12_GPU_DESCRIPTOR_HANDLE, DeferredAdaptor::NUM_GBUFFER> gBuffers{ 0 };
-	D3D12_GPU_DESCRIPTOR_HANDLE depthBuffer{ 0 };
+	std::array<Reference<RenderTexture>, DeferredAdaptor::NUM_GBUFFER> gBufferTextures;
+	Reference<DepthStencilTexture> depthTexture;
 };
 

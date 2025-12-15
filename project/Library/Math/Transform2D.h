@@ -1,14 +1,14 @@
 #pragma once
 
-#include "Library/Math/Matrix3x3.h"
-#include "Library/Math/Matrix4x4.h"
-#include "Library/Math/Vector2.h"
+#include "Matrix3x3.h"
+#include "Matrix4x4.h"
+#include "Vector2.h"
 
 class Transform2D final {
 public:
 	Transform2D() noexcept;
-	Transform2D(const Vector2& scale_, float rotate_, const Vector2& translate_) noexcept;
-	Transform2D(Vector2&& scale_, float rotate_, Vector2&& translate_) noexcept;
+	Transform2D(const Vector2& scale_, r32 rotate_, const Vector2& translate_) noexcept;
+	Transform2D(Vector2&& scale_, r32 rotate_, Vector2&& translate_) noexcept;
 	~Transform2D() noexcept = default;
 
 public:
@@ -17,28 +17,36 @@ public:
 
 public:
 	void set_scale(const Vector2& scale_) noexcept;
-	void set_rotate(float rotate_) noexcept;
+	void set_rotate(r32 rotate_) noexcept;
 	void set_translate(const Vector2& translate_) noexcept;
-	void set_translate_x(float x) noexcept;
-	void set_translate_y(float y) noexcept;
+	
+	void set_translate_x(r32 x) noexcept;
+	void set_translate_y(r32 y) noexcept;
+	
 	Matrix3x3 get_matrix() const noexcept;
 	Matrix4x4 get_matrix4x4_transform() const noexcept;
 	Matrix4x4 get_matrix4x4_padding() const;
+
 	const Vector2& get_scale() const noexcept;
-	const float& get_rotate() const noexcept;
+	const r32& get_rotate() const noexcept;
 	const Vector2& get_translate() const noexcept;
+
+	Vector2& get_scale() noexcept;
+	r32& get_rotate() noexcept;
+	Vector2& get_translate() noexcept;
+
 	void plus_translate(const Vector2& plus)noexcept;
 
 	void copy(const Transform2D& copy) noexcept;
 
-#ifdef _DEBUG
+#ifdef DEBUG_FEATURES_ENABLE
 public:
-	void debug_gui(const char* tag = "Transform2D");
+	void debug_gui(string_literal tag = "Transform2D");
 #endif // _DEBUG
 
 private:
 	Vector2 scale;
-	float rotate;
+	r32 rotate;
 	Vector2 translate;
 
 public:// static関数
@@ -53,7 +61,7 @@ public:// static関数
 	/// </summary>
 	/// <param name="theta">回転</param>
 	/// <returns></returns>
-	static Matrix3x3 MakeRotateMatrix(const float theta) noexcept;
+	static Matrix3x3 MakeRotateMatrix(const r32 theta) noexcept;
 
 	/// <summary>
 	/// 回転行列を作成
@@ -61,7 +69,7 @@ public:// static関数
 	/// <param name="sinTheta">回転</param>
 	/// <param name="cosTheta">回転</param>
 	/// <returns></returns>
-	static constexpr Matrix3x3 MakeRotateMatrix(const float sine, const float cosine) noexcept;
+	static constexpr Matrix3x3 MakeRotateMatrix(const r32 sine, const r32 cosine) noexcept;
 
 	/// <summary>
 	/// 拡縮行列を作成
@@ -69,7 +77,7 @@ public:// static関数
 	/// <param name="x">拡縮X</param>
 	/// <param name="y">拡縮Y</param>
 	/// <returns></returns>
-	static constexpr Matrix3x3 MakeScaleMatrix(const float x, const float y) noexcept;
+	static constexpr Matrix3x3 MakeScaleMatrix(const r32 x, const r32 y) noexcept;
 
 	/// <summary>
 	/// 拡縮行列を作成
@@ -84,7 +92,7 @@ public:// static関数
 	/// <param name="x">移動X</param>
 	/// <param name="y">移動Y</param>
 	/// <returns></returns>
-	static constexpr Matrix3x3 MakeTranslateMatrix(const float x, const float y) noexcept;
+	static constexpr Matrix3x3 MakeTranslateMatrix(const r32 x, const r32 y) noexcept;
 
 	/// <summary>
 	/// 平行移動行列を作成
@@ -100,7 +108,7 @@ public:// static関数
 	/// <param name="theta">回転</param>
 	/// <param name="translate">移動</param>
 	/// <returns></returns>
-	static Matrix3x3 MakeAffineMatrix(const Vector2& scale, const float theta, const Vector2& translate) noexcept;
+	static Matrix3x3 MakeAffineMatrix(const Vector2& scale, const r32 theta, const Vector2& translate) noexcept;
 
 	/// <summary>
 	/// アフィン変換行列を作成
@@ -110,7 +118,7 @@ public:// static関数
 	/// <param name="cosTheta">回転</param>
 	/// <param name="translate">移動</param>
 	/// <returns></returns>
-	static constexpr Matrix3x3 MakeAffineMatrix(const Vector2& scale, const float sinTheta, const float cosTheta, const Vector2& translate) noexcept;
+	static constexpr Matrix3x3 MakeAffineMatrix(const Vector2& scale, const r32 sinTheta, const r32 cosTheta, const Vector2& translate) noexcept;
 
 	/// <summary>
 	/// 2次元ベクトルの同次座標系乗算
@@ -137,7 +145,7 @@ constexpr Matrix3x3 Transform2D::MakeIdentityMatrix() noexcept {
 	};
 }
 
-constexpr Matrix3x3 Transform2D::MakeRotateMatrix(const float sine, const float cosine) noexcept {
+constexpr Matrix3x3 Transform2D::MakeRotateMatrix(const r32 sine, const r32 cosine) noexcept {
 	return {
 		{{ cosine, sine, 0 },
 		{ -sine, cosine, 0 },
@@ -145,7 +153,7 @@ constexpr Matrix3x3 Transform2D::MakeRotateMatrix(const float sine, const float 
 	};
 }
 
-constexpr Matrix3x3 Transform2D::MakeScaleMatrix(const float x, const float y) noexcept {
+constexpr Matrix3x3 Transform2D::MakeScaleMatrix(const r32 x, const r32 y) noexcept {
 	return {
 		{{ x, 0, 0 },
 		{ 0, y, 0 },
@@ -157,7 +165,7 @@ constexpr Matrix3x3 Transform2D::MakeScaleMatrix(const Vector2& scale) noexcept 
 	return MakeScaleMatrix(scale.x, scale.y);
 }
 
-constexpr Matrix3x3 Transform2D::MakeTranslateMatrix(const float x, const float y) noexcept {
+constexpr Matrix3x3 Transform2D::MakeTranslateMatrix(const r32 x, const r32 y) noexcept {
 	return{ {
 		{ 1, 0, 0 },
 		{ 0, 1, 0 },
@@ -170,13 +178,11 @@ constexpr Matrix3x3 Transform2D::MakeTranslateMatrix(const Vector2& translate) n
 }
 
 constexpr Vector2 Transform2D::Homogeneous(const Vector2& vector, const Matrix3x3& matrix) {
-	float w = vector.x * matrix[0][2] + vector.y * matrix[1][2] + 1.0f * matrix[2][2];
-	assert(w != 0);
+	r32 w = vector.x * matrix[0][2] + vector.y * matrix[1][2] + 1.0f * matrix[2][2];
 	return { (vector.x * matrix[0][0] + vector.y * matrix[1][0] + 1.0f * matrix[2][0]) / w, (vector.x * matrix[0][1] + vector.y * matrix[1][1] + 1.0f * matrix[2][1]) / w };;
 }
 
 constexpr Vector2 Transform2D::HomogeneousVector(const Vector2& vector, const Matrix3x3& matrix) {
-	float w = vector.x * matrix[0][2] + vector.y * matrix[1][2] + 1.0f * matrix[2][2];
-	assert(w != 0);
+	r32 w = vector.x * matrix[0][2] + vector.y * matrix[1][2] + 1.0f * matrix[2][2];
 	return { (vector.x * matrix[0][0] + vector.y * matrix[1][0] + 1.0f * 0) / w, (vector.x * matrix[0][1] + vector.y * matrix[1][1] + 1.0f * 0) / w };
 }

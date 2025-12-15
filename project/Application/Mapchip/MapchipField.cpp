@@ -1,9 +1,13 @@
 #include "Application/Mapchip/MapchipField.h"
-#include "Engine/Module/World/Mesh/MeshInstance.h"
-#include "Application/LevelLoader/LevelLoader.h"
-#include <Engine/Utility/Template/Reference.h>
-#include "Engine/Rendering/DirectX/DirectXResourceObject/ConstantBuffer/Material/Material.h"
 
+#include <cmath>
+
+#include "Application/LevelLoader/LevelLoader.h"
+
+#include <Library/Utility/Template/Reference.h>
+
+#include "Engine/Module/World/Mesh/StaticMeshInstance.h"
+#include <Engine/Module/DrawExecutor/Mesh/StaticMeshDrawManager.h>
 
 MapchipField::MapchipField() = default;
 
@@ -29,8 +33,16 @@ void MapchipField::initialize(Reference<const LevelLoader> level) {
 	if (field.size() < rowSize) {
 		field.resize(rowSize);
 	}
-	for (uint32_t row = 0; row < rowSize; ++row) {
+	// リセット
+	for (auto& row : field) {
+		for (auto& elem : row) {
+			elem.mesh->set_draw(false);
+			elem.type = 0;
+			elem.isZeroGravity = false;
+		}
+	}
 
+	for (uint32_t row = 0; row < rowSize; ++row) {
 		columnSize = (uint32_t)fieldLevel[row].size();
 		if (field[row].size() < columnSize) {
 			field[row].resize(columnSize);
@@ -40,11 +52,15 @@ void MapchipField::initialize(Reference<const LevelLoader> level) {
 			write.isZeroGravity = fieldZeroGravity[row][column];
 			write.type = fieldLevel[row][column];
 			if (write.type != 0) {
+				write.mesh->set_draw(true);
 				write.mesh->reset_mesh(fieldFileName[write.type]);
 				auto& objMat = write.mesh->get_materials();
 				for (auto& mat : objMat) {
 					mat.lightingType = LighingType::None;
 				}
+			}
+			else {
+				write.mesh->set_draw(false);
 			}
 
 			write.mesh->reparent(fieldRoot, false);
@@ -59,25 +75,23 @@ void MapchipField::initialize(Reference<const LevelLoader> level) {
 	}
 }
 
-void MapchipField::update() {
-
-}
-
-void MapchipField::begin_rendering() {
-	fieldRoot->update_affine();
-	for (uint32_t i = 0; i < rowSize; ++i) {
-		for (uint32_t j = 0; j < columnSize; ++j) {
-			field[i][j].mesh->begin_rendering();
+void MapchipField::setup(Reference<StaticMeshDrawManager> manager) {
+	for (auto& row : field) {
+		for (auto& elem : row) {
+			manager->register_instance(elem.mesh);
 		}
 	}
 }
 
-void MapchipField::draw() {
-	for (uint32_t i = 0; i < rowSize; ++i) {
-		for (uint32_t j = 0; j < columnSize; ++j) {
-			if (field[i][j].type != 0) {
-				field[i][j].mesh->draw();
-			}
+void MapchipField::update() {
+
+}
+
+void MapchipField::update_affine() {
+	fieldRoot->update_affine();
+	for (auto& row : field) {
+		for (auto& elem : row) {
+			elem.mesh->update_affine();
 		}
 	}
 }
@@ -92,7 +106,7 @@ int MapchipField::getElement(float x, float y) {
 	uint32_t iy = static_cast<uint32_t>(std::round(y));
 
 	// 範囲チェック (0 <= ix, iy <= 6)
-	if (ix < 0 || ix >= columnSize  || iy < 0 || iy >= rowSize) {
+	if (ix < 0 || ix >= columnSize || iy < 0 || iy >= rowSize) {
 		return 0; // 範囲外の場合は 0 を返す
 	}
 
@@ -101,7 +115,7 @@ int MapchipField::getElement(float x, float y) {
 }
 
 MapchipField::Field::Field() :
-	mesh(std::make_unique<MeshInstance>()),
+	mesh(std::make_unique<StaticMeshInstance>()),
 	type(0),
 	isZeroGravity(false) {
 }

@@ -3,10 +3,10 @@
 
 #include <format>
 #include <imgui.h>
-#include "Engine/Resources/Texture/TextureManager.h"
-#include "Engine/Resources/PolygonMesh/PolygonMeshManager.h"
-#include "Engine/Resources/Animation/NodeAnimation/NodeAnimationManager.h"
-#include "Engine/Resources/Animation/Skeleton/SkeletonManager.h"
+#include "Engine/Assets/Texture/TextureLibrary.h"
+#include "Engine/Assets/PolygonMesh/PolygonMeshLibrary.h"
+#include "Engine/Assets/Animation/NodeAnimation/NodeAnimationLibrary.h"
+#include "Engine/Assets/Animation/Skeleton/SkeletonLibrary.h"
 
 ImGuiLoadManager::ImGuiLoadManager() {
 	meshCurrentPath = "./EngineResources";
@@ -53,9 +53,9 @@ void ImGuiLoadManager::show_gui() {
 				get_file_list(meshFileList, meshCurrentPath, { ".obj", ".gltf" });
 			}
 			else if(std::filesystem::exists(select)){
-				PolygonMeshManager::RegisterLoadQue(select);
-				NodeAnimationManager::RegisterLoadQue(select);
-				SkeletonManager::RegisterLoadQue(select);
+				PolygonMeshLibrary::RegisterLoadQue(select);
+				NodeAnimationLibrary::RegisterLoadQue(select);
+				SkeletonLibrary::RegisterLoadQue(select);
 			}
 		}
 	}
@@ -86,7 +86,7 @@ void ImGuiLoadManager::show_gui() {
 				get_file_list(textureFileList, textureCurrentPath, { ".png" });
 			}
 			else if (std::filesystem::exists(select)) {
-				TextureManager::RegisterLoadQue(select);
+				TextureLibrary::RegisterLoadQue(select);
 			}
 		}
 	}

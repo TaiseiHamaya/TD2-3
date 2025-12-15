@@ -1,23 +1,29 @@
 #pragma once
 #include "Application/Character/CharacterBase.h"
-#include "Engine/Runtime/WorldClock/WorldClock.h"
-#include <Application/Mapchip/MapchipHandler.h>
-#include "CharacterStates.h"
-#include "Engine/Resources/Audio/AudioPlayer.h"
-#include <Engine/Module/World/Particle/ParticleEmitterInstance.h>
-#include <memory>
 #include "Application/Character/Child/Child.h"
+#include "Application/Mapchip/MapchipHandler.h"
+#include "CharacterStates.h"
 
+#include <Engine/Assets/Audio/AudioPlayer.h>
+#include <Engine/Module/World/Particle/ParticleEmitterInstance.h>
+#include <Engine/Runtime/Clock/WorldClock.h>
+
+#include <memory>
+
+class SkinningMeshDrawManager;
 
 class Player : public CharacterBase {
 public:
+	Player();
+
+public:
 	void initialize(const LevelLoader& level, MapchipHandler* mapchipHandler) override;
+	void setup(Reference<SkinningMeshDrawManager> drawManager);
 	void finalize() override;
 	void update() override;
 	void fall_update();
 
-	void begin_rendering() override;
-	void draw() const override;
+	void update_affine() override;
 
 public: // アクセッサ
 	void set_child(Child* child) { child_ = child; }
@@ -87,7 +93,7 @@ public: // アクセッサ
 	void set_start_position(const Vector3& pos) { moveStartPosition = pos; }
 
 	//Vector3 get_target_pos() const { return targetPosition; }
-	void get_target_pos(const Vector3& pos) { targetPosition = pos; }
+	void set_target_pos(const Vector3& pos) { targetPosition = pos; }
 
 	Quaternion start_rotation() const { return startRotation; }
 
@@ -126,9 +132,9 @@ private:
 	MapchipHandler* mapchipHandler_;
 	Child* child_; // 子オブジェクトへの参照
 	// 回転失敗時エフェクト
-	std::unique_ptr<AnimatedMeshInstance> exclamation_;
+	std::unique_ptr<SkinningMeshInstance> exclamation_;
 	// 焦るときエフェクト
-	std::unique_ptr<AnimatedMeshInstance> flusteredEffect_;
+	std::unique_ptr<SkinningMeshInstance> flusteredEffect_;
 
 	struct ExclamationData {
 		bool isActive;

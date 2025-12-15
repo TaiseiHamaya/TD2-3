@@ -3,13 +3,28 @@
 #include <cmath>
 
 #include <Library/Math/Definition.h>
+#include <Library/Utility/Tools/Easing.h>
+#include <Library/Utility/Tools/SmartPointer.h>
 
-#include "Engine/Resources/Animation/NodeAnimation/NodeAnimationPlayer.h"
+#include "Engine/Assets/Animation/NodeAnimation/NodeAnimationPlayer.h"
 #include "Engine/Runtime/Input/Input.h"
-#include "Engine/Rendering/DirectX/DirectXResourceObject/ConstantBuffer/Material/Material.h"
-#include <Engine/Utility/Tools/SmartPointer.h>
+#include <Engine/Module/DrawExecutor/Mesh/SkinningMeshDrawManager.h>
 
 #include <Application/Utility/GameUtility.h>
+
+
+PlayerManager::PlayerManager() {
+	child = std::make_unique<Child>();
+	player = std::make_unique<Player>();
+	dustEmitter = eps::CreateUnique<ParticleEmitterInstance>("dust.json", 128);
+	iceDustEmitter = eps::CreateUnique<ParticleEmitterInstance>("iceDust.json", 128);
+	catchEffect_ = std::make_unique<SkinningMeshInstance>();
+	releaseEffect_ = std::make_unique<SkinningMeshInstance>();
+	mapchipHandler = std::make_unique<MapchipHandler>();
+	holdAudio = std::make_unique<AudioPlayer>();
+	releaseAudio = std::make_unique<AudioPlayer>();
+	undoAudio = std::make_unique<AudioPlayer>();
+}
 
 void PlayerManager::initialize(Reference<const LevelLoader> level, MapchipField* mapchipField, const Vector3& goalPosition, bool isResetLogger) {
 	if (isResetLogger) {
@@ -24,25 +39,27 @@ void PlayerManager::initialize(Reference<const LevelLoader> level, MapchipField*
 
 	mapchipField_ = mapchipField;
 
-	catchEffect_ = std::make_unique<AnimatedMeshInstance>();
 	catchEffect_->reset_animated_mesh("CatchEffect.gltf", "Standby", false);
 	catchEffect_->set_active(false);
 	catchEffect_->get_transform().set_quaternion({ 0.0f, 0.5f, 0.0f, 0.5f });
 
-	auto& objMat = catchEffect_->get_materials();
-	for (auto& mat : objMat) {
-		mat.lightingType = LighingType::None;
-	}
-	dustEmitter = eps::CreateUnique<ParticleEmitterInstance>("dust.json", 128);
-	iceDustEmitter = eps::CreateUnique<ParticleEmitterInstance>("iceDust.json", 128);
+	releaseEffect_->reset_animated_mesh("ReleaseEffect.gltf", "Standby", false);
+	releaseEffect_->set_active(false);
+	releaseEffect_->get_transform().set_quaternion({ 0.0f, 0.5f, 0.0f, 0.5f });
 
-	mapchipHandler = std::make_unique<MapchipHandler>();
+	auto& catchMat = catchEffect_->get_materials();
+	auto& releaseMat = releaseEffect_->get_materials();
+	for (auto& catchmat : catchMat) {
+		catchmat.lightingType = LighingType::None;
+	}
+	for (auto& release : releaseMat) {
+		release.lightingType = LighingType::None;
+	}
+
 	mapchipHandler->initialize(mapchipField_);
 
-	child = std::make_unique<Child>();
 	child->initialize(*level.ptr(), mapchipHandler.get());
 
-	player = std::make_unique<Player>();
 	player->initialize(*level.ptr(), mapchipHandler.get());
 	player->set_child(child.get());
 
@@ -55,13 +72,20 @@ void PlayerManager::initialize(Reference<const LevelLoader> level, MapchipField*
 	terminalPoint = goalPosition;
 	terminalPoint.y += 1.0f;
 
+	inputTimer = 0;
+	InputDowntime = 0.4f;
+
 	//音関連
-	holdAudio = std::make_unique<AudioPlayer>();
 	holdAudio->initialize("hold.wav");
-	releaseAudio = std::make_unique<AudioPlayer>();
 	releaseAudio->initialize("release.wav");
-	undoAudio = std::make_unique<AudioPlayer>();
 	undoAudio->initialize("undo.wav");
+}
+
+void PlayerManager::setup(Reference<SkinningMeshDrawManager> skinningManager) {
+	player->setup(skinningManager);
+	skinningManager->register_instance(child->get_object());
+	skinningManager->register_instance(catchEffect_);
+	skinningManager->register_instance(releaseEffect_);
 }
 
 void PlayerManager::finalize() {
@@ -70,13 +94,17 @@ void PlayerManager::finalize() {
 }
 
 void PlayerManager::update() {
+	inputTimer -= WorldClock::DeltaSeconds();
+
+	catchEffect_->update_animation();
+	releaseEffect_->update_animation();
+
 	isStackMovement = false;
 	// それぞれ落下処理はゲームオーバー時でも動くようにする
 	child->update();
 	player->fall_update();
 	catchEffect_->begin();
-	iceDustEmitter->update();
-	dustEmitter->update();
+	releaseEffect_->begin();
 
 	// クリアか失敗のフラグが立ってたら早期リターン
 	if (stageSituation != 0) {
@@ -108,7 +136,7 @@ void PlayerManager::update() {
 	// 子が放すアニメーションが終わったタイミングでスタンバイをセットしなおす
 	if (isRerease && child->get_object()->get_animation()->is_end()) {
 		isRerease = false;
-		child->get_object()->get_animation()->reset_animation("Standby");
+		child->get_object()->reset_animation("Standby");
 		child->get_object()->get_animation()->set_loop(true);
 	}
 
@@ -119,10 +147,13 @@ void PlayerManager::update() {
 	Vector3 catchEffectPos = player->get_translate();
 	catchEffectPos.y += 1.0f;
 	catchEffect_->get_transform().set_translate(catchEffectPos);
+	releaseEffect_->get_transform().set_translate(catchEffectPos);
 
 	dustEmitter->get_transform().set_translate(emitterPos);
 
 	iceDustEmitter->get_transform().set_translate(emitterPos);
+	dustEmitter->update_affine();
+	iceDustEmitter->update_affine();
 
 	//Vector3 playerFlusteredPos = 
 
@@ -130,10 +161,14 @@ void PlayerManager::update() {
 		emplace_log(player->move_start_position(), player->start_rotation());
 	}
 
-	// 入力処理を受け付ける
-	handle_input();
-	// 親子関係の管理
-	manage_parent_child_relationship();
+	// チュートリアル表示中だったら入力をスルー
+	if (!tutorialManager_->get_is_tutorial()) {
+		// 入力処理を受け付ける
+		handle_input();
+		// 親子関係の管理
+		manage_parent_child_relationship();
+	}
+
 	// 子供をプレイヤーの向かせる処理
 	set_child_rotate();
 	// パーティクルのオンオフの切り替え処理
@@ -142,6 +177,10 @@ void PlayerManager::update() {
 	// キャッチエフェクトのアニメーションが終わってたらフラグをfalse
 	if (catchEffect_->get_animation()->is_end()) {
 		catchEffect_->set_active(false);
+	}
+
+	if (releaseEffect_->get_animation()->is_end()) {
+		releaseEffect_->set_active(false);
 	}
 
 	// マップチップのクリア判定
@@ -162,6 +201,7 @@ void PlayerManager::update() {
 		controlPoint.y += 1.5f;
 		clearTimer = 0;
 		catchEffect_->reparent(nullptr);
+		releaseEffect_->reparent(nullptr);
 	}
 	// 子供が先にゴール
 	else if (stageSituation == 2) {
@@ -169,7 +209,7 @@ void PlayerManager::update() {
 		gameManagement_->SetFailedSelect(1);
 		emplace_log(player->move_start_position(), player->start_rotation());
 		child->get_object()->reparent(nullptr);
-		child->get_object()->get_animation()->reset_animation("Relese");
+		child->get_object()->reset_animation("Relese");
 		child->get_object()->get_animation()->restart();
 		child->get_object()->update_affine();
 		initialPoint = child->get_object()->world_position();
@@ -187,6 +227,7 @@ void PlayerManager::update() {
 		controlPoint.y += 1.5f;
 		clearTimer = 0;
 		catchEffect_->reparent(nullptr);
+		releaseEffect_->reparent(nullptr);
 	}
 	// コアラを落とす
 	else if (stageSituation == 4) {
@@ -195,30 +236,72 @@ void PlayerManager::update() {
 	}
 
 	// この条件式でできない理由 is 何
-	if (stageSituation == 0 &&
-		!(player->get_state() != PlayerState::Idle || player->is_falling() || child->is_falling()) &&
-		moveLogger->can_undo() && Input::IsTriggerKey(KeyID::Z)) {
-		if (player->get_state() == PlayerState::Idle) {
-			undo();
+	// チュートリアル表示中だったら入力をスルー
+	if (!tutorialManager_->get_is_tutorial()) {
+		if (stageSituation == 0 &&
+			!(player->get_state() != PlayerState::Idle || player->is_falling() || child->is_falling()) &&
+			moveLogger->can_undo() && (Input::IsTriggerKey(KeyID::Z) || Input::IsTriggerPad(PadID::B))) {
+			if (player->get_state() == PlayerState::Idle) {
+				undo();
+			}
+			undoAudio->restart();
 		}
-		undoAudio->restart();
 	}
+
+	// リセットの途中じゃなければ通る
+	if (gameManagement_->get_reset_state() != GameManagement::ResetState::Completed) {
+		// 最初のフレームだったらチュートリアルを出す
+		if (tutorialManager_->get_tutorial_step() == TutorialManager::TutorialStep::RescueChild) {
+			tutorialManager_->set_is_tutorial(true);
+		}
+		// チュートリアル子供をおろす
+		if (tutorialManager_->get_tutorial_step() == TutorialManager::TutorialStep::DropOffChild) {
+			tutorialManager_->set_is_tutorial(true);
+		}
+
+		// ゴールと一定以上近ければ
+		if (GameUtility::approximately_equal(player->get_translate(), { 2.0f, 1.0f, 2.0f })) {
+			// チュートリアル親をゴールさせよう
+			if (tutorialManager_->get_tutorial_step() == TutorialManager::TutorialStep::LetParentGoalFirst) {
+				tutorialManager_->set_is_tutorial(true);
+			}
+		}
+
+		// 氷系のチュートリアル全部
+		if (tutorialManager_->get_tutorial_step() == TutorialManager::TutorialStep::IceSlippery ||
+			tutorialManager_->get_tutorial_step() == TutorialManager::TutorialStep::NoSlideIfOneOnGround ||
+			tutorialManager_->get_tutorial_step() == TutorialManager::TutorialStep::StopWhenStuckTogether) {
+			tutorialManager_->set_is_tutorial(true);
+		}
+
+		// 子が浮いていたら
+		if (child->is_out_ground()) {
+			// チュートリアル
+			if (tutorialManager_->get_tutorial_step() == TutorialManager::TutorialStep::ParentChildSupportEach) {
+				tutorialManager_->set_is_tutorial(true);
+			}
+		}
+		// 親が浮いていたら
+		{
+			// チュートリアル
+			if (tutorialManager_->get_tutorial_step() == TutorialManager::TutorialStep::ChildSupportsParent) {
+				tutorialManager_->set_is_tutorial(true);
+			}
+		}
+	}
+
+	iceDustEmitter->update();
+	dustEmitter->update();
 }
 
-void PlayerManager::begin_rendering() {
-	player->begin_rendering();
-	child->begin_rendering();
-	catchEffect_->begin_rendering();
-	dustEmitter->begin_rendering();
-	iceDustEmitter->begin_rendering();
+void PlayerManager::update_affine() {
+	player->update_affine();
+	child->update_affine();
+	catchEffect_->update_affine();
+	releaseEffect_->update_affine();
 
-}
-
-void PlayerManager::draw() const {
-	player->draw();
-	child->draw();
-	catchEffect_->draw();
-
+	dustEmitter->transfer();
+	iceDustEmitter->transfer();
 }
 
 void PlayerManager::draw_particle() const {
@@ -241,18 +324,46 @@ void PlayerManager::handle_input() {
 		return;
 	}
 
-	Vector3 directions[] = {
+	constexpr Vector3 directions[] = {
 		{0.0f, 0.0f, 1.0f},  // 前
 		{-1.0f, 0.0f, 0.0f}, // 左
 		{0.0f, 0.0f, -1.0f}, // 後ろ
 		{1.0f, 0.0f, 0.0f}   // 右
 	};
 
-	KeyID keys[] = { KeyID::W, KeyID::A, KeyID::S, KeyID::D };
+	constexpr KeyID keysWASD[] = { KeyID::W, KeyID::A, KeyID::S, KeyID::D };
+	constexpr KeyID keysArrow[] = { KeyID::Up, KeyID::Left, KeyID::Down, KeyID::Right };
+	constexpr std::array<PadID, 4> padTrigger = { PadID::Up, PadID::Left, PadID::Down, PadID::Right };
+	constexpr std::array<Vector2, 4> stickDirection{
+		CVector2::UP,
+		CVector2::BACKWARD,
+		CVector2::DOWN,
+		CVector2::FORWARD,
+	};
 
+
+	if (inputTimer > 0) {
+		bool isReleased = true;
+		for (size_t i = 0; i < 4; ++i) {
+			if (Input::IsPressKey(keysWASD[i]) || Input::IsPressKey(keysArrow[i]) ||
+				Input::IsPressPad(padTrigger[i])) {
+				isReleased = false;
+			}
+		}
+		float stickLength = Input::StickL().length();
+		isReleased &= stickLength < 0.5f;
+		// キーを離したら強制的にInputDownTimerを0にする
+		if (isReleased) {
+			inputTimer = 0;
+		}
+		return;
+	}
+	Vector2 stickL = Input::StickL().normalize_safe(CVector2::ZERO);
 	for (size_t i = 0; i < 4; ++i) {
 		//if (Input::GetInstance().IsTriggerKey(keys[i])) {
-		if (Input::GetInstance().IsPressKey(keys[i])) {
+		if (Input::IsPressKey(keysWASD[i]) || Input::IsPressKey(keysArrow[i]) ||
+			Input::IsPressPad(padTrigger[i]) || (Vector2::Dot(stickL, stickDirection[i]) > std::cos(PI / 4) && stickL.length() != 0.0f)) {
+			inputTimer = InputDowntime;
 			//player->set = directions[i];
 			Vector3 nextPosition = player->get_translate() + directions[i];
 
@@ -262,6 +373,7 @@ void PlayerManager::handle_input() {
 			}
 			else {
 				set_rotate_failed_parameters(directions[i]);
+
 			}
 
 			// MapchipHandlerに移動可能かを問い合わせ
@@ -271,6 +383,11 @@ void PlayerManager::handle_input() {
 			}
 			else {
 				set_move_failed_parameters(directions[i]);
+
+				// チュートリアル
+				if (tutorialManager_->get_tutorial_step() == TutorialManager::TutorialStep::CannotProceedIfFall) {
+					tutorialManager_->set_is_tutorial(true);
+				}
 			}
 
 			// いろいろと判定が完了したらプレイヤーの状態を回転にする
@@ -279,7 +396,6 @@ void PlayerManager::handle_input() {
 		}
 	}
 }
-
 
 #ifdef _DEBUG
 void PlayerManager::debug_update() {
@@ -290,6 +406,10 @@ void PlayerManager::debug_update() {
 	//catchEffect_->debug_gui();
 	//ImGui::End();
 
+	//ImGui::Begin("ReleaseEffect");
+	//releaseEffect_->debug_gui();
+	//ImGui::End();
+
 	//ImGui::Begin("dustEmitter");
 	//dustEmitter->debug_gui();
 	//ImGui::End();
@@ -297,6 +417,8 @@ void PlayerManager::debug_update() {
 	//ImGui::Begin("iceDustEmitter");
 	//iceDustEmitter->debug_gui();
 	//ImGui::End();
+
+
 }
 #endif
 
@@ -330,12 +452,13 @@ void PlayerManager::manage_parent_child_relationship() {
 		if (distance <= 1.01f) {
 			// 子をプレイヤーにくっつける処理
 			attach_child_to_player(player.get(), child.get());
-			if (child->get_object()->get_animation()->is_end()) {
-				//child->get_object()->reset_animated_mesh("ChiledKoala.gltf", "Standby", false);
-				child->get_object()->get_animation()->reset_animation("Standby");
-				child->get_object()->get_animation()->set_loop(false);
-				child->get_object()->get_animation()->restart();
-			}
+
+			//if (child->get_object()->get_animation()->is_end()) {
+			//	//child->get_object()->reset_animated_mesh("ChiledKoala.gltf", "Standby", false);
+			//	child->get_object()->get_animation()->reset_animation("Standby");
+			//	child->get_object()->get_animation()->set_loop(false);
+			//	child->get_object()->get_animation()->restart();
+			//}
 
 			//前フレ子なし、今フレ子ありならholdを鳴らす
 			if (!preParent && player->is_parent()) {
@@ -343,6 +466,15 @@ void PlayerManager::manage_parent_child_relationship() {
 
 				catchEffect_->set_active(true);
 				catchEffect_->get_animation()->restart();
+
+				releaseEffect_->set_active(false);
+				//releaseEffect_->get_animation()->restart();
+
+				// 初めてつかんでたら兼子供に向きがあるチュートリアル
+				if (tutorialManager_->get_tutorial_step() == TutorialManager::TutorialStep::MoveToRocket ||
+					tutorialManager_->get_tutorial_step() == TutorialManager::TutorialStep::HoldingHasDirection) {
+					tutorialManager_->set_is_tutorial(true);
+				}
 			}
 		}
 	}
@@ -351,7 +483,7 @@ void PlayerManager::manage_parent_child_relationship() {
 			return;
 		}
 		// 子をプレイヤーから切り離す処理
-		if (Input::IsTriggerKey(KeyID::Space)) {
+		if (Input::IsTriggerKey(KeyID::Space) || Input::IsTriggerPad(PadID::A)) {
 			emplace_log(player->get_translate(), player->get_rotation());
 			detach_child_from_player(player.get(), child.get());
 		}
@@ -359,6 +491,11 @@ void PlayerManager::manage_parent_child_relationship() {
 		//前フレ子あり、今フレ子なしならreleaseを鳴らす
 		if (preParent && !player->is_parent()) {
 			releaseAudio->restart();
+
+			releaseEffect_->set_active(true);
+			releaseEffect_->get_animation()->restart();
+
+			catchEffect_->set_active(false);
 		}
 	}
 	// 判定を取り終わったら元に戻しておく
@@ -399,7 +536,7 @@ void PlayerManager::set_child_rotate() {
 	Quaternion currentRotation = child->get_rotation();
 
 	// Slerpのロジックを利用して反転防止を実現
-	float dot = Vector3::DotProduct(currentRotation.vector(), targetRotation.vector()) + currentRotation.real() * targetRotation.real();
+	float dot = Vector3::Dot(currentRotation.vector(), targetRotation.vector()) + currentRotation.real() * targetRotation.real();
 	if (dot < 0.0f) {
 		targetRotation = targetRotation * -1.0f;
 	}
@@ -423,10 +560,9 @@ void PlayerManager::attach_child_to_player(Player* player, Child* child) {
 	child->get_object()->reparent(player->get_object());
 	child->get_object()->look_at(*player->get_object());
 	player->set_parent(true);
-	NodeAnimationPlayer* anim = child->get_object()->get_animation();
-	anim->reset_animation("Hold");
-	anim->set_loop(false);
-	anim->restart();
+	SkinningMeshInstance* anim = child->get_object();
+	anim->reset_animation("Hold", false);
+	anim->get_animation()->restart();
 }
 
 void PlayerManager::detach_child_from_player(Player* player, Child* child) {
@@ -447,21 +583,18 @@ void PlayerManager::detach_child_from_player(Player* player, Child* child) {
 	// 親子付けフラグをオフにする
 	player->set_parent(false);
 	// アニメーションをセット
-	NodeAnimationPlayer* anim = child->get_object()->get_animation();
+	SkinningMeshInstance* anim = child->get_object();
 	if (!child->is_out_ground()) {
 		anim->reset_animation("Relese");
-		anim->set_loop(false);
-		anim->restart();
+		anim->get_animation()->restart();
 		isRerease = true;
 	}
 	else {
-		anim->reset_animation("Falling");
-		anim->set_loop(true);
-		anim->restart();
+		anim->reset_animation("Falling", true);
+		anim->get_animation()->restart();
 	}
 	if (player->is_out_ground()) {
-		player->get_object()->get_animation()->reset_animation("Falling");
-		player->get_object()->get_animation()->set_loop(true);
+		player->get_object()->reset_animation("Falling", true);
 		player->get_object()->get_animation()->restart();
 	}
 }
@@ -496,8 +629,8 @@ void PlayerManager::undo() {
 		player->get_translate()
 	);
 
-	AnimatedMeshInstance* childMesh = child->get_object();
-	AnimatedMeshInstance* playerMesh = player->get_object();
+	SkinningMeshInstance* childMesh = child->get_object();
+	SkinningMeshInstance* playerMesh = player->get_object();
 	NodeAnimationPlayer* childAnimation = childMesh->get_animation();
 	NodeAnimationPlayer* playerAnimation = playerMesh->get_animation();
 
@@ -523,8 +656,8 @@ void PlayerManager::undo() {
 	Vector3 childWorld = child->get_object()->get_transform().get_translate();
 	child->set_translate({ std::round(childWorld.x), std::round(childWorld.y), std::round(childWorld.z) });
 
-	player->begin_rendering();
-	child->begin_rendering();
+	player->update_affine();
+	child->update_affine();
 
 	// アニメーション設定
 	// くっつき状態
@@ -537,32 +670,32 @@ void PlayerManager::undo() {
 		// 親
 		// 足元が地面
 		if (isPlayerOnGround) {
-			playerAnimation->reset_animation("Standby");
+			playerMesh->reset_animation("Standby");
 			playerAnimation->set_loop(true);
 		}
 		else {
-			playerAnimation->reset_animation("Flustered");
+			playerMesh->reset_animation("Flustered");
 			playerAnimation->set_loop(true);
 
 		}
 		// 子
 		// 足元が地面
 		if (isChildOnGround) {
-			childAnimation->reset_animation("Hold");
+			childMesh->reset_animation("Hold");
 			childAnimation->set_time_force(1000);
 			childAnimation->set_loop(false);
 		}
 		else {
-			childAnimation->reset_animation("Flustered");
+			childMesh->reset_animation("Flustered");
 			childAnimation->set_time_force(1000);
 			childAnimation->set_loop(true);
 		}
 	}
 	// 非くっつき状態
 	else {
-		playerAnimation->reset_animation("Standby");
+		playerMesh->reset_animation("Standby");
 		playerAnimation->set_loop(true);
-		childAnimation->reset_animation("Standby");
+		childMesh->reset_animation("Standby");
 		childAnimation->set_loop(true);
 	}
 }
@@ -622,7 +755,7 @@ void PlayerManager::set_move_parameters(const Vector3& direction) {
 	switch (player->get_move_type()) {
 	case MoveType::Normal:
 		nextPosition = player->get_translate() + direction;
-		player->get_target_pos(nextPosition);
+		player->set_target_pos(nextPosition);
 		player->set_move_timer(0.0f);
 		player->set_move_duration(moveDuration_);
 		player->set_start_position(player->get_translate());
@@ -630,7 +763,7 @@ void PlayerManager::set_move_parameters(const Vector3& direction) {
 	case MoveType::SlidingOnIce:
 		moveNumOnIce = mapchipHandler->can_player_move_on_ice(player.get(), child.get(), direction);
 		nextPosition = player->get_translate() + direction * static_cast<float>(moveNumOnIce);
-		player->get_target_pos(nextPosition);
+		player->set_target_pos(nextPosition);
 		player->set_move_timer(0.0f);
 		player->set_move_duration(moveDuration_ * static_cast<float>(moveNumOnIce));
 		player->set_start_position(player->get_translate());
@@ -642,11 +775,15 @@ void PlayerManager::set_move_failed_parameters(const Vector3& direction) {
 	Vector3 nextPosition;
 	switch (player->get_move_type()) {
 	case MoveType::MoveOnChild:
-		nextPosition = player->get_translate();
-		player->get_target_pos(nextPosition);
-		player->set_move_timer(0.0f);
-		player->set_move_duration(0.01f);
-		player->set_start_position(player->get_translate());
+		//nextPosition = player->get_translate();
+		//player->set_target_pos(nextPosition);
+		//player->set_move_timer(0.0f);
+		//player->set_move_duration(0.01f);
+		//player->set_start_position(nextPosition);
+		player->set_wall_target_pos(player->get_translate());
+		player->set_wall_timer(0.0f);
+		player->set_wall_duration(moveDuration_);
+		player->set_wall_start_pos(player->get_translate());
 		break;
 	case MoveType::HitRock:
 		//条件を「入力方向に回転する時引っかからない」かつ「進行方向が壁か穴」だと上手く行く

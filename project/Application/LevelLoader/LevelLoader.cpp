@@ -2,10 +2,10 @@
 
 #include <format>
 
-#include <Engine/Resources/Json/JsonResource.h>
+#include <Engine/Assets/Json/JsonAsset.h>
 
 LevelLoader::LevelLoader(int32_t level) {
-	JsonResource jsonResource{
+	JsonAsset jsonResource{
 		std::format("./GameResources/Json/Level/Stage{:02}.json", level)
 	};
 

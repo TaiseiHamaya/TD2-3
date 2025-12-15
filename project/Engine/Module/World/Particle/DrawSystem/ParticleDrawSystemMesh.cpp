@@ -1,34 +1,35 @@
 #include "ParticleDrawSystemMesh.h"
 
-#include "Engine/Resources/PolygonMesh/PolygonMeshManager.h"
-#include "Engine/Resources/Texture/TextureManager.h"
-#include "Engine/Rendering/DirectX/DirectXResourceObject/Texture/Texture.h"
-#include "Engine/Rendering/DirectX/DirectXCommand/DirectXCommand.h"
+#include "Engine/Assets/PolygonMesh/PolygonMesh.h"
+#include "Engine/Assets/PolygonMesh/PolygonMeshLibrary.h"
+#include "Engine/Assets/Texture/TextureAsset.h"
+#include "Engine/Assets/Texture/TextureLibrary.h"
+#include "Engine/GraphicsAPI/DirectX/DxCommand/DxCommand.h"
 
 ParticleDrawSystemMesh::ParticleDrawSystemMesh(const std::string& meshName) {
 	set_mesh(meshName);
 }
 
 void ParticleDrawSystemMesh::draw_command(size_t InstanceCount) const {
-	auto& commandList = DirectXCommand::GetCommandList();
-	if (mesh) {
+	auto& commandList = DxCommand::GetCommandList();
+	if (mesh && InstanceCount) {
 		commandList->IASetVertexBuffers(0, 1, &mesh->get_vbv(0));
 		commandList->IASetIndexBuffer(mesh->get_p_ibv(0));
 		commandList->SetGraphicsRootDescriptorTable(0, particleBuffer.get_handle_gpu());
-		commandList->SetGraphicsRootDescriptorTable(2, texture->get_gpu_handle());
+		commandList->SetGraphicsRootDescriptorTable(2, texture->handle());
 
 		commandList->DrawIndexedInstanced(mesh->index_size(0), static_cast<UINT>(InstanceCount), 0, 0, 0);
 	}
 }
 
 void ParticleDrawSystemMesh::set_mesh(const std::string& meshName) {
-	mesh = PolygonMeshManager::GetPolygonMesh(meshName);
+	mesh = PolygonMeshLibrary::GetPolygonMesh(meshName);
 	if (mesh) {
 		if (mesh->material_count()) {
-			texture = TextureManager::GetTexture(mesh->material_data(0)->textureFileName);
+			texture = TextureLibrary::GetTexture(mesh->material_data(0)->textureFileName);
 		}
 		else {
-			texture = TextureManager::GetTexture("Error.png");
+			texture = TextureLibrary::GetTexture("Error.png");
 		}
 	}
 }

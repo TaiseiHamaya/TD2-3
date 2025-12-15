@@ -1,17 +1,17 @@
 #include "Particle.h"
 
-#include "Engine/Runtime/WorldClock/WorldClock.h"
+#include "Engine/Runtime/Clock/WorldClock.h"
 
-#include "Engine/Utility/Tools/RandomEngine.h"
+#include <Library/Utility/Tools/RandomEngine.h>
 
 Particle::Particle(
 	const Vector3& translate,
-	float lifetime_,
+	r32 lifetime_,
 	const Vector3& velocity_, const Vector3& acceleration_,
 	const Color4& startColor_, const Color4& endColor_,
 	const Vector3& startSize_, const Vector3& endSize_,
-	RotationType rotationType_, std::variant<Constant, std::monostate, Random> rotationData_
-) : 
+	RotationType rotationType_, std::variant<Constant, std::monostate, Random, LookAtAngle> rotationData_
+) :
 	WorldInstance(),
 	lifetime(lifetime_),
 	velocity(velocity_), acceleration(acceleration_),
@@ -19,7 +19,7 @@ Particle::Particle(
 	startSize(startSize_), endSize(endSize_),
 	rotationType(rotationType_), rotationData(rotationData_) {
 	isDestroy = false;
-	timer = 0;
+	timer.set(0.0f);
 	transform.set_translate(translate);
 	transform.set_scale(startSize_);
 	switch (rotationType) {
@@ -35,14 +35,24 @@ Particle::Particle(
 	case Particle::RotationType::LookAt:
 		look_at(*lookAtDefault);
 		break;
+	case Particle::RotationType::LookAtAngle:
+	{
+		const auto& data = std::get<LookAtAngle>(rotationData);
+		look_at(*lookAtDefault);
+		Vector3 axis = CVector3::FORWARD * transform.get_quaternion();
+		transform.set_quaternion(
+			Quaternion::AngleAxis(axis, data.angleParSec * timer) * transform.get_quaternion()
+		);
+		break;
+	}
 	case Particle::RotationType::Random:
 	{
-		float cos = -2.0f * RandomEngine::Random01MOD() + 1.0f;
-		float sin = std::sqrt(1.0f - cos * cos);
-		float phi = PI2 * RandomEngine::Random01MOD();
-		float radius = std::pow(RandomEngine::Random01MOD(), 1.0f / 3.0f);
+		r32 cos = -2.0f * RandomEngine::Random01MOD() + 1.0f;
+		r32 sin = std::sqrt(1.0f - cos * cos);
+		r32 phi = PI2 * RandomEngine::Random01MOD();
+		r32 radius = std::pow(RandomEngine::Random01MOD(), 1.0f / 3.0f);
 		Vector3 axis = { sin * std::cos(phi), sin * std::sin(phi), cos };
-		float angle = PI2 * RandomEngine::Random01MOD();
+		r32 angle = PI2 * RandomEngine::Random01MOD();
 		transform.set_quaternion(Quaternion::AngleAxis(axis, angle));
 		break;
 	}
@@ -51,12 +61,14 @@ Particle::Particle(
 	}
 
 	color = startColor_;
+
+	update_affine();
 }
 
 void Particle::update() {
-	timer += WorldClock::DeltaSeconds();
+	timer.ahead();
 
-	float parametric = std::min(1.0f, timer / lifetime);
+	r32 parametric = std::min(1.0f, timer / lifetime);
 
 	velocity += acceleration * WorldClock::DeltaSeconds();
 	transform.plus_translate(velocity * WorldClock::DeltaSeconds());
@@ -78,6 +90,12 @@ void Particle::update() {
 	case Particle::RotationType::LookAt:
 		look_at(*lookAtDefault);
 		break;
+	case Particle::RotationType::LookAtAngle:
+	{
+		const auto& data = std::get<LookAtAngle>(rotationData);
+		look_at(*lookAtDefault, data.angleParSec * timer * WorldClock::DeltaSeconds());
+		break;
+	}
 	case Particle::RotationType::Random:
 	{
 		const auto& data = std::get<Random>(rotationData);
@@ -93,6 +111,8 @@ void Particle::update() {
 	if (timer >= lifetime) {
 		isDestroy = true;
 	}
+
+	update_affine();
 }
 
 const Matrix4x4 Particle::create_uv_matrix() const {

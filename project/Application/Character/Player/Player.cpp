@@ -1,17 +1,34 @@
 #include "Player.h"
 #include "Engine/Runtime/Input/Input.h"
 #include "Application/Utility/GameUtility.h"
-#include "Engine/Rendering/DirectX/DirectXResourceObject/ConstantBuffer/Material/Material.h"
-#include <Engine/Resources/Animation/NodeAnimation/NodeAnimationPlayer.h>
+
+#include <Engine/Assets/Animation/NodeAnimation/NodeAnimationPlayer.h>
+#include <Engine/Module/DrawExecutor/Mesh/SkinningMeshDrawManager.h>
+
+Player::Player() {
+	object_ = std::make_unique<SkinningMeshInstance>();
+	exclamation_ = std::make_unique<SkinningMeshInstance>();
+	flusteredEffect_ = std::make_unique<SkinningMeshInstance>();
+
+	moveAudio = std::make_unique<AudioPlayer>();
+	unmovable = std::make_unique<AudioPlayer>();
+	fall = std::make_unique<AudioPlayer>();
+	iceMove = std::make_unique<AudioPlayer>();
+	rotatAudio = std::make_unique<AudioPlayer>();
+}
 
 void Player::initialize(const LevelLoader& level, MapchipHandler* mapchipHandler) {
-	object_ = std::make_unique<AnimatedMeshInstance>();
 	object_->reset_animated_mesh("ParentKoala.gltf", "Standby", true);
 	object_->get_transform().set_translate(level.get_player_position());
+	object_->set_active(true);
+	object_->get_transform().set_scale(CVector3::ONE);
+	object_->update_affine();
+
+	playerState = PlayerState::Idle;
 
 	// ビックリマークの生成
-	exclamation_ = std::make_unique<AnimatedMeshInstance>();
 	exclamation_->reset_animated_mesh("exclamation.gltf", "Standby", false);
+	exclamation_->get_animation()->set_time_force(10000);
 
 	auto& objMat = object_->get_materials();
 	for (auto& mat : objMat) {
@@ -19,26 +36,25 @@ void Player::initialize(const LevelLoader& level, MapchipHandler* mapchipHandler
 	}
 	mapchipHandler_ = mapchipHandler;
 
-	flusteredEffect_ = std::make_unique<AnimatedMeshInstance>();
 	flusteredEffect_->reset_animated_mesh("FlusteredEffect.gltf", "Standby", true);
-	flusteredEffect_->set_active(false);
+	flusteredEffect_->get_animation()->set_time_force(1000);
 
 	//音関連
-
-	moveAudio = std::make_unique<AudioPlayer>();
 	moveAudio->initialize("move.wav");
-	unmovable = std::make_unique<AudioPlayer>();
 	unmovable->initialize("unmovable.wav");
-	fall = std::make_unique<AudioPlayer>();
 	fall->initialize("fall.wav");
-	iceMove = std::make_unique<AudioPlayer>();
 	iceMove->initialize("iceMove.wav");
-	rotatAudio = std::make_unique<AudioPlayer>();
 	rotatAudio->initialize("rotate.wav");
 
 	fallSoundFlag = false;
 	unmovableFlag = false;
 	isMoved = false;
+}
+
+void Player::setup(Reference<SkinningMeshDrawManager> drawManager) {
+	drawManager->register_instance(object_);
+	drawManager->register_instance(exclamation_);
+	//drawManager->register_instance(flusteredEffect_);
 }
 
 void Player::finalize() {}
@@ -92,13 +108,14 @@ void Player::update() {
 	flusteredEffect_->update();
 
 	if (isMoving && !preIsMoving) {
-		object_->get_animation()->reset_animation("Walk");
-	}else if(!isMoving && preIsMoving){
+		object_->reset_animation("Walk", true);
+	}
+	else if (!isMoving && preIsMoving) {
 		if (is_out_ground()) {
-			object_->get_animation()->reset_animation("Flustered");
+			object_->reset_animation("Flustered", true);
 		}
 		else {
-		object_->get_animation()->reset_animation("Standby");
+			object_->reset_animation("Standby", true);
 		}
 	}
 	object_->update();
@@ -107,18 +124,13 @@ void Player::update() {
 	preIsMoving = isMoving;
 }
 
-void Player::begin_rendering() {
-	object_->begin_rendering();
-	exclamation_->begin_rendering();
-	flusteredEffect_->begin_rendering();
-}
-
-void Player::draw() const {
-	object_->draw();
-	if (exclamationData_.isActive) {
-		exclamation_->draw();
-	}
-	//flusteredEffect_->draw();
+void Player::update_affine() {
+	object_->update_animation();
+	object_->update_affine();
+	exclamation_->update_animation();
+	exclamation_->update_affine();
+	flusteredEffect_->update_affine();
+	flusteredEffect_->update_animation();
 }
 
 void Player::on_undo(Vector3 position, Quaternion rotation, bool setParent) {
@@ -132,10 +144,10 @@ void Player::on_undo(Vector3 position, Quaternion rotation, bool setParent) {
 
 #ifdef _DEBUG
 void Player::debug_update() {
-	ImGui::Begin("Player");
-	ImGui::Text("%d", isParent);
-	object_->debug_gui();
-	ImGui::End();
+	//ImGui::Begin("Player");
+	//ImGui::Text("%d", isParent);
+	//object_->debug_gui();
+	//ImGui::End();
 
 	//ImGui::Begin("flust");
 	//flusteredEffect_->debug_gui();
@@ -174,8 +186,8 @@ void Player::move_update() {
 	if (moveType != MoveType::Normal &&
 		moveType != MoveType::ParentCarriesChild &&
 		moveType != MoveType::ChildCarriesParent &&
-		moveType != MoveType::SlidingOnIce &&
-		moveType != MoveType::MoveOnChild) {
+		moveType != MoveType::SlidingOnIce/* &&
+		moveType != MoveType::MoveOnChild*/) {
 		playerState = PlayerState::MoveFailed;
 		return;
 	}
@@ -193,7 +205,7 @@ void Player::move_update() {
 		}
 	}
 	// 移動中なら補間処理を実行
-		moveTimer += WorldClock::DeltaSeconds();
+	moveTimer += WorldClock::DeltaSeconds();
 
 	// 現在の位置を補間
 	Vector3 position = Vector3::Lerp(object_->get_transform().get_translate(), targetPosition, moveTimer / moveDuration);
@@ -315,6 +327,9 @@ void Player::wall_move() {
 		isWallMoveing = false;
 		newPos = wallStartPosition;
 		playerState = PlayerState::Idle;
+		if (moveType == MoveType::MoveOnChild) {
+			isMove = true;
+		}
 
 		moveType = MoveType::Normal;
 		unmovableFlag = false;

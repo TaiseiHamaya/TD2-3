@@ -1,21 +1,18 @@
 #include "Vector3.h"
 
-#include <cassert>
-#include <cmath>
 #include <algorithm>
+#include <cmath>
 
-float Vector3::length() const noexcept {
-	return std::sqrt(DotProduct(*this, *this));
+r32 Vector3::length() const noexcept {
+	return std::sqrt(Dot(*this, *this));
 }
 
-const Vector3 Vector3::normalize() const noexcept(false) {
-	assert(length() != 0);
-	return *this / length();;
+Vector3 Vector3::normalize() const noexcept(false) {
+	return *this / length();
 }
 
-const Vector3 Vector3::normalize_safe(float tolerance, const Vector3& disapproval) const noexcept {
-	assert(tolerance >= 0);
-	float length_ = length();
+Vector3 Vector3::normalize_safe(const Vector3& disapproval, r32 tolerance) const noexcept {
+	r32 length_ = length();
 	if (length_ <= tolerance) {
 		return disapproval;
 	}
@@ -24,28 +21,28 @@ const Vector3 Vector3::normalize_safe(float tolerance, const Vector3& disapprova
 	}
 }
 
-float Vector3::Length(const Vector3& vector) noexcept {
+r32 Vector3::Length(const Vector3& vector) noexcept {
 	return vector.length();
 }
 
-float Vector3::Length(const Vector3& vector1, const Vector3& vector2) noexcept {
+r32 Vector3::Length(const Vector3& vector1, const Vector3& vector2) noexcept {
 	return Vector3::Length(vector1 - vector2);
 }
 
-const Vector3 Vector3::Normalize(const Vector3& vector) {
+Vector3 Vector3::Normalize(const Vector3& vector) {
 	return vector.normalize();
 }
 
-const Vector3 Vector3::Normalize(const Vector3& vectorFrom, const Vector3& vectorTo) {
+Vector3 Vector3::Normalize(const Vector3& vectorFrom, const Vector3& vectorTo) {
 	return Vector3::Normalize(vectorTo - vectorFrom);
 }
 
-const Vector3 Vector3::Abs(const Vector3& vector) noexcept {
+Vector3 Vector3::Abs(const Vector3& vector) noexcept {
 	return { std::abs(vector.x), std::abs(vector.y), std::abs(vector.z) };
 }
 
 Vector3 Vector3::Projection(const Vector3& vector, const Vector3& onto) {
-	return onto * Vector3::DotProduct(onto, vector);
+	return onto * Vector3::Dot(onto, vector);
 }
 
 Vector3 Vector3::Reflect(const Vector3& input, const Vector3& normal) {
@@ -56,17 +53,17 @@ Vector3 Vector3::Clamp(const Vector3& vector, const Vector3& min, const Vector3&
 	return { std::clamp(vector.x, min.x, max.x),std::clamp(vector.y, min.y, max.y) ,std::clamp(vector.z, min.z, max.z) };
 }
 
-Vector3 Vector3::Slerp(const Vector3& from, const Vector3& to, const float& t) {
-	float dot = Vector3::DotProduct(from, to);
+Vector3 Vector3::Slerp(const Vector3& from, const Vector3& to, const r32& t) {
+	r32 dot = Vector3::Dot(from, to);
 	if (dot >= 0.9999f) {
 		return Lerp(from, to, t).normalize();
 	}
 
-	float theta = std::acos(dot);
-	float sinT = std::sin(theta);
+	r32 theta = std::acos(dot);
+	r32 sinT = std::sin(theta);
 
-	float factor0 = std::sin((1 - t) * theta) / sinT;
-	float factor1 = std::sin(t * theta) / sinT;
+	r32 factor0 = std::sin((1 - t) * theta) / sinT;
+	r32 factor1 = std::sin(t * theta) / sinT;
 
 	return from * factor0 + to * factor1;
 }

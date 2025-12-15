@@ -1,7 +1,16 @@
 #include "FailedUI.h"
+
+#include <Engine/Debug/ImGui/ImGuiLoadManager/ImGuiLoadManager.h>
+#include <Engine/Module/DrawExecutor/2D/SpriteDrawExecutor.h>
 #include <Engine/Module/World/Sprite/SpriteInstance.h>
+#include <Engine/Runtime/Clock/WorldClock.h>
+#include <Engine/Runtime/Input/Input.h>
+
+#include <Library/Utility/Tools/Easing.h>
 
 #include <algorithm>
+
+#include <Application/Configuration/Configuration.h>
 
 FailedUI::FailedUI() { init(); }
 
@@ -24,19 +33,26 @@ void FailedUI::init() {
 	endPos[4] = { 691.f,endPosHeight };
 	endPos[5] = { 786.f,endPosHeight };
 	endPos[6] = { 919.f,endPosHeight };
-	
+
 	for (int i = 0; i < 7; i++) {
 		curEaseT[i] = 0;
 		letterTex[i]->get_transform().set_translate_x(endPos[i].x);
-		letterTex[i]->get_color().alpha = 0.f;
-		startPos[i] = { 640-(3-i)*30.0f,720};
+		letterTex[i]->get_material().color.alpha = 0.f;
+		startPos[i] = { 640 - (3 - i) * 30.0f,720 };
 	}
 	curDelayTime = 0;
 	curIndex = 0;
 
-	failedReasonUI = std::make_unique<SpriteInstance>("FailedUI_1.png",Vector2(0.5f,0.5f));
+	switch (Configuration::GetLanguage()) {
+	case Configuration::Language::Japanese:
+		failedReasonUI = std::make_unique<SpriteInstance>("FailedUI_1.png",Vector2(0.5f,0.5f));
+		break;
+	case Configuration::Language::English:
+		failedReasonUI = std::make_unique<SpriteInstance>("FailedUI_1_EN.png",Vector2(0.5f,0.5f));
+		break;
+	}
 	failedReasonUI->get_transform().set_scale({ 0.25f,1 });
-	failedReasonUI->get_uv_transform().set_scale({ 0.25f,1 });
+	failedReasonUI->get_material().uvTransform.set_scale({ 0.25f,1 });
 	failedReasonUI->get_transform().set_translate({ 640,265 });
 	reaCurEaseT = 0;
 	newScale = CVector2::ZERO;
@@ -45,13 +61,13 @@ void FailedUI::init() {
 
 	uiVisibleFlag = false;
 	canOperation = false;
-
 }
 
 void FailedUI::update() {
 	KeyID keys[] = { KeyID::Space, KeyID::R, KeyID::Z };
+	PadID pad[] = { PadID::A, PadID::Y, PadID::B };
 	for (int i = 0; i < 3; i++) {
-		if (!canOperation && Input::IsTriggerKey(keys[i])) {
+		if (!canOperation && (Input::IsTriggerKey(keys[i]) || Input::IsTriggerPad(pad[i]))) {
 			curIndex = 7;
 			for (int i = 0; i < curIndex; i++) {
 				curEaseT[i] = totalEaseT;
@@ -61,7 +77,7 @@ void FailedUI::update() {
 			canOperation = true;
 		}
 	}
-	
+
 	if (curIndex < 7) {
 		curDelayTime += WorldClock::DeltaSeconds();
 		if (curDelayTime >= delayTotalTime) {
@@ -69,13 +85,16 @@ void FailedUI::update() {
 			curIndex++;
 		}
 	}
-	
+
+
 
 	for (int i = 0; i < curIndex; i++) {
 		curEaseT[i] += WorldClock::DeltaSeconds();
 		EaseChange(i, curEaseT[i]);
 	}
-	if (curEaseT[6] > totalEaseT) { reaUpdateFlag = true; }
+	if (curEaseT[6] > totalEaseT) {
+		reaUpdateFlag = true; canOperation = true;
+	}
 	updateReason();
 }
 #ifdef _DEBUG
@@ -91,21 +110,13 @@ void FailedUI::debugUpdate() {
 	}*/
 }
 #endif
-void FailedUI::begin_rendering() {
-	alignmentTex->begin_rendering();
-	for (int i = 0; i < 7; i++) {
-		letterTex[i]->begin_rendering();
-	}
-	failedReasonUI->begin_rendering();
-}
 
-void FailedUI::draw() {
-	//failedTex->draw();
+void FailedUI::write_to_executor(Reference<SpriteDrawExecutor> executor) const {
+	//executor->write_to_buffer(alignmentTex);
 	for (int i = 0; i < 7; i++) {
-		letterTex[i]->draw();
+		executor->write_to_buffer(letterTex[i]);
 	}
-	failedReasonUI->draw();
-
+	executor->write_to_buffer(failedReasonUI);
 }
 
 void FailedUI::EaseChange(int index, float easeT) {
@@ -113,7 +124,7 @@ void FailedUI::EaseChange(int index, float easeT) {
 	float ratio = std::clamp(easeT / totalEaseT, 0.f, 1.f);
 	//色
 	//Easing::Out::Expo(ratio)
-	letterTex[index]->get_color().alpha = Easing::Out::Expo(ratio);
+	letterTex[index]->get_material().color.alpha = Easing::Out::Expo(ratio);
 	//座標
 	letterTex[index]->get_transform().set_translate(
 		{ std::lerp(
@@ -123,7 +134,7 @@ void FailedUI::EaseChange(int index, float easeT) {
 		startPos[index].y,
 		endPos[index].y,
 		Easing::Out::Quad(ratio)) }
-	
+
 	);
 }
 
@@ -136,7 +147,7 @@ void FailedUI::updateReason() {
 	newScale.y = std::lerp(0.f, 1.f, Easing::Out::Back(ratio));
 	failedReasonUI->get_transform().set_scale(newScale);
 
-	failedReasonUI->get_uv_transform().set_translate_x(0.25f * reasonIndex);
+	failedReasonUI->get_material().uvTransform.set_translate_x(0.25f * reasonIndex);
 
 	if (ratio >= 1.0f) { uiVisibleFlag = true; }
 }
